@@ -1,0 +1,46 @@
+name: finora_mb
+description: "Finora - AI-Powered Personal Finance Management Mobile App"
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.3.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+
+  # State management
+  flutter_riverpod: ^2.5.1
+  riverpod_annotation: ^2.4.0
+
+  # Routing
+  go_router: ^14.2.0
+
+  # Network
+  dio: ^5.4.3+1
+
+  # Storage
+  flutter_secure_storage: ^9.2.2
+  shared_preferences: ^2.2.3
+
+  # Formatting & Validation
+  intl: ^0.20.2
+  formz: ^0.8.1
+
+  # Icons & UI
+  cupertino_icons: ^1.0.8
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+
+  # Code generation (Riverpod)
+  riverpod_generator: ^2.4.0
+  build_runner: 2.4.13
+
+flutter:
+  uses-material-design: true
