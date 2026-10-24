@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../theme/app_colors.dart';
+import '../theme/app_text_styles.dart';
 import 'quick_add_modal.dart';
 
-/// Shell có Bottom Navigation Bar chuẩn thiết kế SOLARN Style (`static-ui/ui-sample-3`).
+/// Shell có Bottom Navigation Bar chuẩn thiết kế SOLARN FinTech Style (`static-ui/ui-sample-3` & `device-preview`).
 class ScaffoldWithNavBar extends StatelessWidget {
   final StatefulNavigationShell navigationShell;
 
@@ -56,22 +57,22 @@ class ScaffoldWithNavBar extends StatelessWidget {
         child: SafeArea(
           top: false,
           child: SizedBox(
-            height: 64,
+            height: 66,
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // 1. Tab Tổng quan (Dashboard)
+                // 1. Tab Trang chủ (Home)
                 _NavItem(
-                  icon: Icons.dashboard_rounded,
-                  label: 'Tổng quan',
+                  icon: Icons.home_rounded,
+                  label: 'Trang chủ',
                   isSelected: currentIndex == 0,
                   onTap: () => _onItemTapped(context, 0),
                 ),
 
-                // 2. Tab Sổ giao dịch (Transactions)
+                // 2. Tab Ngân sách (Budgets)
                 _NavItem(
-                  icon: Icons.receipt_long_rounded,
-                  label: 'Sổ GD',
+                  icon: Icons.calendar_month_rounded,
+                  label: 'Lịch & Ví',
                   isSelected: currentIndex == 1,
                   onTap: () => _onItemTapped(context, 1),
                 ),
@@ -82,8 +83,9 @@ class ScaffoldWithNavBar extends StatelessWidget {
                     child: GestureDetector(
                       onTap: () => _openQuickAddModal(context),
                       child: Container(
-                        width: 50,
-                        height: 50,
+                        width: 52,
+                        height: 52,
+                        margin: const EdgeInsets.only(bottom: 4),
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           gradient: const LinearGradient(
@@ -97,25 +99,25 @@ class ScaffoldWithNavBar extends StatelessWidget {
                           boxShadow: [
                             BoxShadow(
                               color: AppColors.primary.withValues(alpha: 0.45),
-                              blurRadius: 18,
-                              offset: const Offset(0, 6),
+                              blurRadius: 20,
+                              offset: const Offset(0, 8),
                             ),
                           ],
                         ),
                         child: const Icon(
                           Icons.add_rounded,
                           color: Colors.white,
-                          size: 28,
+                          size: 26,
                         ),
                       ),
                     ),
                   ),
                 ),
 
-                // 4. Tab Báo cáo (Analytics)
+                // 4. Tab Báo cáo / Nora AI
                 _NavItem(
-                  icon: Icons.pie_chart_rounded,
-                  label: 'Báo cáo',
+                  icon: Icons.smart_toy_rounded,
+                  label: 'Nora AI',
                   isSelected: currentIndex == 2,
                   onTap: () => _onItemTapped(context, 2),
                 ),
@@ -152,8 +154,8 @@ class _NavItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final activeColor = AppColors.primary;
-    final inactiveColor = isDark ? AppColors.darkMuted : const Color(0xFF94A3B8);
+    const activeColor = AppColors.primary;
+    final inactiveColor = isDark ? AppColors.darkMuted : AppColors.lightFaint;
 
     return Expanded(
       child: Material(
@@ -173,7 +175,7 @@ class _NavItem extends StatelessWidget {
               const SizedBox(height: 3),
               Text(
                 label,
-                style: TextStyle(
+                style: AppTextStyles.caption.copyWith(
                   fontSize: 10.5,
                   fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
                   color: isSelected ? activeColor : inactiveColor,

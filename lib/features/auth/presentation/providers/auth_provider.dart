@@ -1,12 +1,9 @@
-import 'dart:convert';
-
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../../core/errors/app_exception.dart';
 import '../../../../core/network/auth_interceptor.dart';
-import '../../../../core/storage/local_storage.dart';
-import '../../../../core/storage/secure_storage.dart';
-import '../../data/models/user_model.dart';
-import '../../domain/entities/user.dart';
+import '../../data/auth_repository.dart';
+import '../../data/models/user.dart';
 
 part 'auth_provider.g.dart';
 
@@ -19,46 +16,51 @@ class AuthNotifier extends _$AuthNotifier {
     });
     ref.onDispose(sub.cancel);
 
-    final token = await ref.watch(secureStorageProvider).getAccessToken();
-    if (token == null || token.isEmpty) {
-      // Cho mục đích demo / offline ban đầu: trả về User mặc định phong cách ui-sample-3
-      return const User(
-        id: '1',
-        name: 'Nguyễn Văn A',
-        email: 'nguyenvana@finora.vn',
-        avatarUrl: null,
-      );
+    try {
+      return await ref.watch(authRepositoryProvider).getCurrentUser();
+    } catch (_) {
+      return null;
     }
-
-    final cached = ref.watch(localStorageProvider).getCachedUser();
-    if (cached != null) {
-      try {
-        return UserModel.fromJson(jsonDecode(cached) as Map<String, dynamic>);
-      } catch (_) {}
-    }
-
-    return const User(
-      id: '1',
-      name: 'Nguyễn Văn A',
-      email: 'nguyenvana@finora.vn',
-    );
   }
 
   Future<void> login({required String email, required String password}) async {
     state = const AsyncValue.loading();
-    await Future.delayed(const Duration(milliseconds: 600)); // Simulating network
-    const user = User(
-      id: '1',
-      name: 'Nguyễn Văn A',
-      email: 'nguyenvana@finora.vn',
-    );
-    await ref.read(secureStorageProvider).saveAccessToken('mock_access_token');
-    state = const AsyncValue.data(user);
+    try {
+      final user = await ref
+          .read(authRepositoryProvider)
+          .login(email: email, password: password);
+      state = AsyncValue.data(user);
+    } on AppException catch (e, st) {
+      state = AsyncValue.error(e, st);
+    } catch (e, st) {
+      state = AsyncValue.error(AppException.unknown(e.toString()), st);
+    }
+  }
+
+  Future<void> register({
+    required String name,
+    required String email,
+    required String password,
+  }) async {
+    state = const AsyncValue.loading();
+    try {
+      final user = await ref
+          .read(authRepositoryProvider)
+          .register(name: name, email: email, password: password);
+      state = AsyncValue.data(user);
+    } on AppException catch (e, st) {
+      state = AsyncValue.error(e, st);
+    } catch (e, st) {
+      state = AsyncValue.error(AppException.unknown(e.toString()), st);
+    }
   }
 
   Future<void> logout() async {
-    await ref.read(secureStorageProvider).clearTokens();
-    await ref.read(localStorageProvider).clearCachedUser();
+    await ref.read(authRepositoryProvider).logout();
     state = const AsyncValue.data(null);
+  }
+
+  void updateLocalUser(User user) {
+    state = AsyncValue.data(user);
   }
 }

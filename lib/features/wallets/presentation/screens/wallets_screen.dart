@@ -1,9 +1,7 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
-import '../../../../app/theme/app_colors.dart';
-import '../../../../core/utils/currency_formatter.dart';
-import '../../../../core/widgets/app_card.dart';
-import '../../../dashboard/domain/models/dashboard_data.dart';
+import 'package:finora_mb/app/theme/app_colors.dart';
 
 class WalletsScreen extends StatelessWidget {
   const WalletsScreen({super.key});
@@ -15,105 +13,59 @@ class WalletsScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: isDark ? AppColors.darkBackground : AppColors.lightBackground,
       appBar: AppBar(
-        title: const Text(
-          'Ví & Tài khoản',
-          style: TextStyle(fontWeight: FontWeight.w900, fontSize: 18),
+        title: Text(
+          'Quản lý Ví tiền',
+          style: GoogleFonts.inter(
+            fontWeight: FontWeight.w700,
+            fontSize: 18,
+            color: isDark ? AppColors.darkForeground : AppColors.lightForeground,
+          ),
         ),
-        centerTitle: false,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.add_circle_outline_rounded),
-            onPressed: () {},
-          ),
-        ],
+        centerTitle: true,
+        backgroundColor: isDark ? AppColors.darkSurface : Colors.white,
+        elevation: 0,
       ),
-      body: ListView(
-        padding: const EdgeInsets.all(20),
-        children: [
-          // Total Balance Card
-          AppCard(
-            color: AppColors.primary,
-            border: Border.all(color: Colors.transparent),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Tổng tài sản khả dụng',
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.white.withValues(alpha: 0.8),
-                  ),
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 64,
+                height: 64,
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(20),
                 ),
-                const SizedBox(height: 6),
-                Text(
-                  CurrencyFormatter.formatVnd(24850000),
-                  style: const TextStyle(
-                    fontSize: 26,
-                    fontWeight: FontWeight.w900,
-                    color: Colors.white,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 20),
-
-          Text(
-            'Danh sách tài khoản (${AccountItem.sampleAccounts.length})',
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w900,
-              color: isDark ? AppColors.darkForeground : AppColors.lightForeground,
-            ),
-          ),
-          const SizedBox(height: 10),
-
-          ...AccountItem.sampleAccounts.map((acc) {
-            return Padding(
-              padding: const EdgeInsets.only(bottom: 12),
-              child: AppCard(
-                child: Row(
-                  children: [
-                    Container(
-                      width: 44,
-                      height: 44,
-                      decoration: BoxDecoration(
-                        color: acc.badgeColor.withValues(alpha: 0.15),
-                        borderRadius: BorderRadius.circular(14),
-                      ),
-                      child: Icon(acc.icon, color: acc.badgeColor, size: 22),
-                    ),
-                    const SizedBox(width: 14),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            acc.name,
-                            style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 14),
-                          ),
-                          const SizedBox(height: 2),
-                          Text(
-                            acc.typeName,
-                            style: TextStyle(
-                              fontSize: 11,
-                              color: isDark ? AppColors.darkMuted : const Color(0xFF64748B),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Text(
-                      CurrencyFormatter.formatVnd(acc.balance),
-                      style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 14),
-                    ),
-                  ],
+                child: const Icon(
+                  Icons.account_balance_wallet_rounded,
+                  color: AppColors.primary,
+                  size: 32,
                 ),
               ),
-            );
-          }),
-        ],
+              const SizedBox(height: 16),
+              Text(
+                'Quản lý Ví tiền',
+                style: GoogleFonts.inter(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w700,
+                  color: isDark ? AppColors.darkForeground : AppColors.lightForeground,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Danh sách các ví tiền mặt, ví điện tử (MoMo, ZaloPay) và phân bổ số dư (/wallets)',
+                style: GoogleFonts.inter(
+                  fontSize: 14,
+                  color: isDark ? AppColors.darkMuted : AppColors.lightMuted,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

@@ -77,11 +77,21 @@ class AuthInterceptor extends Interceptor {
 
     final response = await _refreshDio.post(
       ApiConstants.refreshToken,
-      data: {'refresh_token': refreshToken},
+      data: {'refreshToken': refreshToken},
     );
 
-    final newAccessToken = response.data['access_token'] as String?;
-    final newRefreshToken = response.data['refresh_token'] as String?;
+    final rawData = response.data;
+    final Map<String, dynamic> responseData;
+    if (rawData is Map<String, dynamic>) {
+      responseData = rawData['data'] is Map<String, dynamic>
+          ? rawData['data'] as Map<String, dynamic>
+          : rawData;
+    } else {
+      responseData = <String, dynamic>{};
+    }
+
+    final newAccessToken = (responseData['accessToken'] ?? responseData['access_token']) as String?;
+    final newRefreshToken = (responseData['refreshToken'] ?? responseData['refresh_token']) as String?;
 
     if (newAccessToken == null) return null;
 

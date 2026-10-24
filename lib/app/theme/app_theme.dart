@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import 'app_colors.dart';
 
@@ -36,17 +37,33 @@ class AppTheme {
       surface: surfaceColor,
     );
 
+    final baseTextTheme = GoogleFonts.interTextTheme(
+      brightness == Brightness.light
+          ? ThemeData.light().textTheme
+          : ThemeData.dark().textTheme,
+    );
+
     return ThemeData(
       useMaterial3: true,
       brightness: brightness,
+      fontFamily: GoogleFonts.inter().fontFamily,
       colorScheme: colorScheme,
       scaffoldBackgroundColor: scaffoldBg,
+      textTheme: baseTextTheme.apply(
+        bodyColor: textColor,
+        displayColor: textColor,
+      ),
       appBarTheme: AppBarTheme(
         backgroundColor: scaffoldBg,
         foregroundColor: textColor,
         elevation: 0,
         scrolledUnderElevation: 0,
         centerTitle: true,
+        titleTextStyle: GoogleFonts.outfit(
+          fontSize: 18,
+          fontWeight: FontWeight.w800,
+          color: textColor,
+        ),
       ),
       cardTheme: CardThemeData(
         color: surfaceColor,
@@ -86,7 +103,10 @@ class AppTheme {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppColors.radiusSm),
           ),
-          textStyle: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15),
+          textStyle: GoogleFonts.inter(
+            fontWeight: FontWeight.w800,
+            fontSize: 15,
+          ),
         ),
       ),
       snackBarTheme: SnackBarThemeData(

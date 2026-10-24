@@ -16,7 +16,7 @@ class ThemeModeNotifier extends _$ThemeModeNotifier {
       case 'dark':
         return ThemeMode.dark;
       default:
-        return ThemeMode.system;
+        return ThemeMode.light;
     }
   }
 
