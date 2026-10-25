@@ -7,7 +7,8 @@ import '../../../../app/router/route_names.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/utils/extensions.dart';
 import '../../../../core/widgets/app_toast.dart';
-import '../../data/models/user.dart';
+import '../../domain/models/user.dart';
+import '../../domain/validators/auth_validators.dart';
 import '../providers/auth_provider.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
@@ -18,30 +19,37 @@ class LoginScreen extends ConsumerStatefulWidget {
 }
 
 class _LoginScreenState extends ConsumerState<LoginScreen> {
-  final _emailController = TextEditingController(text: 'demo@finora.vn');
-  final _passwordController = TextEditingController(text: '123456');
+  final _accountController = TextEditingController(text: 'admin');
+  final _passwordController = TextEditingController(text: 'Admin@123456');
   bool _isPasswordVisible = false;
   bool _rememberMe = true;
 
   @override
   void dispose() {
-    _emailController.dispose();
+    _accountController.dispose();
     _passwordController.dispose();
     super.dispose();
   }
 
   void _handleLogin() {
     context.hideKeyboard();
-    final email = _emailController.text.trim();
+    final account = _accountController.text.trim();
     final password = _passwordController.text;
 
-    if (email.isEmpty || password.isEmpty) {
-      AppToast.error(context, 'Vui lòng nhập đầy đủ Email và Mật khẩu');
+    final userErr = AuthValidators.validateUsername(account);
+    if (userErr != null) {
+      AppToast.error(context, userErr);
+      return;
+    }
+
+    final passErr = AuthValidators.validatePassword(password);
+    if (passErr != null) {
+      AppToast.error(context, passErr);
       return;
     }
 
     ref.read(authNotifierProvider.notifier).login(
-          email: email,
+          username: account,
           password: password,
         );
   }
@@ -62,7 +70,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final isLoading = ref.watch(authNotifierProvider).isLoading;
 
-    ref.listen(authNotifierProvider, (_, next) {
+    ref.listen(authNotifierProvider, (previous, next) {
+      if (previous?.isLoading == true && next.hasValue && next.value != null) {
+        AppToast.success(
+          context,
+          'Đăng nhập thành công! Chào mừng ${next.value!.name}',
+        );
+      }
       next.whenOrNull(
         error: (error, _) {
           AppToast.error(context, error.toString());
@@ -317,9 +331,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                               ),
                               const SizedBox(height: 20),
 
-                              // Email Label & Field
+                              // Account Label & Field
                               Text(
-                                'EMAIL',
+                                'TÀI KHOẢN / EMAIL',
                                 style: GoogleFonts.inter(
                                   fontSize: 11,
                                   fontWeight: FontWeight.w800,
@@ -338,8 +352,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                   ),
                                 ),
                                 child: TextField(
-                                  controller: _emailController,
-                                  keyboardType: TextInputType.emailAddress,
+                                  controller: _accountController,
+                                  keyboardType: TextInputType.text,
                                   style: GoogleFonts.inter(
                                     fontSize: 14,
                                     fontWeight: FontWeight.w600,
@@ -349,11 +363,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                     border: InputBorder.none,
                                     contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
                                     prefixIcon: Icon(
-                                      Icons.mail_outline_rounded,
+                                      Icons.person_outline_rounded,
                                       size: 19,
                                       color: isDark ? AppColors.darkMuted : AppColors.lightMuted,
                                     ),
-                                    hintText: 'name@example.com',
+                                    hintText: 'Tên đăng nhập hoặc email',
                                     hintStyle: GoogleFonts.inter(
                                       fontSize: 14,
                                       color: isDark ? AppColors.darkMuted.withValues(alpha: 0.6) : AppColors.lightFaint,

@@ -31,8 +31,9 @@ class ApiConstants {
   // Auth
   static const String login = '/auth/login';
   static const String register = '/auth/register';
-  static const String refreshToken = '/auth/refresh';
+  static const String refreshToken = '/auth/refresh-token';
   static const String profile = '/users/me';
+  static const String updateProfile = '/users/profile';
 
   // Finance & AI
   static const String transactions = '/transactions';

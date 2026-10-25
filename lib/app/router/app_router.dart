@@ -30,6 +30,7 @@ import '../../features/products/presentation/screens/product_detail_screen.dart'
 import '../../features/products/presentation/screens/product_form_screen.dart';
 import '../../features/products/presentation/screens/products_screen.dart';
 import '../../features/profile/presentation/screens/profile_screen.dart';
+import '../../features/profile/presentation/screens/user_profile_detail_screen.dart';
 import '../../features/settings/presentation/screens/ai_persona_settings_screen.dart';
 import '../../features/settings/presentation/screens/category_settings_screen.dart';
 import '../../features/settings/presentation/screens/notification_settings_screen.dart';
@@ -191,6 +192,15 @@ GoRouter appRouter(AppRouterRef ref) {
                 path: RoutePaths.profile,
                 name: RouteNames.profile,
                 builder: (context, state) => const ProfileScreen(),
+                routes: [
+                  GoRoute(
+                    parentNavigatorKey: _rootNavigatorKey,
+                    path: 'detail',
+                    name: RouteNames.userProfileDetail,
+                    builder: (context, state) =>
+                        const UserProfileDetailScreen(),
+                  ),
+                ],
               ),
             ],
           ),

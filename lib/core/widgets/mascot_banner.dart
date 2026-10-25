@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../app/theme/app_colors.dart';
 import '../../app/theme/app_text_styles.dart';
+import 'mascot/mascot.dart';
 
 class MascotBanner extends StatelessWidget {
   final String name;
@@ -8,6 +9,8 @@ class MascotBanner extends StatelessWidget {
   final String emoji;
   final String? actionText;
   final VoidCallback? onAction;
+  final String? mascotId;
+  final num? balance;
 
   const MascotBanner({
     super.key,
@@ -16,6 +19,8 @@ class MascotBanner extends StatelessWidget {
     this.emoji = '🤖',
     this.actionText,
     this.onAction,
+    this.mascotId,
+    this.balance,
   });
 
   @override
@@ -52,24 +57,20 @@ class MascotBanner extends StatelessWidget {
         children: [
           // Mascot Avatar Badge
           Container(
-            width: 46,
-            height: 46,
+            width: 48,
+            height: 48,
             decoration: BoxDecoration(
-              color: AppColors.primary,
-              borderRadius: BorderRadius.circular(15),
-              boxShadow: [
-                BoxShadow(
-                  color: AppColors.primary.withValues(alpha: 0.35),
-                  blurRadius: 10,
-                  offset: const Offset(0, 4),
-                ),
-              ],
+              color: AppColors.primary.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(16),
             ),
-            child: const Center(
-              child: Icon(
-                Icons.smart_toy_rounded,
-                color: Colors.white,
-                size: 24,
+            alignment: Alignment.center,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(16),
+              child: MascotWidget(
+                mascotId: mascotId ?? 'nora',
+                balance: balance,
+                size: 38,
+                float: true,
               ),
             ),
           ),

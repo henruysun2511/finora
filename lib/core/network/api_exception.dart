@@ -24,9 +24,25 @@ AppException mapDioExceptionToAppException(DioException error) {
       final data = error.response?.data;
       String? msg;
       if (data is Map<String, dynamic>) {
-        msg = data['message']?.toString();
+        final errors = data['errors'];
+        if (errors is List && errors.isNotEmpty) {
+          msg = errors.first?.toString();
+        } else if (errors is Map && errors.isNotEmpty) {
+          msg = errors.values.first?.toString();
+        } else if (errors is String && errors.isNotEmpty) {
+          msg = errors;
+        } else if (data['message'] != null) {
+          msg = data['message'].toString();
+        }
+      } else if (data is String && data.isNotEmpty) {
+        msg = data;
       }
-      if (statusCode == 401) return AppException.unauthorized();
+      if (statusCode == 401) {
+        return AppException(
+          msg ?? 'Phiên đăng nhập đã hết hạn.',
+          statusCode: 401,
+        );
+      }
       return AppException(msg ?? 'Yêu cầu không hợp lệ.', statusCode: statusCode);
 
     case DioExceptionType.unknown:

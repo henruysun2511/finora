@@ -32,59 +32,79 @@ class ProfileScreen extends ConsumerWidget {
       body: ListView(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
         children: [
-          // User Profile Card
-          Container(
-            padding: const EdgeInsets.all(18),
-            decoration: BoxDecoration(
-              color: isDark ? AppColors.darkSurface : Colors.white,
-              borderRadius: BorderRadius.circular(AppColors.radiusLg),
-              border: Border.all(
-                color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.03),
-                  blurRadius: 10,
-                  offset: const Offset(0, 3),
+          // User Profile Card (Clickable to open UserProfileDetailScreen)
+          GestureDetector(
+            onTap: () => context.push(RoutePaths.userProfileDetail),
+            child: Container(
+              padding: const EdgeInsets.all(18),
+              decoration: BoxDecoration(
+                color: isDark ? AppColors.darkSurface : Colors.white,
+                borderRadius: BorderRadius.circular(AppColors.radiusLg),
+                border: Border.all(
+                  color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
                 ),
-              ],
-            ),
-            child: Row(
-              children: [
-                CircleAvatar(
-                  radius: 28,
-                  backgroundColor: AppColors.primaryLight,
-                  child: Text(
-                    user?.name.isNotEmpty == true ? user!.name[0] : 'N',
-                    style: const TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.primary,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.03),
+                    blurRadius: 10,
+                    offset: const Offset(0, 3),
+                  ),
+                ],
+              ),
+              child: Row(
+                children: [
+                  CircleAvatar(
+                    radius: 28,
+                    backgroundColor: AppColors.primaryLight,
+                    child: Text(
+                      user?.name.isNotEmpty == true ? user!.name[0] : 'N',
+                      style: const TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.primary,
+                      ),
                     ),
                   ),
-                ),
-                const SizedBox(width: 14),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        user?.name ?? 'Nguyễn Văn A',
-                        style: AppTextStyles.h4.copyWith(
-                          color: isDark ? AppColors.darkForeground : AppColors.lightForeground,
+                  const SizedBox(width: 14),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          user?.name ?? 'Nguyễn Văn A',
+                          style: AppTextStyles.h4.copyWith(
+                            color: isDark ? AppColors.darkForeground : AppColors.lightForeground,
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 3),
-                      Text(
-                        user?.email ?? 'demo@finora.vn',
-                        style: AppTextStyles.caption.copyWith(
-                          color: isDark ? AppColors.darkMuted : AppColors.lightMuted,
+                        const SizedBox(height: 3),
+                        Text(
+                          user?.email ?? 'demo@finora.vn',
+                          style: AppTextStyles.caption.copyWith(
+                            color: isDark ? AppColors.darkMuted : AppColors.lightMuted,
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                  const SizedBox(width: 8),
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: isDark
+                          ? AppColors.darkBackground
+                          : const Color(0xFFF1F5F9),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      Icons.chevron_right_rounded,
+                      size: 20,
+                      color: isDark
+                          ? AppColors.darkMuted
+                          : AppColors.lightMuted,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
           const SizedBox(height: 16),
@@ -202,6 +222,14 @@ class ProfileScreen extends ConsumerWidget {
             ),
             child: Column(
               children: [
+                _buildSettingsRow(
+                  isDark: isDark,
+                  icon: Icons.person_outline_rounded,
+                  title: 'Hồ sơ cá nhân',
+                  subtitle: 'Họ tên, số điện thoại, avatar & tài khoản',
+                  onTap: () => context.push(RoutePaths.userProfileDetail),
+                ),
+                Divider(height: 20, color: isDark ? AppColors.darkBorder : AppColors.lightBorder),
                 _buildSettingsRow(
                   isDark: isDark,
                   icon: Icons.security_rounded,

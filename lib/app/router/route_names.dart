@@ -21,6 +21,7 @@ class RouteNames {
   static const String budgets = 'budgets';
   static const String aiChat = 'aiChat';
   static const String profile = 'profile';
+  static const String userProfileDetail = 'userProfileDetail';
 
   // 3. Transactions (Giao dịch thu chi)
   static const String transactions = 'transactions';
@@ -100,6 +101,7 @@ class RoutePaths {
   static const String budgets = '/budgets';
   static const String aiChat = '/chat-ai';
   static const String profile = '/profile';
+  static const String userProfileDetail = '/profile/detail';
 
   // 3. Transactions
   static const String transactions = '/transactions';

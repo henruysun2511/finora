@@ -28,9 +28,16 @@ class AuthInterceptor extends Interceptor {
     RequestOptions options,
     RequestInterceptorHandler handler,
   ) async {
-    final token = await _secureStorage.getAccessToken();
-    if (token != null && token.isNotEmpty) {
-      options.headers['Authorization'] = 'Bearer $token';
+    final path = options.path;
+    final isPublicEndpoint = path.contains('/auth/login') ||
+        path.contains('/auth/register') ||
+        path.contains('/auth/refresh');
+
+    if (!isPublicEndpoint) {
+      final token = await _secureStorage.getAccessToken();
+      if (token != null && token.isNotEmpty) {
+        options.headers['Authorization'] = 'Bearer $token';
+      }
     }
     handler.next(options);
   }
@@ -41,9 +48,14 @@ class AuthInterceptor extends Interceptor {
     ErrorInterceptorHandler handler,
   ) async {
     final isUnauthorized = err.response?.statusCode == 401;
-    final isRefreshCall = err.requestOptions.path == ApiConstants.refreshToken;
+    final path = err.requestOptions.path;
+    final isAuthEndpoint = path.contains('/auth/login') ||
+        path.contains('/auth/register') ||
+        path.contains('/auth/refresh') ||
+        path.contains('/auth/logout') ||
+        path.contains('/auth/google');
 
-    if (!isUnauthorized || isRefreshCall) {
+    if (!isUnauthorized || isAuthEndpoint) {
       handler.next(err);
       return;
     }

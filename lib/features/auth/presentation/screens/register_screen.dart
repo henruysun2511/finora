@@ -58,7 +58,13 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final isLoading = ref.watch(authNotifierProvider).isLoading;
 
-    ref.listen(authNotifierProvider, (_, next) {
+    ref.listen(authNotifierProvider, (previous, next) {
+      if (previous?.isLoading == true && next.hasValue && next.value != null) {
+        AppToast.success(
+          context,
+          'Đăng ký tài khoản thành công! Chào mừng ${next.value!.name}',
+        );
+      }
       next.whenOrNull(
         error: (error, _) {
           AppToast.error(context, error.toString());
