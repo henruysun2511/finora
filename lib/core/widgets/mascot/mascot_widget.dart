@@ -202,7 +202,7 @@ class _MascotWidgetState extends State<MascotWidget>
 
     Widget svgBody = SizedBox(
       width: size,
-      height: size * (240 / 200), // aspect ratio of SVG viewBox (200x240)
+      height: size,
       child: SvgPicture.string(
         mascot.svg,
         fit: BoxFit.contain,
@@ -221,20 +221,20 @@ class _MascotWidgetState extends State<MascotWidget>
       );
     }
 
-    Widget content = Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        if (bubble != null) ...[
-          MascotSpeechBubble(
-            text: bubble,
-            onTap: widget.onTap,
-          ),
-          const SizedBox(height: 8),
-        ],
-        svgBody,
-      ],
-    );
+    Widget content = bubble != null
+        ? Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              MascotSpeechBubble(
+                text: bubble,
+                onTap: widget.onTap,
+              ),
+              const SizedBox(height: 8),
+              svgBody,
+            ],
+          )
+        : svgBody;
 
     if (widget.interactive || widget.onTap != null) {
       content = GestureDetector(
