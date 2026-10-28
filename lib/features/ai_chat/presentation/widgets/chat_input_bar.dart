@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 
+import 'voice_recording_modal.dart';
+
 import '../../../../app/theme/app_colors.dart';
 
 class ChatInputBar extends StatefulWidget {
@@ -64,88 +66,22 @@ class ChatInputBarState extends State<ChatInputBar> {
 
     showModalBottomSheet(
       context: context,
+      isScrollControlled: true,
       backgroundColor: isDark ? AppColors.darkSurface : Colors.white,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
       builder: (ctx) {
-        return SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  width: 40,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: Colors.grey.withValues(alpha: 0.3),
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                ),
-                const SizedBox(height: 20),
-                Text(
-                  'Nhập liệu bằng giọng nói',
-                  style: GoogleFonts.inter(
-                    fontSize: 17,
-                    fontWeight: FontWeight.w800,
-                    color: isDark
-                        ? AppColors.darkForeground
-                        : AppColors.lightForeground,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  'Nói câu lệnh chi tiêu, ví dụ:\n"Ghi cho anh ăn sáng phở Thìn 65k tiền mặt"',
-                  textAlign: TextAlign.center,
-                  style: GoogleFonts.inter(
-                    fontSize: 13,
-                    color: isDark ? AppColors.darkMuted : AppColors.lightMuted,
-                    height: 1.4,
-                  ),
-                ),
-                const SizedBox(height: 24),
-                GestureDetector(
-                  onTap: () {
-                    Navigator.pop(ctx);
-                    setText('Ăn sáng phở Thìn 65k tiền mặt');
-                  },
-                  child: Container(
-                    width: 72,
-                    height: 72,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      gradient: const LinearGradient(
-                        colors: [Color(0xFF0072D5), Color(0xFF0058A8)],
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: const Color(0xFF0072D5).withValues(alpha: 0.4),
-                          blurRadius: 18,
-                          offset: const Offset(0, 6),
-                        ),
-                      ],
-                    ),
-                    child: const Icon(
-                      Icons.mic_rounded,
-                      color: Colors.white,
-                      size: 34,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  'Chạm để dùng câu lệnh mẫu hoặc nói',
-                  style: GoogleFonts.inter(
-                    fontSize: 11.5,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.primary,
-                  ),
-                ),
-                const SizedBox(height: 10),
-              ],
-            ),
-          ),
+        return VoiceRecordingModal(
+          onSendVoice: (bytes, filename, {promptHint}) {
+            if (widget.onSendMedia != null) {
+              widget.onSendMedia!(bytes, filename, promptHint: promptHint);
+            }
+          },
+          onSelectSample: (text) {
+            setText(text);
+            _handleSend();
+          },
         );
       },
     );
@@ -197,18 +133,21 @@ class ChatInputBarState extends State<ChatInputBar> {
 
     showModalBottomSheet(
       context: context,
+      isScrollControlled: true,
       backgroundColor: isDark ? AppColors.darkSurface : Colors.white,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
       builder: (ctx) {
         return SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
+          child: SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
                 Center(
                   child: Container(
                     width: 38,
@@ -358,10 +297,11 @@ class ChatInputBarState extends State<ChatInputBar> {
               ],
             ),
           ),
-        );
-      },
-    );
-  }
+        ),
+      );
+    },
+  );
+}
 
   Widget _buildQuickSampleChip(
     BuildContext context,

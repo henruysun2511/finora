@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../domain/models/chat_message_model.dart';
@@ -178,11 +180,31 @@ class AiChatNotifier extends StateNotifier<AiChatState> {
   }) async {
     final walletId = state.activeWalletId ?? 'a1111111-1111-4111-a111-111111111111';
 
+    final lowerName = filename.toLowerCase();
+    final isAudio = lowerName.endsWith('.mp3') ||
+        lowerName.endsWith('.wav') ||
+        lowerName.endsWith('.m4a') ||
+        lowerName.endsWith('.aac') ||
+        lowerName.endsWith('.ogg') ||
+        lowerName.endsWith('.webm') ||
+        lowerName.contains('audio') ||
+        lowerName.contains('voice');
+    final mediaType = isAudio ? 'audio' : 'image';
+
+    final tempId = 'temp_media_${DateTime.now().millisecondsSinceEpoch}';
     final tempMsg = ChatMessageModel(
-      id: 'temp_media_${DateTime.now().millisecondsSinceEpoch}',
+      id: tempId,
       role: ChatRoleEnum.user,
       messageType: ChatMessageTypeEnum.text,
-      textContent: userPromptHint ?? 'Đã tải lên tệp: $filename',
+      textContent: userPromptHint ?? (isAudio ? '🎤 Tin nhắn thoại' : '📷 Ảnh hóa đơn'),
+      mediaBytes: Uint8List.fromList(bytes),
+      mediaType: mediaType,
+      retryBytes: bytes,
+      retryFilename: filename,
+      payloadJson: {
+        'input': isAudio ? 'voice' : 'receipt',
+        'filename': filename,
+      },
       createdAt: DateTime.now(),
     );
 
@@ -201,17 +223,70 @@ class AiChatNotifier extends StateNotifier<AiChatState> {
 
       final newMascot = assistantMsg.mascot ?? state.mascotId;
 
+      final serverImageUrl = assistantMsg.imageUrl;
+      final serverAudioUrl = assistantMsg.audioUrl;
+
+      final updatedMessages = state.messages.map((m) {
+        if (m.id == tempId) {
+          final updatedPayload = Map<String, dynamic>.from(m.payloadJson ?? {});
+          if (serverImageUrl != null && serverImageUrl.isNotEmpty) {
+            updatedPayload['imageUrl'] = serverImageUrl;
+            updatedPayload['photoUrl'] = serverImageUrl;
+          }
+          if (serverAudioUrl != null && serverAudioUrl.isNotEmpty) {
+            updatedPayload['audioUrl'] = serverAudioUrl;
+          }
+          return m.copyWith(payloadJson: updatedPayload);
+        }
+        return m;
+      }).toList();
+
       state = state.copyWith(
-        messages: [...state.messages, assistantMsg],
+        messages: [...updatedMessages, assistantMsg],
         isSending: false,
         mascotId: newMascot,
       );
     } catch (e) {
+      String userFriendlyError =
+          'Dịch vụ đọc hóa đơn đang bận. Vui lòng thử lại hoặc nhập tay.';
+      if (e is DioException) {
+        final respData = e.response?.data;
+        if (respData is Map && respData['message'] != null) {
+          userFriendlyError = respData['message'].toString();
+        } else if (e.message != null && e.message!.isNotEmpty) {
+          userFriendlyError = e.message!;
+        }
+      }
+
+      final failedMsg = tempMsg.copyWith(
+        hasError: true,
+        errorMessage: userFriendlyError,
+      );
+
+      final updatedMessages = state.messages.map((m) {
+        return m.id == tempId ? failedMsg : m;
+      }).toList();
+
       state = state.copyWith(
+        messages: updatedMessages,
         isSending: false,
-        errorMessage: 'Lỗi xử lý tệp: $e',
+        errorMessage: userFriendlyError,
       );
     }
+  }
+
+  Future<void> retryMediaMessage(ChatMessageModel msg) async {
+    if (msg.retryBytes == null) return;
+    state = state.copyWith(
+      messages: state.messages.where((m) => m.id != msg.id).toList(),
+      clearError: true,
+    );
+    await sendMediaMessage(
+      msg.retryBytes!,
+      msg.retryFilename ??
+          (msg.mediaType == 'audio' ? 'voice.mp3' : 'receipt.jpg'),
+      userPromptHint: msg.textContent,
+    );
   }
 
   Future<void> confirmPendingAction(

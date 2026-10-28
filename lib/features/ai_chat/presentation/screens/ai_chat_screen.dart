@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../../../app/router/route_names.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/widgets/mascot/mascot_widget.dart';
 import '../providers/ai_chat_notifier.dart';
@@ -95,6 +97,27 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen> {
                         fontSize: 12,
                         color: Colors.redAccent,
                         fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  InkWell(
+                    onTap: () => context.push(RoutePaths.createTransaction),
+                    borderRadius: BorderRadius.circular(6),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 3),
+                      decoration: BoxDecoration(
+                        color: Colors.redAccent.withValues(alpha: 0.15),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: Text(
+                        'Nhập tay',
+                        style: GoogleFonts.inter(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.redAccent,
+                        ),
                       ),
                     ),
                   ),
@@ -291,6 +314,10 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen> {
                                     'Tôi chọn: $intent',
                                     intentOverride: intent,
                                   ),
+                                  onRetry: (msgToRetry) =>
+                                      notifier.retryMediaMessage(msgToRetry),
+                                  onManualInput: () =>
+                                      context.push(RoutePaths.createTransaction),
                                 );
                               },
                             ),
