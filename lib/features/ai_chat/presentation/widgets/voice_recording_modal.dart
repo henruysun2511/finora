@@ -142,7 +142,7 @@ class _VoiceRecordingModalState extends State<VoiceRecordingModal>
 
   Future<void> _pickAudioFile() async {
     try {
-      final result = await FilePicker.platform.pickFiles(
+      final result = await FilePicker.pickFiles(
         type: FileType.custom,
         allowedExtensions: ['mp3', 'wav', 'm4a', 'aac', 'ogg', 'webm'],
         withData: true,

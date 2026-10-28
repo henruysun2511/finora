@@ -30,6 +30,9 @@ dependencies:
   intl: ^0.20.2
   formz: ^0.8.1
 
+  # Environment
+  flutter_dotenv: ^5.2.1
+
   # Icons & UI
   cupertino_icons: ^1.0.8
   google_fonts: ^6.2.1
@@ -49,3 +52,5 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  assets:
+    - .env
