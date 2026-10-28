@@ -33,8 +33,12 @@ class ConfirmationPromptCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     final payload = message.payloadJson ?? {};
+    if (payload['result'] != null) {
+      return const SizedBox.shrink();
+    }
+
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final pendingAction = message.pendingAction;
     final actionId = (pendingAction != null && pendingAction.id.isNotEmpty)
         ? pendingAction.id
@@ -47,6 +51,10 @@ class ConfirmationPromptCard extends StatelessWidget {
         : (payload['toolInput'] is Map
             ? Map<String, dynamic>.from(payload['toolInput'] as Map)
             : payload);
+
+    if (preview['amount'] == null && payload['amount'] == null && preview['amountFormatted'] == null) {
+      return const SizedBox.shrink();
+    }
 
     final txName = preview['name'] ??
         preview['transaction_name'] ??
@@ -81,8 +89,11 @@ class ConfirmationPromptCard extends StatelessWidget {
 
     final dateStr = preview['date']?.toString() ?? payload['date']?.toString();
     final noteStr = preview['note']?.toString() ?? payload['note']?.toString();
-    final photoUrl = preview['photoUrl']?.toString() ??
+    final photoUrl = message.imageUrl ??
+        preview['photoUrl']?.toString() ??
         payload['photoUrl']?.toString() ??
+        preview['imageUrl']?.toString() ??
+        payload['imageUrl']?.toString() ??
         preview['receiptUrl']?.toString() ??
         payload['receiptUrl']?.toString();
     final budgetRemaining = preview['budgetRemaining'] ??

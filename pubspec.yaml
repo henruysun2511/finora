@@ -30,11 +30,16 @@ dependencies:
   intl: ^0.20.2
   formz: ^0.8.1
 
+  # Environment
+  flutter_dotenv: ^5.2.1
+
   # Icons & UI
   cupertino_icons: ^1.0.8
   google_fonts: ^6.2.1
   flutter_svg: ^2.3.0
   image_picker: ^1.2.4
+  record: ^7.1.2
+  file_picker: ^11.0.3
 
 dev_dependencies:
   flutter_test:
@@ -47,3 +52,5 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  assets:
+    - .env

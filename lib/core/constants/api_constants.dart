@@ -1,17 +1,32 @@
 import 'package:flutter/foundation.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class ApiConstants {
   ApiConstants._();
 
   // ─── Cấu hình Base URL ───────────────────────────────────────────────────────
-  // - Có thể cấu hình qua command line: --dart-define=BASE_URL=http://localhost:3000/api/v1
-  // - Debug Web / iOS Simulator: http://localhost:3000/api/v1
-  // - Debug Android Emulator: http://10.0.2.2:3000/api/v1
-  // - Production: https://api.finora.vn/api/v1
+  // 1. Đọc từ file .env (BASE_URL)
+  // 2. Đọc từ command line (--dart-define=BASE_URL=...)
+  // 3. Fallback tự động theo nền tảng debug (Web/iOS/Windows: localhost, Android Emulator: 10.0.2.2)
+  // 4. Production: https://api.finora.vn/api/v1
   static String get baseUrl {
+    // 1. Đọc từ file .env
+    final fromDotenv = dotenv.maybeGet('BASE_URL');
+    if (fromDotenv != null && fromDotenv.trim().isNotEmpty) {
+      // Tự động map localhost -> 10.0.2.2 trên Android emulator khi cấu hình .env là localhost
+      if (kDebugMode &&
+          defaultTargetPlatform == TargetPlatform.android &&
+          fromDotenv.contains('localhost')) {
+        return fromDotenv.replaceAll('localhost', '10.0.2.2');
+      }
+      return fromDotenv.trim();
+    }
+
+    // 2. Đọc từ --dart-define
     const fromEnv = String.fromEnvironment('BASE_URL');
     if (fromEnv.isNotEmpty) return fromEnv;
 
+    // 3. Fallback theo nền tảng
     if (kDebugMode) {
       if (kIsWeb) {
         return 'http://localhost:3000/api/v1';
@@ -25,8 +40,39 @@ class ApiConstants {
     return 'https://api.finora.vn/api/v1';
   }
 
-  static const Duration connectTimeout = Duration(seconds: 15);
-  static const Duration receiveTimeout = Duration(seconds: 15);
+  static String get socketUrl {
+    final fromDotenv = dotenv.maybeGet('SOCKET_URL');
+    if (fromDotenv != null && fromDotenv.trim().isNotEmpty) {
+      if (kDebugMode &&
+          defaultTargetPlatform == TargetPlatform.android &&
+          fromDotenv.contains('localhost')) {
+        return fromDotenv.replaceAll('localhost', '10.0.2.2');
+      }
+      return fromDotenv.trim();
+    }
+
+    const fromEnv = String.fromEnvironment('SOCKET_URL');
+    if (fromEnv.isNotEmpty) return fromEnv;
+
+    if (kDebugMode) {
+      if (defaultTargetPlatform == TargetPlatform.android) {
+        return 'http://10.0.2.2:3000';
+      }
+      return 'http://localhost:3000';
+    }
+
+    return 'https://api.finora.vn';
+  }
+
+  static Duration get connectTimeout {
+    final sec = int.tryParse(dotenv.maybeGet('CONNECT_TIMEOUT_SECONDS') ?? '');
+    return Duration(seconds: sec ?? 15);
+  }
+
+  static Duration get receiveTimeout {
+    final sec = int.tryParse(dotenv.maybeGet('RECEIVE_TIMEOUT_SECONDS') ?? '');
+    return Duration(seconds: sec ?? 15);
+  }
 
   // ─── 1. Authentication (/auth) ──────────────────────────────────────────────
   static const String login = '/auth/login';
