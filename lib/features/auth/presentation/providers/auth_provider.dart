@@ -3,6 +3,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../../core/errors/app_exception.dart';
 import '../../../../core/network/auth_interceptor.dart';
 import '../../domain/models/login_input.dart';
+import '../../domain/models/register_input.dart';
 import '../../domain/models/user.dart';
 import 'auth_providers.dart';
 
@@ -44,21 +45,20 @@ class AuthNotifier extends _$AuthNotifier {
     }
   }
 
-  Future<void> register({
-    required String name,
-    required String email,
-    required String password,
-  }) async {
+  /// Đăng ký tài khoản mới bằng RegisterInput
+  Future<User> register(RegisterInput input) async {
     state = const AsyncValue.loading();
     try {
-      final user = await ref
-          .read(authRepositoryProvider)
-          .register(name: name, email: email, password: password);
+      final user = await ref.read(authRepositoryProvider).register(input);
       state = AsyncValue.data(user);
+      return user;
     } on AppException catch (e, st) {
       state = AsyncValue.error(e, st);
+      rethrow;
     } catch (e, st) {
-      state = AsyncValue.error(AppException.unknown(e.toString()), st);
+      final appEx = AppException.unknown(e.toString());
+      state = AsyncValue.error(appEx, st);
+      throw appEx;
     }
   }
 

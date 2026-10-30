@@ -1,5 +1,6 @@
 import '../models/auth_tokens.dart';
 import '../models/login_input.dart';
+import '../models/register_input.dart';
 import '../models/user.dart';
 
 abstract class AuthRepository {
@@ -7,11 +8,7 @@ abstract class AuthRepository {
   Future<User> login(LoginInput input);
 
   /// Đăng ký tài khoản mới
-  Future<User> register({
-    required String name,
-    required String email,
-    required String password,
-  });
+  Future<User> register(RegisterInput input);
 
   /// Thu hồi token trên server và đăng xuất
   Future<void> logout();

@@ -5,11 +5,11 @@ import '../../../../core/storage/local_storage.dart';
 import '../../../../core/storage/secure_storage.dart';
 import '../../domain/models/auth_tokens.dart';
 import '../../domain/models/login_input.dart';
+import '../../domain/models/register_input.dart';
 import '../../domain/models/user.dart';
 import '../../domain/repositories/auth_repository.dart';
-import '../dto/login_request.dart';
 import '../dto/refresh_token_request.dart';
-import '../dto/register_request.dart';
+import '../mappers/auth_mapper.dart';
 import '../services/auth_api_service.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
@@ -32,23 +32,15 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   Future<User> login(LoginInput input) async {
-    final res = await _api.login(
-      LoginRequest(username: input.username, password: input.password),
-    );
+    final res = await _api.login(input.toLoginRequest());
     await _persistTokens(res.tokens.accessToken, res.tokens.refreshToken);
     await _localStorage.saveCachedUser(jsonEncode(res.user.toJson()));
     return res.user;
   }
 
   @override
-  Future<User> register({
-    required String name,
-    required String email,
-    required String password,
-  }) async {
-    final res = await _api.register(
-      RegisterRequest(name: name, email: email, password: password),
-    );
+  Future<User> register(RegisterInput input) async {
+    final res = await _api.register(input.toRegisterRequest());
     await _persistTokens(res.tokens.accessToken, res.tokens.refreshToken);
     await _localStorage.saveCachedUser(jsonEncode(res.user.toJson()));
     return res.user;
@@ -104,7 +96,7 @@ class AuthRepositoryImpl implements AuthRepository {
           return User.fromJson(jsonDecode(cachedJson) as Map<String, dynamic>);
         } catch (_) {}
       }
-      rethrow;
+      return null;
     }
   }
 
@@ -127,12 +119,12 @@ class AuthRepositoryImpl implements AuthRepository {
     String? phone,
     String? avatarUrl,
   }) async {
-    final updatedUser = await _api.updateProfile(
+    final updated = await _api.updateProfile(
       fullName: name,
       phone: phone,
       avatar: avatarUrl,
     );
-    await _localStorage.saveCachedUser(jsonEncode(updatedUser.toJson()));
-    return updatedUser;
+    await _localStorage.saveCachedUser(jsonEncode(updated.toJson()));
+    return updated;
   }
 }

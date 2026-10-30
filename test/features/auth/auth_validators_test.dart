@@ -72,4 +72,58 @@ void main() {
       expect(AuthValidators.validatePassword('MatKhau@123'), isNull);
     });
   });
+
+  group('AuthValidators - validateFullName', () {
+    test('trả về lỗi khi để trống', () {
+      expect(
+        AuthValidators.validateFullName(''),
+        'Vui lòng nhập họ và tên',
+      );
+      expect(
+        AuthValidators.validateFullName(null),
+        'Vui lòng nhập họ và tên',
+      );
+    });
+
+    test('trả về lỗi khi dưới 2 ký tự', () {
+      expect(
+        AuthValidators.validateFullName('A'),
+        'Họ và tên quá ngắn (tối thiểu 2 ký tự)',
+      );
+    });
+
+    test('hợp lệ khi đủ điều kiện', () {
+      expect(AuthValidators.validateFullName('Nguyễn Văn A'), isNull);
+      expect(AuthValidators.validateFullName('John Doe'), isNull);
+    });
+  });
+
+  group('AuthValidators - validateEmail', () {
+    test('trả về lỗi khi để trống', () {
+      expect(
+        AuthValidators.validateEmail(''),
+        'Vui lòng nhập email',
+      );
+      expect(
+        AuthValidators.validateEmail(null),
+        'Vui lòng nhập email',
+      );
+    });
+
+    test('trả về lỗi khi sai định dạng', () {
+      expect(
+        AuthValidators.validateEmail('abc'),
+        'Địa chỉ email không đúng định dạng',
+      );
+      expect(
+        AuthValidators.validateEmail('user@'),
+        'Địa chỉ email không đúng định dạng',
+      );
+    });
+
+    test('hợp lệ khi đúng định dạng', () {
+      expect(AuthValidators.validateEmail('user@finora.vn'), isNull);
+      expect(AuthValidators.validateEmail('test.dev@gmail.com'), isNull);
+    });
+  });
 }
