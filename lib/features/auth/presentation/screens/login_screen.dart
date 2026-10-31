@@ -1,7 +1,10 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 import '../../../../app/router/route_names.dart';
 import '../../../../app/theme/app_colors.dart';
@@ -63,6 +66,49 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             name: 'Nguyễn Văn A',
           ),
         );
+  }
+
+  Future<void> _handleGoogleSignIn() async {
+    context.hideKeyboard();
+    try {
+      final googleClientId = dotenv.env['GOOGLE_SERVER_CLIENT_ID'];
+      if (googleClientId == null || googleClientId.isEmpty) {
+        if (mounted) {
+          AppToast.error(
+            context,
+            'Chưa cấu hình GOOGLE_SERVER_CLIENT_ID trong file .env',
+          );
+        }
+        return;
+      }
+
+      final googleSignIn = GoogleSignIn(
+        scopes: ['email', 'profile', 'openid'],
+        clientId: kIsWeb ? googleClientId : null,
+        serverClientId: kIsWeb ? null : googleClientId,
+      );
+      final account = await googleSignIn.signIn();
+      if (account == null) return;
+
+      final auth = await account.authentication;
+      final token = auth.idToken ?? auth.accessToken;
+
+      if (token == null || token.isEmpty) {
+        if (mounted) {
+          AppToast.error(
+            context,
+            'Không nhận được mã xác thực Google. Vui lòng thử lại',
+          );
+        }
+        return;
+      }
+
+      await ref.read(authNotifierProvider.notifier).loginWithGoogle(token);
+    } catch (e) {
+      if (mounted) {
+        AppToast.error(context, 'Lỗi đăng nhập Google: $e');
+      }
+    }
   }
 
   @override
@@ -585,9 +631,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
                               // Google Login Button
                               OutlinedButton(
-                                onPressed: () {
-                                  _handleDemoLogin();
-                                },
+                                onPressed:
+                                    isLoading ? null : _handleGoogleSignIn,
                                 style: OutlinedButton.styleFrom(
                                   padding: const EdgeInsets.symmetric(vertical: 14),
                                   side: BorderSide(

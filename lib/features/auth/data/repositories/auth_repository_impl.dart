@@ -47,6 +47,14 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
+  Future<User> loginWithGoogle(String idToken) async {
+    final res = await _api.loginWithGoogle(idToken);
+    await _persistTokens(res.tokens.accessToken, res.tokens.refreshToken);
+    await _localStorage.saveCachedUser(jsonEncode(res.user.toJson()));
+    return res.user;
+  }
+
+  @override
   Future<void> clearLocalSession() async {
     await _secureStorage.clearTokens();
     await _localStorage.clearCachedUser();

@@ -15,6 +15,7 @@ abstract class AuthApiService {
   Future<void> logout([String? refreshToken]);
   Future<User> getCurrentUser();
   Future<AuthResponse> register(RegisterRequest request);
+  Future<AuthResponse> loginWithGoogle(String idToken);
   Future<User> updateProfile({String? fullName, String? phone, String? avatar});
 }
 
@@ -79,6 +80,15 @@ class DioAuthApiService implements AuthApiService {
         final res = await _dio.post<Map<String, dynamic>>(
           ApiConstants.register,
           data: request.toJson(),
+        );
+        return AuthResponse.fromJson(_extractData(res.data));
+      });
+
+  @override
+  Future<AuthResponse> loginWithGoogle(String idToken) => _guard(() async {
+        final res = await _dio.post<Map<String, dynamic>>(
+          '/auth/google/mobile',
+          data: {'idToken': idToken},
         );
         return AuthResponse.fromJson(_extractData(res.data));
       });

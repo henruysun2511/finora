@@ -10,6 +10,9 @@ abstract class AuthRepository {
   /// Đăng ký tài khoản mới
   Future<User> register(RegisterInput input);
 
+  /// Đăng nhập bằng Google ID Token (Mobile)
+  Future<User> loginWithGoogle(String idToken);
+
   /// Thu hồi token trên server và đăng xuất
   Future<void> logout();
 

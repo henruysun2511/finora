@@ -62,6 +62,24 @@ class AuthNotifier extends _$AuthNotifier {
     }
   }
 
+  /// Đăng nhập bằng Google ID Token từ Mobile SDK
+  Future<User> loginWithGoogle(String idToken) async {
+    state = const AsyncValue.loading();
+    try {
+      final user =
+          await ref.read(authRepositoryProvider).loginWithGoogle(idToken);
+      state = AsyncValue.data(user);
+      return user;
+    } on AppException catch (e, st) {
+      state = AsyncValue.error(e, st);
+      rethrow;
+    } catch (e, st) {
+      final appEx = AppException.unknown(e.toString());
+      state = AsyncValue.error(appEx, st);
+      throw appEx;
+    }
+  }
+
   Future<void> logout() async {
     await ref.read(authRepositoryProvider).logout();
     state = const AsyncValue.data(null);

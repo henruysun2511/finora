@@ -45,6 +45,24 @@ class MockAuthApiService implements AuthApiService {
   }
 
   @override
+  Future<AuthResponse> loginWithGoogle(String idToken) async {
+    await Future<void>.delayed(const Duration(milliseconds: 500));
+    _mockUser = const User(
+      id: 'mock-google-user-1',
+      email: 'google.user@finora.vn',
+      name: 'Google User Demo',
+    );
+    return AuthResponse(
+      user: _mockUser,
+      tokens: const AuthTokensResponse(
+        accessToken: 'mock_google_access_token',
+        refreshToken: 'mock_google_refresh_token',
+        expiresIn: '7d',
+      ),
+    );
+  }
+
+  @override
   Future<AuthTokensResponse> refreshToken(RefreshTokenRequest request) async {
     await Future<void>.delayed(const Duration(milliseconds: 300));
     return const AuthTokensResponse(
