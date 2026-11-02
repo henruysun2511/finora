@@ -3,7 +3,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../app/theme/app_colors.dart';
-import '../../domain/models/budget_enums.dart';
 import '../../domain/models/budget_summary.dart';
 import 'budget_progress_bar.dart';
 
@@ -164,4 +163,3 @@ class BudgetOverviewCard extends StatelessWidget {
     );
   }
 }
-

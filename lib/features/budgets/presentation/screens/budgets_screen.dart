@@ -129,7 +129,7 @@ class BudgetsScreen extends ConsumerWidget {
                       padding: const EdgeInsets.all(32),
                       child: Column(
                         children: [
-                          const Icon(Icons.savings_outlined, size: 48, color: AppColors.lightMuted),
+                          Icon(Icons.savings_outlined, size: 48, color: AppColors.lightMuted),
                           const SizedBox(height: 12),
                           Text(
                             'Chưa có ngân sách nào được thiết lập.',
