@@ -97,3 +97,4 @@ class _BudgetSearchBarState extends ConsumerState<BudgetSearchBar> {
     );
   }
 }
+
