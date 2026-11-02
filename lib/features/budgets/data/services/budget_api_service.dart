@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
 
-import '../../../../core/network/api_exception.dart';
+import '../../../../core/errors/app_exception.dart';
 import '../dto/budget_period_response.dart';
 import '../dto/budget_response.dart';
 import '../dto/budget_status_response.dart';
