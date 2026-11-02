@@ -56,12 +56,12 @@ void main() {
     await tester.pump(const Duration(milliseconds: 400));
     await tester.pumpAndSettle();
 
-    await tester.tap(find.text('🤝 Cho vay').first);
+    await tester.tap(find.text('Cho vay').first);
     await tester.pump(const Duration(milliseconds: 400));
     await tester.pumpAndSettle();
     expect(currentFilter?.type, LoanType.lent);
 
-    await tester.tap(find.text('✅ Đã xong'));
+    await tester.tap(find.text('Đã xong'));
     await tester.pump(const Duration(milliseconds: 400));
     await tester.pumpAndSettle();
 

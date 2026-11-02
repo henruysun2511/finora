@@ -20,11 +20,11 @@ enum LoanType {
   String get displayName {
     switch (this) {
       case LoanType.lent:
-        return '🤝 Cho vay';
+        return 'Cho vay';
       case LoanType.borrowed:
-        return '💸 Đi vay';
+        return 'Đi vay';
       case LoanType.installment:
-        return '🛵 Trả góp';
+        return 'Trả góp';
     }
   }
 }

@@ -49,6 +49,7 @@ class RouteNames {
   static const String loans = 'loans';
   static const String loanDetail = 'loanDetail';
   static const String createLoan = 'createLoan';
+  static const String editLoan = 'editLoan';
   static const String splitExpenses = 'splitExpenses';
   static const String splitExpenseDetail = 'splitExpenseDetail';
   static const String createSplitExpense = 'createSplitExpense';
@@ -129,6 +130,7 @@ class RoutePaths {
   static const String loans = '/loans';
   static const String loanDetail = '/loans/:id';
   static const String createLoan = '/loans/create';
+  static const String editLoan = '/loans/:id/edit';
   static const String splitExpenses = '/split-expenses';
   static const String splitExpenseDetail = '/split-expenses/:id';
   static const String createSplitExpense = '/split-expenses/create';

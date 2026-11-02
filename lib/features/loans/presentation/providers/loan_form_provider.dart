@@ -31,7 +31,7 @@ class LoanFormNotifier extends AutoDisposeNotifier<LoanFormState> {
   @override
   LoanFormState build() => const LoanFormState();
 
-  Future<Loan?> submit(LoanInput input) async {
+  Future<Loan?> submitCreate(LoanInput input) async {
     if (state.isSubmitting) return null;
     state = state.copyWith(isSubmitting: true, clearError: true);
 
@@ -39,6 +39,27 @@ class LoanFormNotifier extends AutoDisposeNotifier<LoanFormState> {
       final saved = await ref.read(loanRepositoryProvider).createLoan(input);
       ref.invalidate(loanListProvider);
       ref.invalidate(loanSummaryProvider);
+      state = state.copyWith(isSubmitting: false);
+      return saved;
+    } catch (error) {
+      final message = error is AppException ? error.message : error.toString();
+      state = state.copyWith(
+        isSubmitting: false,
+        errorMessage: message,
+      );
+      return null;
+    }
+  }
+
+  Future<Loan?> submitUpdate(String id, LoanUpdateInput input) async {
+    if (state.isSubmitting) return null;
+    state = state.copyWith(isSubmitting: true, clearError: true);
+
+    try {
+      final saved = await ref.read(loanRepositoryProvider).updateLoan(id, input);
+      ref.invalidate(loanListProvider);
+      ref.invalidate(loanSummaryProvider);
+      ref.invalidate(loanDetailProvider(id));
       state = state.copyWith(isSubmitting: false);
       return saved;
     } catch (error) {

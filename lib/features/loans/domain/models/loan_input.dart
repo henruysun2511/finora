@@ -10,6 +10,7 @@ class LoanInput {
     this.counterpartyUserId,
     this.counterpartyPhone,
     this.sourceWalletId,
+    this.accountId,
     this.dueDate,
     this.interestRate,
     this.interestPeriod = 'month',
@@ -24,6 +25,7 @@ class LoanInput {
   final String? counterpartyUserId;
   final String? counterpartyPhone;
   final String? sourceWalletId;
+  final String? accountId;
   final DateTime? dueDate;
   final double? interestRate;
   final String? interestPeriod;
@@ -45,6 +47,7 @@ class LoanUpdateInput {
     this.counterpartyPhone,
     this.dueDate,
     this.notes,
+    this.principalAmount,
   });
 
   final String? counterpartyName;
@@ -52,6 +55,7 @@ class LoanUpdateInput {
   final String? counterpartyPhone;
   final DateTime? dueDate;
   final String? notes;
+  final double? principalAmount;
 }
 
 /// Dữ liệu đầu vào khi ghi nhận một đợt thanh toán nợ
@@ -61,6 +65,7 @@ class LoanPaymentInput {
     required this.paymentDate,
     required this.affectsBalance,
     this.walletId,
+    this.accountId,
     this.notes,
   });
 
@@ -68,5 +73,6 @@ class LoanPaymentInput {
   final DateTime paymentDate;
   final bool affectsBalance;
   final String? walletId;
+  final String? accountId;
   final String? notes;
 }

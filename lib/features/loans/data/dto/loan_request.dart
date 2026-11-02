@@ -1,4 +1,4 @@
-/// DTO Request: Tạo khoản nợ mới
+/// DTO Request: Tạo khoản nợ mới (Tương thích đồng thời NestJS BE và Mock)
 class CreateLoanRequest {
   const CreateLoanRequest({
     required this.type,
@@ -8,6 +8,7 @@ class CreateLoanRequest {
     this.counterpartyUserId,
     this.counterpartyPhone,
     this.sourceWalletId,
+    this.accountId,
     this.dueDate,
     this.interestRate,
     this.interestPeriod,
@@ -22,27 +23,44 @@ class CreateLoanRequest {
   final String? counterpartyUserId;
   final String? counterpartyPhone;
   final String? sourceWalletId;
+  final String? accountId;
   final DateTime? dueDate;
   final double? interestRate;
   final String? interestPeriod;
   final String? notes;
   final int? installmentMonths;
 
-  Map<String, dynamic> toJson() => {
-        'type': type,
-        'counterpartyName': counterpartyName,
-        'principalAmount': principalAmount,
-        'affectsBalance': affectsBalance,
-        if (counterpartyUserId != null)
-          'counterpartyUserId': counterpartyUserId,
-        if (counterpartyPhone != null) 'counterpartyPhone': counterpartyPhone,
-        if (sourceWalletId != null) 'sourceWalletId': sourceWalletId,
-        if (dueDate != null) 'dueDate': dueDate!.toIso8601String(),
-        if (interestRate != null) 'interestRate': interestRate,
-        if (interestPeriod != null) 'interestPeriod': interestPeriod,
-        if (notes != null) 'notes': notes,
-        if (installmentMonths != null) 'installmentMonths': installmentMonths,
-      };
+  Map<String, dynamic> toJson() {
+    final effectiveWalletId = sourceWalletId ?? '00000000-0000-0000-0000-000000000001';
+    final effectiveAccountId = accountId ?? '00000000-0000-0000-0000-000000000001';
+
+    return {
+      'type': type,
+      'contactName': counterpartyName,
+      'counterpartyName': counterpartyName,
+      'principalAmount': principalAmount,
+      'affectsBalance': affectsBalance,
+      'walletId': effectiveWalletId,
+      'sourceWalletId': effectiveWalletId,
+      'accountId': effectiveAccountId,
+      if (counterpartyUserId != null) 'counterpartyUserId': counterpartyUserId,
+      if (counterpartyPhone != null) ...{
+        'contactInfo': counterpartyPhone,
+        'counterpartyPhone': counterpartyPhone,
+      },
+      if (dueDate != null) 'dueDate': dueDate!.toIso8601String(),
+      if (interestRate != null) ...{
+        'isInterestBearing': interestRate! > 0,
+        'interestRate': interestRate,
+      },
+      if (interestPeriod != null) 'interestPeriod': interestPeriod,
+      if (notes != null) ...{
+        'note': notes,
+        'notes': notes,
+      },
+      if (installmentMonths != null) 'installmentMonths': installmentMonths,
+    };
+  }
 }
 
 /// DTO Request: Cập nhật khoản nợ
@@ -53,6 +71,7 @@ class UpdateLoanRequest {
     this.counterpartyPhone,
     this.dueDate,
     this.notes,
+    this.principalAmount,
   });
 
   final String? counterpartyName;
@@ -60,14 +79,25 @@ class UpdateLoanRequest {
   final String? counterpartyPhone;
   final DateTime? dueDate;
   final String? notes;
+  final double? principalAmount;
 
   Map<String, dynamic> toJson() => {
-        if (counterpartyName != null) 'counterpartyName': counterpartyName,
+        if (counterpartyName != null) ...{
+          'contactName': counterpartyName,
+          'counterpartyName': counterpartyName,
+        },
         if (counterpartyUserId != null)
           'counterpartyUserId': counterpartyUserId,
-        if (counterpartyPhone != null) 'counterpartyPhone': counterpartyPhone,
+        if (counterpartyPhone != null) ...{
+          'contactInfo': counterpartyPhone,
+          'counterpartyPhone': counterpartyPhone,
+        },
         if (dueDate != null) 'dueDate': dueDate!.toIso8601String(),
-        if (notes != null) 'notes': notes,
+        if (notes != null) ...{
+          'note': notes,
+          'notes': notes,
+        },
+        if (principalAmount != null) 'principalAmount': principalAmount,
       };
 }
 
@@ -78,6 +108,7 @@ class CreateLoanPaymentRequest {
     required this.paymentDate,
     required this.affectsBalance,
     this.walletId,
+    this.accountId,
     this.notes,
   });
 
@@ -85,13 +116,21 @@ class CreateLoanPaymentRequest {
   final DateTime paymentDate;
   final bool affectsBalance;
   final String? walletId;
+  final String? accountId;
   final String? notes;
 
-  Map<String, dynamic> toJson() => {
-        'amount': amount,
-        'paymentDate': paymentDate.toIso8601String(),
-        'affectsBalance': affectsBalance,
-        if (walletId != null) 'walletId': walletId,
-        if (notes != null) 'notes': notes,
-      };
+  Map<String, dynamic> toJson() {
+    final effectiveAccId = accountId ?? walletId ?? '00000000-0000-0000-0000-000000000001';
+    return {
+      'amount': amount,
+      'paymentDate': paymentDate.toIso8601String(),
+      'affectsBalance': affectsBalance,
+      'accountId': effectiveAccId,
+      'walletId': effectiveAccId,
+      if (notes != null) ...{
+        'note': notes,
+        'notes': notes,
+      },
+    };
+  }
 }

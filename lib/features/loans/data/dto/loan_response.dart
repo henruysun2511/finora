@@ -1,4 +1,4 @@
-/// DTO Response: Khoản nợ từ API Backend
+/// DTO Response: Khoản nợ từ API Backend (tương thích cả finora_be DTO và Mock)
 class LoanResponse {
   const LoanResponse({
     required this.id,
@@ -15,6 +15,8 @@ class LoanResponse {
     this.counterpartyAvatarUrl,
     this.sourceWalletId,
     this.sourceWalletName,
+    this.accountId,
+    this.accountName,
     this.dueDate,
     this.interestRate,
     this.interestPeriod,
@@ -38,6 +40,8 @@ class LoanResponse {
   final String? counterpartyAvatarUrl;
   final String? sourceWalletId;
   final String? sourceWalletName;
+  final String? accountId;
+  final String? accountName;
   final DateTime? dueDate;
   final num? interestRate;
   final String? interestPeriod;
@@ -47,32 +51,45 @@ class LoanResponse {
   final DateTime? updatedAt;
 
   factory LoanResponse.fromJson(Map<String, dynamic> json) {
+    final principal = (json['principalAmount'] as num?) ?? 0;
+    final remaining = (json['remainingAmount'] as num?) ?? principal;
+    final paid = (json['paidAmount'] as num?) ?? (principal > remaining ? principal - remaining : 0);
+
+    // Xử lý linh hoạt tên đối tác: backend dùng contactName, mockup/app dùng counterpartyName
+    final contact = (json['contactName'] ?? json['counterpartyName'] ?? 'Không tên') as String;
+
+    // Xử lý linh hoạt ngày tạo: nếu backend trả về null thì fallback về thời gian hiện tại
+    final created = json['createdAt'] != null
+        ? DateTime.tryParse(json['createdAt'] as String) ?? DateTime.now()
+        : DateTime.now();
+
     return LoanResponse(
-      id: json['id'] as String,
-      type: json['type'] as String,
-      status: json['status'] as String,
-      counterpartyName: json['counterpartyName'] as String,
-      principalAmount: json['principalAmount'] as num,
-      paidAmount: (json['paidAmount'] as num?) ?? 0,
-      remainingAmount:
-          (json['remainingAmount'] as num?) ?? json['principalAmount'] as num,
+      id: (json['id'] ?? '') as String,
+      type: (json['type'] ?? 'LENT') as String,
+      status: (json['status'] ?? 'ACTIVE') as String,
+      counterpartyName: contact,
+      principalAmount: principal,
+      paidAmount: paid,
+      remainingAmount: remaining,
       affectsBalance: (json['affectsBalance'] as bool?) ?? true,
-      createdAt: DateTime.parse(json['createdAt'] as String),
+      createdAt: created,
       counterpartyUserId: json['counterpartyUserId'] as String?,
-      counterpartyPhone: json['counterpartyPhone'] as String?,
+      counterpartyPhone: (json['contactInfo'] ?? json['counterpartyPhone']) as String?,
       counterpartyAvatarUrl: json['counterpartyAvatarUrl'] as String?,
-      sourceWalletId: json['sourceWalletId'] as String?,
-      sourceWalletName: json['sourceWalletName'] as String?,
+      sourceWalletId: (json['walletId'] ?? json['sourceWalletId']) as String?,
+      sourceWalletName: (json['walletName'] ?? json['sourceWalletName']) as String?,
+      accountId: json['accountId'] as String?,
+      accountName: json['accountName'] as String?,
       dueDate: json['dueDate'] != null
-          ? DateTime.parse(json['dueDate'] as String)
+          ? DateTime.tryParse(json['dueDate'] as String)
           : null,
       interestRate: json['interestRate'] as num?,
       interestPeriod: json['interestPeriod'] as String?,
-      notes: json['notes'] as String?,
+      notes: (json['note'] ?? json['notes']) as String?,
       installmentMonths: json['installmentMonths'] as int?,
       currentInstallment: json['currentInstallment'] as int?,
       updatedAt: json['updatedAt'] != null
-          ? DateTime.parse(json['updatedAt'] as String)
+          ? DateTime.tryParse(json['updatedAt'] as String)
           : null,
     );
   }

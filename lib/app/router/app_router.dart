@@ -17,8 +17,8 @@ import '../../features/budgets/presentation/screens/budget_detail_screen.dart';
 import '../../features/budgets/presentation/screens/budgets_screen.dart';
 import '../../features/budgets/presentation/screens/create_budget_screen.dart';
 import '../../features/home/presentation/screens/home_screen.dart';
-import '../../features/loans/presentation/screens/create_loan_screen.dart';
 import '../../features/loans/presentation/screens/loan_detail_screen.dart';
+import '../../features/loans/presentation/screens/loan_form_screen.dart';
 import '../../features/loans/presentation/screens/loans_screen.dart';
 import '../../features/notifications/presentation/screens/notifications_screen.dart';
 import '../../features/onboarding/presentation/screens/onboarding_all_set_screen.dart';
@@ -334,13 +334,24 @@ GoRouter appRouter(AppRouterRef ref) {
         parentNavigatorKey: _rootNavigatorKey,
         path: RoutePaths.loans,
         name: RouteNames.loans,
-        builder: (context, state) => const LoansScreen(),
+        builder: (context, state) => LoansScreen(
+          initialTab: state.uri.queryParameters['tab'],
+        ),
       ),
       GoRoute(
         parentNavigatorKey: _rootNavigatorKey,
         path: RoutePaths.createLoan,
         name: RouteNames.createLoan,
-        builder: (context, state) => const CreateLoanScreen(),
+        builder: (context, state) => const LoanFormScreen(),
+      ),
+      GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
+        path: RoutePaths.editLoan,
+        name: RouteNames.editLoan,
+        builder: (context, state) {
+          final id = state.pathParameters['id'] ?? '';
+          return LoanFormScreen(loanId: id);
+        },
       ),
       GoRoute(
         parentNavigatorKey: _rootNavigatorKey,

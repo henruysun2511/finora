@@ -25,6 +25,8 @@ extension LoanResponseMapper on LoanResponse {
         counterpartyAvatarUrl: counterpartyAvatarUrl,
         sourceWalletId: sourceWalletId,
         sourceWalletName: sourceWalletName,
+        accountId: accountId,
+        accountName: accountName,
         dueDate: dueDate,
         interestRate: interestRate?.toDouble(),
         interestPeriod: interestPeriod,
@@ -51,8 +53,8 @@ extension LoanPaymentResponseMapper on LoanPaymentResponse {
         loanId: loanId,
         amount: amount.toDouble(),
         paymentDate: paymentDate,
-        walletId: walletId,
-        walletName: walletName,
+        walletId: walletId ?? accountId,
+        walletName: walletName ?? accountName,
         notes: notes,
         createdAt: createdAt,
       );
@@ -67,6 +69,7 @@ extension LoanInputMapper on LoanInput {
         counterpartyUserId: counterpartyUserId,
         counterpartyPhone: counterpartyPhone,
         sourceWalletId: sourceWalletId,
+        accountId: accountId,
         dueDate: dueDate,
         interestRate: interestRate,
         interestPeriod: interestPeriod,
@@ -82,6 +85,7 @@ extension LoanUpdateInputMapper on LoanUpdateInput {
         counterpartyPhone: counterpartyPhone,
         dueDate: dueDate,
         notes: notes,
+        principalAmount: principalAmount,
       );
 }
 
@@ -91,6 +95,7 @@ extension LoanPaymentInputMapper on LoanPaymentInput {
         paymentDate: paymentDate,
         affectsBalance: affectsBalance,
         walletId: walletId,
+        accountId: accountId ?? walletId,
         notes: notes,
       );
 }

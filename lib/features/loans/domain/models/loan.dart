@@ -19,6 +19,8 @@ class Loan {
     this.counterpartyAvatarUrl,
     this.sourceWalletId,
     this.sourceWalletName,
+    this.accountId,
+    this.accountName,
     this.dueDate,
     this.interestRate,
     this.interestPeriod,
@@ -43,9 +45,11 @@ class Loan {
   final String? counterpartyPhone;
   final String? counterpartyAvatarUrl;
 
-  // Thông tin ví nguồn
+  // Thông tin ví nguồn & tài khoản liên kết
   final String? sourceWalletId;
   final String? sourceWalletName;
+  final String? accountId;
+  final String? accountName;
 
   // Thời hạn & lãi suất
   final DateTime? dueDate;
@@ -113,6 +117,8 @@ class Loan {
     String? counterpartyAvatarUrl,
     String? sourceWalletId,
     String? sourceWalletName,
+    String? accountId,
+    String? accountName,
     DateTime? dueDate,
     double? interestRate,
     String? interestPeriod,
@@ -140,6 +146,8 @@ class Loan {
           counterpartyAvatarUrl ?? this.counterpartyAvatarUrl,
       sourceWalletId: sourceWalletId ?? this.sourceWalletId,
       sourceWalletName: sourceWalletName ?? this.sourceWalletName,
+      accountId: accountId ?? this.accountId,
+      accountName: accountName ?? this.accountName,
       dueDate: dueDate ?? this.dueDate,
       interestRate: interestRate ?? this.interestRate,
       interestPeriod: interestPeriod ?? this.interestPeriod,

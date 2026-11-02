@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -105,7 +106,8 @@ class _VoiceRecordingModalState extends State<VoiceRecordingModal>
         setState(() => _isRecording = false);
 
         if (bytes != null && bytes.isNotEmpty) {
-          final filename = 'voice_${DateTime.now().millisecondsSinceEpoch}.m4a';
+          const ext = kIsWeb ? 'webm' : 'm4a';
+          final filename = 'voice_${DateTime.now().millisecondsSinceEpoch}.$ext';
           if (mounted) {
             Navigator.pop(context);
             widget.onSendVoice(

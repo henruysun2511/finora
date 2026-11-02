@@ -1,10 +1,12 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
+import '../../../../app/router/route_names.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_text_styles.dart';
 import '../../../../core/errors/app_exception.dart';
@@ -12,13 +14,12 @@ import '../../../../core/utils/currency_formatter.dart';
 import '../../../../core/widgets/app_toast.dart';
 import '../../../../core/widgets/confirm_dialog.dart';
 import '../../domain/models/loan.dart';
-import '../../domain/models/loan_input.dart';
 import '../../domain/models/loan_payment.dart';
 import '../../domain/models/loan_status.dart';
 import '../../domain/models/loan_type.dart';
-import '../../domain/validators/loan_validators.dart';
 import '../providers/loan_list_provider.dart';
 import '../providers/loan_providers.dart';
+import '../widgets/loan_payment_sheet.dart';
 
 class LoanDetailScreen extends ConsumerStatefulWidget {
   const LoanDetailScreen({super.key, required this.loanId});
@@ -44,13 +45,13 @@ class _LoanDetailScreenState extends ConsumerState<LoanDetailScreen> {
       isScrollControlled: true,
       useSafeArea: true,
       showDragHandle: true,
-      builder: (_) => _PaymentSheet(loan: loan),
+      builder: (_) => LoanPaymentSheet(loan: loan),
     );
     if (!mounted || settled == null) return;
     AppToast.success(
       context,
       settled
-          ? 'Khoản nợ đã được tất toán. Chúc mừng bạn!'
+          ? 'Khoản nợ đã được tất toán thành công. Chúc mừng bạn!'
           : 'Đã ghi nhận đợt thanh toán.',
     );
     if (settled) {
@@ -63,10 +64,10 @@ class _LoanDetailScreenState extends ConsumerState<LoanDetailScreen> {
             size: 44,
           ),
           title: const Text('Khoản nợ đã tất toán'),
-          content: const Text('Toàn bộ khoản nợ đã được thanh toán.'),
+          content: const Text('Toàn bộ khoản nợ đã được thanh toán hoàn tất.'),
           actions: [
             TextButton(
-              onPressed: () => Navigator.pop(context),
+              onPressed: () => context.pop(),
               child: const Text('Đóng'),
             ),
           ],
@@ -83,33 +84,14 @@ class _LoanDetailScreenState extends ConsumerState<LoanDetailScreen> {
       _countdownTimer?.cancel();
       _countdownTimer = Timer.periodic(const Duration(seconds: 1), (_) {
         if (!mounted) return;
-        if (DateTime.now().difference(
-              ref.read(reminderCooldownProvider(loan.id))!,
-            ) >=
-            const Duration(hours: 6)) {
+        final last = ref.read(reminderCooldownProvider(loan.id));
+        if (last == null ||
+            DateTime.now().difference(last) >= const Duration(hours: 6)) {
           _countdownTimer?.cancel();
         }
         setState(() {});
       });
       if (mounted) AppToast.success(context, 'Đã gửi lời nhắc nợ lịch sự.');
-    } catch (error) {
-      final message = error is AppException ? error.message : error.toString();
-      if (mounted) AppToast.error(context, message);
-    }
-  }
-
-  Future<void> _editLoan(Loan loan) async {
-    final input = await showDialog<LoanUpdateInput>(
-      context: context,
-      builder: (_) => _EditLoanDialog(loan: loan),
-    );
-    if (input == null) return;
-    try {
-      await ref.read(loanRepositoryProvider).updateLoan(loan.id, input);
-      ref.invalidate(loanDetailProvider(loan.id));
-      ref.invalidate(loanListProvider);
-      ref.invalidate(loanSummaryProvider);
-      if (mounted) AppToast.success(context, 'Đã cập nhật khoản nợ.');
     } catch (error) {
       final message = error is AppException ? error.message : error.toString();
       if (mounted) AppToast.error(context, message);
@@ -128,7 +110,7 @@ class _LoanDetailScreenState extends ConsumerState<LoanDetailScreen> {
       await ref.read(loanListProvider.notifier).deleteLoan(loan.id);
       if (mounted) {
         AppToast.success(context, 'Đã xóa khoản nợ.');
-        Navigator.of(context).pop();
+        context.pop();
       }
     } catch (error) {
       final message = error is AppException ? error.message : error.toString();
@@ -166,52 +148,7 @@ class _LoanDetailScreenState extends ConsumerState<LoanDetailScreen> {
     return Scaffold(
       backgroundColor:
           isDark ? AppColors.darkBackground : AppColors.lightBackground,
-      appBar: AppBar(
-        title: Text('Chi tiết khoản nợ', style: AppTextStyles.titleLarge()),
-        centerTitle: true,
-        backgroundColor:
-            isDark ? AppColors.darkSurface : AppColors.lightSurface,
-        actions: [
-          loanAsync.maybeWhen(
-            data: (loan) {
-              final paymentState = ref.watch(loanPaymentsProvider(loan.id));
-              final canDelete = paymentState.maybeWhen(
-                data: (items) => items.isEmpty,
-                orElse: () => false,
-              );
-              return PopupMenuButton<String>(
-                onSelected: (action) {
-                  if (action == 'edit') _editLoan(loan);
-                  if (action == 'delete') _deleteLoan(loan);
-                },
-                itemBuilder: (context) => [
-                  const PopupMenuItem(
-                    value: 'edit',
-                    child: ListTile(
-                      contentPadding: EdgeInsets.zero,
-                      leading: Icon(Icons.edit_outlined),
-                      title: Text('Chỉnh sửa'),
-                    ),
-                  ),
-                  if (canDelete)
-                    const PopupMenuItem(
-                      value: 'delete',
-                      child: ListTile(
-                        contentPadding: EdgeInsets.zero,
-                        leading: Icon(
-                          Icons.delete_outline,
-                          color: AppColors.danger,
-                        ),
-                        title: Text('Xóa khoản nợ'),
-                      ),
-                    ),
-                ],
-              );
-            },
-            orElse: () => const SizedBox.shrink(),
-          ),
-        ],
-      ),
+      // Không dùng AppBar tiêu đề riêng biệt – Nút quay lại và tiêu đề được đưa vào trong Hero Banner
       body: loanAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (error, _) {
@@ -235,12 +172,12 @@ class _LoanDetailScreenState extends ConsumerState<LoanDetailScreen> {
             ),
           );
         },
-        data: (loan) => _buildDetails(loan, isDark),
+        data: (loan) => _buildBody(loan, isDark),
       ),
     );
   }
 
-  Widget _buildDetails(Loan loan, bool isDark) {
+  Widget _buildBody(Loan loan, bool isDark) {
     final payments = ref.watch(loanPaymentsProvider(loan.id));
     final lastReminder = ref.watch(reminderCooldownProvider(loan.id));
     final remainingCooldown = lastReminder == null
@@ -248,103 +185,139 @@ class _LoanDetailScreenState extends ConsumerState<LoanDetailScreen> {
         : const Duration(hours: 6) - DateTime.now().difference(lastReminder);
     final remindEnabled = remainingCooldown <= Duration.zero;
 
-    return ListView(
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
-      children: [
-        _LoanHero(loan: loan, isDark: isDark),
-        if (loan.isLinkedToFriend) ...[
-          const SizedBox(height: 12),
-          Card(
-            color: AppColors.primary.withValues(alpha: 0.1),
-            child: Padding(
-              padding: const EdgeInsets.all(14),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Khoản nợ này được liên kết với bạn bè FINORA.',
-                  ),
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: TextButton.icon(
-                      onPressed: () => _removeCounterparty(loan),
-                      icon: const Icon(Icons.link_off_rounded),
-                      label: const Text('Gỡ liên kết của tôi'),
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          // ── Banner Chi Tiết Khoản Nợ (có nút quay lại và menu thao tác) ──
+          _DetailHeroBanner(
+            loan: loan,
+            onBack: () {
+              if (context.canPop()) {
+                context.pop();
+              } else {
+                context.go(RoutePaths.loans);
+              }
+            },
+            onEdit: () => context.pushNamed(
+              RouteNames.editLoan,
+              pathParameters: {'id': loan.id},
+            ),
+            onDelete: () => _deleteLoan(loan),
+          ),
+
+          // ── Phần nội dung thân màn hình ──
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 40),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                // Thao tác nhanh
+                Row(
+                  children: [
+                    Expanded(
+                      child: FilledButton.icon(
+                        style: FilledButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                        ),
+                        onPressed: loan.effectiveStatus == LoanStatus.settled
+                            ? null
+                            : () => _recordPayment(loan),
+                        icon: const Icon(Icons.add_card_rounded),
+                        label: const Text(
+                          'Ghi nhận trả nợ',
+                          style: TextStyle(fontWeight: FontWeight.w800),
+                        ),
+                      ),
+                    ),
+                    if (loan.type == LoanType.lent) ...[
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: OutlinedButton.icon(
+                          style: OutlinedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                          ),
+                          onPressed: loan.isLinkedToFriend && remindEnabled
+                              ? () => _sendReminder(loan)
+                              : null,
+                          icon: const Icon(Icons.notifications_active_outlined),
+                          label: Text(
+                            !loan.isLinkedToFriend
+                                ? 'Chưa liên kết'
+                                : remindEnabled
+                                    ? 'Nhắc nợ'
+                                    : _formatCooldown(remainingCooldown),
+                            style: const TextStyle(fontWeight: FontWeight.w800),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+
+                if (loan.isLinkedToFriend) ...[
+                  const SizedBox(height: 14),
+                  Container(
+                    padding: const EdgeInsets.all(14),
+                    decoration: BoxDecoration(
+                      color: AppColors.primary.withValues(alpha: 0.08),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                        color: AppColors.primary.withValues(alpha: 0.25),
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.link_rounded, color: AppColors.primary),
+                        const SizedBox(width: 10),
+                        const Expanded(
+                          child: Text(
+                            'Đã liên kết với tài khoản bạn bè FINORA.',
+                            style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+                          ),
+                        ),
+                        TextButton(
+                          onPressed: () => _removeCounterparty(loan),
+                          child: const Text('Gỡ', style: TextStyle(fontWeight: FontWeight.w800)),
+                        ),
+                      ],
                     ),
                   ),
                 ],
-              ),
+
+                const SizedBox(height: 20),
+                Text('Thông tin chi tiết', style: AppTextStyles.titleMedium()),
+                const SizedBox(height: 10),
+                _InformationCard(loan: loan, isDark: isDark),
+
+                const SizedBox(height: 22),
+                Text('Lịch sử các đợt thanh toán', style: AppTextStyles.titleMedium()),
+                const SizedBox(height: 10),
+                payments.when(
+                  loading: () => const Padding(
+                    padding: EdgeInsets.all(24),
+                    child: Center(child: CircularProgressIndicator()),
+                  ),
+                  error: (error, _) => _InlineError(
+                    message:
+                        error is AppException ? error.message : error.toString(),
+                    onRetry: () => ref.invalidate(loanPaymentsProvider(loan.id)),
+                  ),
+                  data: (items) => items.isEmpty
+                      ? _EmptyPayments(isDark: isDark)
+                      : _PaymentTimeline(payments: items, isDark: isDark),
+                ),
+              ],
             ),
           ),
         ],
-        const SizedBox(height: 16),
-        Text('Thao tác nhanh', style: AppTextStyles.titleMedium()),
-        const SizedBox(height: 8),
-        Row(
-          children: [
-            Expanded(
-              child: FilledButton.icon(
-                onPressed: loan.effectiveStatus == LoanStatus.settled
-                    ? null
-                    : () => _recordPayment(loan),
-                icon: const Icon(Icons.add_card_rounded),
-                label: const Text('Ghi nhận trả nợ'),
-              ),
-            ),
-            if (loan.type == LoanType.lent) ...[
-              const SizedBox(width: 8),
-              Expanded(
-                child: OutlinedButton.icon(
-                  onPressed: loan.isLinkedToFriend && remindEnabled
-                      ? () => _sendReminder(loan)
-                      : null,
-                  icon: const Icon(Icons.notifications_active_outlined),
-                  label: Text(
-                    !loan.isLinkedToFriend
-                        ? 'Chưa liên kết'
-                        : remindEnabled
-                            ? 'Nhắc nợ'
-                            : _formatCooldown(remainingCooldown),
-                  ),
-                ),
-              ),
-            ],
-          ],
-        ),
-        const SizedBox(height: 20),
-        _InformationCard(loan: loan, isDark: isDark),
-        const SizedBox(height: 20),
-        Text('Lịch sử thanh toán', style: AppTextStyles.titleMedium()),
-        const SizedBox(height: 8),
-        payments.when(
-          loading: () => const Padding(
-            padding: EdgeInsets.all(24),
-            child: Center(child: CircularProgressIndicator()),
-          ),
-          error: (error, _) => _InlineError(
-            message: error is AppException ? error.message : error.toString(),
-            onRetry: () => ref.invalidate(loanPaymentsProvider(loan.id)),
-          ),
-          data: (items) => items.isEmpty
-              ? _EmptyPayments(isDark: isDark)
-              : _PaymentTimeline(payments: items, isDark: isDark),
-        ),
-        payments.maybeWhen(
-          data: (items) => items.isEmpty
-              ? Align(
-                  alignment: Alignment.centerLeft,
-                  child: TextButton.icon(
-                      onPressed: () => _deleteLoan(loan),
-                      icon: const Icon(Icons.delete_outline_rounded),
-                      label: const Text('Xóa khoản nợ'),
-                      style: TextButton.styleFrom(
-                        foregroundColor: AppColors.danger,
-                      )),
-                )
-              : const SizedBox.shrink(),
-          orElse: () => const SizedBox.shrink(),
-        ),
-      ],
+      ),
     );
   }
 
@@ -360,20 +333,27 @@ class _LoanDetailScreenState extends ConsumerState<LoanDetailScreen> {
   }
 }
 
-class _LoanHero extends StatelessWidget {
-  const _LoanHero({required this.loan, required this.isDark});
+class _DetailHeroBanner extends StatelessWidget {
+  const _DetailHeroBanner({
+    required this.loan,
+    required this.onBack,
+    required this.onEdit,
+    required this.onDelete,
+  });
 
   final Loan loan;
-  final bool isDark;
+  final VoidCallback onBack;
+  final VoidCallback onEdit;
+  final VoidCallback onDelete;
 
   @override
   Widget build(BuildContext context) {
     final loanStatus = loan.effectiveStatus;
     final dueText = loan.dueDate == null
         ? 'Chưa đặt hạn thanh toán'
-        : 'Hạn ${DateFormat('dd/MM/yyyy').format(loan.dueDate!)}';
+        : 'Hạn: ${DateFormat('dd/MM/yyyy').format(loan.dueDate!)}';
+
     return Container(
-      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
           colors: [
@@ -381,57 +361,193 @@ class _LoanHero extends StatelessWidget {
             AppColors.balanceGradMid,
             AppColors.balanceGradEnd,
           ],
+          stops: [0.0, 0.55, 1.0],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        borderRadius: BorderRadius.circular(AppColors.radiusLg),
-      ),
-      child: Column(
-        children: [
-          CircleAvatar(
-            radius: 25,
-            backgroundColor: Colors.white.withValues(alpha: 0.2),
-            child: Text(
-              loan.counterpartyName.isEmpty
-                  ? '?'
-                  : loan.counterpartyName.substring(0, 1).toUpperCase(),
-              style: AppTextStyles.titleMedium(color: Colors.white),
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            loan.counterpartyName,
-            textAlign: TextAlign.center,
-            style: AppTextStyles.titleMedium(color: Colors.white),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            CurrencyFormatter.formatVnd(loan.remainingAmount),
-            style: AppTextStyles.amountCard(color: Colors.white),
-          ),
-          Text(
-            'Còn lại · Đã trả ${(loan.repaidPercent * 100).toStringAsFixed(1)}%',
-            style: AppTextStyles.bodySmall(color: Colors.white70),
-          ),
-          const SizedBox(height: 12),
-          Chip(
-            avatar: Icon(
-              loanStatus == LoanStatus.overdue
-                  ? Icons.warning_amber_rounded
-                  : Icons.event_available_rounded,
-              color: Colors.white,
-              size: 18,
-            ),
-            label: Text(
-              loanStatus == LoanStatus.overdue
-                  ? '${loan.overdueDays ?? 0} ngày quá hạn'
-                  : dueText,
-              style: const TextStyle(color: Colors.white),
-            ),
-            backgroundColor: Colors.white.withValues(alpha: 0.16),
-            side: BorderSide.none,
+        borderRadius: const BorderRadius.only(
+          bottomLeft: Radius.circular(30),
+          bottomRight: Radius.circular(30),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.primary.withValues(alpha: 0.32),
+            blurRadius: 24,
+            offset: const Offset(0, 10),
           ),
         ],
+      ),
+      child: SafeArea(
+        bottom: false,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(18, 12, 18, 26),
+          child: Column(
+            children: [
+              // Hàng 1: Nút quay lại + Tiêu đề + Menu sửa/xóa ở trong banner
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  InkWell(
+                    onTap: onBack,
+                    borderRadius: BorderRadius.circular(12),
+                    child: Container(
+                      width: 38,
+                      height: 38,
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.16),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: Colors.white.withValues(alpha: 0.2),
+                        ),
+                      ),
+                      child: const Icon(
+                        Icons.arrow_back_ios_new_rounded,
+                        color: Colors.white,
+                        size: 17,
+                      ),
+                    ),
+                  ),
+                  Text(
+                    'Chi tiết khoản nợ',
+                    style: GoogleFonts.inter(
+                      fontSize: 17,
+                      fontWeight: FontWeight.w900,
+                      color: Colors.white,
+                    ),
+                  ),
+                  PopupMenuButton<String>(
+                    icon: Container(
+                      width: 38,
+                      height: 38,
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.16),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: Colors.white.withValues(alpha: 0.2),
+                        ),
+                      ),
+                      child: const Icon(
+                        Icons.more_horiz_rounded,
+                        color: Colors.white,
+                        size: 20,
+                      ),
+                    ),
+                    onSelected: (val) {
+                      if (val == 'edit') onEdit();
+                      if (val == 'delete') onDelete();
+                    },
+                    itemBuilder: (context) => [
+                      const PopupMenuItem(
+                        value: 'edit',
+                        child: ListTile(
+                          contentPadding: EdgeInsets.zero,
+                          leading: Icon(Icons.edit_outlined),
+                          title: Text('Chỉnh sửa'),
+                        ),
+                      ),
+                      const PopupMenuItem(
+                        value: 'delete',
+                        child: ListTile(
+                          contentPadding: EdgeInsets.zero,
+                          leading: Icon(
+                            Icons.delete_outline_rounded,
+                            color: AppColors.danger,
+                          ),
+                          title: Text('Xóa khoản nợ'),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
+
+              // Hero Content: Avatar + Tên + Số tiền lớn + Badge hạn trả
+              CircleAvatar(
+                radius: 30,
+                backgroundColor: Colors.white.withValues(alpha: 0.22),
+                child: Text(
+                  loan.counterpartyName.isEmpty
+                      ? '?'
+                      : loan.counterpartyName.substring(0, 1).toUpperCase(),
+                  style: const TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.w900,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 8),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    loan.counterpartyName,
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.inter(
+                      fontSize: 17,
+                      fontWeight: FontWeight.w900,
+                      color: Colors.white,
+                    ),
+                  ),
+                  if (loan.isLinkedToFriend) ...[
+                    const SizedBox(width: 6),
+                    const Icon(Icons.star_rounded, color: Colors.amber, size: 18),
+                  ],
+                ],
+              ),
+              const SizedBox(height: 4),
+              Text(
+                CurrencyFormatter.formatVnd(loan.remainingAmount),
+                style: GoogleFonts.outfit(
+                  fontSize: 32,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: -0.6,
+                  color: Colors.white,
+                ),
+              ),
+              Text(
+                'Số nợ còn lại · Đã thanh toán ${(loan.repaidPercent * 100).toStringAsFixed(1)}%',
+                style: GoogleFonts.inter(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white.withValues(alpha: 0.85),
+                ),
+              ),
+              const SizedBox(height: 14),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.18),
+                  borderRadius: BorderRadius.circular(99),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      loanStatus == LoanStatus.overdue
+                          ? Icons.warning_amber_rounded
+                          : Icons.calendar_today_rounded,
+                      color: Colors.white,
+                      size: 14,
+                    ),
+                    const SizedBox(width: 6),
+                    Text(
+                      loanStatus == LoanStatus.overdue
+                          ? 'Quá hạn ${loan.overdueDays ?? 0} ngày'
+                          : dueText,
+                      style: GoogleFonts.inter(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -445,80 +561,72 @@ class _InformationCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      color: isDark ? AppColors.darkSurface : AppColors.lightSurface,
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Thông tin khoản nợ', style: AppTextStyles.titleMedium()),
-            const SizedBox(height: 12),
-            _InfoRow(label: 'Loại', value: loan.type.displayName),
-            _InfoRow(
-              label: 'Số tiền gốc',
-              value: CurrencyFormatter.formatVnd(loan.principalAmount),
-            ),
-            _InfoRow(
-              label: 'Đã thanh toán',
-              value: CurrencyFormatter.formatVnd(loan.paidAmount),
-            ),
-            _InfoRow(
-              label: 'Tài khoản nguồn',
-              value: loan.sourceWalletName ??
-                  loan.sourceWalletId ??
-                  'Chưa liên kết ví',
-            ),
-            _InfoRow(
-              label: 'Ngày tạo',
-              value: DateFormat('dd/MM/yyyy').format(loan.createdAt),
-            ),
-            _InfoRow(
-              label: 'Lãi suất',
-              value: '${loan.interestRate ?? 0}% / '
-                  '${loan.interestPeriod == 'year' ? 'năm' : 'tháng'}',
-            ),
-            if (loan.installmentMonths != null)
-              _InfoRow(
-                label: 'Trả góp',
-                value: '${loan.currentInstallment ?? 0}/'
-                    '${loan.installmentMonths} kỳ',
-              ),
-            if (loan.notes?.isNotEmpty == true)
-              _InfoRow(label: 'Ghi chú', value: loan.notes!),
-          ],
+    return Container(
+      decoration: BoxDecoration(
+        color: isDark ? AppColors.darkSurface : Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
         ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.03),
+            blurRadius: 10,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          _buildRow('Loại khoản nợ', loan.type.displayName),
+          _buildRow('Số tiền gốc ban đầu', CurrencyFormatter.formatVnd(loan.principalAmount)),
+          _buildRow('Đã hoàn trả', CurrencyFormatter.formatVnd(loan.paidAmount)),
+          if (loan.counterpartyPhone != null)
+            _buildRow('Số điện thoại liên hệ', loan.counterpartyPhone!),
+          if (loan.sourceWalletName != null || loan.accountName != null)
+            _buildRow('Nguồn tài khoản / Ví', loan.accountName ?? loan.sourceWalletName!),
+          if (loan.interestRate != null && loan.interestRate! > 0)
+            _buildRow('Lãi suất', '${loan.interestRate}% / ${loan.interestPeriod == 'year' ? 'năm' : 'tháng'}'),
+          if (loan.installmentMonths != null)
+            _buildRow('Kỳ hạn trả góp', '${loan.installmentMonths} tháng'),
+          if (loan.notes?.isNotEmpty == true)
+            _buildRow('Ghi chú', loan.notes!, isLast: true)
+          else
+            const SizedBox.shrink(),
+        ],
       ),
     );
   }
-}
 
-class _InfoRow extends StatelessWidget {
-  const _InfoRow({required this.label, required this.value});
-
-  final String label;
-  final String value;
-
-  @override
-  Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 5),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(
-            flex: 2,
-            child: Text(
-              label,
-              style: AppTextStyles.bodySmall(
-                color: isDark ? AppColors.darkMuted : AppColors.lightMuted,
+  Widget _buildRow(String label, String value, {bool isLast = false}) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+      decoration: BoxDecoration(
+        border: isLast
+            ? null
+            : Border(
+                bottom: BorderSide(
+                  color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
+                ),
               ),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            label,
+            style: AppTextStyles.bodyMedium(
+              color: isDark ? AppColors.darkMuted : AppColors.lightMuted,
             ),
           ),
-          Expanded(
-            flex: 3,
-            child: Text(value, style: AppTextStyles.bodyMedium()),
+          Flexible(
+            child: Text(
+              value,
+              textAlign: TextAlign.right,
+              style: AppTextStyles.bodyMedium(
+                color: isDark ? AppColors.darkForeground : AppColors.lightForeground,
+              ).copyWith(fontWeight: FontWeight.w700),
+            ),
           ),
         ],
       ),
@@ -534,39 +642,34 @@ class _PaymentTimeline extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final muted = isDark ? AppColors.darkMuted : AppColors.lightMuted;
-    return Card(
-      color: isDark ? AppColors.darkSurface : AppColors.lightSurface,
-      child: Column(
-        children: [
-          for (var index = 0; index < payments.length; index++)
-            ListTile(
-              leading: CircleAvatar(
-                backgroundColor: AppColors.success.withValues(alpha: 0.12),
-                child: const Icon(
-                  Icons.check_rounded,
-                  color: AppColors.success,
-                ),
+    return Column(
+      children: [
+        for (final p in payments)
+          Card(
+            margin: const EdgeInsets.symmetric(vertical: 4),
+            color: isDark ? AppColors.darkSurface : Colors.white,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(14),
+              side: BorderSide(
+                color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
+              ),
+            ),
+            child: ListTile(
+              leading: const CircleAvatar(
+                backgroundColor: Color(0xFFDCFCE7),
+                child: Icon(Icons.check_rounded, color: Color(0xFF16A34A)),
               ),
               title: Text(
-                CurrencyFormatter.formatVnd(payments[index].amount),
-                style: AppTextStyles.titleSmall(),
+                '+ ${CurrencyFormatter.formatVnd(p.amount)}',
+                style: const TextStyle(fontWeight: FontWeight.w800),
               ),
               subtitle: Text(
-                [
-                  DateFormat('dd/MM/yyyy · HH:mm')
-                      .format(payments[index].paymentDate),
-                  if (payments[index].walletName != null)
-                    'Ví: ${payments[index].walletName}',
-                  if (payments[index].notes?.isNotEmpty == true)
-                    payments[index].notes!,
-                ].join('\n'),
-                style: AppTextStyles.bodySmall(color: muted),
+                DateFormat('dd/MM/yyyy HH:mm').format(p.paymentDate) +
+                    (p.notes != null ? ' · ${p.notes}' : ''),
               ),
-              isThreeLine: payments[index].notes?.isNotEmpty == true,
             ),
-        ],
-      ),
+          ),
+      ],
     );
   }
 }
@@ -577,17 +680,29 @@ class _EmptyPayments extends StatelessWidget {
   final bool isDark;
 
   @override
-  Widget build(BuildContext context) => Card(
-        color: isDark ? AppColors.darkSurface : AppColors.lightSurface,
-        child: Padding(
-          padding: const EdgeInsets.all(20),
-          child: Text(
-            'Chưa có đợt thanh toán nào được ghi nhận.',
-            textAlign: TextAlign.center,
-            style: AppTextStyles.bodyMedium(),
-          ),
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          children: [
+            Icon(
+              Icons.receipt_long_outlined,
+              size: 44,
+              color: isDark ? AppColors.darkMuted : AppColors.lightMuted,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Chưa có đợt thanh toán nào được ghi nhận.',
+              style: AppTextStyles.bodySmall(
+                color: isDark ? AppColors.darkMuted : AppColors.lightMuted,
+              ),
+            ),
+          ],
         ),
-      );
+      ),
+    );
+  }
 }
 
 class _InlineError extends StatelessWidget {
@@ -597,314 +712,14 @@ class _InlineError extends StatelessWidget {
   final VoidCallback onRetry;
 
   @override
-  Widget build(BuildContext context) => Card(
-        child: ListTile(
-          leading: const Icon(Icons.error_outline, color: AppColors.danger),
-          title: Text(message),
-          trailing: IconButton(
-            onPressed: onRetry,
-            icon: const Icon(Icons.refresh_rounded),
-          ),
-        ),
-      );
-}
-
-class _PaymentSheet extends ConsumerStatefulWidget {
-  const _PaymentSheet({required this.loan});
-
-  final Loan loan;
-
-  @override
-  ConsumerState<_PaymentSheet> createState() => _PaymentSheetState();
-}
-
-class _PaymentSheetState extends ConsumerState<_PaymentSheet> {
-  final _formKey = GlobalKey<FormState>();
-  late final TextEditingController _amountController;
-  final _walletIdController = TextEditingController();
-  final _notesController = TextEditingController();
-  DateTime _paymentDate = DateTime.now();
-  bool _affectsBalance = true;
-  bool _isSubmitting = false;
-  String? _errorMessage;
-
-  @override
-  void initState() {
-    super.initState();
-    _amountController = TextEditingController(
-      text: widget.loan.remainingAmount.toStringAsFixed(0),
-    );
-  }
-
-  @override
-  void dispose() {
-    _amountController.dispose();
-    _walletIdController.dispose();
-    _notesController.dispose();
-    super.dispose();
-  }
-
-  double _parseAmount(String value) =>
-      double.parse(value.replaceAll(RegExp(r'[^0-9]'), ''));
-
-  Future<void> _submit() async {
-    if (!_formKey.currentState!.validate() || _isSubmitting) return;
-    setState(() {
-      _isSubmitting = true;
-      _errorMessage = null;
-    });
-    final walletId = _walletIdController.text.trim();
-    final notes = _notesController.text.trim();
-    try {
-      await ref.read(loanRepositoryProvider).recordPayment(
-            widget.loan.id,
-            LoanPaymentInput(
-              amount: _parseAmount(_amountController.text),
-              paymentDate: _paymentDate,
-              affectsBalance: _affectsBalance,
-              walletId: walletId.isEmpty ? null : walletId,
-              notes: notes.isEmpty ? null : notes,
-            ),
-          );
-      final isSettled =
-          _parseAmount(_amountController.text) >= widget.loan.remainingAmount;
-      ref.invalidate(loanDetailProvider(widget.loan.id));
-      ref.invalidate(loanPaymentsProvider(widget.loan.id));
-      ref.invalidate(loanListProvider);
-      ref.invalidate(loanSummaryProvider);
-      if (mounted) Navigator.of(context).pop(isSettled);
-    } catch (error) {
-      final message = error is AppException ? error.message : error.toString();
-      if (mounted) {
-        setState(() {
-          _isSubmitting = false;
-          _errorMessage = message;
-        });
-      }
-    }
-  }
-
-  Future<void> _chooseDate() async {
-    final selected = await showDatePicker(
-      context: context,
-      initialDate: _paymentDate,
-      firstDate: DateTime(2000),
-      lastDate: DateTime.now().add(const Duration(days: 1)),
-    );
-    if (selected != null) setState(() => _paymentDate = selected);
-  }
-
-  @override
   Widget build(BuildContext context) {
-    final bottomInset = MediaQuery.viewInsetsOf(context).bottom;
-    return Padding(
-      padding: EdgeInsets.fromLTRB(16, 8, 16, bottomInset + 20),
-      child: Form(
-        key: _formKey,
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Text(
-                'Ghi nhận đợt thanh toán',
-                style: AppTextStyles.titleLarge(),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                'Số tiền còn nợ: '
-                '${CurrencyFormatter.formatVnd(widget.loan.remainingAmount)}',
-                style: AppTextStyles.bodyMedium(color: AppColors.primary),
-              ),
-              if (_errorMessage != null) ...[
-                const SizedBox(height: 12),
-                Text(
-                  _errorMessage!,
-                  style: AppTextStyles.bodyMedium(color: AppColors.danger),
-                ),
-              ],
-              const SizedBox(height: 16),
-              TextFormField(
-                controller: _amountController,
-                keyboardType: TextInputType.number,
-                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                decoration: const InputDecoration(labelText: 'Số tiền trả (₫)'),
-                validator: (value) => LoanValidators.validatePaymentAmount(
-                  value,
-                  widget.loan.remainingAmount,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Wrap(
-                spacing: 8,
-                children: [
-                  ActionChip(
-                    label: const Text('Trả hết'),
-                    onPressed: () => setState(() {
-                      _amountController.text =
-                          widget.loan.remainingAmount.toStringAsFixed(0);
-                    }),
-                  ),
-                  ActionChip(
-                    label: const Text('Trả một nửa'),
-                    onPressed: () => setState(() {
-                      _amountController.text =
-                          (widget.loan.remainingAmount / 2).floor().toString();
-                    }),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 12),
-              TextFormField(
-                controller: _walletIdController,
-                decoration: const InputDecoration(
-                  labelText: 'Mã ví (nếu đã biết)',
-                  helperText:
-                      'Danh sách ví chưa được tích hợp; mã ví không được tra cứu tại đây.',
-                ),
-              ),
-              SwitchListTile(
-                contentPadding: EdgeInsets.zero,
-                title: Text(
-                  widget.loan.type == LoanType.lent
-                      ? 'Tự động cộng vào ví nhận tiền'
-                      : 'Tự động trừ từ ví thanh toán',
-                ),
-                value: _affectsBalance,
-                onChanged: (value) => setState(() => _affectsBalance = value),
-              ),
-              OutlinedButton.icon(
-                onPressed: _chooseDate,
-                icon: const Icon(Icons.calendar_today_rounded),
-                label: Text(DateFormat('dd/MM/yyyy').format(_paymentDate)),
-              ),
-              const SizedBox(height: 12),
-              TextFormField(
-                controller: _notesController,
-                decoration: const InputDecoration(
-                  labelText: 'Ghi chú đợt thanh toán',
-                ),
-                maxLines: 2,
-              ),
-              const SizedBox(height: 16),
-              FilledButton.icon(
-                onPressed: _isSubmitting ? null : _submit,
-                icon: _isSubmitting
-                    ? const SizedBox.square(
-                        dimension: 18,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      )
-                    : const Icon(Icons.check_rounded),
-                label: Text(_isSubmitting ? 'Đang ghi nhận...' : 'Xác nhận'),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _EditLoanDialog extends StatefulWidget {
-  const _EditLoanDialog({required this.loan});
-
-  final Loan loan;
-
-  @override
-  State<_EditLoanDialog> createState() => _EditLoanDialogState();
-}
-
-class _EditLoanDialogState extends State<_EditLoanDialog> {
-  late final TextEditingController _nameController;
-  late final TextEditingController _notesController;
-  DateTime? _dueDate;
-
-  @override
-  void initState() {
-    super.initState();
-    _nameController = TextEditingController(text: widget.loan.counterpartyName);
-    _notesController = TextEditingController(text: widget.loan.notes ?? '');
-    _dueDate = widget.loan.dueDate;
-  }
-
-  @override
-  void dispose() {
-    _nameController.dispose();
-    _notesController.dispose();
-    super.dispose();
-  }
-
-  Future<void> _selectDate() async {
-    final today = DateUtils.dateOnly(DateTime.now());
-    final selected = await showDatePicker(
-      context: context,
-      initialDate: _dueDate ?? today,
-      firstDate: DateTime(today.year - 10),
-      lastDate: DateTime(today.year + 30),
-    );
-    if (selected != null) setState(() => _dueDate = selected);
-  }
-
-  void _save() {
-    final name = _nameController.text.trim();
-    final nameError = LoanValidators.validateCounterpartyName(name);
-    if (nameError != null) {
-      AppToast.error(context, nameError);
-      return;
-    }
-    Navigator.of(context).pop(
-      LoanUpdateInput(
-        counterpartyName: name,
-        dueDate: _dueDate,
-        notes: _notesController.text.trim(),
-      ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) => AlertDialog(
-        title: const Text('Chỉnh sửa khoản nợ'),
-        content: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextFormField(
-                controller: _nameController,
-                decoration: const InputDecoration(labelText: 'Đối tác'),
-              ),
-              const SizedBox(height: 12),
-              TextFormField(
-                initialValue:
-                    CurrencyFormatter.formatVnd(widget.loan.principalAmount),
-                readOnly: true,
-                decoration: const InputDecoration(
-                  labelText: 'Số tiền gốc (không thể chỉnh sửa)',
-                ),
-              ),
-              const SizedBox(height: 12),
-              OutlinedButton.icon(
-                onPressed: _selectDate,
-                icon: const Icon(Icons.calendar_month_rounded),
-                label: Text(
-                  _dueDate == null
-                      ? 'Chọn hạn thanh toán'
-                      : DateFormat('dd/MM/yyyy').format(_dueDate!),
-                ),
-              ),
-              TextFormField(
-                controller: _notesController,
-                decoration: const InputDecoration(labelText: 'Ghi chú'),
-                maxLines: 2,
-              ),
-            ],
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Hủy'),
-          ),
-          FilledButton(onPressed: _save, child: const Text('Lưu')),
+    return Center(
+      child: Column(
+        children: [
+          Text(message),
+          TextButton(onPressed: onRetry, child: const Text('Thử lại')),
         ],
-      );
+      ),
+    );
+  }
 }

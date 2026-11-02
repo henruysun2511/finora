@@ -301,9 +301,11 @@ class MockLoanApiService implements LoanApiService {
       type: old.type,
       status: old.status,
       counterpartyName: r.counterpartyName ?? old.counterpartyName,
-      principalAmount: old.principalAmount,
+      principalAmount: r.principalAmount ?? old.principalAmount,
       paidAmount: old.paidAmount,
-      remainingAmount: old.remainingAmount,
+      remainingAmount: r.principalAmount != null
+          ? (r.principalAmount! - old.paidAmount)
+          : old.remainingAmount,
       affectsBalance: old.affectsBalance,
       createdAt: old.createdAt,
       counterpartyUserId: r.counterpartyUserId ?? old.counterpartyUserId,
