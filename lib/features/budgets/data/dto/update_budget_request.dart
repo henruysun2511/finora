@@ -18,3 +18,4 @@ class UpdateBudgetRequest {
     return map;
   }
 }
+

@@ -91,3 +91,4 @@ class BudgetResponse {
         'categoryIcon': categoryIcon,
       };
 }
+
