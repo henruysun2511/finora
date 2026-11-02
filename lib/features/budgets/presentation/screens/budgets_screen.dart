@@ -7,6 +7,7 @@ import '../providers/budget_filter_provider.dart';
 import '../providers/budget_list_provider.dart';
 import '../widgets/budget_overview_card.dart';
 import '../widgets/budget_progress_card.dart';
+import '../widgets/budget_search_bar.dart';
 import '../widgets/wallet_filter_tabs.dart';
 import 'budget_detail_screen.dart';
 import 'budget_form_screen.dart';
@@ -62,6 +63,10 @@ class BudgetsScreen extends ConsumerWidget {
                 ref.read(budgetFilterProvider.notifier).setWalletId(walletId);
               },
             ),
+            const SizedBox(height: 12),
+
+            // Ô tìm kiếm với Debounce 400ms
+            const BudgetSearchBar(),
             const SizedBox(height: 16),
 
             // Card Tổng quan
@@ -129,7 +134,7 @@ class BudgetsScreen extends ConsumerWidget {
                       padding: const EdgeInsets.all(32),
                       child: Column(
                         children: [
-                          Icon(Icons.savings_outlined, size: 48, color: AppColors.lightMuted),
+                          const Icon(Icons.savings_outlined, size: 48, color: AppColors.lightMuted),
                           const SizedBox(height: 12),
                           Text(
                             'Chưa có ngân sách nào được thiết lập.',
