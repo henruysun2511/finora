@@ -42,9 +42,9 @@ import '../../features/social/presentation/screens/social_feed_screen.dart';
 import '../../features/split_expenses/presentation/screens/create_split_expense_screen.dart';
 import '../../features/split_expenses/presentation/screens/split_expense_detail_screen.dart';
 import '../../features/split_expenses/presentation/screens/split_expenses_screen.dart';
-import '../../features/transactions/presentation/screens/create_recurring_transaction_screen.dart';
 import '../../features/transactions/presentation/screens/create_transaction_screen.dart';
-import '../../features/transactions/presentation/screens/recurring_transactions_screen.dart';
+import '../../features/recurring_transaction/presentation/screens/recurring-transaction-screen.dart' as recurring_list;
+import '../../features/recurring_transaction/presentation/screens/recurring-transaction-form-screen.dart' as recurring_form;
 import '../../features/transactions/presentation/screens/scan_receipt_screen.dart';
 import '../../features/transactions/presentation/screens/transaction_detail_screen.dart';
 import '../../features/transactions/presentation/screens/transactions_screen.dart';
@@ -232,13 +232,15 @@ GoRouter appRouter(AppRouterRef ref) {
         parentNavigatorKey: _rootNavigatorKey,
         path: RoutePaths.recurringTransactions,
         name: RouteNames.recurringTransactions,
-        builder: (context, state) => const RecurringTransactionsScreen(),
+        builder: (context, state) =>
+            const recurring_list.RecurringTransactionsScreen(),
       ),
       GoRoute(
         parentNavigatorKey: _rootNavigatorKey,
         path: RoutePaths.createRecurringTransaction,
         name: RouteNames.createRecurringTransaction,
-        builder: (context, state) => const CreateRecurringTransactionScreen(),
+        builder: (context, state) =>
+            const recurring_form.RecurringTransactionFormScreen(),
       ),
       GoRoute(
         parentNavigatorKey: _rootNavigatorKey,
