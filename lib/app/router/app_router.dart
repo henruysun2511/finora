@@ -15,7 +15,7 @@ import '../../features/auth/presentation/screens/register_screen.dart';
 import '../../features/auth/presentation/screens/welcome_screen.dart';
 import '../../features/budgets/presentation/screens/budget_detail_screen.dart';
 import '../../features/budgets/presentation/screens/budgets_screen.dart';
-import '../../features/budgets/presentation/screens/create_budget_screen.dart';
+import '../../features/budgets/presentation/screens/budget_form_screen.dart';
 import '../../features/home/presentation/screens/home_screen.dart';
 import '../../features/loans/presentation/screens/loan_detail_screen.dart';
 import '../../features/loans/presentation/screens/loan_form_screen.dart';
@@ -315,7 +315,7 @@ GoRouter appRouter(AppRouterRef ref) {
         parentNavigatorKey: _rootNavigatorKey,
         path: RoutePaths.createBudget,
         name: RouteNames.createBudget,
-        builder: (context, state) => const CreateBudgetScreen(),
+        builder: (context, state) => const BudgetFormScreen(),
       ),
       GoRoute(
         parentNavigatorKey: _rootNavigatorKey,
