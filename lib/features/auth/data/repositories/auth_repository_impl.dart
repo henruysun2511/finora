@@ -4,13 +4,18 @@ import '../../../../core/errors/app_exception.dart';
 import '../../../../core/storage/local_storage.dart';
 import '../../../../core/storage/secure_storage.dart';
 import '../../domain/models/auth_tokens.dart';
+import '../../domain/models/forgot_password_result.dart';
 import '../../domain/models/login_input.dart';
 import '../../domain/models/register_input.dart';
 import '../../domain/models/user.dart';
 import '../../domain/repositories/auth_repository.dart';
+import '../dto/forgot_password_request.dart';
 import '../dto/refresh_token_request.dart';
+import '../dto/reset_password_request.dart';
+import '../dto/verify_otp_request.dart';
 import '../mappers/auth_mapper.dart';
 import '../services/auth_api_service.dart';
+
 
 class AuthRepositoryImpl implements AuthRepository {
   final AuthApiService _api;
@@ -135,4 +140,23 @@ class AuthRepositoryImpl implements AuthRepository {
     await _localStorage.saveCachedUser(jsonEncode(updated.toJson()));
     return updated;
   }
+
+  @override
+  Future<ForgotPasswordResult> forgotPassword(String email) {
+    return _api.forgotPassword(ForgotPasswordRequest(email: email));
+  }
+
+  @override
+  Future<String> verifyOtp(String email, String otp) {
+    return _api.verifyOtp(VerifyOtpRequest(email: email, otp: otp));
+  }
+
+  @override
+  Future<void> resetPassword(String resetToken, String newPassword) {
+    return _api.resetPassword(
+      ResetPasswordRequest(resetToken: resetToken, newPassword: newPassword),
+    );
+  }
 }
+
+

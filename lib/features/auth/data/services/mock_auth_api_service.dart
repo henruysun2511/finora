@@ -1,9 +1,13 @@
+import '../../domain/models/forgot_password_result.dart';
 import '../../domain/models/user.dart';
 import '../dto/auth_response.dart';
 import '../dto/auth_tokens_response.dart';
+import '../dto/forgot_password_request.dart';
 import '../dto/login_request.dart';
 import '../dto/refresh_token_request.dart';
 import '../dto/register_request.dart';
+import '../dto/reset_password_request.dart';
+import '../dto/verify_otp_request.dart';
 import 'auth_api_service.dart';
 
 class MockAuthApiService implements AuthApiService {
@@ -93,4 +97,27 @@ class MockAuthApiService implements AuthApiService {
     _mockUser = _mockUser.copyWith(name: fullName ?? _mockUser.name);
     return _mockUser;
   }
+
+  @override
+  Future<ForgotPasswordResult> forgotPassword(
+      ForgotPasswordRequest request) async {
+    await Future<void>.delayed(const Duration(milliseconds: 400));
+    return ForgotPasswordResult(
+      email: request.email,
+      expiresIn: 30,
+    );
+  }
+
+  @override
+  Future<String> verifyOtp(VerifyOtpRequest request) async {
+    await Future<void>.delayed(const Duration(milliseconds: 400));
+    return 'mock_reset_token_${DateTime.now().millisecondsSinceEpoch}';
+  }
+
+  @override
+  Future<void> resetPassword(ResetPasswordRequest request) async {
+    await Future<void>.delayed(const Duration(milliseconds: 400));
+  }
 }
+
+

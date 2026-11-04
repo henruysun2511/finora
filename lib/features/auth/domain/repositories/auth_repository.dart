@@ -1,4 +1,5 @@
 import '../models/auth_tokens.dart';
+import '../models/forgot_password_result.dart';
 import '../models/login_input.dart';
 import '../models/register_input.dart';
 import '../models/user.dart';
@@ -31,4 +32,15 @@ abstract class AuthRepository {
     String? phone,
     String? avatarUrl,
   });
+
+  /// Yêu cầu gửi mã OTP quên mật khẩu (30 giây) qua Email
+  Future<ForgotPasswordResult> forgotPassword(String email);
+
+  /// Xác thực mã OTP 6 số trong vòng 30 giây
+  Future<String> verifyOtp(String email, String otp);
+
+  /// Đặt lại mật khẩu mới bằng resetToken
+  Future<void> resetPassword(String resetToken, String newPassword);
 }
+
+

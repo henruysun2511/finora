@@ -40,4 +40,17 @@ class AuthValidators {
     if (t.length > 50) return 'Mật khẩu tối đa 50 ký tự';
     return null;
   }
+
+  static final RegExp _otpRegex = RegExp(r'^\d{6}$');
+
+  /// Kiểm tra mã OTP: không để trống, đúng 6 chữ số
+  static String? validateOtp(String? value) {
+    final t = value?.trim() ?? '';
+    if (t.isEmpty) return 'Vui lòng nhập mã xác thực OTP';
+    if (!_otpRegex.hasMatch(t)) {
+      return 'Mã xác thực OTP phải gồm đúng 6 chữ số';
+    }
+    return null;
+  }
 }
+

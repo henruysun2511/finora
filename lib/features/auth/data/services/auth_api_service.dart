@@ -2,12 +2,16 @@ import 'package:dio/dio.dart';
 
 import '../../../../core/constants/api_constants.dart';
 import '../../../../core/network/api_exception.dart';
+import '../../domain/models/forgot_password_result.dart';
 import '../../domain/models/user.dart';
 import '../dto/auth_response.dart';
 import '../dto/auth_tokens_response.dart';
+import '../dto/forgot_password_request.dart';
 import '../dto/login_request.dart';
 import '../dto/refresh_token_request.dart';
 import '../dto/register_request.dart';
+import '../dto/reset_password_request.dart';
+import '../dto/verify_otp_request.dart';
 
 abstract class AuthApiService {
   Future<AuthResponse> login(LoginRequest request);
@@ -17,7 +21,12 @@ abstract class AuthApiService {
   Future<AuthResponse> register(RegisterRequest request);
   Future<AuthResponse> loginWithGoogle(String idToken);
   Future<User> updateProfile({String? fullName, String? phone, String? avatar});
+  Future<ForgotPasswordResult> forgotPassword(ForgotPasswordRequest request);
+  Future<String> verifyOtp(VerifyOtpRequest request);
+  Future<void> resetPassword(ResetPasswordRequest request);
 }
+
+
 
 class DioAuthApiService implements AuthApiService {
   DioAuthApiService(this._dio);
@@ -107,4 +116,35 @@ class DioAuthApiService implements AuthApiService {
         );
         return User.fromJson(_extractData(res.data));
       });
+
+  @override
+  Future<ForgotPasswordResult> forgotPassword(ForgotPasswordRequest request) =>
+      _guard(() async {
+        final res = await _dio.post<Map<String, dynamic>>(
+          ApiConstants.forgotPassword,
+          data: request.toJson(),
+        );
+        return ForgotPasswordResult.fromJson(_extractData(res.data));
+      });
+
+  @override
+  Future<String> verifyOtp(VerifyOtpRequest request) => _guard(() async {
+        final res = await _dio.post<Map<String, dynamic>>(
+          ApiConstants.verifyOtp,
+          data: request.toJson(),
+        );
+        final data = _extractData(res.data);
+        return data['resetToken']?.toString() ?? '';
+      });
+
+  @override
+  Future<void> resetPassword(ResetPasswordRequest request) =>
+      _guard(() async {
+        await _dio.post<dynamic>(
+          ApiConstants.resetPassword,
+          data: request.toJson(),
+        );
+      });
 }
+
+
