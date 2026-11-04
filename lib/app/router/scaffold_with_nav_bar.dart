@@ -80,34 +80,37 @@ class ScaffoldWithNavBar extends StatelessWidget {
                 // 3. Center FAB: Nút thêm nhanh / AI nổi bật SOLARN Style
                 Expanded(
                   child: Center(
-                    child: GestureDetector(
-                      onTap: () => _openQuickAddModal(context),
-                      child: Container(
-                        width: 52,
-                        height: 52,
-                        margin: const EdgeInsets.only(bottom: 4),
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          gradient: const LinearGradient(
-                            colors: [
-                              AppColors.primary,
-                              AppColors.orange,
-                            ],
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                          ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: AppColors.primary.withValues(alpha: 0.45),
-                              blurRadius: 20,
-                              offset: const Offset(0, 8),
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: GestureDetector(
+                        onTap: () => _openQuickAddModal(context),
+                        child: Container(
+                          width: 52,
+                          height: 52,
+                          margin: const EdgeInsets.only(bottom: 4),
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            gradient: const LinearGradient(
+                              colors: [
+                                AppColors.primary,
+                                AppColors.orange,
+                              ],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
                             ),
-                          ],
-                        ),
-                        child: const Icon(
-                          Icons.add_rounded,
-                          color: Colors.white,
-                          size: 26,
+                            boxShadow: [
+                              BoxShadow(
+                                color: AppColors.primary.withValues(alpha: 0.45),
+                                blurRadius: 20,
+                                offset: const Offset(0, 8),
+                              ),
+                            ],
+                          ),
+                          child: const Icon(
+                            Icons.add_rounded,
+                            color: Colors.white,
+                            size: 26,
+                          ),
                         ),
                       ),
                     ),
@@ -164,24 +167,33 @@ class _NavItem extends StatelessWidget {
           onTap: onTap,
           splashColor: AppColors.primary.withValues(alpha: 0.1),
           highlightColor: Colors.transparent,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                icon,
-                size: 22,
-                color: isSelected ? activeColor : inactiveColor,
+          child: Center(
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    icon,
+                    size: 22,
+                    color: isSelected ? activeColor : inactiveColor,
+                  ),
+                  const SizedBox(height: 3),
+                  Text(
+                    label,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    softWrap: false,
+                    style: AppTextStyles.caption.copyWith(
+                      fontSize: 10.5,
+                      fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
+                      color: isSelected ? activeColor : inactiveColor,
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(height: 3),
-              Text(
-                label,
-                style: AppTextStyles.caption.copyWith(
-                  fontSize: 10.5,
-                  fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
-                  color: isSelected ? activeColor : inactiveColor,
-                ),
-              ),
-            ],
+            ),
           ),
         ),
       ),
