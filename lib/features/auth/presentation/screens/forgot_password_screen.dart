@@ -1,4 +1,4 @@
-import 'dart:async';
+﻿import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -45,7 +45,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
 
   // Quản lý đếm ngược 30 giây thời gian thực cho mã OTP
   Timer? _countdownTimer;
-  int _secondsRemaining = 30;
+  int _secondsRemaining = 180;
 
   @override
   void initState() {
@@ -118,10 +118,10 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
     if (success && mounted) {
       AppToast.success(
         context,
-        'Mã xác thực OTP đã được gửi về email của bạn (hiệu lực 30 giây)',
+        'Mã xác thực OTP đã được gửi về email của bạn (hiệu lực 180 giây)',
       );
       _clearOtpInputs();
-      _startCountdown(30);
+      _startCountdown(180);
     }
   }
 
@@ -134,10 +134,10 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
     if (success && mounted) {
       AppToast.success(
         context,
-        'Đã gửi lại mã xác thực mới (hiệu lực 30 giây)',
+        'Đã gửi lại mã xác thực mới (hiệu lực 180 giây)',
       );
       _clearOtpInputs();
-      _startCountdown(30);
+      _startCountdown(180);
     }
   }
 

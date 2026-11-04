@@ -20,7 +20,7 @@ class ForgotPasswordState {
     this.errorMessage,
     this.email = '',
     this.maskedEmail = '',
-    this.expiresIn = 30,
+    this.expiresIn = 180,
     this.resetToken = '',
   });
 
