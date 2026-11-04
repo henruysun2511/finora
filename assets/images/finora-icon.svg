@@ -1,0 +1,43 @@
+<svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="oklch(0.58 0.18 250)"/>
+      <stop offset="100%" stop-color="oklch(0.42 0.17 250)"/>
+    </linearGradient>
+    <linearGradient id="barGrad" x1="0%" y1="100%" x2="0%" y2="0%">
+      <stop offset="0%" stop-color="oklch(0.78 0.16 65)"/>
+      <stop offset="100%" stop-color="oklch(0.88 0.13 90)"/>
+    </linearGradient>
+    <radialGradient id="dotGrad" cx="35%" cy="35%" r="70%">
+      <stop offset="0%" stop-color="oklch(0.9 0.12 90)"/>
+      <stop offset="100%" stop-color="oklch(0.78 0.16 65)"/>
+    </radialGradient>
+    <filter id="glow" x="-100%" y="-100%" width="300%" height="300%">
+      <feGaussianBlur stdDeviation="10" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect x="0" y="0" width="400" height="400" rx="88" fill="url(#bgGrad)"/>
+
+  <!-- Subtle inner highlight -->
+  <rect x="0" y="0" width="400" height="400" rx="88" fill="oklch(1 0 0 / 0.04)"/>
+
+  <!-- Ascending bars forming an abstract F / growth chart -->
+  <g>
+    <rect x="112" y="230" width="34" height="90" rx="10" fill="oklch(0.95 0.02 250)"/>
+    <rect x="164" y="185" width="34" height="135" rx="10" fill="oklch(0.95 0.02 250)"/>
+    <rect x="216" y="140" width="34" height="180" rx="10" fill="url(#barGrad)"/>
+  </g>
+
+  <!-- Trend line connecting the bars, echoing the F crossbar -->
+  <path d="M 112 232 L 216 142" stroke="url(#barGrad)" stroke-width="10" stroke-linecap="round" fill="none"/>
+
+  <!-- AI spark dot (Nora) -->
+  <circle cx="266" cy="112" r="26" fill="url(#dotGrad)" filter="url(#glow)"/>
+  <circle cx="266" cy="112" r="8" fill="oklch(0.99 0 0 / 0.9)"/>
+</svg>

@@ -215,6 +215,25 @@ class QuickAddModal extends StatelessWidget {
                   ),
                 ],
               ),
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  Expanded(
+                    child: _QuickActionTile(
+                      icon: Icons.category_rounded,
+                      title: 'Quản lý Danh mục',
+                      subtitle: 'Cấu hình và phân loại thu chi',
+                      gradient: const [Color(0xFF0284C7), Color(0xFF38BDF8)],
+                      onTap: () {
+                        Navigator.pop(context);
+                        context.push(RoutePaths.categorySettings);
+                      },
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  const Expanded(child: SizedBox.shrink()),
+                ],
+              ),
             ],
           ),
         ),

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'lucide_icon.dart';
 
+/// Icon danh mục chuẩn Solarn FinTech sử dụng Lucide Vector SVG
 class CategoryIcon extends StatelessWidget {
   final String? icon;
   final String? colorHex;
@@ -26,8 +28,6 @@ class CategoryIcon extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final baseColor = _parseColor(colorHex);
-    final isEmoji = icon != null &&
-        icon!.runes.any((rune) => rune > 127 || rune == 0x200D);
 
     return Container(
       width: size,
@@ -37,16 +37,12 @@ class CategoryIcon extends StatelessWidget {
         borderRadius: BorderRadius.circular(size * 0.35),
       ),
       alignment: Alignment.center,
-      child: isEmoji
-          ? Text(
-              icon ?? '🏷️',
-              style: TextStyle(fontSize: size * 0.5),
-            )
-          : Icon(
-              Icons.category_outlined,
-              size: size * 0.52,
-              color: baseColor,
-            ),
+      child: LucideIcon(
+        name: icon ?? 'tag',
+        size: size * 0.52,
+        color: baseColor,
+        strokeWidth: 2.0,
+      ),
     );
   }
 }

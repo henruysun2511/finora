@@ -44,11 +44,13 @@ class RouteNames {
   // 5. Budgets (Ngân sách)
   static const String createBudget = 'createBudget';
   static const String budgetDetail = 'budgetDetail';
+  static const String editBudget = 'editBudget';
 
   // 6. Loans & Split Expenses (Sổ nợ & Chia tiền nhóm)
   static const String loans = 'loans';
   static const String loanDetail = 'loanDetail';
   static const String createLoan = 'createLoan';
+  static const String editLoan = 'editLoan';
   static const String splitExpenses = 'splitExpenses';
   static const String splitExpenseDetail = 'splitExpenseDetail';
   static const String createSplitExpense = 'createSplitExpense';
@@ -70,6 +72,7 @@ class RouteNames {
   static const String securitySettings = 'securitySettings';
   static const String categorySettings = 'categorySettings';
   static const String aiPersonaSettings = 'aiPersonaSettings';
+  static const String mascotShowcase = 'mascotShowcase';
   static const String notificationSettings = 'notificationSettings';
 
   // 11. Sample Features (CRUD Mẫu)
@@ -124,11 +127,13 @@ class RoutePaths {
   // 5. Budgets
   static const String createBudget = '/budgets/create';
   static const String budgetDetail = '/budgets/:id';
+  static const String editBudget = '/budgets/:id/edit';
 
   // 6. Loans & Split Expenses
   static const String loans = '/loans';
   static const String loanDetail = '/loans/:id';
   static const String createLoan = '/loans/create';
+  static const String editLoan = '/loans/:id/edit';
   static const String splitExpenses = '/split-expenses';
   static const String splitExpenseDetail = '/split-expenses/:id';
   static const String createSplitExpense = '/split-expenses/create';
@@ -150,6 +155,7 @@ class RoutePaths {
   static const String securitySettings = '/settings/security';
   static const String categorySettings = '/settings/categories';
   static const String aiPersonaSettings = '/settings/ai-persona';
+  static const String mascotShowcase = '/mascots/showcase';
   static const String notificationSettings = '/settings/notifications';
 
   // 11. Sample Features (CRUD Mẫu)

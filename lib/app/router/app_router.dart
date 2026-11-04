@@ -15,10 +15,10 @@ import '../../features/auth/presentation/screens/register_screen.dart';
 import '../../features/auth/presentation/screens/welcome_screen.dart';
 import '../../features/budgets/presentation/screens/budget_detail_screen.dart';
 import '../../features/budgets/presentation/screens/budgets_screen.dart';
-import '../../features/budgets/presentation/screens/create_budget_screen.dart';
+import '../../features/budgets/presentation/screens/budget_form_screen.dart';
 import '../../features/home/presentation/screens/home_screen.dart';
-import '../../features/loans/presentation/screens/create_loan_screen.dart';
 import '../../features/loans/presentation/screens/loan_detail_screen.dart';
+import '../../features/loans/presentation/screens/loan_form_screen.dart';
 import '../../features/loans/presentation/screens/loans_screen.dart';
 import '../../features/notifications/presentation/screens/notifications_screen.dart';
 import '../../features/onboarding/presentation/screens/onboarding_all_set_screen.dart';
@@ -31,8 +31,9 @@ import '../../features/products/presentation/screens/product_form_screen.dart';
 import '../../features/products/presentation/screens/products_screen.dart';
 import '../../features/profile/presentation/screens/profile_screen.dart';
 import '../../features/profile/presentation/screens/user_profile_detail_screen.dart';
-import '../../features/settings/presentation/screens/ai_persona_settings_screen.dart';
-import '../../features/settings/presentation/screens/category_settings_screen.dart';
+import '../../features/mascot/presentation/screens/mascot_settings_screen.dart';
+import '../../features/mascot/presentation/screens/mascot_showcase_screen.dart';
+import '../../features/categories/presentation/screens/category_list_screen.dart';
 import '../../features/settings/presentation/screens/notification_settings_screen.dart';
 import '../../features/settings/presentation/screens/security_settings_screen.dart';
 import '../../features/settings/presentation/screens/settings_screen.dart';
@@ -315,7 +316,7 @@ GoRouter appRouter(AppRouterRef ref) {
         parentNavigatorKey: _rootNavigatorKey,
         path: RoutePaths.createBudget,
         name: RouteNames.createBudget,
-        builder: (context, state) => const CreateBudgetScreen(),
+        builder: (context, state) => const BudgetFormScreen(),
       ),
       GoRoute(
         parentNavigatorKey: _rootNavigatorKey,
@@ -326,6 +327,15 @@ GoRouter appRouter(AppRouterRef ref) {
           return BudgetDetailScreen(budgetId: id);
         },
       ),
+      GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
+        path: RoutePaths.editBudget,
+        name: RouteNames.editBudget,
+        builder: (context, state) {
+          final id = state.pathParameters['id'] ?? '';
+          return BudgetFormScreen(budgetId: id);
+        },
+      ),
 
       // ==========================================
       // 6. PHÂN HỆ SỔ NỢ & CHIA TIỀN NHÓM (Loans & Split)
@@ -334,13 +344,24 @@ GoRouter appRouter(AppRouterRef ref) {
         parentNavigatorKey: _rootNavigatorKey,
         path: RoutePaths.loans,
         name: RouteNames.loans,
-        builder: (context, state) => const LoansScreen(),
+        builder: (context, state) => LoansScreen(
+          initialTab: state.uri.queryParameters['tab'],
+        ),
       ),
       GoRoute(
         parentNavigatorKey: _rootNavigatorKey,
         path: RoutePaths.createLoan,
         name: RouteNames.createLoan,
-        builder: (context, state) => const CreateLoanScreen(),
+        builder: (context, state) => const LoanFormScreen(),
+      ),
+      GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
+        path: RoutePaths.editLoan,
+        name: RouteNames.editLoan,
+        builder: (context, state) {
+          final id = state.pathParameters['id'] ?? '';
+          return LoanFormScreen(loanId: id);
+        },
       ),
       GoRoute(
         parentNavigatorKey: _rootNavigatorKey,
@@ -448,13 +469,22 @@ GoRouter appRouter(AppRouterRef ref) {
         parentNavigatorKey: _rootNavigatorKey,
         path: RoutePaths.categorySettings,
         name: RouteNames.categorySettings,
-        builder: (context, state) => const CategorySettingsScreen(),
+        builder: (context, state) => const CategoryListScreen(),
       ),
       GoRoute(
         parentNavigatorKey: _rootNavigatorKey,
         path: RoutePaths.aiPersonaSettings,
         name: RouteNames.aiPersonaSettings,
-        builder: (context, state) => const AiPersonaSettingsScreen(),
+        builder: (context, state) => const MascotSettingsScreen(),
+      ),
+      GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
+        path: RoutePaths.mascotShowcase,
+        name: RouteNames.mascotShowcase,
+        builder: (context, state) {
+          final id = state.uri.queryParameters['id'];
+          return MascotShowcaseScreen(initialMascotId: id);
+        },
       ),
       GoRoute(
         parentNavigatorKey: _rootNavigatorKey,
