@@ -1,6 +1,7 @@
 import '../models/budget.dart';
 import '../models/budget_filter.dart';
 import '../models/budget_input.dart';
+import '../models/budget_live_status.dart';
 import '../models/budget_period.dart';
 import '../models/budget_summary.dart';
 
@@ -15,6 +16,9 @@ abstract class BudgetRepository {
 
   /// Lấy chi tiết một ngân sách theo ID
   Future<Budget> getBudgetById(String id);
+
+  /// Lấy tiến độ chi tiêu theo thời gian thực: GET /api/v1/budgets/:id/status
+  Future<BudgetLiveStatus> getBudgetStatus(String id);
 
   /// Lấy lịch sử các chu kỳ trước của một ngân sách
   Future<List<BudgetPeriod>> getBudgetHistory(String id);
@@ -31,4 +35,3 @@ abstract class BudgetRepository {
   /// Chốt kỳ sang kỳ mới sớm (reset period)
   Future<Budget> resetBudgetPeriod(String id);
 }
-

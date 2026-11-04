@@ -9,9 +9,11 @@ class SmartDailyBudgetCard extends StatelessWidget {
   const SmartDailyBudgetCard({
     super.key,
     required this.budget,
+    this.customDailyAmount,
   });
 
   final Budget budget;
+  final double? customDailyAmount;
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +21,7 @@ class SmartDailyBudgetCard extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     final days = budget.daysRemaining;
-    final dailyAmount = budget.dailyBudgetRemaining;
+    final dailyAmount = customDailyAmount ?? budget.dailyBudgetRemaining;
 
     return Container(
       width: double.infinity,

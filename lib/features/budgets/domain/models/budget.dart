@@ -1,4 +1,5 @@
 import 'budget_enums.dart';
+import 'budget_period.dart';
 
 /// Entity thuần Domain cho Ngân sách (Budget).
 /// Tuân thủ Clean Architecture, không phụ thuộc vào Flutter UI hay Network library.
@@ -14,9 +15,11 @@ class Budget {
     required this.startDate,
     this.endDate,
     this.isRolloverEnabled = true,
+    this.historyPeriods = const [],
     this.walletName,
     this.categoryName,
     this.categoryIcon,
+    this.categoryColor,
     this.createdAt,
     this.updatedAt,
   });
@@ -31,11 +34,13 @@ class Budget {
   final DateTime startDate;
   final DateTime? endDate;
   final bool isRolloverEnabled;
+  final List<BudgetPeriod> historyPeriods;
 
   // Thuộc tính tiện ích phục vụ hiển thị
   final String? walletName;
   final String? categoryName;
   final String? categoryIcon;
+  final String? categoryColor;
   final DateTime? createdAt;
   final DateTime? updatedAt;
 
@@ -80,9 +85,11 @@ class Budget {
     DateTime? startDate,
     DateTime? endDate,
     bool? isRolloverEnabled,
+    List<BudgetPeriod>? historyPeriods,
     String? walletName,
     String? categoryName,
     String? categoryIcon,
+    String? categoryColor,
     DateTime? createdAt,
     DateTime? updatedAt,
   }) {
@@ -97,12 +104,13 @@ class Budget {
       startDate: startDate ?? this.startDate,
       endDate: endDate ?? this.endDate,
       isRolloverEnabled: isRolloverEnabled ?? this.isRolloverEnabled,
+      historyPeriods: historyPeriods ?? this.historyPeriods,
       walletName: walletName ?? this.walletName,
       categoryName: categoryName ?? this.categoryName,
       categoryIcon: categoryIcon ?? this.categoryIcon,
+      categoryColor: categoryColor ?? this.categoryColor,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );
   }
 }
-

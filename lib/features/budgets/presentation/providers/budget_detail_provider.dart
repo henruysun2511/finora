@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../domain/models/budget.dart';
+import '../../domain/models/budget_live_status.dart';
 import '../../domain/models/budget_period.dart';
 import 'budget_list_provider.dart';
 import 'budget_providers.dart';
@@ -9,22 +10,34 @@ class BudgetDetailData {
   const BudgetDetailData({
     required this.budget,
     required this.history,
+    this.liveStatus,
   });
 
   final Budget budget;
   final List<BudgetPeriod> history;
+  final BudgetLiveStatus? liveStatus;
 }
 
 final budgetDetailProvider =
     FutureProvider.family<BudgetDetailData, String>((ref, id) async {
   final repo = ref.watch(budgetRepositoryProvider);
-  final budgetFuture = repo.getBudgetById(id);
-  final historyFuture = repo.getBudgetHistory(id);
+  final budget = await repo.getBudgetById(id);
 
-  final res = await Future.wait([budgetFuture, historyFuture]);
+  BudgetLiveStatus? liveStatus;
+  try {
+    liveStatus = await repo.getBudgetStatus(id);
+  } catch (_) {
+    // Fallback an toàn nếu status api gặp vấn đề mạng
+  }
+
+  final history = budget.historyPeriods.isNotEmpty
+      ? budget.historyPeriods
+      : await repo.getBudgetHistory(id);
+
   return BudgetDetailData(
-    budget: res[0] as Budget,
-    history: res[1] as List<BudgetPeriod>,
+    budget: budget,
+    history: history,
+    liveStatus: liveStatus,
   );
 });
 
@@ -39,4 +52,3 @@ final budgetResetPeriodProvider =
     return updated;
   };
 });
-

@@ -8,6 +8,7 @@ import '../../../../core/widgets/mascot_banner.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
 import '../widgets/home_accounts_section.dart';
 import '../widgets/home_header.dart';
+import '../widgets/home_mascot_section.dart';
 import '../widgets/quick_actions_grid.dart';
 import '../widgets/recent_transactions_section.dart';
 
@@ -62,6 +63,10 @@ class HomeScreen extends ConsumerWidget {
 
                       // Section: Giao dịch gần đây
                       const RecentTransactionsSection(),
+                      const SizedBox(height: 22),
+
+                      // Section: Linh vật AI Finora
+                      const HomeMascotSection(),
                     ],
                   ),
                 ),

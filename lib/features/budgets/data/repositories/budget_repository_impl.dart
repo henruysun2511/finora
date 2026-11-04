@@ -1,6 +1,7 @@
 import '../../domain/models/budget.dart';
 import '../../domain/models/budget_filter.dart';
 import '../../domain/models/budget_input.dart';
+import '../../domain/models/budget_live_status.dart';
 import '../../domain/models/budget_period.dart';
 import '../../domain/models/budget_summary.dart';
 import '../../domain/repositories/budget_repository.dart';
@@ -63,6 +64,12 @@ class BudgetRepositoryImpl implements BudgetRepository {
   }
 
   @override
+  Future<BudgetLiveStatus> getBudgetStatus(String id) async {
+    final res = await _service.getBudgetStatus(id);
+    return BudgetMapper.toStatusDomain(res);
+  }
+
+  @override
   Future<List<BudgetPeriod>> getBudgetHistory(String id) async {
     final res = await _service.getBudgetHistory(id);
     return res.map(BudgetMapper.toPeriodDomain).toList();
@@ -91,4 +98,3 @@ class BudgetRepositoryImpl implements BudgetRepository {
     return BudgetMapper.toDomain(res);
   }
 }
-

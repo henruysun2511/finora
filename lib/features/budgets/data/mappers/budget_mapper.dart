@@ -1,9 +1,11 @@
 import '../../domain/models/budget.dart';
 import '../../domain/models/budget_enums.dart';
 import '../../domain/models/budget_input.dart';
+import '../../domain/models/budget_live_status.dart';
 import '../../domain/models/budget_period.dart';
 import '../dto/budget_period_response.dart';
 import '../dto/budget_response.dart';
+import '../dto/budget_status_response.dart';
 import '../dto/create_budget_request.dart';
 import '../dto/update_budget_request.dart';
 
@@ -28,6 +30,8 @@ class BudgetMapper {
       walletName: dto.walletName,
       categoryName: dto.categoryName,
       categoryIcon: dto.categoryIcon,
+      categoryColor: dto.categoryColor,
+      historyPeriods: dto.periods?.map(toPeriodDomain).toList() ?? const [],
       createdAt: dto.createdAt,
       updatedAt: dto.updatedAt,
     );
@@ -44,6 +48,22 @@ class BudgetMapper {
       spentAmount: dto.spentAmount,
       rolloverAmount: dto.rolloverAmount,
       isClosed: dto.isClosed,
+    );
+  }
+
+  /// Chuyển đổi BudgetStatusResponse (DTO) sang BudgetLiveStatus (Domain Entity)
+  static BudgetLiveStatus toStatusDomain(BudgetStatusResponse dto) {
+    return BudgetLiveStatus(
+      budgetId: dto.budgetId,
+      effectiveLimit: dto.effectiveLimit,
+      spentAmount: dto.spentAmount,
+      remainingAmount: dto.remainingAmount,
+      percentage: dto.percentage,
+      dailyBudgetRemaining: dto.dailyBudgetRemaining,
+      daysRemaining: dto.daysRemaining,
+      status: BudgetProgressStatus.fromCode(dto.statusCode),
+      rolloverAmount: dto.rolloverAmount,
+      limitAmount: dto.limitAmount,
     );
   }
 
@@ -68,4 +88,3 @@ class BudgetMapper {
     );
   }
 }
-

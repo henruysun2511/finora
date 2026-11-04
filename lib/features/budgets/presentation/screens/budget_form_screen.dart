@@ -6,21 +6,26 @@ import 'package:intl/intl.dart';
 
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/widgets/app_toast.dart';
+import '../../../../core/widgets/solarn_header.dart';
 import '../../domain/models/budget.dart';
 import '../../domain/models/budget_enums.dart';
 import '../../domain/models/budget_input.dart';
 import '../../domain/validators/budget_validators.dart';
+import '../providers/budget_detail_provider.dart';
 import '../providers/budget_form_provider.dart';
 
 class BudgetFormScreen extends ConsumerStatefulWidget {
   const BudgetFormScreen({
     super.key,
     this.initialBudget,
+    this.budgetId,
   });
 
   final Budget? initialBudget;
+  final String? budgetId;
 
-  bool get isEditing => initialBudget != null;
+  bool get isEditing =>
+      initialBudget != null || (budgetId != null && budgetId!.isNotEmpty);
 
   @override
   ConsumerState<BudgetFormScreen> createState() => _BudgetFormScreenState();
@@ -35,24 +40,30 @@ class _BudgetFormScreenState extends ConsumerState<BudgetFormScreen> {
   BudgetPeriodType _selectedPeriod = BudgetPeriodType.monthly;
   DateTime _startDate = DateTime.now();
   bool _isRolloverEnabled = true;
+  bool _isLoadedFromProvider = false;
 
   @override
   void initState() {
     super.initState();
+    _limitController = TextEditingController();
     final b = widget.initialBudget;
     if (b != null) {
-      final formatter = NumberFormat.currency(locale: 'vi_VN', symbol: '', decimalDigits: 0);
-      _limitController = TextEditingController(text: formatter.format(b.limitAmount).trim());
-      _selectedWalletId = b.walletId;
-      _selectedCategoryId = b.categoryId;
-      _selectedPeriod = b.periodType;
-      _startDate = b.startDate;
-      _isRolloverEnabled = b.isRolloverEnabled;
+      _populateFromBudget(b);
     } else {
-      _limitController = TextEditingController();
-      _selectedWalletId = 'personal';
-      _selectedCategoryId = 'food';
+      _selectedWalletId = '11111111-1111-4111-8111-111111111111';
+      _selectedCategoryId = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';
     }
+  }
+
+  void _populateFromBudget(Budget b) {
+    final formatter =
+        NumberFormat.currency(locale: 'vi_VN', symbol: '', decimalDigits: 0);
+    _limitController.text = formatter.format(b.limitAmount).trim();
+    _selectedWalletId = b.walletId;
+    _selectedCategoryId = b.categoryId;
+    _selectedPeriod = b.periodType;
+    _startDate = b.startDate;
+    _isRolloverEnabled = b.isRolloverEnabled;
   }
 
   @override
@@ -61,10 +72,42 @@ class _BudgetFormScreenState extends ConsumerState<BudgetFormScreen> {
     super.dispose();
   }
 
-  Future<void> _submit() async {
+  List<DropdownMenuItem<String>> _buildWalletItems(Budget? currentBudget) {
+    final map = <String, String>{
+      '11111111-1111-4111-8111-111111111111': 'Ví Cá Nhân (VND)',
+      '22222222-2222-4222-8222-222222222222': 'Ví Gia Đình (VND)',
+    };
+    if (_selectedWalletId != null && !map.containsKey(_selectedWalletId)) {
+      map[_selectedWalletId!] =
+          currentBudget?.walletName ?? 'Ví chi tiêu (${_selectedWalletId!.substring(0, 8)})';
+    }
+    return map.entries
+        .map((e) => DropdownMenuItem(value: e.key, child: Text(e.value)))
+        .toList();
+  }
+
+  List<DropdownMenuItem<String>> _buildCategoryItems(Budget? currentBudget) {
+    final map = <String, String>{
+      'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa': '🍔 Ăn uống & Tiệc tùng',
+      'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb': '🛍️ Mua sắm & Thời trang',
+      'cccccccc-cccc-4ccc-8ccc-cccccccccccc': '☕ Cà phê & Gặp gỡ',
+      'dddddddd-dddd-4ddd-8ddd-dddddddddddd': '🚗 Di chuyển & Xăng xe',
+      'eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee': '⚡ Hoá đơn & Tiện ích',
+    };
+    if (_selectedCategoryId != null && !map.containsKey(_selectedCategoryId)) {
+      map[_selectedCategoryId!] =
+          currentBudget?.categoryName ?? 'Danh mục (${_selectedCategoryId!.substring(0, 8)})';
+    }
+    return map.entries
+        .map((e) => DropdownMenuItem(value: e.key, child: Text(e.value)))
+        .toList();
+  }
+
+  Future<void> _submit(String? activeId) async {
     if (!_formKey.currentState!.validate()) return;
 
-    final limitRaw = _limitController.text.replaceAll(RegExp(r'[\.,\s₫VND]'), '');
+    final limitRaw =
+        _limitController.text.replaceAll(RegExp(r'[\.,\s₫VND]'), '');
     final limitAmount = double.tryParse(limitRaw) ?? 0.0;
 
     final input = BudgetInput(
@@ -76,7 +119,7 @@ class _BudgetFormScreenState extends ConsumerState<BudgetFormScreen> {
       isRolloverEnabled: _isRolloverEnabled,
     );
 
-    final formNotifier = ref.read(budgetFormProvider(widget.initialBudget?.id).notifier);
+    final formNotifier = ref.read(budgetFormProvider(activeId).notifier);
     final result = await formNotifier.submit(input);
 
     if (!mounted) return;
@@ -84,12 +127,14 @@ class _BudgetFormScreenState extends ConsumerState<BudgetFormScreen> {
     if (result != null) {
       AppToast.show(
         context,
-        message: widget.isEditing ? 'Cập nhật ngân sách thành công!' : 'Tạo mới ngân sách thành công!',
+        message: widget.isEditing
+            ? 'Cập nhật ngân sách thành công!'
+            : 'Tạo mới ngân sách thành công!',
         type: ToastType.success,
       );
       Navigator.pop(context, result);
     } else {
-      final err = ref.read(budgetFormProvider(widget.initialBudget?.id)).errorMessage;
+      final err = ref.read(budgetFormProvider(activeId)).errorMessage;
       if (err != null) {
         AppToast.show(
           context,
@@ -103,45 +148,71 @@ class _BudgetFormScreenState extends ConsumerState<BudgetFormScreen> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final formState = ref.watch(budgetFormProvider(widget.initialBudget?.id));
+    final activeId = widget.initialBudget?.id ?? widget.budgetId;
+
+    // Nếu vào qua router với budgetId mà chưa có initialBudget
+    if (widget.initialBudget == null && widget.budgetId != null) {
+      final detailAsync = ref.watch(budgetDetailProvider(widget.budgetId!));
+      return detailAsync.when(
+        loading: () => const Scaffold(
+          body: Center(child: CircularProgressIndicator()),
+        ),
+        error: (err, _) => Scaffold(
+          appBar: AppBar(title: const Text('Lỗi')),
+          body: Center(child: Text(err.toString())),
+        ),
+        data: (data) {
+          if (!_isLoadedFromProvider) {
+            _isLoadedFromProvider = true;
+            _populateFromBudget(data.budget);
+          }
+          return _buildScaffold(context, isDark, activeId, data.budget);
+        },
+      );
+    }
+
+    return _buildScaffold(context, isDark, activeId, widget.initialBudget);
+  }
+
+  Widget _buildScaffold(
+    BuildContext context,
+    bool isDark,
+    String? activeId,
+    Budget? currentBudget,
+  ) {
+    final formState = ref.watch(budgetFormProvider(activeId));
 
     return Scaffold(
-      backgroundColor: isDark ? AppColors.darkBackground : AppColors.lightBackground,
-      appBar: AppBar(
-        title: Text(
-          widget.isEditing ? 'Chỉnh sửa ngân sách' : 'Thiết lập ngân sách mới',
-          style: GoogleFonts.inter(fontWeight: FontWeight.w700, fontSize: 18),
-        ),
-        centerTitle: true,
-        backgroundColor: isDark ? AppColors.darkSurface : Colors.white,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.close_rounded),
-          onPressed: () => Navigator.pop(context),
-        ),
+      backgroundColor:
+          isDark ? AppColors.darkBackground : AppColors.lightBackground,
+      appBar: SolarnHeader.subPage(
+        title: widget.isEditing ? 'Chỉnh sửa ngân sách' : 'Thiết lập ngân sách mới',
       ),
       body: Form(
         key: _formKey,
         child: ListView(
           padding: const EdgeInsets.all(20),
           children: [
-            // Banner lỗi từ Backend nếu có (Lớp 2 validation)
+            // Banner lỗi từ Backend nếu có
             if (formState.errorMessage != null) ...[
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
                   color: AppColors.danger.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: AppColors.danger.withValues(alpha: 0.3)),
+                  border:
+                      Border.all(color: AppColors.danger.withValues(alpha: 0.3)),
                 ),
                 child: Row(
                   children: [
-                    const Icon(Icons.error_outline, color: AppColors.danger, size: 20),
+                    const Icon(Icons.error_outline,
+                        color: AppColors.danger, size: 20),
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
                         formState.errorMessage!,
-                        style: GoogleFonts.inter(color: AppColors.danger, fontSize: 13),
+                        style: GoogleFonts.inter(
+                            color: AppColors.danger, fontSize: 13),
                       ),
                     ),
                   ],
@@ -153,7 +224,8 @@ class _BudgetFormScreenState extends ConsumerState<BudgetFormScreen> {
             // 1. Chọn ví chi tiêu
             Text(
               '1. Chọn Ví chi tiêu *',
-              style: GoogleFonts.inter(fontWeight: FontWeight.w600, fontSize: 14),
+              style:
+                  GoogleFonts.inter(fontWeight: FontWeight.w600, fontSize: 14),
             ),
             const SizedBox(height: 8),
             DropdownButtonFormField<String>(
@@ -161,13 +233,11 @@ class _BudgetFormScreenState extends ConsumerState<BudgetFormScreen> {
               decoration: InputDecoration(
                 filled: true,
                 fillColor: isDark ? AppColors.darkSurface : Colors.white,
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                border:
+                    OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
               ),
               validator: BudgetValidators.validateWalletId,
-              items: const [
-                DropdownMenuItem(value: 'personal', child: Text('Ví Cá Nhân (VND)')),
-                DropdownMenuItem(value: 'family', child: Text('Ví Gia Đình (VND)')),
-              ],
+              items: _buildWalletItems(currentBudget),
               onChanged: (val) => setState(() => _selectedWalletId = val),
             ),
             const SizedBox(height: 20),
@@ -175,12 +245,16 @@ class _BudgetFormScreenState extends ConsumerState<BudgetFormScreen> {
             // 2. Chọn Danh mục chi tiêu
             Text(
               '2. Chọn Danh mục chi tiêu *',
-              style: GoogleFonts.inter(fontWeight: FontWeight.w600, fontSize: 14),
+              style:
+                  GoogleFonts.inter(fontWeight: FontWeight.w600, fontSize: 14),
             ),
             const SizedBox(height: 4),
             Text(
               '*(Lưu ý: Chỉ áp dụng cho danh mục Chi tiêu - EXPENSE)*',
-              style: GoogleFonts.inter(fontSize: 12, color: AppColors.lightMuted, fontStyle: FontStyle.italic),
+              style: GoogleFonts.inter(
+                  fontSize: 12,
+                  color: AppColors.lightMuted,
+                  fontStyle: FontStyle.italic),
             ),
             const SizedBox(height: 8),
             DropdownButtonFormField<String>(
@@ -188,16 +262,11 @@ class _BudgetFormScreenState extends ConsumerState<BudgetFormScreen> {
               decoration: InputDecoration(
                 filled: true,
                 fillColor: isDark ? AppColors.darkSurface : Colors.white,
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                border:
+                    OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
               ),
               validator: BudgetValidators.validateCategoryId,
-              items: const [
-                DropdownMenuItem(value: 'food', child: Text('🍔 Ăn uống & Tiệc tùng')),
-                DropdownMenuItem(value: 'shopping', child: Text('🛍️ Mua sắm & Thời trang')),
-                DropdownMenuItem(value: 'cafe', child: Text('☕ Cà phê & Gặp gỡ')),
-                DropdownMenuItem(value: 'transport', child: Text('🚗 Di chuyển & Xăng xe')),
-                DropdownMenuItem(value: 'bills', child: Text('⚡ Hoá đơn & Tiện ích')),
-              ],
+              items: _buildCategoryItems(currentBudget),
               onChanged: (val) => setState(() => _selectedCategoryId = val),
             ),
             const SizedBox(height: 20),
@@ -205,7 +274,8 @@ class _BudgetFormScreenState extends ConsumerState<BudgetFormScreen> {
             // 3. Hạn mức chi tiêu mong muốn
             Text(
               '3. Hạn mức chi tiêu mong muốn *',
-              style: GoogleFonts.inter(fontWeight: FontWeight.w600, fontSize: 14),
+              style:
+                  GoogleFonts.inter(fontWeight: FontWeight.w600, fontSize: 14),
             ),
             const SizedBox(height: 8),
             TextFormField(
@@ -219,7 +289,8 @@ class _BudgetFormScreenState extends ConsumerState<BudgetFormScreen> {
                 suffixText: 'VND',
                 filled: true,
                 fillColor: isDark ? AppColors.darkSurface : Colors.white,
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                border:
+                    OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
               ),
               validator: BudgetValidators.validateLimitAmount,
             ),
@@ -228,7 +299,8 @@ class _BudgetFormScreenState extends ConsumerState<BudgetFormScreen> {
             // 4. Chu kỳ ngân sách
             Text(
               '4. Chu kỳ ngân sách',
-              style: GoogleFonts.inter(fontWeight: FontWeight.w600, fontSize: 14),
+              style:
+                  GoogleFonts.inter(fontWeight: FontWeight.w600, fontSize: 14),
             ),
             const SizedBox(height: 8),
             Row(
@@ -242,8 +314,11 @@ class _BudgetFormScreenState extends ConsumerState<BudgetFormScreen> {
                       selected: isSelected,
                       selectedColor: AppColors.primary,
                       labelStyle: TextStyle(
-                        color: isSelected ? Colors.white : (isDark ? Colors.white : Colors.black),
-                        fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                        color: isSelected
+                            ? Colors.white
+                            : (isDark ? Colors.white : Colors.black),
+                        fontWeight:
+                            isSelected ? FontWeight.w600 : FontWeight.normal,
                       ),
                       onSelected: (_) => setState(() => _selectedPeriod = p),
                     ),
@@ -253,10 +328,11 @@ class _BudgetFormScreenState extends ConsumerState<BudgetFormScreen> {
             ),
             const SizedBox(height: 20),
 
-            // 5. Ngày bắt đầu áp dụng
+            // 5. Ngày bắt đầu kỳ
             Text(
               '5. Ngày bắt đầu áp dụng',
-              style: GoogleFonts.inter(fontWeight: FontWeight.w600, fontSize: 14),
+              style:
+                  GoogleFonts.inter(fontWeight: FontWeight.w600, fontSize: 14),
             ),
             const SizedBox(height: 8),
             InkWell(
@@ -265,38 +341,46 @@ class _BudgetFormScreenState extends ConsumerState<BudgetFormScreen> {
                   context: context,
                   initialDate: _startDate,
                   firstDate: DateTime(2020),
-                  lastDate: DateTime(2035),
+                  lastDate: DateTime(2100),
                 );
-                if (picked != null) setState(() => _startDate = picked);
+                if (picked != null) {
+                  setState(() => _startDate = picked);
+                }
               },
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                 decoration: BoxDecoration(
                   color: isDark ? AppColors.darkSurface : Colors.white,
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: isDark ? AppColors.darkBorder : AppColors.lightBorder),
+                  border: Border.all(
+                      color: isDark
+                          ? AppColors.darkBorder
+                          : AppColors.lightBorder),
                 ),
                 child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Icon(Icons.calendar_today_rounded, size: 18, color: AppColors.primary),
-                    const SizedBox(width: 12),
                     Text(
-                      DateFormat('yyyy-MM-dd').format(_startDate),
-                      style: GoogleFonts.inter(fontSize: 14),
+                      DateFormat('dd/MM/yyyy').format(_startDate),
+                      style: GoogleFonts.inter(fontSize: 15),
                     ),
+                    const Icon(Icons.calendar_today_rounded, size: 18),
                   ],
                 ),
               ),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 20),
 
-            // 6. Cơ chế Rollover
+            // 6. Tính năng Rollover
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 color: isDark ? AppColors.darkSurface : Colors.white,
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: isDark ? AppColors.darkBorder : AppColors.lightBorder),
+                border: Border.all(
+                    color:
+                        isDark ? AppColors.darkBorder : AppColors.lightBorder),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -306,50 +390,67 @@ class _BudgetFormScreenState extends ConsumerState<BudgetFormScreen> {
                     children: [
                       Row(
                         children: [
-                          const Icon(Icons.autorenew_rounded, color: AppColors.primary),
+                          const Icon(Icons.autorenew_rounded,
+                              color: AppColors.primary, size: 20),
                           const SizedBox(width: 8),
                           Text(
-                            'Bật tính năng Rollover',
-                            style: GoogleFonts.inter(fontWeight: FontWeight.w700, fontSize: 14),
+                            'Cộng dồn ngân sách (Rollover)',
+                            style: GoogleFonts.inter(
+                                fontWeight: FontWeight.w600, fontSize: 14),
                           ),
                         ],
                       ),
-                      Switch(
+                      Switch.adaptive(
                         value: _isRolloverEnabled,
-                        activeThumbColor: AppColors.primary,
-                        onChanged: (val) => setState(() => _isRolloverEnabled = val),
+                        activeTrackColor: AppColors.primary,
+                        onChanged: (val) =>
+                            setState(() => _isRolloverEnabled = val),
                       ),
                     ],
                   ),
-                  const Divider(height: 20),
+                  const SizedBox(height: 8),
                   Text(
-                    '• Tiết kiệm được: Tiền thừa tháng này cộng vào tháng sau.\n• Bị bội chi: Tháng sau sẽ bị trừ bớt hạn mức bù lại.',
-                    style: GoogleFonts.inter(fontSize: 12, height: 1.5, color: AppColors.lightMuted),
+                    'Tự động cộng dồn số tiền chưa dùng hết của kỳ trước sang kỳ tiếp theo, hoặc trừ bớt nếu bạn chi tiêu vượt quá hạn mức.',
+                    style: GoogleFonts.inter(
+                      fontSize: 12,
+                      color:
+                          isDark ? AppColors.darkMuted : AppColors.lightMuted,
+                      height: 1.4,
+                    ),
                   ),
                 ],
               ),
             ),
             const SizedBox(height: 32),
 
-            // Nút Lưu ngân sách
-            ElevatedButton(
-              onPressed: formState.isSubmitting ? null : _submit,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
-                foregroundColor: Colors.white,
-                minimumSize: const Size.fromHeight(50),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+            // Nút Lưu
+            SizedBox(
+              width: double.infinity,
+              height: 50,
+              child: ElevatedButton(
+                onPressed: formState.isSubmitting
+                    ? null
+                    : () => _submit(activeId),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primary,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14)),
+                  elevation: 0,
+                ),
+                child: formState.isSubmitting
+                    ? const SizedBox(
+                        width: 22,
+                        height: 22,
+                        child: CircularProgressIndicator(
+                            strokeWidth: 2.5, color: Colors.white),
+                      )
+                    : Text(
+                        widget.isEditing ? 'Cập nhật' : 'Hoàn tất & Kích hoạt',
+                        style: GoogleFonts.inter(
+                            fontSize: 16, fontWeight: FontWeight.w700),
+                      ),
               ),
-              child: formState.isSubmitting
-                  ? const SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
-                    )
-                  : Text(
-                      widget.isEditing ? 'Cập nhật ngân sách' : 'Lưu ngân sách',
-                      style: GoogleFonts.inter(fontSize: 15, fontWeight: FontWeight.w600),
-                    ),
             ),
           ],
         ),
@@ -357,4 +458,3 @@ class _BudgetFormScreenState extends ConsumerState<BudgetFormScreen> {
     );
   }
 }
-

@@ -56,9 +56,14 @@ class DioBudgetApiService implements BudgetApiService {
   @override
   Future<List<BudgetResponse>> getBudgets({String? walletId, String? periodType}) =>
       _guard(() async {
-        final query = <String, dynamic>{};
+        final query = <String, dynamic>{
+          'limit': 100, // Lấy toàn bộ ngân sách thay vì chỉ 10 mục mặc định
+        };
         if (walletId != null && walletId.isNotEmpty) query['walletId'] = walletId;
-        if (periodType != null && periodType.isNotEmpty) query['periodType'] = periodType;
+        if (periodType != null && periodType.isNotEmpty) {
+          // Chỉ gửi query 'period' khớp với RecurrencePeriod trong NestJS DTO
+          query['period'] = periodType.toLowerCase();
+        }
 
         final res = await _dio.get<dynamic>(_basePath, queryParameters: query);
         final raw = _extractData(res.data);
@@ -66,8 +71,14 @@ class DioBudgetApiService implements BudgetApiService {
         List<dynamic> items = [];
         if (raw is List) {
           items = raw;
-        } else if (raw is Map<String, dynamic> && raw['items'] is List) {
-          items = raw['items'] as List;
+        } else if (raw is Map<String, dynamic>) {
+          if (raw['items'] is List) {
+            items = raw['items'] as List;
+          } else if (raw['data'] is Map<String, dynamic> && raw['data']['items'] is List) {
+            items = raw['data']['items'] as List;
+          } else if (raw['data'] is List) {
+            items = raw['data'] as List;
+          }
         }
 
         return items
@@ -91,17 +102,12 @@ class DioBudgetApiService implements BudgetApiService {
 
   @override
   Future<List<BudgetPeriodResponse>> getBudgetHistory(String id) => _guard(() async {
-        final res = await _dio.get<dynamic>('$_basePath/$id/history');
-        final raw = _extractData(res.data);
-        List<dynamic> items = [];
-        if (raw is List) {
-          items = raw;
-        } else if (raw is Map<String, dynamic> && raw['items'] is List) {
-          items = raw['items'] as List;
+        // Backend NestJS trả về danh sách periods ngay trong GET /budgets/:id
+        final budget = await getBudgetById(id);
+        if (budget.periods != null && budget.periods!.isNotEmpty) {
+          return budget.periods!;
         }
-        return items
-            .map((e) => BudgetPeriodResponse.fromJson(e as Map<String, dynamic>))
-            .toList();
+        return <BudgetPeriodResponse>[];
       });
 
   @override
@@ -131,4 +137,3 @@ class DioBudgetApiService implements BudgetApiService {
         return BudgetResponse.fromJson(raw as Map<String, dynamic>);
       });
 }
-

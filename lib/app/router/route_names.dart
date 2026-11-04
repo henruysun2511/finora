@@ -44,6 +44,7 @@ class RouteNames {
   // 5. Budgets (Ngân sách)
   static const String createBudget = 'createBudget';
   static const String budgetDetail = 'budgetDetail';
+  static const String editBudget = 'editBudget';
 
   // 6. Loans & Split Expenses (Sổ nợ & Chia tiền nhóm)
   static const String loans = 'loans';
@@ -71,6 +72,7 @@ class RouteNames {
   static const String securitySettings = 'securitySettings';
   static const String categorySettings = 'categorySettings';
   static const String aiPersonaSettings = 'aiPersonaSettings';
+  static const String mascotShowcase = 'mascotShowcase';
   static const String notificationSettings = 'notificationSettings';
 
   // 11. Sample Features (CRUD Mẫu)
@@ -125,6 +127,7 @@ class RoutePaths {
   // 5. Budgets
   static const String createBudget = '/budgets/create';
   static const String budgetDetail = '/budgets/:id';
+  static const String editBudget = '/budgets/:id/edit';
 
   // 6. Loans & Split Expenses
   static const String loans = '/loans';
@@ -152,6 +155,7 @@ class RoutePaths {
   static const String securitySettings = '/settings/security';
   static const String categorySettings = '/settings/categories';
   static const String aiPersonaSettings = '/settings/ai-persona';
+  static const String mascotShowcase = '/mascots/showcase';
   static const String notificationSettings = '/settings/notifications';
 
   // 11. Sample Features (CRUD Mẫu)

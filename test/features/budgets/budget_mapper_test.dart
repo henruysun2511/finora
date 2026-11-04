@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:finora_mb/features/budgets/data/dto/budget_period_response.dart';
 import 'package:finora_mb/features/budgets/data/dto/budget_response.dart';
+import 'package:finora_mb/features/budgets/data/dto/budget_status_response.dart';
 import 'package:finora_mb/features/budgets/data/mappers/budget_mapper.dart';
 import 'package:finora_mb/features/budgets/domain/models/budget_enums.dart';
 import 'package:finora_mb/features/budgets/domain/models/budget_input.dart';
@@ -83,8 +84,29 @@ void main() {
     });
   });
 
+  group('BudgetMapper - toStatusDomain', () {
+    test('chuyển đổi đúng từ BudgetStatusResponse sang BudgetLiveStatus', () {
+      const dto = BudgetStatusResponse(
+        budgetId: 'budget-1',
+        percentage: 82.5,
+        effectiveLimit: 5000000,
+        remainingAmount: 875000,
+        spentAmount: 4125000,
+        dailyBudgetRemaining: 87500,
+        daysRemaining: 10,
+        statusCode: 'WARNING',
+      );
+
+      final live = BudgetMapper.toStatusDomain(dto);
+      expect(live.budgetId, 'budget-1');
+      expect(live.percentage, 82.5);
+      expect(live.status, BudgetProgressStatus.warning);
+      expect(live.dailyBudgetRemaining, 87500);
+    });
+  });
+
   group('BudgetMapper - toCreateRequest & toUpdateRequest', () {
-    test('chuyển đổi đúng từ BudgetInput sang DTO requests', () {
+    test('chuyển đổi đúng từ BudgetInput sang DTO requests khớp backend', () {
       final input = BudgetInput(
         walletId: 'wallet-99',
         categoryId: 'cat-99',
@@ -99,10 +121,17 @@ void main() {
       expect(createReq.periodType, 'WEEKLY');
       expect(createReq.limitAmount, 3000000);
 
+      final json = createReq.toJson();
+      expect(json['period'], 'weekly');
+      expect(json['isRollover'], true);
+
       final updateReq = BudgetMapper.toUpdateRequest(input);
       expect(updateReq.periodType, 'WEEKLY');
       expect(updateReq.limitAmount, 3000000);
+
+      final updateJson = updateReq.toJson();
+      expect(updateJson['period'], 'weekly');
+      expect(updateJson['isRollover'], true);
     });
   });
 }
-

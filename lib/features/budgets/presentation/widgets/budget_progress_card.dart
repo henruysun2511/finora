@@ -3,10 +3,10 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../app/theme/app_colors.dart';
+import '../../../../core/widgets/category_icon.dart';
 import '../../domain/models/budget.dart';
-import '../../domain/models/budget_enums.dart';
-import 'budget_progress_bar.dart';
 
+/// Thẻ ngân sách từng danh mục chuẩn Solarn FinTech Style (`static-ui/ui-sample-3`).
 class BudgetProgressCard extends StatelessWidget {
   const BudgetProgressCard({
     super.key,
@@ -19,142 +19,163 @@ class BudgetProgressCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final currencyFormatter = NumberFormat.currency(locale: 'vi_VN', symbol: '₫', decimalDigits: 0);
+    final currencyFormatter = NumberFormat.currency(
+      locale: 'vi_VN',
+      symbol: '₫',
+      decimalDigits: 0,
+    );
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    final status = budget.status;
+    final pct = budget.percentage;
+    final pctClamped = (pct / 100.0).clamp(0.0, 1.0);
+
+    // Màu sắc và Pill trạng thái chuẩn ui-sample-3
     Color statusColor;
-    String statusIcon;
-    String statusAlert = '';
-    switch (status) {
-      case BudgetProgressStatus.safe:
-        statusColor = AppColors.success;
-        statusIcon = '🟢';
-        break;
-      case BudgetProgressStatus.warning:
-        statusColor = AppColors.warning;
-        statusIcon = '🟡';
-        statusAlert = ' · ⚠️ Sắp chạm trần';
-        break;
-      case BudgetProgressStatus.exceeded:
-        statusColor = AppColors.danger;
-        statusIcon = '🔴';
-        statusAlert = ' · 🚨 ĐÃ VƯỢT HẠN MỨC!';
-        break;
+    Color pillBg;
+    String pillText;
+    IconData pillIcon;
+
+    if (pct >= 100.0) {
+      statusColor = AppColors.danger;
+      pillBg = AppColors.danger.withValues(alpha: 0.12);
+      pillText = 'Vượt';
+      pillIcon = Icons.error_outline_rounded;
+    } else if (pct >= 80.0) {
+      statusColor = const Color(0xFFF97316); // Solarn Orange / Warn
+      pillBg = const Color(0xFFF97316).withValues(alpha: 0.12);
+      pillText = 'Gần vượt';
+      pillIcon = Icons.warning_amber_rounded;
+    } else {
+      statusColor = AppColors.success;
+      pillBg = AppColors.success.withValues(alpha: 0.12);
+      pillText = 'Ổn';
+      pillIcon = Icons.check_circle_outline_rounded;
     }
 
-    final categoryIcon = budget.categoryIcon ?? '📁';
     final categoryName = budget.categoryName ?? 'Chi tiêu';
 
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(16),
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: isDark ? AppColors.darkSurface : Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
-            width: 1,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: isDark ? 0.15 : 0.03),
-              blurRadius: 10,
-              offset: const Offset(0, 2),
-            ),
-          ],
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      decoration: BoxDecoration(
+        color: isDark ? AppColors.darkSurface : Colors.white,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(
+          color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
+          width: 1,
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: isDark ? 0.15 : 0.03),
+            blurRadius: 16,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(18),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Expanded(
-                  child: Row(
-                    children: [
-                      Text(categoryIcon, style: const TextStyle(fontSize: 20)),
-                      const SizedBox(width: 8),
-                      Flexible(
-                        child: Text(
-                          '$categoryName (${budget.periodType.label.replaceAll("Theo ", "")})',
-                          style: GoogleFonts.inter(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w700,
-                            color: isDark ? AppColors.darkForeground : AppColors.lightForeground,
-                          ),
-                          overflow: TextOverflow.ellipsis,
+                // 1. bud-row: Icon + Tên + % Đã dùng
+                Row(
+                  children: [
+                    CategoryIcon(
+                      icon: budget.categoryIcon,
+                      colorHex: budget.categoryColor,
+                      size: 40,
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        categoryName,
+                        style: GoogleFonts.inter(
+                          fontSize: 14.5,
+                          fontWeight: FontWeight.w800,
+                          color: isDark ? AppColors.darkForeground : AppColors.lightForeground,
                         ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                    ],
+                    ),
+                    Text(
+                      '${pct.toStringAsFixed(0)}%',
+                      style: GoogleFonts.inter(
+                        fontSize: 14.5,
+                        fontWeight: FontWeight.w900,
+                        color: statusColor,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+
+                // 2. bud-bar-t: Thanh tiến độ mỏng thanh lịch 7px
+                Container(
+                  height: 7,
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: isDark ? AppColors.darkBorder : const Color(0xFFF1F5F9),
+                    borderRadius: BorderRadius.circular(99),
                   ),
-                ),
-                Text(
-                  '$statusIcon ${budget.percentage.toStringAsFixed(0)}%',
-                  style: GoogleFonts.inter(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w700,
-                    color: statusColor,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 10),
-            Row(
-              children: [
-                Text(
-                  'Hạn mức: ${currencyFormatter.format(budget.effectiveLimit)}',
-                  style: GoogleFonts.inter(fontSize: 12, color: AppColors.lightMuted),
-                ),
-                const SizedBox(width: 6),
-                const Text('·', style: TextStyle(color: AppColors.lightMuted)),
-                const SizedBox(width: 6),
-                Text(
-                  'Đã chi: ${currencyFormatter.format(budget.spentAmount)}',
-                  style: GoogleFonts.inter(fontSize: 12, color: AppColors.lightMuted),
-                ),
-              ],
-            ),
-            const SizedBox(height: 6),
-            Row(
-              children: [
-                Text(
-                  budget.remainingAmount >= 0
-                      ? 'Còn lại: ${currencyFormatter.format(budget.remainingAmount)}'
-                      : 'Bội chi: -${currencyFormatter.format(budget.remainingAmount.abs())}',
-                  style: GoogleFonts.inter(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    color: budget.remainingAmount >= 0 ? statusColor : AppColors.danger,
-                  ),
-                ),
-                if (budget.rolloverAmount != 0)
-                  Text(
-                    ' (Rollover: ${budget.rolloverAmount > 0 ? "+" : ""}${currencyFormatter.format(budget.rolloverAmount)})',
-                    style: GoogleFonts.inter(
-                      fontSize: 11,
-                      color: AppColors.lightMuted,
+                  child: FractionallySizedBox(
+                    alignment: Alignment.centerLeft,
+                    widthFactor: budget.effectiveLimit > 0 ? pctClamped : 0.0,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(99),
+                        color: statusColor,
+                      ),
                     ),
                   ),
-                if (statusAlert.isNotEmpty)
-                  Text(
-                    statusAlert,
-                    style: GoogleFonts.inter(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w600,
-                      color: statusColor,
+                ),
+                const SizedBox(height: 10),
+
+                // 3. bud-foot: ₫960,000 / ₫1,200,000 + Pill trạng thái Solarn
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      '${currencyFormatter.format(budget.spentAmount)} / ${currencyFormatter.format(budget.effectiveLimit)}',
+                      style: GoogleFonts.inter(
+                        fontSize: 11.5,
+                        fontWeight: FontWeight.w700,
+                        color: isDark ? AppColors.darkMuted : AppColors.lightMuted,
+                      ),
                     ),
-                  ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 3),
+                      decoration: BoxDecoration(
+                        color: pillBg,
+                        borderRadius: BorderRadius.circular(99),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(pillIcon, size: 12, color: statusColor),
+                          const SizedBox(width: 4),
+                          Text(
+                            pillText,
+                            style: GoogleFonts.inter(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w800,
+                              color: statusColor,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
               ],
             ),
-            const SizedBox(height: 10),
-            BudgetProgressBar(percentage: budget.percentage, height: 8),
-          ],
+          ),
         ),
       ),
     );
   }
 }
-

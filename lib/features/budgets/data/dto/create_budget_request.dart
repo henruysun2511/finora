@@ -1,4 +1,5 @@
 /// DTO gửi lên Backend để tạo ngân sách mới: POST /api/v1/budgets
+/// Tương thích 100% với CreateBudgetDto của NestJS backend.
 class CreateBudgetRequest {
   const CreateBudgetRequest({
     required this.walletId,
@@ -20,9 +21,12 @@ class CreateBudgetRequest {
         'walletId': walletId,
         'categoryId': categoryId,
         'limitAmount': limitAmount,
-        'periodType': periodType,
+        // Backend NestJS nhận field 'period' (enum: 'weekly', 'monthly', 'yearly')
+        'period': periodType.toLowerCase(),
+        'periodType': periodType.toLowerCase(),
         'startDate': startDate.toIso8601String().split('T').first,
+        // Backend NestJS nhận field 'isRollover'
+        'isRollover': isRolloverEnabled,
         'isRolloverEnabled': isRolloverEnabled,
       };
 }
-

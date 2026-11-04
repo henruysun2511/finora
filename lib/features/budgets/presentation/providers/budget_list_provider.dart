@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../domain/models/budget_summary.dart';
 import 'budget_filter_provider.dart';
 import 'budget_list_state.dart';
 import 'budget_providers.dart';
@@ -10,14 +11,34 @@ class BudgetListNotifier extends AsyncNotifier<BudgetListState> {
     final filter = ref.watch(budgetFilterProvider);
     final repo = ref.watch(budgetRepositoryProvider);
 
-    final itemsFuture = repo.getBudgets(filter);
-    final summaryFuture = repo.getBudgetSummary(walletId: filter.walletId);
+    // Tối ưu hiệu năng: Chỉ gọi 1 API request duy nhất thay vì gọi 2 lần song song
+    final items = await repo.getBudgets(filter);
 
-    final results = await Future.wait([itemsFuture, summaryFuture]);
+    // Tính toán tổng quan trực tiếp từ danh sách items
+    double totalLimit = 0;
+    double totalSpent = 0;
+    int maxDays = 0;
+
+    for (final b in items) {
+      totalLimit += b.effectiveLimit;
+      totalSpent += b.spentAmount;
+      if (b.daysRemaining > maxDays) maxDays = b.daysRemaining;
+    }
+
+    final now = DateTime.now();
+    final monthStr = now.month.toString().padLeft(2, '0');
+    final periodLabel = 'Tháng $monthStr/${now.year}';
+
+    final summary = BudgetSummary(
+      totalLimit: totalLimit,
+      totalSpent: totalSpent,
+      periodLabel: periodLabel,
+      daysRemaining: maxDays,
+    );
 
     return BudgetListState(
-      items: results[0] as dynamic,
-      summary: results[1] as dynamic,
+      items: items,
+      summary: summary,
     );
   }
 
@@ -44,4 +65,3 @@ final budgetListProvider =
     AsyncNotifierProvider<BudgetListNotifier, BudgetListState>(
   BudgetListNotifier.new,
 );
-
