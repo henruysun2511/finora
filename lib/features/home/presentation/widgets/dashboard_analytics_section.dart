@@ -25,7 +25,7 @@ class DashboardAnalyticsSection extends ConsumerWidget {
         SectionHeader(
           title: 'Báo cáo & Xu hướng',
           actionText: 'Xem chi tiết',
-          onTap: () => context.push(RoutePaths.analytics),
+          onTap: () => context.push(RoutePaths.reportsOverview),
         ),
         const SizedBox(height: 12),
         Container(

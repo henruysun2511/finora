@@ -8,6 +8,7 @@ import '../../../../core/widgets/app_button.dart';
 import '../../../../core/widgets/app_text_field.dart';
 import '../../../../core/widgets/app_toast.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
+import '../widgets/profile_info_row.dart';
 
 /// Màn hình Chi tiết & Chỉnh sửa hồ sơ cá nhân
 class UserProfileDetailScreen extends ConsumerStatefulWidget {
@@ -228,9 +229,8 @@ class _UserProfileDetailScreenState
                 const SizedBox(height: 28),
 
                 // 2. Chỉnh sửa thông tin cơ bản
-                _buildSectionHeader(
+                const ProfileSectionHeader(
                   title: 'THÔNG TIN CƠ BẢN',
-                  isDark: isDark,
                 ),
                 const SizedBox(height: 10),
                 Container(
@@ -279,9 +279,8 @@ class _UserProfileDetailScreenState
                 const SizedBox(height: 24),
 
                 // 3. Thông tin tài khoản & Hệ thống (Read-only)
-                _buildSectionHeader(
+                const ProfileSectionHeader(
                   title: 'TÀI KHOẢN & HỆ THỐNG',
-                  isDark: isDark,
                 ),
                 const SizedBox(height: 10),
                 Container(
@@ -305,11 +304,10 @@ class _UserProfileDetailScreenState
                   ),
                   child: Column(
                     children: [
-                      _buildInfoRow(
+                      ProfileInfoRow(
                         label: 'Email',
                         value: user?.email ?? 'Chưa cập nhật',
                         icon: Icons.mail_outline_rounded,
-                        isDark: isDark,
                       ),
                       Divider(
                         height: 1,
@@ -317,11 +315,10 @@ class _UserProfileDetailScreenState
                             ? AppColors.darkBorder
                             : AppColors.lightBorder,
                       ),
-                      _buildInfoRow(
+                      ProfileInfoRow(
                         label: 'Tên đăng nhập',
                         value: user?.username ?? (user?.email.split('@').first ?? '---'),
                         icon: Icons.alternate_email_rounded,
-                        isDark: isDark,
                       ),
                       Divider(
                         height: 1,
@@ -329,11 +326,10 @@ class _UserProfileDetailScreenState
                             ? AppColors.darkBorder
                             : AppColors.lightBorder,
                       ),
-                      _buildInfoRow(
+                      ProfileInfoRow(
                         label: 'Vai trò tài khoản',
                         value: user?.role ?? 'Người dùng thành viên',
                         icon: Icons.shield_outlined,
-                        isDark: isDark,
                       ),
                       Divider(
                         height: 1,
@@ -341,11 +337,10 @@ class _UserProfileDetailScreenState
                             ? AppColors.darkBorder
                             : AppColors.lightBorder,
                       ),
-                      _buildInfoRow(
+                      ProfileInfoRow(
                         label: 'Ngày tham gia',
                         value: createdDateStr,
                         icon: Icons.calendar_today_outlined,
-                        isDark: isDark,
                       ),
                     ],
                   ),
@@ -364,68 +359,6 @@ class _UserProfileDetailScreenState
             ),
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _buildSectionHeader({
-    required String title,
-    required bool isDark,
-  }) {
-    return Padding(
-      padding: const EdgeInsets.only(left: 4),
-      child: Text(
-        title,
-        style: TextStyle(
-          fontSize: 11.5,
-          fontWeight: FontWeight.w800,
-          letterSpacing: 0.6,
-          color: isDark ? AppColors.darkMuted : AppColors.lightMuted,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildInfoRow({
-    required String label,
-    required String value,
-    required IconData icon,
-    required bool isDark,
-  }) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 14),
-      child: Row(
-        children: [
-          Icon(
-            icon,
-            size: 20,
-            color: isDark ? AppColors.darkMuted : AppColors.lightMuted,
-          ),
-          const SizedBox(width: 12),
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 13.5,
-              fontWeight: FontWeight.w600,
-              color: isDark ? AppColors.darkMuted : AppColors.lightMuted,
-            ),
-          ),
-          const Spacer(),
-          Flexible(
-            child: Text(
-              value,
-              textAlign: TextAlign.end,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                fontSize: 13.5,
-                fontWeight: FontWeight.w700,
-                color: isDark
-                    ? AppColors.darkForeground
-                    : AppColors.lightForeground,
-              ),
-            ),
-          ),
-        ],
       ),
     );
   }

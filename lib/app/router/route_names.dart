@@ -58,6 +58,7 @@ class RouteNames {
   static const String createSplitExpense = 'createSplitExpense';
 
   // 8. Reports & Analytics (Báo cáo & Phân tích)
+  static const String reportsOverview = 'reportsOverview';
   static const String analytics = 'analytics';
   static const String cashflowReport = 'cashflowReport';
   static const String categoryReport = 'categoryReport';
@@ -144,6 +145,7 @@ class RoutePaths {
   static const String createSplitExpense = '/split-expenses/create';
 
   // 8. Reports & Analytics
+  static const String reportsOverview = '/reports/overview';
   static const String analytics = '/analytics';
   static const String cashflowReport = '/reports/cashflow';
   static const String categoryReport = '/reports/category';

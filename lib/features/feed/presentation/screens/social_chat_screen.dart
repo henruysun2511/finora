@@ -1,14 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../../messages/presentation/screens/conversations_screen.dart';
 import 'package:finora_mb/app/theme/app_colors.dart';
+import 'package:finora_mb/core/widgets/lucide_icon.dart';
 import 'package:finora_mb/core/widgets/page_header.dart';
 
+/// Màn hình Tin nhắn P2P / Locket Chat
+/// Được kết nối trực tiếp với module messages chuẩn Clean Architecture.
 class SocialChatScreen extends StatelessWidget {
   const SocialChatScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    return const ConversationsScreen();
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
@@ -31,10 +36,12 @@ class SocialChatScreen extends StatelessWidget {
                   color: AppColors.primary.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(20),
                 ),
-                child: const Icon(
-                  Icons.mark_chat_unread_rounded,
+                alignment: Alignment.center,
+                child: const LucideIcon(
+                  name: 'message-circle',
                   color: AppColors.primary,
                   size: 32,
+                  strokeWidth: 2.2,
                 ),
               ),
               const SizedBox(height: 16),

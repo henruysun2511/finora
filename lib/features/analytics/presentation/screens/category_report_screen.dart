@@ -153,7 +153,7 @@ class CategoryReportScreen extends ConsumerWidget {
                     border: Border.all(
                       color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
                     ),
-                  ],
+                  ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [

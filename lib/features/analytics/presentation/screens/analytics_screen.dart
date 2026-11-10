@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../../../app/router/route_names.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/utils/currency_formatter.dart';
 import '../../../../core/widgets/page_header.dart';
+import 'package:go_router/go_router.dart';
 import '../../../dashboard/presentation/providers/dashboard_providers.dart';
 
 class AnalyticsScreen extends ConsumerStatefulWidget {
@@ -40,16 +42,26 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen>
       appBar: PageHeader.subPage(
         title: 'Báo cáo & Phân tích',
         subtitle: 'Bức tranh chi tiết toàn cảnh tài chính',
-        action: IconButton(
-          icon: const Icon(Icons.refresh_rounded),
-          tooltip: 'Làm mới',
-          onPressed: () {
-            ref.invalidate(dashboardOverviewProvider);
-            ref.invalidate(dashboardCashFlowProvider);
-            ref.invalidate(dashboardCategoryBreakdownProvider);
-            ref.invalidate(dashboardBudgetHealthProvider);
-            ref.invalidate(dashboardCalendarProvider);
-          },
+        action: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            IconButton(
+              icon: const Icon(Icons.pie_chart_outline_rounded),
+              tooltip: 'Báo cáo Tổng quan',
+              onPressed: () => context.push(RoutePaths.reportsOverview),
+            ),
+            IconButton(
+              icon: const Icon(Icons.refresh_rounded),
+              tooltip: 'Làm mới',
+              onPressed: () {
+                ref.invalidate(dashboardOverviewProvider);
+                ref.invalidate(dashboardCashFlowProvider);
+                ref.invalidate(dashboardCategoryBreakdownProvider);
+                ref.invalidate(dashboardBudgetHealthProvider);
+                ref.invalidate(dashboardCalendarProvider);
+              },
+            ),
+          ],
         ),
       ),
       body: Column(

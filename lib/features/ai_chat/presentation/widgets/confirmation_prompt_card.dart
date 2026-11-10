@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../app/theme/app_colors.dart';
+import '../../../../core/widgets/app_toast.dart';
 import '../../domain/models/chat_message_model.dart';
 import '../../domain/models/send_message_input.dart';
 import 'edit_transaction_draft_bottom_sheet.dart';
@@ -444,12 +445,7 @@ class ConfirmationPromptCard extends StatelessWidget {
                                 if (draft != null) {
                                   onSaveDraft?.call(actionId, draft);
                                   if (context.mounted) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                        content: Text('Đã cập nhật bản nháp. Bấm "Xác nhận ghi sổ" để hoàn tất.'),
-                                        duration: Duration(seconds: 2),
-                                      ),
-                                    );
+                                    AppToast.success(context, 'Đã cập nhật bản nháp. Bấm "Xác nhận ghi sổ" để hoàn tất.');
                                   }
                                 }
                               }
