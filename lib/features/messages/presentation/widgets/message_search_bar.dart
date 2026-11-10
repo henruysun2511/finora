@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../app/theme/app_colors.dart';
+import '../../../../core/widgets/lucide_icon.dart';
 import '../providers/message_filter_provider.dart';
 
 class MessageSearchBar extends ConsumerStatefulWidget {
@@ -63,10 +64,13 @@ class _MessageSearchBarState extends ConsumerState<MessageSearchBar> {
           fontSize: 13,
           color: isDark ? AppColors.darkMuted : AppColors.lightMuted,
         ),
-        prefixIcon: const Icon(Icons.search_rounded, size: 20, color: AppColors.lightMuted),
+        prefixIcon: const Padding(
+          padding: EdgeInsets.all(12),
+          child: LucideIcon(name: 'search', size: 18, color: AppColors.lightMuted),
+        ),
         suffixIcon: _controller.text.isNotEmpty
             ? IconButton(
-                icon: const Icon(Icons.close_rounded, size: 18, color: AppColors.lightMuted),
+                icon: const LucideIcon(name: 'x', size: 16, color: AppColors.lightMuted),
                 onPressed: _clear,
               )
             : null,

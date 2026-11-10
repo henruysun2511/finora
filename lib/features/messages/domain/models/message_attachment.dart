@@ -4,7 +4,7 @@ class MessageTransactionAttachment {
     required this.transactionId,
     required this.title,
     required this.amount,
-    required this.categoryName,
+    this.categoryName = 'Khác',
     this.categoryIcon,
     this.isExpense = true,
   });

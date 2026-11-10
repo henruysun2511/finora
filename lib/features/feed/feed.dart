@@ -22,6 +22,7 @@ export 'presentation/providers/feed_providers.dart';
 export 'presentation/screens/feed_screen.dart';
 export 'presentation/screens/friends_screen.dart';
 export 'presentation/screens/social_chat_screen.dart';
+export 'presentation/widgets/feed_grid_card.dart';
 export 'presentation/widgets/feed_post_card.dart';
 export 'presentation/widgets/post_card.dart';
 export 'presentation/widgets/post_reactions_sheet.dart';

@@ -1,7 +1,11 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'package:finora_mb/app/theme/app_colors.dart';
+import 'package:finora_mb/core/widgets/lucide_icon.dart';
+import 'package:finora_mb/core/widgets/navigation/social_bottom_bar.dart';
+import 'package:finora_mb/core/widgets/navigation/social_tab.dart';
+import 'package:finora_mb/core/widgets/page_header.dart';
 
 class SplitExpensesScreen extends StatelessWidget {
   const SplitExpensesScreen({super.key});
@@ -12,18 +16,9 @@ class SplitExpensesScreen extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: isDark ? AppColors.darkBackground : AppColors.lightBackground,
-      appBar: AppBar(
-        title: Text(
-          'Chia tiền nhóm (Split Bill)',
-          style: GoogleFonts.inter(
-            fontWeight: FontWeight.w700,
-            fontSize: 18,
-            color: isDark ? AppColors.darkForeground : AppColors.lightForeground,
-          ),
-        ),
-        centerTitle: true,
-        backgroundColor: isDark ? AppColors.darkSurface : Colors.white,
-        elevation: 0,
+      appBar: const PageHeader.subPage(
+        title: 'Chia tiền nhóm',
+        subtitle: 'Quản lý các đợt chia bill & hóa đơn',
       ),
       body: Center(
         child: Padding(
@@ -38,10 +33,12 @@ class SplitExpensesScreen extends StatelessWidget {
                   color: AppColors.primary.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(20),
                 ),
-                child: const Icon(
-                  Icons.call_split_rounded,
+                alignment: Alignment.center,
+                child: const LucideIcon(
+                  name: 'receipt',
                   color: AppColors.primary,
                   size: 32,
+                  strokeWidth: 2.2,
                 ),
               ),
               const SizedBox(height: 16),
@@ -67,6 +64,7 @@ class SplitExpensesScreen extends StatelessWidget {
           ),
         ),
       ),
+      bottomNavigationBar: const SocialBottomBar(currentTab: SocialTab.splitBill),
     );
   }
 }

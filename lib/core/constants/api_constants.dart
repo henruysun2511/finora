@@ -196,6 +196,9 @@ class ApiConstants {
   static const String sendP2PMessage = '/messages';
   static String conversationDetail(String id) => '/messages/conversations/$id';
   static String friendMessages(String friendId) => '/messages/$friendId';
+  static String markMessagesAsRead(String friendId) => '/messages/$friendId/read';
+  static String recallMessage(String messageId) => '/messages/$messageId';
+  static String messageReactions(String messageId) => '/messages/$messageId/reactions';
 
   // ─── 17. Notifications (/notifications) ─────────────────────────────────────
   static const String notifications = '/notifications';

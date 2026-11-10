@@ -7,9 +7,14 @@ import '../../../../app/theme/app_colors.dart';
 import '../../../../core/widgets/app_toast.dart';
 import '../../../../core/widgets/banner_header.dart';
 import '../../../../core/widgets/lucide_icon.dart';
+import '../../../../core/widgets/navigation/social_bottom_bar.dart';
+import '../../../../core/widgets/navigation/social_tab.dart';
+import '../../../friends/friends.dart';
+import '../../domain/models/feed_post.dart';
 import '../providers/feed_list_provider.dart';
 import '../widgets/feed_category_filter_bar.dart';
 import '../widgets/feed_empty_state.dart';
+import '../widgets/feed_grid_card.dart';
 import '../widgets/feed_post_card.dart';
 import '../widgets/feed_search_bar.dart';
 import '../widgets/feed_stories_bar.dart';
@@ -36,44 +41,20 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
     (key: 'shopping', label: 'Mua sắm', icon: 'shopping-bag'),
   ];
 
-  static const List<FeedStoryItem> _stories = [
-    FeedStoryItem(
-      name: 'Trần Ngọc',
-      initials: 'TN',
-      gradient: [Color(0xFFF59E0B), Color(0xFFEA580C)],
-      isSeen: false,
-    ),
-    FeedStoryItem(
-      name: 'Hùng Minh',
-      initials: 'HM',
-      gradient: [Color(0xFF0072D6), Color(0xFF0284C7)],
-      isSeen: false,
-    ),
-    FeedStoryItem(
-      name: 'Phạm Lan',
-      initials: 'PL',
-      gradient: [Color(0xFF10B981), Color(0xFF059669)],
-      isSeen: true,
-    ),
-    FeedStoryItem(
-      name: 'Anh Thư',
-      initials: 'AT',
-      gradient: [Color(0xFFEC4899), Color(0xFFDB2777)],
-      isSeen: true,
-    ),
-    FeedStoryItem(
-      name: 'Minh Tuấn',
-      initials: 'MT',
-      gradient: [Color(0xFF8B5CF6), Color(0xFF6366F1)],
-      isSeen: true,
-    ),
-    FeedStoryItem(
-      name: 'Hải Đăng',
-      initials: 'HĐ',
-      gradient: [Color(0xFF06B6D4), Color(0xFF0284C7)],
-      isSeen: true,
-    ),
+  static const List<List<Color>> _storyGradients = [
+    [Color(0xFFF59E0B), Color(0xFFEA580C)],
+    [Color(0xFF0072D6), Color(0xFF0284C7)],
+    [Color(0xFF10B981), Color(0xFF059669)],
+    [Color(0xFFEC4899), Color(0xFFDB2777)],
+    [Color(0xFF8B5CF6), Color(0xFF6366F1)],
+    [Color(0xFF06B6D4), Color(0xFF0284C7)],
+    [Color(0xFFF43F5E), Color(0xFFBE123C)],
   ];
+
+  List<Color> _getStoryGradient(String seed) {
+    final hash = seed.hashCode.abs();
+    return _storyGradients[hash % _storyGradients.length];
+  }
 
   @override
   void dispose() {
@@ -136,6 +117,21 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
 
     final searchQuery = ref.watch(feedSearchQueryProvider);
     final feedAsync = ref.watch(feedListProvider);
+    final friendsAsync = ref.watch(friendsListProvider);
+    final viewMode = ref.watch(feedViewModeProvider);
+
+    final friends = friendsAsync.value ?? const [];
+    final stories = friends.map((f) {
+      final name = f.fullName.isNotEmpty ? f.fullName : f.displayName;
+      return FeedStoryItem(
+        id: f.id,
+        name: name,
+        initials: f.initials,
+        avatar: f.avatar,
+        gradient: _getStoryGradient(f.id.isNotEmpty ? f.id : name),
+        isSeen: true,
+      );
+    }).toList();
 
     return Scaffold(
       backgroundColor: bg,
@@ -166,29 +162,15 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
-            action: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                _buildHeaderButton(
-                  iconName: 'users',
-                  onTap: () => context.push(RoutePaths.friends),
-                  tooltip: 'Bạn bè',
-                ),
-                const SizedBox(width: 8),
-                _buildHeaderButton(
-                  iconName: 'plus',
-                  onTap: () => context.push(RoutePaths.createTransaction),
-                  tooltip: 'Chia bill',
-                ),
-              ],
-            ),
             child: FeedStoriesBar(
-              stories: _stories,
+              stories: stories,
+              isLoading: friendsAsync.isLoading,
               selectedFriendName: _selectedFriendName,
               onFriendSelected: (friend) {
                 setState(() => _selectedFriendName = friend);
               },
               onAddBill: () => context.push(RoutePaths.createTransaction),
+              onAddFriend: () => context.push(RoutePaths.friends),
             ),
           ),
 
@@ -298,8 +280,10 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
                         style: FilledButton.styleFrom(
                           backgroundColor: AppColors.primary,
                         ),
-                        onPressed: () =>
-                            ref.read(feedListProvider.notifier).refresh(),
+                        onPressed: () {
+                          ref.read(feedListProvider.notifier).refresh();
+                          ref.read(friendsListProvider.notifier).refresh();
+                        },
                         icon: const LucideIcon(
                           name: 'refresh-cw',
                           size: 16,
@@ -315,7 +299,8 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
                 final filtered = posts.where((p) {
                   // Friend filter
                   if (_selectedFriendName != null &&
-                      p.author.displayName != _selectedFriendName) {
+                      p.author.displayName != _selectedFriendName &&
+                      p.author.fullName != _selectedFriendName) {
                     return false;
                   }
 
@@ -371,20 +356,133 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
 
                 return RefreshIndicator(
                   color: AppColors.primary,
-                  onRefresh: () =>
+                  onRefresh: () async {
+                    await Future.wait([
                       ref.read(feedListProvider.notifier).refresh(),
-                  child: ListView.builder(
-                    padding: const EdgeInsets.only(bottom: 24, top: 4),
-                    itemCount: filtered.length,
-                    itemBuilder: (context, index) {
-                      final post = filtered[index];
-                      return FeedPostCard(
-                        post: post,
+                      ref.read(friendsListProvider.notifier).refresh(),
+                    ]);
+                  },
+                  child: viewMode == FeedViewMode.grid
+                      ? GridView.builder(
+                          padding: const EdgeInsets.fromLTRB(10, 6, 10, 24),
+                          gridDelegate:
+                              const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 3,
+                            crossAxisSpacing: 6,
+                            mainAxisSpacing: 6,
+                            childAspectRatio: 1.0,
+                          ),
+                          itemCount: filtered.length,
+                          itemBuilder: (context, index) {
+                            final post = filtered[index];
+                            return FeedGridCard(
+                              post: post,
+                              onTap: () => _showPostDetailModal(context, post),
+                            );
+                          },
+                        )
+                      : ListView.builder(
+                          padding: const EdgeInsets.only(bottom: 24, top: 4),
+                          itemCount: filtered.length,
+                          itemBuilder: (context, index) {
+                            final post = filtered[index];
+                            return FeedPostCard(
+                              post: post,
+                              onToggleReaction: ({emoji, symbol, label}) {
+                                ref
+                                    .read(feedListProvider.notifier)
+                                    .toggleReaction(
+                                      post.id,
+                                      emoji: emoji,
+                                      symbol: symbol,
+                                      label: label,
+                                    );
+                              },
+                              onFetchReactions: () {
+                                return ref
+                                    .read(feedListProvider.notifier)
+                                    .getReactions(post.id);
+                              },
+                              onUpdatePost: ({amountHidden, note}) {
+                                ref.read(feedListProvider.notifier).updatePost(
+                                      transactionId: post.id,
+                                      amountHidden: amountHidden,
+                                      note: note,
+                                    );
+                              },
+                              onChatWithAuthor: () {
+                                context.push(RoutePaths.socialChat);
+                              },
+                              onShare: () {
+                                _sharePost(post.name);
+                              },
+                            );
+                          },
+                        ),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+      bottomNavigationBar: SocialBottomBar(
+        currentTab: viewMode == FeedViewMode.grid
+            ? SocialTab.feedGrid
+            : SocialTab.feed,
+      ),
+    );
+  }
+
+  /// Hiển thị Bottom Sheet chi tiết bài đăng khi chạm vào ô vuông trong chế độ Lưới
+  void _showPostDetailModal(BuildContext context, FeedPost initialPost) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) {
+        return Consumer(
+          builder: (context, ref, _) {
+            final posts = ref.watch(feedListProvider).value ?? [];
+            final currentPost = posts.firstWhere(
+              (p) => p.id == initialPost.id,
+              orElse: () => initialPost,
+            );
+
+            final isDark = Theme.of(context).brightness == Brightness.dark;
+            final bg = isDark ? AppColors.darkSurface : Colors.white;
+
+            return Container(
+              constraints: BoxConstraints(
+                maxHeight: MediaQuery.of(context).size.height * 0.88,
+              ),
+              decoration: BoxDecoration(
+                color: bg,
+                borderRadius:
+                    const BorderRadius.vertical(top: Radius.circular(24)),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const SizedBox(height: 12),
+                  Container(
+                    width: 36,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: Colors.grey.withValues(alpha: 0.3),
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Flexible(
+                    child: SingleChildScrollView(
+                      padding: const EdgeInsets.only(bottom: 24),
+                      child: FeedPostCard(
+                        post: currentPost,
                         onToggleReaction: ({emoji, symbol, label}) {
                           ref
                               .read(feedListProvider.notifier)
                               .toggleReaction(
-                                post.id,
+                                currentPost.id,
                                 emoji: emoji,
                                 symbol: symbol,
                                 label: label,
@@ -393,30 +491,31 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
                         onFetchReactions: () {
                           return ref
                               .read(feedListProvider.notifier)
-                              .getReactions(post.id);
+                              .getReactions(currentPost.id);
                         },
                         onUpdatePost: ({amountHidden, note}) {
                           ref.read(feedListProvider.notifier).updatePost(
-                                transactionId: post.id,
+                                transactionId: currentPost.id,
                                 amountHidden: amountHidden,
                                 note: note,
                               );
                         },
                         onChatWithAuthor: () {
+                          Navigator.pop(ctx);
                           context.push(RoutePaths.socialChat);
                         },
                         onShare: () {
-                          _sharePost(post.name);
+                          _sharePost(currentPost.name);
                         },
-                      );
-                    },
+                      ),
+                    ),
                   ),
-                );
-              },
-            ),
-          ),
-        ],
-      ),
+                ],
+              ),
+            );
+          },
+        );
+      },
     );
   }
 }

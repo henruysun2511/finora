@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../app/theme/app_colors.dart';
+import '../../../../core/widgets/lucide_icon.dart';
 import '../../domain/models/message_attachment.dart';
 
 class MessageInputBar extends StatefulWidget {
@@ -66,7 +67,7 @@ class _MessageInputBarState extends State<MessageInputBar> {
                 ListTile(
                   leading: const CircleAvatar(
                     backgroundColor: AppColors.primaryLight,
-                    child: Icon(Icons.receipt_long_rounded, color: AppColors.primary),
+                    child: LucideIcon(name: 'receipt', size: 18, color: AppColors.primary),
                   ),
                   title: const Text('Chia sẻ giao dịch gần đây'),
                   subtitle: const Text('Gửi chi tiết hoá đơn ăn uống, mua sắm để chia tiền'),
@@ -86,7 +87,7 @@ class _MessageInputBarState extends State<MessageInputBar> {
                 ListTile(
                   leading: CircleAvatar(
                     backgroundColor: AppColors.success.withValues(alpha: 0.15),
-                    child: const Icon(Icons.request_quote_rounded, color: AppColors.success),
+                    child: const LucideIcon(name: 'coins', size: 18, color: AppColors.success),
                   ),
                   title: const Text('Tạo yêu cầu chuyển tiền'),
                   subtitle: const Text('Nhắc nhẹ bạn bè thanh toán phần chia tiền'),
@@ -157,7 +158,7 @@ class _MessageInputBarState extends State<MessageInputBar> {
                     ),
                   ),
                   IconButton(
-                    icon: const Icon(Icons.close_rounded, size: 16, color: AppColors.primary),
+                    icon: const LucideIcon(name: 'x', size: 16, color: AppColors.primary),
                     onPressed: () => setState(() => _selectedAttachment = null),
                     padding: EdgeInsets.zero,
                     constraints: const BoxConstraints(),
@@ -169,7 +170,7 @@ class _MessageInputBarState extends State<MessageInputBar> {
           Row(
             children: [
               IconButton(
-                icon: const Icon(Icons.add_circle_outline_rounded, color: AppColors.primary),
+                icon: const LucideIcon(name: 'plus', color: AppColors.primary),
                 onPressed: _showAttachOptions,
                 tooltip: 'Đính kèm tài chính',
               ),
@@ -206,7 +207,7 @@ class _MessageInputBarState extends State<MessageInputBar> {
                         height: 20,
                         child: CircularProgressIndicator(strokeWidth: 2),
                       )
-                    : const Icon(Icons.send_rounded, color: AppColors.primary),
+                    : const LucideIcon(name: 'send', size: 20, color: AppColors.primary),
                 onPressed: widget.isSending ? null : _handleSend,
               ),
             ],

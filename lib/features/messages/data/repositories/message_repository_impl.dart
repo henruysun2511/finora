@@ -13,7 +13,7 @@ class MessageRepositoryImpl implements MessageRepository {
 
   @override
   Future<List<Conversation>> getConversations({MessageFilter? filter}) async {
-    final list = await _service.getConversations();
+    final list = await _service.getConversations(search: filter?.searchQuery);
     var domainList = list.map(MessageMapper.toConversationDomain).toList();
 
     if (filter != null) {
@@ -45,12 +45,14 @@ class MessageRepositoryImpl implements MessageRepository {
     String? friendId,
     int page = 1,
     int limit = 30,
+    String? before,
   }) async {
     final list = await _service.getMessages(
       conversationId: conversationId,
       friendId: friendId,
       page: page,
       limit: limit,
+      before: before,
     );
     return list.map(MessageMapper.toDomain).toList();
   }
@@ -63,8 +65,23 @@ class MessageRepositoryImpl implements MessageRepository {
   }
 
   @override
-  Future<void> markConversationAsRead(String conversationId) {
-    return _service.markConversationAsRead(conversationId);
+  Future<void> markConversationAsRead(String friendId) {
+    return _service.markMessagesAsRead(friendId);
+  }
+
+  @override
+  Future<void> recallMessage(String messageId) {
+    return _service.recallMessage(messageId);
+  }
+
+  @override
+  Future<void> addReaction(String messageId, String emoji) {
+    return _service.addReaction(messageId, emoji);
+  }
+
+  @override
+  Future<void> removeReaction(String messageId) {
+    return _service.removeReaction(messageId);
   }
 
   @override
@@ -72,4 +89,3 @@ class MessageRepositoryImpl implements MessageRepository {
     return _service.deleteConversation(conversationId);
   }
 }
-

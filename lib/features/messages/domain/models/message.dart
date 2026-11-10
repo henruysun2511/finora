@@ -2,7 +2,6 @@ import 'message_attachment.dart';
 import 'message_enums.dart';
 
 /// Entity thuần Domain cho một Tin nhắn (Message) giữa 2 người dùng.
-/// Hoàn toàn độc lập với Flutter UI, Dio hay Data DTOs.
 class Message {
   const Message({
     required this.id,
@@ -12,8 +11,10 @@ class Message {
     required this.content,
     this.type = MessageType.text,
     this.status = MessageDeliveryStatus.sent,
+    this.isRead = false,
     this.mediaUrl,
     this.transactionAttachment,
+    this.reactions = const [],
     required this.createdAt,
     this.updatedAt,
   });
@@ -25,8 +26,10 @@ class Message {
   final String content;
   final MessageType type;
   final MessageDeliveryStatus status;
+  final bool isRead;
   final String? mediaUrl;
   final MessageTransactionAttachment? transactionAttachment;
+  final List<({String emoji, String userId})> reactions;
   final DateTime createdAt;
   final DateTime? updatedAt;
 
@@ -41,8 +44,10 @@ class Message {
     String? content,
     MessageType? type,
     MessageDeliveryStatus? status,
+    bool? isRead,
     String? mediaUrl,
     MessageTransactionAttachment? transactionAttachment,
+    List<({String emoji, String userId})>? reactions,
     DateTime? createdAt,
     DateTime? updatedAt,
   }) {
@@ -54,11 +59,13 @@ class Message {
       content: content ?? this.content,
       type: type ?? this.type,
       status: status ?? this.status,
+      isRead: isRead ?? this.isRead,
       mediaUrl: mediaUrl ?? this.mediaUrl,
-      transactionAttachment: transactionAttachment ?? this.transactionAttachment,
+      transactionAttachment:
+          transactionAttachment ?? this.transactionAttachment,
+      reactions: reactions ?? this.reactions,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );
   }
 }
-

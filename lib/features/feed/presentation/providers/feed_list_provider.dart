@@ -10,6 +10,11 @@ final feedTabFilterProvider = StateProvider.autoDispose<int>((ref) => 0);
 
 final feedSearchQueryProvider = StateProvider.autoDispose<String>((ref) => '');
 
+enum FeedViewMode { list, grid }
+
+final feedViewModeProvider =
+    StateProvider<FeedViewMode>((ref) => FeedViewMode.list);
+
 final feedListProvider =
     AsyncNotifierProvider.autoDispose<FeedListNotifier, List<FeedPost>>(() {
   return FeedListNotifier();

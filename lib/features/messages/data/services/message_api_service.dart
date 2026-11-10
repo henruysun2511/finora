@@ -7,16 +7,21 @@ import '../dto/message_response.dart';
 import '../dto/send_message_request.dart';
 
 abstract class MessageApiService {
-  Future<List<ConversationResponse>> getConversations();
+  Future<List<ConversationResponse>> getConversations({String? search});
   Future<ConversationResponse> getConversationById(String conversationId);
   Future<List<MessageResponse>> getMessages({
     String? conversationId,
     String? friendId,
     int page = 1,
     int limit = 30,
+    String? before,
   });
   Future<MessageResponse> sendMessage(SendMessageRequest request);
+  Future<void> markMessagesAsRead(String friendId);
   Future<void> markConversationAsRead(String conversationId);
+  Future<void> recallMessage(String messageId);
+  Future<void> addReaction(String messageId, String emoji);
+  Future<void> removeReaction(String messageId);
   Future<void> deleteConversation(String conversationId);
 }
 
@@ -55,8 +60,17 @@ class DioMessageApiService implements MessageApiService {
   }
 
   @override
-  Future<List<ConversationResponse>> getConversations() => _guard(() async {
-        final res = await _dio.get<dynamic>(ApiConstants.conversations);
+  Future<List<ConversationResponse>> getConversations({String? search}) =>
+      _guard(() async {
+        final query = <String, dynamic>{};
+        if (search != null && search.trim().isNotEmpty) {
+          query['search'] = search.trim();
+        }
+
+        final res = await _dio.get<dynamic>(
+          ApiConstants.conversations,
+          queryParameters: query.isNotEmpty ? query : null,
+        );
         final raw = _extractData(res.data);
         List<dynamic> items = [];
         if (raw is List) {
@@ -65,16 +79,27 @@ class DioMessageApiService implements MessageApiService {
           items = raw['items'] as List;
         }
         return items
-            .map((e) => ConversationResponse.fromJson(e as Map<String, dynamic>))
+            .map((e) =>
+                ConversationResponse.fromJson(e as Map<String, dynamic>))
             .toList();
       });
 
   @override
   Future<ConversationResponse> getConversationById(String conversationId) =>
       _guard(() async {
-        final res = await _dio.get<dynamic>(ApiConstants.conversationDetail(conversationId));
-        final raw = _extractData(res.data);
-        return ConversationResponse.fromJson(raw as Map<String, dynamic>);
+        // Lấy danh sách hội thoại và tìm conversationId (chính là friendId)
+        final convs = await getConversations();
+        return convs.firstWhere(
+          (c) => c.id == conversationId || c.participant.id == conversationId,
+          orElse: () => ConversationResponse(
+            id: conversationId,
+            participant: ConversationParticipantDto(
+              id: conversationId,
+              displayName: 'Bạn bè',
+            ),
+            updatedAt: DateTime.now(),
+          ),
+        );
       });
 
   @override
@@ -83,15 +108,24 @@ class DioMessageApiService implements MessageApiService {
     String? friendId,
     int page = 1,
     int limit = 30,
+    String? before,
   }) =>
       _guard(() async {
-        final path = friendId != null && friendId.isNotEmpty
-            ? ApiConstants.friendMessages(friendId)
-            : '${ApiConstants.conversations}/$conversationId/messages';
+        final targetId =
+            (friendId != null && friendId.isNotEmpty) ? friendId : conversationId;
 
+        final query = <String, dynamic>{
+          'page': page,
+          'limit': limit,
+        };
+        if (before != null && before.isNotEmpty) {
+          query['before'] = before;
+        }
+
+        final path = ApiConstants.friendMessages(targetId ?? '');
         final res = await _dio.get<dynamic>(
           path,
-          queryParameters: {'page': page, 'limit': limit},
+          queryParameters: query,
         );
         final raw = _extractData(res.data);
         List<dynamic> items = [];
@@ -106,7 +140,8 @@ class DioMessageApiService implements MessageApiService {
       });
 
   @override
-  Future<MessageResponse> sendMessage(SendMessageRequest request) => _guard(() async {
+  Future<MessageResponse> sendMessage(SendMessageRequest request) =>
+      _guard(() async {
         final res = await _dio.post<dynamic>(
           ApiConstants.sendP2PMessage,
           data: request.toJson(),
@@ -116,13 +151,35 @@ class DioMessageApiService implements MessageApiService {
       });
 
   @override
-  Future<void> markConversationAsRead(String conversationId) => _guard(() async {
-        await _dio.post<dynamic>('${ApiConstants.conversationDetail(conversationId)}/read');
+  Future<void> markMessagesAsRead(String friendId) => _guard(() async {
+        await _dio.patch<dynamic>(ApiConstants.markMessagesAsRead(friendId));
       });
 
   @override
-  Future<void> deleteConversation(String conversationId) => _guard(() async {
-        await _dio.delete<dynamic>(ApiConstants.conversationDetail(conversationId));
-      });
-}
+  Future<void> markConversationAsRead(String conversationId) =>
+      markMessagesAsRead(conversationId);
 
+  @override
+  Future<void> recallMessage(String messageId) => _guard(() async {
+        await _dio.delete<dynamic>(ApiConstants.recallMessage(messageId));
+      });
+
+  @override
+  Future<void> addReaction(String messageId, String emoji) => _guard(() async {
+        await _dio.post<dynamic>(
+          ApiConstants.messageReactions(messageId),
+          data: {'emoji': emoji},
+        );
+      });
+
+  @override
+  Future<void> removeReaction(String messageId) => _guard(() async {
+        await _dio.delete<dynamic>(ApiConstants.messageReactions(messageId));
+      });
+
+  @override
+  Future<void> deleteConversation(String conversationId) async {
+    // Backend NestJS không có endpoint xoá cả cuộc trò chuyện,
+    // các cuộc trò chuyện tự tính toán từ lịch sử tin nhắn.
+  }
+}

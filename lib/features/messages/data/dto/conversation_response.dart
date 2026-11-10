@@ -16,9 +16,12 @@ class ConversationParticipantDto {
 
   factory ConversationParticipantDto.fromJson(Map<String, dynamic> json) {
     return ConversationParticipantDto(
-      id: json['id']?.toString() ?? '',
-      displayName: json['displayName'] as String? ?? (json['name'] as String? ?? 'Người dùng'),
-      avatarUrl: json['avatarUrl'] as String? ?? json['avatar'] as String?,
+      id: json['id']?.toString() ?? (json['friendId']?.toString() ?? ''),
+      displayName: json['displayName'] as String? ??
+          (json['friendFullName'] as String? ??
+              (json['name'] as String? ?? 'Người dùng')),
+      avatarUrl: json['avatarUrl'] as String? ??
+          (json['friendAvatar'] as String? ?? json['avatar'] as String?),
       isOnline: (json['isOnline'] as bool?) ?? false,
     );
   }
@@ -41,6 +44,45 @@ class ConversationResponse {
   final DateTime updatedAt;
 
   factory ConversationResponse.fromJson(Map<String, dynamic> json) {
+    // 1. Phục vụ response chuẩn NestJS ConversationResponseDto:
+    // { friendId, friendFullName, friendAvatar, lastMessageContent, lastMessageSenderId, lastMessageAt, unreadCount }
+    if (json['friendId'] != null) {
+      final fId = json['friendId'].toString();
+      final fName = json['friendFullName'] as String? ?? 'Bạn bè';
+      final fAvatar = json['friendAvatar'] as String?;
+      final lastContent = json['lastMessageContent'] as String? ?? '';
+      final lastSenderId = json['lastMessageSenderId'] as String? ?? '';
+      final lastAt = json['lastMessageAt'] != null
+          ? DateTime.tryParse(json['lastMessageAt'].toString()) ?? DateTime.now()
+          : DateTime.now();
+
+      final participantDto = ConversationParticipantDto(
+        id: fId,
+        displayName: fName,
+        avatarUrl: fAvatar,
+      );
+
+      final lastMsg = lastContent.isNotEmpty
+          ? MessageResponse(
+              id: '',
+              conversationId: fId,
+              senderId: lastSenderId,
+              receiverId: '',
+              content: lastContent,
+              createdAt: lastAt,
+            )
+          : null;
+
+      return ConversationResponse(
+        id: fId,
+        participant: participantDto,
+        lastMessage: lastMsg,
+        unreadCount: (json['unreadCount'] as num?)?.toInt() ?? 0,
+        updatedAt: lastAt,
+      );
+    }
+
+    // 2. Fallback cho response dạng object lồng nhau
     ConversationParticipantDto participantDto;
     if (json['participant'] is Map<String, dynamic>) {
       participantDto = ConversationParticipantDto.fromJson(
@@ -55,7 +97,8 @@ class ConversationResponse {
 
     MessageResponse? lastMsg;
     if (json['lastMessage'] is Map<String, dynamic>) {
-      lastMsg = MessageResponse.fromJson(json['lastMessage'] as Map<String, dynamic>);
+      lastMsg =
+          MessageResponse.fromJson(json['lastMessage'] as Map<String, dynamic>);
     }
 
     return ConversationResponse(
@@ -69,4 +112,3 @@ class ConversationResponse {
     );
   }
 }
-

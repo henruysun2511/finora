@@ -19,8 +19,12 @@ class MessageMapper {
       content: dto.content,
       type: MessageType.fromValue(dto.type),
       status: MessageDeliveryStatus.fromValue(dto.status),
+      isRead: dto.isRead,
       mediaUrl: dto.mediaUrl,
       transactionAttachment: dto.transactionAttachment,
+      reactions: dto.reactions
+          .map((r) => (emoji: r.emoji, userId: r.userId))
+          .toList(),
       createdAt: dto.createdAt,
       updatedAt: dto.updatedAt,
     );
@@ -44,12 +48,8 @@ class MessageMapper {
   static SendMessageRequest toRequest(SendMessageInput input) {
     return SendMessageRequest(
       receiverId: input.receiverId,
-      conversationId: input.conversationId,
       content: input.content,
-      type: input.type.value,
-      mediaUrl: input.mediaUrl,
-      transactionAttachment: input.transactionAttachment,
+      relatedTransactionId: input.transactionAttachment?.transactionId,
     );
   }
 }
-

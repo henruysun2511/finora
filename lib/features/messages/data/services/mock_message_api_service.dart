@@ -59,7 +59,7 @@ class MockMessageApiService implements MessageApiService {
       conversationId: 'c3',
       senderId: 'me',
       receiverId: 'user_linh',
-      content: 'Cuối tuần này đi siêu thị sắm đồ chung không cậu?',
+      content: 'Đã gửi ảnh hóa đơn ăn trưa cho cậu xem rồi nha',
       type: 'TEXT',
       status: 'SENT',
       createdAt: now.subtract(const Duration(days: 1)),
@@ -124,8 +124,16 @@ class MockMessageApiService implements MessageApiService {
   }
 
   @override
-  Future<List<ConversationResponse>> getConversations() async {
+  Future<List<ConversationResponse>> getConversations({String? search}) async {
     await Future.delayed(_delay);
+    if (search != null && search.trim().isNotEmpty) {
+      final q = search.trim().toLowerCase();
+      return _conversations
+          .where((c) =>
+              c.participant.displayName.toLowerCase().contains(q) ||
+              (c.lastMessage?.content.toLowerCase().contains(q) ?? false))
+          .toList();
+    }
     return List<ConversationResponse>.from(_conversations);
   }
 
@@ -133,7 +141,9 @@ class MockMessageApiService implements MessageApiService {
   Future<ConversationResponse> getConversationById(String conversationId) async {
     await Future.delayed(_delay);
     final found = _conversations.where((c) => c.id == conversationId).firstOrNull;
-    if (found == null) throw const AppException('Không tìm thấy cuộc trò chuyện', statusCode: 404);
+    if (found == null) {
+      throw const AppException('Không tìm thấy cuộc trò chuyện', statusCode: 404);
+    }
     return found;
   }
 
@@ -143,6 +153,7 @@ class MockMessageApiService implements MessageApiService {
     String? friendId,
     int page = 1,
     int limit = 30,
+    String? before,
   }) async {
     await Future.delayed(_delay);
     final key = conversationId ?? (friendId != null ? 'c1' : 'c1');
@@ -152,23 +163,21 @@ class MockMessageApiService implements MessageApiService {
   @override
   Future<MessageResponse> sendMessage(SendMessageRequest request) async {
     await Future.delayed(_delay);
-    final cId = request.conversationId ?? 'c1';
+    final cId = request.receiverId.isNotEmpty ? request.receiverId : 'c1';
     final newMsg = MessageResponse(
       id: 'm_${_nextMsgId++}',
       conversationId: cId,
       senderId: 'me',
       receiverId: request.receiverId,
       content: request.content,
-      type: request.type,
+      type: request.relatedTransactionId != null ? 'TRANSACTION_SHARE' : 'TEXT',
       status: 'SENT',
-      mediaUrl: request.mediaUrl,
-      transactionAttachment: request.transactionAttachment,
+      relatedTransactionId: request.relatedTransactionId,
       createdAt: DateTime.now(),
     );
 
     _messages.putIfAbsent(cId, () => []).add(newMsg);
 
-    // Cập nhật lastMessage của conversation
     final idx = _conversations.indexWhere((c) => c.id == cId);
     if (idx != -1) {
       final old = _conversations[idx];
@@ -185,9 +194,9 @@ class MockMessageApiService implements MessageApiService {
   }
 
   @override
-  Future<void> markConversationAsRead(String conversationId) async {
+  Future<void> markMessagesAsRead(String friendId) async {
     await Future.delayed(_delay);
-    final idx = _conversations.indexWhere((c) => c.id == conversationId);
+    final idx = _conversations.indexWhere((c) => c.id == friendId || c.participant.id == friendId);
     if (idx != -1) {
       final old = _conversations[idx];
       _conversations[idx] = ConversationResponse(
@@ -201,10 +210,31 @@ class MockMessageApiService implements MessageApiService {
   }
 
   @override
+  Future<void> markConversationAsRead(String conversationId) =>
+      markMessagesAsRead(conversationId);
+
+  @override
+  Future<void> recallMessage(String messageId) async {
+    await Future.delayed(_delay);
+    for (final list in _messages.values) {
+      list.removeWhere((m) => m.id == messageId);
+    }
+  }
+
+  @override
+  Future<void> addReaction(String messageId, String emoji) async {
+    await Future.delayed(_delay);
+  }
+
+  @override
+  Future<void> removeReaction(String messageId) async {
+    await Future.delayed(_delay);
+  }
+
+  @override
   Future<void> deleteConversation(String conversationId) async {
     await Future.delayed(_delay);
     _conversations.removeWhere((c) => c.id == conversationId);
     _messages.remove(conversationId);
   }
 }
-

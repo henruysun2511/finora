@@ -5,6 +5,9 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/widgets/app_toast.dart';
 import '../../../../core/widgets/confirm_dialog.dart';
+import '../../../../core/widgets/lucide_icon.dart';
+import '../../../../core/widgets/navigation/social_bottom_bar.dart';
+import '../../../../core/widgets/navigation/social_tab.dart';
 import '../../../../core/widgets/page_header.dart';
 import '../providers/conversations_provider.dart';
 import '../widgets/conversation_card.dart';
@@ -21,14 +24,9 @@ class ConversationsScreen extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: isDark ? AppColors.darkBackground : AppColors.lightBackground,
-      appBar: PageHeader.page(
+      appBar: const PageHeader.page(
         title: 'Tin nhắn Finora',
         subtitle: 'Trò chuyện tài chính tế nhị & Chia sẻ giao dịch',
-        action: IconButton(
-          icon: const Icon(Icons.mark_chat_read_outlined),
-          tooltip: 'Làm mới',
-          onPressed: () => ref.read(conversationsProvider.notifier).refresh(),
-        ),
       ),
       body: RefreshIndicator(
         onRefresh: () => ref.read(conversationsProvider.notifier).refresh(),
@@ -49,10 +47,20 @@ class ConversationsScreen extends ConsumerWidget {
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(
-                            Icons.chat_bubble_outline_rounded,
-                            size: 56,
-                            color: AppColors.lightMuted.withValues(alpha: 0.6),
+                          Container(
+                            width: 64,
+                            height: 64,
+                            decoration: BoxDecoration(
+                              color: AppColors.primary.withValues(alpha: 0.12),
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            alignment: Alignment.center,
+                            child: const LucideIcon(
+                              name: 'message-square',
+                              size: 32,
+                              color: AppColors.primary,
+                              strokeWidth: 2.2,
+                            ),
                           ),
                           const SizedBox(height: 12),
                           Text(
@@ -107,7 +115,11 @@ class ConversationsScreen extends ConsumerWidget {
                           color: AppColors.danger,
                           borderRadius: BorderRadius.circular(16),
                         ),
-                        child: const Icon(Icons.delete_outline_rounded, color: Colors.white),
+                        child: const LucideIcon(
+                          name: 'trash-2',
+                          color: Colors.white,
+                          size: 20,
+                        ),
                       ),
                       child: ConversationCard(
                         conversation: conv,
@@ -124,6 +136,7 @@ class ConversationsScreen extends ConsumerWidget {
                                 conversationId: conv.id,
                                 receiverId: conv.participant.id,
                                 receiverName: conv.participant.displayName,
+                                receiverAvatar: conv.participant.avatarUrl,
                               ),
                             ),
                           );
@@ -152,6 +165,8 @@ class ConversationsScreen extends ConsumerWidget {
           ],
         ),
       ),
+      bottomNavigationBar:
+          const SocialBottomBar(currentTab: SocialTab.messages),
     );
   }
 }

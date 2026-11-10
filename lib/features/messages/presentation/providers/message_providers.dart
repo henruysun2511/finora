@@ -6,7 +6,7 @@ import '../../data/services/message_api_service.dart';
 import '../../data/services/mock_message_api_service.dart';
 import '../../domain/repositories/message_repository.dart';
 
-const bool kUseMockApi = bool.fromEnvironment('USE_MOCK_API', defaultValue: true);
+const bool kUseMockApi = bool.fromEnvironment('USE_MOCK_API', defaultValue: false);
 
 /// Dependency injection cho module messages
 final messageApiServiceProvider = Provider<MessageApiService>((ref) {
