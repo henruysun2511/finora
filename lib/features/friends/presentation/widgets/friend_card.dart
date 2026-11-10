@@ -106,13 +106,13 @@ class FriendCard extends StatelessWidget {
                 icon: Icon(Icons.more_vert_rounded, size: 20, color: muted),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                 color: surface,
-                itemBuilder: (_) => [
+                itemBuilder: (_) => const [
                   PopupMenuItem(
                     value: 'unfriend',
                     child: Row(
                       children: [
-                        const Icon(Icons.person_remove_rounded, size: 18, color: AppColors.danger),
-                        const SizedBox(width: 10),
+                        Icon(Icons.person_remove_rounded, size: 18, color: AppColors.danger),
+                        SizedBox(width: 10),
                         Text(
                           'Hủy kết bạn',
                           style: TextStyle(

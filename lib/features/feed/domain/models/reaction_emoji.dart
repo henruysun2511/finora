@@ -6,6 +6,7 @@ enum ReactionEmoji {
   wow('wow', '😮', 'Bất ngờ'),
   sad('sad', '😢', 'Buồn'),
   clap('clap', '👏', 'Vỗ tay'),
+  mascot('mascot', '🦊', 'Mascot Nora'),
   angry('angry', '😡', 'Phẫn nộ');
 
   const ReactionEmoji(this.value, this.symbol, this.label);
@@ -23,4 +24,3 @@ enum ReactionEmoji {
     return null;
   }
 }
-

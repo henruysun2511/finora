@@ -70,7 +70,10 @@ class FriendsApiService {
   Future<void> sendFriendRequest(String userId) async {
     await _dio.post(
       ApiConstants.friendRequests,
-      data: {'friendId': userId},
+      data: {
+        'addresseeId': userId,
+        'friendId': userId,
+      },
     );
   }
 
