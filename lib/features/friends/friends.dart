@@ -1,0 +1,12 @@
+export 'domain/models/friend.dart';
+export 'domain/models/friend_request.dart';
+export 'domain/models/user_search_result.dart';
+export 'domain/repositories/friends_repository.dart';
+export 'domain/validators/friends_validators.dart';
+export 'presentation/providers/friends_providers.dart';
+export 'presentation/providers/friends_list_provider.dart';
+export 'presentation/screens/friends_list_screen.dart';
+export 'presentation/widgets/friend_card.dart';
+export 'presentation/widgets/friend_request_card.dart';
+export 'presentation/widgets/friends_empty_state.dart';
+export 'presentation/widgets/user_search_card.dart';
