@@ -37,7 +37,7 @@ import '../../features/categories/presentation/screens/category_list_screen.dart
 import '../../features/settings/presentation/screens/notification_settings_screen.dart';
 import '../../features/settings/presentation/screens/security_settings_screen.dart';
 import '../../features/settings/presentation/screens/settings_screen.dart';
-import '../../features/feed/presentation/screens/friends_screen.dart';
+import '../../features/friends/presentation/screens/friends_list_screen.dart';
 import '../../features/feed/presentation/screens/social_chat_screen.dart';
 import '../../features/feed/presentation/screens/feed_screen.dart';
 import '../../features/split_expenses/presentation/screens/create_split_expense_screen.dart';
@@ -457,7 +457,7 @@ GoRouter appRouter(AppRouterRef ref) {
         parentNavigatorKey: _rootNavigatorKey,
         path: RoutePaths.friends,
         name: RouteNames.friends,
-        builder: (context, state) => const FriendsScreen(),
+        builder: (context, state) => const FriendsListScreen(),
       ),
       GoRoute(
         parentNavigatorKey: _rootNavigatorKey,
