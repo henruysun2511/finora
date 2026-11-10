@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'package:finora_mb/app/theme/app_colors.dart';
+import 'package:finora_mb/core/widgets/lucide_icon.dart';
 import 'package:finora_mb/core/widgets/page_header.dart';
 
 class FriendsScreen extends StatelessWidget {
@@ -31,10 +32,12 @@ class FriendsScreen extends StatelessWidget {
                   color: AppColors.primary.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(20),
                 ),
-                child: const Icon(
-                  Icons.person_add_alt_1_rounded,
+                alignment: Alignment.center,
+                child: const LucideIcon(
+                  name: 'user-plus',
                   color: AppColors.primary,
                   size: 32,
+                  strokeWidth: 2.2,
                 ),
               ),
               const SizedBox(height: 16),

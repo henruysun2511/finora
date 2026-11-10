@@ -5,6 +5,7 @@ import 'package:image_picker/image_picker.dart';
 import 'voice_recording_modal.dart';
 
 import '../../../../app/theme/app_colors.dart';
+import '../../../../core/widgets/app_toast.dart';
 
 class ChatInputBar extends StatefulWidget {
   final ValueChanged<String> onSend;
@@ -121,9 +122,7 @@ class ChatInputBarState extends State<ChatInputBar> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(this.context).showSnackBar(
-          SnackBar(content: Text('Không thể chọn ảnh từ thiết bị: $e')),
-        );
+        AppToast.error(this.context, 'Không thể chọn ảnh từ thiết bị: $e');
       }
     }
   }

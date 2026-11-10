@@ -13,10 +13,13 @@ import '../../domain/validators/auth_validators.dart';
 import '../providers/forgot_password_provider.dart';
 import '../providers/forgot_password_state.dart';
 import '../widgets/auth_ambient_rings.dart';
+import '../widgets/auth_gradient_button.dart';
 import '../widgets/auth_hero_header.dart';
 import '../widgets/auth_otp_boxes.dart';
 import '../widgets/auth_security_badge.dart';
 import '../widgets/auth_text_field.dart';
+import '../widgets/forgot_password_step_indicator.dart';
+import '../widgets/forgot_password_success_view.dart';
 
 /// Màn hình Quên mật khẩu Finora (SOLARN Design System 1:1 theo device-preview)
 /// Hỗ trợ luồng 3 bước: Nhập Email -> Xác thực OTP (đếm ngược 30s) -> Đặt lại mật khẩu
@@ -359,7 +362,9 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                                         CrossAxisAlignment.stretch,
                                     children: [
                                       // Progress Indicator 3 bước
-                                      _buildStepIndicator(state.step, isDark),
+                                      ForgotPasswordStepIndicator(
+                                        currentStep: state.step,
+                                      ),
                                       const SizedBox(height: 20),
 
                                       // Banner lỗi API nếu có
@@ -418,7 +423,10 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                                         _buildNewPasswordStep(
                                             isDark, state.isLoading)
                                       else
-                                        _buildSuccessStep(isDark),
+                                        ForgotPasswordSuccessView(
+                                          onLoginPressed: () =>
+                                              context.go(RoutePaths.login),
+                                        ),
 
                                       const Spacer(),
                                       const SizedBox(height: 20),
@@ -480,91 +488,6 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
     );
   }
 
-  // ── Step Indicator (1: Email -> 2: OTP -> 3: Pass) ────────────────────────
-  Widget _buildStepIndicator(ForgotPasswordStep currentStep, bool isDark) {
-    int activeIndex;
-    switch (currentStep) {
-      case ForgotPasswordStep.email:
-        activeIndex = 0;
-        break;
-      case ForgotPasswordStep.otp:
-        activeIndex = 1;
-        break;
-      case ForgotPasswordStep.newPassword:
-      case ForgotPasswordStep.success:
-        activeIndex = 2;
-        break;
-    }
-
-    final steps = ['Email', 'Xác thực OTP (30s)', 'Mật khẩu mới'];
-
-    return Row(
-      children: List.generate(steps.length * 2 - 1, (index) {
-        if (index.isOdd) {
-          final lineIdx = index ~/ 2;
-          final isDone = lineIdx < activeIndex;
-          return Expanded(
-            child: Container(
-              height: 2,
-              color: isDone
-                  ? AppColors.primary
-                  : (isDark ? AppColors.darkBorder : AppColors.lightBorder),
-            ),
-          );
-        }
-
-        final stepIdx = index ~/ 2;
-        final isActive = stepIdx == activeIndex;
-        final isDone = stepIdx < activeIndex;
-
-        return Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 24,
-              height: 24,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: isDone || isActive
-                    ? AppColors.primary
-                    : (isDark ? AppColors.darkBorder : AppColors.lightBorder),
-              ),
-              child: Center(
-                child: isDone
-                    ? const Icon(Icons.check, size: 14, color: Colors.white)
-                    : Text(
-                        '${stepIdx + 1}',
-                        style: GoogleFonts.inter(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w800,
-                          color: isActive
-                              ? Colors.white
-                              : (isDark
-                                  ? AppColors.darkMuted
-                                  : AppColors.lightMuted),
-                        ),
-                      ),
-              ),
-            ),
-            const SizedBox(width: 4),
-            Text(
-              steps[stepIdx],
-              style: GoogleFonts.inter(
-                fontSize: 11,
-                fontWeight: isActive ? FontWeight.w800 : FontWeight.w600,
-                color: isActive
-                    ? (isDark
-                        ? AppColors.darkForeground
-                        : AppColors.lightForeground)
-                    : (isDark ? AppColors.darkMuted : AppColors.lightMuted),
-              ),
-            ),
-          ],
-        );
-      }),
-    );
-  }
-
   // ── BƯỚC 1: Nhập Email ──────────────────────────────────────────────────
   Widget _buildEmailStep(bool isDark, bool isLoading) {
     return Form(
@@ -602,7 +525,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
             onFieldSubmitted: (_) => _handleSendOtp(),
           ),
           const SizedBox(height: 24),
-          _buildPrimaryButton(
+          AuthGradientButton(
             label: 'GỬI MÃ XÁC THỰC',
             icon: Icons.send_rounded,
             isLoading: isLoading,
@@ -744,7 +667,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
         const SizedBox(height: 20),
 
         // Nút Xác thực OTP
-        _buildPrimaryButton(
+        AuthGradientButton(
           label: 'XÁC THỰC MÃ OTP',
           icon: Icons.check_circle_outline_rounded,
           isLoading: state.isLoading,
@@ -863,136 +786,13 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
           const SizedBox(height: 24),
 
           // Nút cập nhật mật khẩu
-          _buildPrimaryButton(
+          AuthGradientButton(
             label: 'LƯU MẬT KHẨU MỚI',
             icon: Icons.save_rounded,
             isLoading: isLoading,
             onPressed: _handleResetPassword,
           ),
         ],
-      ),
-    );
-  }
-
-  // ── BƯỚC 4: Hoàn thành & Thành công ─────────────────────────────────────
-  Widget _buildSuccessStep(bool isDark) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        const SizedBox(height: 10),
-        Center(
-          child: Container(
-            width: 76,
-            height: 76,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: const Color(0xFF10B981).withValues(alpha: 0.15),
-              border: Border.all(
-                color: const Color(0xFF10B981).withValues(alpha: 0.35),
-                width: 2,
-              ),
-            ),
-            child: const Icon(
-              Icons.check_circle_rounded,
-              color: Color(0xFF10B981),
-              size: 46,
-            ),
-          ),
-        ),
-        const SizedBox(height: 18),
-        Text(
-          'Đổi mật khẩu thành công!',
-          style: GoogleFonts.outfit(
-            fontSize: 22,
-            fontWeight: FontWeight.w900,
-            color:
-                isDark ? AppColors.darkForeground : AppColors.lightForeground,
-          ),
-          textAlign: TextAlign.center,
-        ),
-        const SizedBox(height: 8),
-        Text(
-          'Tài khoản Finora của bạn đã được cập nhật mật khẩu mới. Bạn có thể đăng nhập ngay bây giờ.',
-          style: GoogleFonts.inter(
-            fontSize: 13,
-            fontWeight: FontWeight.w500,
-            color: isDark ? AppColors.darkMuted : AppColors.lightMuted,
-          ),
-          textAlign: TextAlign.center,
-        ),
-        const SizedBox(height: 26),
-        _buildPrimaryButton(
-          label: 'ĐĂNG NHẬP NGAY',
-          icon: Icons.login_rounded,
-          isLoading: false,
-          onPressed: () {
-            context.go(RoutePaths.login);
-          },
-        ),
-      ],
-    );
-  }
-
-  // ── Helper: Nút Gradient chính thương hiệu ──────────────────────────────
-  Widget _buildPrimaryButton({
-    required String label,
-    required IconData icon,
-    required bool isLoading,
-    required VoidCallback onPressed,
-  }) {
-    return Container(
-      height: 52,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
-        gradient: const LinearGradient(
-          colors: [
-            AppColors.primary,
-            Color(0xFF0058A8),
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.primary.withValues(alpha: 0.35),
-            blurRadius: 18,
-            offset: const Offset(0, 6),
-          ),
-        ],
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(16),
-          onTap: isLoading ? null : onPressed,
-          child: Center(
-            child: isLoading
-                ? const SizedBox(
-                    width: 22,
-                    height: 22,
-                    child: CircularProgressIndicator(
-                      color: Colors.white,
-                      strokeWidth: 2.2,
-                    ),
-                  )
-                : Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        label,
-                        style: GoogleFonts.inter(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w800,
-                          letterSpacing: 0.5,
-                          color: Colors.white,
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Icon(icon, color: Colors.white, size: 18),
-                    ],
-                  ),
-          ),
-        ),
       ),
     );
   }
