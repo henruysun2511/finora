@@ -1,117 +1,76 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'package:finora_mb/app/theme/app_colors.dart';
-import 'package:finora_mb/features/notifications/presentation/widgets/notification_card.dart';
+import 'package:finora_mb/core/widgets/app_toast.dart';
+import 'package:finora_mb/core/widgets/page_header.dart';
+import '../../domain/models/notification_filter.dart';
+import '../../domain/models/notification_item.dart';
+import '../providers/notification_list_provider.dart';
+import '../widgets/notification_card.dart';
 
-class NotificationsScreen extends StatefulWidget {
+class NotificationsScreen extends ConsumerWidget {
   const NotificationsScreen({super.key});
 
   @override
-  State<NotificationsScreen> createState() => _NotificationsScreenState();
-}
-
-class _NotificationsScreenState extends State<NotificationsScreen> {
-  int _selectedFilter = 0;
-
-  final List<Map<String, dynamic>> _notifications = [
-    {
-      'title': 'Sắp vượt ngân sách!',
-      'message': 'Bạn đã sử dụng 90% ngân sách ăn uống trong tháng này.',
-      'time': '10 phút trước',
-      'icon': Icons.account_balance_wallet_rounded,
-      'isRead': false,
-    },
-    {
-      'title': 'Khoản nợ sắp đến hạn',
-      'message': 'Bạn có một khoản thanh toán cần chú ý.',
-      'time': '2 giờ trước',
-      'icon': Icons.event_note_rounded,
-      'isRead': false,
-    },
-    {
-      'title': 'Bí quyết quản lý chi tiêu',
-      'message': 'Khám phá cách tiết kiệm và quản lý tài chính hiệu quả.',
-      'time': 'Hôm qua',
-      'icon': Icons.auto_stories_rounded,
-      'isRead': true,
-    },
-  ];
-
-  void _markAllAsRead() {
-    setState(() {
-      for (final item in _notifications) {
-        item['isRead'] = true;
-      }
-    });
-  }
-
-  void _markAsRead(Map<String, dynamic> item) {
-    setState(() {
-      item['isRead'] = true;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final notificationsAsync = ref.watch(notificationListProvider);
+    final filter = ref.watch(notificationFilterProvider);
+    final unreadCountAsync = ref.watch(unreadNotificationCountProvider);
+    final unreadCount = unreadCountAsync.valueOrNull ?? 0;
 
     final foreground =
         isDark ? AppColors.darkForeground : AppColors.lightForeground;
-
     final muted = isDark ? AppColors.darkMuted : AppColors.lightMuted;
-
-    final unreadCount =
-        _notifications.where((item) => item['isRead'] == false).length;
-
-    final filteredNotifications = _notifications.where((item) {
-      if (_selectedFilter == 1) {
-        return item['isRead'] == false;
-      }
-      if (_selectedFilter == 2) {
-        return item['isRead'] == true;
-      }
-      return true;
-    }).toList();
 
     return Scaffold(
       backgroundColor:
           isDark ? AppColors.darkBackground : AppColors.lightBackground,
-      appBar: AppBar(
-        backgroundColor: isDark ? AppColors.darkSurface : Colors.white,
-        elevation: 0,
-        centerTitle: false,
-        title: Text(
-          'Thông báo',
-          style: GoogleFonts.inter(
-            fontSize: 21,
-            fontWeight: FontWeight.w800,
-            color: foreground,
-          ),
-        ),
-        actions: [
-          IconButton(
-            tooltip: 'Đánh dấu tất cả đã đọc',
-            onPressed: unreadCount > 0 ? _markAllAsRead : null,
-            icon: Icon(
-              Icons.done_all_rounded,
-              color: unreadCount > 0 ? AppColors.primary : muted,
-            ),
-          ),
-          const SizedBox(width: 8),
-        ],
-      ),
-      body: SafeArea(
-        child: ListView(
-          padding: const EdgeInsets.fromLTRB(16, 18, 16, 24),
-          children: [
-            Container(
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: AppColors.primary.withValues(
-                  alpha: isDark ? 0.16 : 0.09,
+      appBar: PageHeader.subPage(
+        title: 'Thông báo',
+        subtitle: unreadCount > 0
+            ? 'Bạn có $unreadCount thông báo chưa đọc'
+            : 'Tất cả thông báo đã được đọc',
+        action: unreadCount > 0
+            ? IconButton(
+                tooltip: 'Đánh dấu tất cả đã đọc',
+                onPressed: () async {
+                  await ref
+                      .read(notificationListProvider.notifier)
+                      .markAllAsRead();
+                  if (context.mounted) {
+                    AppToast.success(context, 'Đã đánh dấu tất cả là đã đọc');
+                  }
+                },
+                icon: const Icon(
+                  Icons.done_all_rounded,
+                  color: AppColors.primary,
                 ),
-                borderRadius: BorderRadius.circular(24),
+              )
+            : null,
+      ),
+      body: RefreshIndicator(
+        color: AppColors.primary,
+        onRefresh: () =>
+            ref.read(notificationListProvider.notifier).refresh(),
+        child: ListView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
+          children: [
+            // ── Banner tóm tắt trung tâm thông báo ───────────────────────
+            Container(
+              padding: const EdgeInsets.all(18),
+              decoration: BoxDecoration(
+                color: isDark ? AppColors.darkSurface : Colors.white,
+                borderRadius: BorderRadius.circular(18),
+                border: Border.all(
+                  color: isDark
+                      ? AppColors.darkBorder
+                      : AppColors.lightBorder,
+                ),
               ),
               child: Row(
                 children: [
@@ -120,31 +79,31 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'CẬP NHẬT MỚI NHẤT',
+                          'TRUNG TÂM THÔNG BÁO',
                           style: GoogleFonts.inter(
                             fontSize: 10,
-                            letterSpacing: 1.1,
-                            fontWeight: FontWeight.w700,
+                            letterSpacing: 0.8,
+                            fontWeight: FontWeight.w800,
                             color: AppColors.primary,
                           ),
                         ),
-                        const SizedBox(height: 9),
+                        const SizedBox(height: 6),
                         Text(
                           unreadCount == 0
                               ? 'Bạn đã xem hết thông báo'
-                              : 'Bạn có $unreadCount thông báo mới',
+                              : 'Bạn có $unreadCount tin chưa đọc',
                           style: GoogleFonts.inter(
-                            fontSize: 19,
+                            fontSize: 17,
                             fontWeight: FontWeight.w800,
                             color: foreground,
                           ),
                         ),
-                        const SizedBox(height: 9),
+                        const SizedBox(height: 4),
                         Text(
-                          'Theo dõi ngân sách, khoản nợ và tin tức tài chính của bạn.',
+                          'Cập nhật tự động về ngân sách, khoản nợ và dòng tiền.',
                           style: GoogleFonts.inter(
                             fontSize: 12,
-                            height: 1.5,
+                            height: 1.4,
                             color: muted,
                           ),
                         ),
@@ -153,135 +112,262 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                   ),
                   const SizedBox(width: 12),
                   Container(
-                    width: 56,
-                    height: 56,
+                    width: 50,
+                    height: 50,
                     decoration: BoxDecoration(
-                      color: AppColors.primary.withValues(
-                        alpha: 0.13,
-                      ),
-                      shape: BoxShape.circle,
+                      color: AppColors.primary.withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(14),
                     ),
                     child: const Icon(
                       Icons.notifications_active_rounded,
                       color: AppColors.primary,
-                      size: 29,
+                      size: 26,
                     ),
                   ),
                 ],
               ),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 16),
+
+            // ── Bộ lọc Tabs (ChoiceChips theo Quy chuẩn 2 GEMINI.md) ──────
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Row(
                 children: [
-                  _filterChip('Tất cả', 0, isDark),
-                  _filterChip('Chưa đọc', 1, isDark),
-                  _filterChip('Đã đọc', 2, isDark),
+                  _buildFilterChip(
+                    context: context,
+                    ref: ref,
+                    label: 'Tất cả',
+                    selected: filter.isRead == null,
+                    onSelected: () {
+                      ref.read(notificationFilterProvider.notifier).state =
+                          filter.copyWith(clearRead: true);
+                    },
+                  ),
+                  const SizedBox(width: 8),
+                  _buildFilterChip(
+                    context: context,
+                    ref: ref,
+                    label: 'Chưa đọc',
+                    selected: filter.isRead == false,
+                    badgeCount: unreadCount > 0 ? unreadCount : null,
+                    onSelected: () {
+                      ref.read(notificationFilterProvider.notifier).state =
+                          filter.copyWith(isRead: false);
+                    },
+                  ),
+                  const SizedBox(width: 8),
+                  _buildFilterChip(
+                    context: context,
+                    ref: ref,
+                    label: 'Đã đọc',
+                    selected: filter.isRead == true,
+                    onSelected: () {
+                      ref.read(notificationFilterProvider.notifier).state =
+                          filter.copyWith(isRead: true);
+                    },
+                  ),
                 ],
               ),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 16),
+
+            // ── Tiêu đề danh sách ─────────────────────────────────────────
             Row(
               children: [
                 Expanded(
                   child: Text(
                     'Gần đây',
                     style: GoogleFonts.inter(
-                      fontSize: 17,
+                      fontSize: 16,
                       fontWeight: FontWeight.w700,
                       color: foreground,
                     ),
                   ),
                 ),
-                TextButton(
-                  onPressed: unreadCount > 0 ? _markAllAsRead : null,
-                  child: Text(
-                    'Đánh dấu đã đọc',
-                    style: GoogleFonts.inter(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w600,
+                if (unreadCount > 0)
+                  TextButton(
+                    onPressed: () => ref
+                        .read(notificationListProvider.notifier)
+                        .markAllAsRead(),
+                    style: TextButton.styleFrom(
+                      visualDensity: VisualDensity.compact,
+                      padding: const EdgeInsets.symmetric(horizontal: 8),
                     ),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 10),
-            if (filteredNotifications.isEmpty)
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 55),
-                child: Column(
-                  children: [
-                    Icon(
-                      Icons.notifications_off_outlined,
-                      size: 50,
-                      color: muted,
-                    ),
-                    const SizedBox(height: 12),
-                    Text(
-                      'Không có thông báo',
+                    child: Text(
+                      'Đánh dấu đã đọc',
                       style: GoogleFonts.inter(
-                        fontSize: 14,
+                        fontSize: 12,
                         fontWeight: FontWeight.w600,
-                        color: foreground,
+                        color: AppColors.primary,
                       ),
                     ),
-                  ],
-                ),
-              )
-            else
-              ...filteredNotifications.map(
-                (item) => NotificationCard(
-                  title: item['title'] as String,
-                  message: item['message'] as String,
-                  time: item['time'] as String,
-                  icon: item['icon'] as IconData,
-                  isRead: item['isRead'] as bool,
-                  onTap: () => _markAsRead(item),
+                  ),
+              ],
+            ),
+            const SizedBox(height: 8),
+
+            // ── Danh sách NotificationCard từ Provider ────────────────────
+            notificationsAsync.when(
+              data: (list) {
+                if (list.isEmpty) {
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 48),
+                    child: Column(
+                      children: [
+                        Icon(
+                          Icons.notifications_off_outlined,
+                          size: 48,
+                          color: muted,
+                        ),
+                        const SizedBox(height: 12),
+                        Text(
+                          'Không có thông báo',
+                          style: GoogleFonts.inter(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
+                            color: foreground,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          'Bạn sẽ nhận được thông báo khi có biến động mới.',
+                          style: GoogleFonts.inter(
+                            fontSize: 12,
+                            color: muted,
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }
+
+                return Column(
+                  children: list.map((item) {
+                    return NotificationCard.fromItem(
+                      item: item,
+                      onTap: () {
+                        if (!item.isRead) {
+                          ref
+                              .read(notificationListProvider.notifier)
+                              .markAsRead(item.id);
+                        }
+                        if (item.actionUrl != null &&
+                            item.actionUrl!.isNotEmpty) {
+                          context.push(item.actionUrl!);
+                        }
+                      },
+                      onDelete: () {
+                        ref
+                            .read(notificationListProvider.notifier)
+                            .delete(item.id);
+                      },
+                    );
+                  }).toList(),
+                );
+              },
+              loading: () => const Padding(
+                padding: EdgeInsets.symmetric(vertical: 48),
+                child: Center(child: CircularProgressIndicator()),
+              ),
+              error: (err, _) => Padding(
+                padding: const EdgeInsets.symmetric(vertical: 36),
+                child: Center(
+                  child: Column(
+                    children: [
+                      const Icon(Icons.error_outline_rounded,
+                          size: 40, color: AppColors.danger),
+                      const SizedBox(height: 8),
+                      Text('Không thể tải thông báo: $err',
+                          textAlign: TextAlign.center),
+                      const SizedBox(height: 12),
+                      FilledButton(
+                        onPressed: () => ref
+                            .read(notificationListProvider.notifier)
+                            .refresh(),
+                        child: const Text('Thử lại'),
+                      ),
+                    ],
+                  ),
                 ),
               ),
+            ),
           ],
         ),
       ),
     );
   }
 
-  Widget _filterChip(String label, int index, bool isDark) {
-    final selected = _selectedFilter == index;
+  /// ChoiceChip tuân thủ nghiêm ngặt Quy chuẩn 2 trong GEMINI.md
+  Widget _buildFilterChip({
+    required BuildContext context,
+    required WidgetRef ref,
+    required String label,
+    required bool selected,
+    required VoidCallback onSelected,
+    int? badgeCount,
+  }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    return Padding(
-      padding: const EdgeInsets.only(right: 9),
-      child: ChoiceChip(
-        label: Text(
-          label,
-          style: GoogleFonts.inter(
-            fontSize: 12,
-            fontWeight: FontWeight.w600,
-            color: selected
-                ? Colors.white
-                : (isDark
-                    ? AppColors.darkForeground
-                    : AppColors.lightForeground),
+    return ChoiceChip(
+      label: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 12.5,
+              fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+              color: selected
+                  ? Colors.white
+                  : (isDark
+                      ? AppColors.darkForeground
+                      : AppColors.lightForeground),
+            ),
           ),
-        ),
-        selected: selected,
-        onSelected: (_) {
-          setState(() {
-            _selectedFilter = index;
-          });
-        },
-        selectedColor: AppColors.primary,
-        backgroundColor: isDark ? AppColors.darkSurface : Colors.white,
-        side: BorderSide.none,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(30),
-        ),
-        showCheckmark: false,
-        padding: const EdgeInsets.symmetric(
-          horizontal: 10,
-          vertical: 9,
-        ),
+          if (badgeCount != null && badgeCount > 0) ...[
+            const SizedBox(width: 5),
+            Container(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+              decoration: BoxDecoration(
+                color: selected
+                    ? Colors.white.withValues(alpha: 0.25)
+                    : (isDark
+                        ? AppColors.darkBorder
+                        : AppColors.lightBorder),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Text(
+                '$badgeCount',
+                style: TextStyle(
+                  fontSize: 10,
+                  fontWeight: FontWeight.w700,
+                  color: selected
+                      ? Colors.white
+                      : (isDark
+                          ? AppColors.darkForeground
+                          : AppColors.lightForeground),
+                ),
+              ),
+            ),
+          ],
+        ],
       ),
+      selected: selected,
+      onSelected: (_) => onSelected(),
+      selectedColor: AppColors.primary,
+      backgroundColor: isDark ? AppColors.darkSurface : Colors.white,
+      side: BorderSide(
+        color: selected
+            ? AppColors.primary
+            : (isDark ? AppColors.darkBorder : AppColors.lightBorder),
+      ),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      showCheckmark: false,
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
     );
   }
 }

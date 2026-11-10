@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'package:finora_mb/app/theme/app_colors.dart';
+import 'package:finora_mb/core/widgets/page_header.dart';
 
 class SocialChatScreen extends StatelessWidget {
   const SocialChatScreen({super.key});
@@ -13,19 +14,9 @@ class SocialChatScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor:
           isDark ? AppColors.darkBackground : AppColors.lightBackground,
-      appBar: AppBar(
-        title: Text(
-          'Tin nhắn Locket Chat',
-          style: GoogleFonts.inter(
-            fontWeight: FontWeight.w700,
-            fontSize: 18,
-            color:
-                isDark ? AppColors.darkForeground : AppColors.lightForeground,
-          ),
-        ),
-        centerTitle: true,
-        backgroundColor: isDark ? AppColors.darkSurface : Colors.white,
-        elevation: 0,
+      appBar: const PageHeader.subPage(
+        title: 'Tin nhắn Locket Chat',
+        subtitle: 'Nhắn tin & chia sẻ giao dịch',
       ),
       body: Center(
         child: Padding(

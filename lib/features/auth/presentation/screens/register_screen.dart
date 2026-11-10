@@ -32,8 +32,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   late final TextEditingController _usernameController;
   late final TextEditingController _emailController;
   late final TextEditingController _passwordController;
+  late final TextEditingController _confirmPasswordController;
 
   bool _isPasswordVisible = false;
+  bool _isConfirmPasswordVisible = false;
 
   @override
   void initState() {
@@ -42,6 +44,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     _usernameController = TextEditingController();
     _emailController = TextEditingController();
     _passwordController = TextEditingController();
+    _confirmPasswordController = TextEditingController();
   }
 
   @override
@@ -50,6 +53,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     _usernameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
+    _confirmPasswordController.dispose();
     super.dispose();
   }
 
@@ -347,6 +351,47 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                                               setState(() {
                                                 _isPasswordVisible =
                                                     !_isPasswordVisible;
+                                              });
+                                            },
+                                          ),
+                                        ),
+                                        const SizedBox(height: 12),
+
+                                        // Trường 5: Xác nhận mật khẩu
+                                        AuthTextField(
+                                          label: 'Xác nhận mật khẩu',
+                                          controller:
+                                              _confirmPasswordController,
+                                          prefixIcon: Icons.lock_outline_rounded,
+                                          hintText: 'Nhập lại mật khẩu',
+                                          obscureText:
+                                              !_isConfirmPasswordVisible,
+                                          validator: (value) {
+                                            if (value == null ||
+                                                value.isEmpty) {
+                                              return 'Vui lòng xác nhận mật khẩu';
+                                            }
+                                            if (value !=
+                                                _passwordController.text) {
+                                              return 'Mật khẩu xác nhận không khớp';
+                                            }
+                                            return null;
+                                          },
+                                          suffixIcon: IconButton(
+                                            icon: Icon(
+                                              _isConfirmPasswordVisible
+                                                  ? Icons.visibility_outlined
+                                                  : Icons
+                                                      .visibility_off_outlined,
+                                              size: 20,
+                                              color: isDark
+                                                  ? AppColors.darkMuted
+                                                  : AppColors.lightMuted,
+                                            ),
+                                            onPressed: () {
+                                              setState(() {
+                                                _isConfirmPasswordVisible =
+                                                    !_isConfirmPasswordVisible;
                                               });
                                             },
                                           ),

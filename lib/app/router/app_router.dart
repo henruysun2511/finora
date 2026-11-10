@@ -37,9 +37,9 @@ import '../../features/categories/presentation/screens/category_list_screen.dart
 import '../../features/settings/presentation/screens/notification_settings_screen.dart';
 import '../../features/settings/presentation/screens/security_settings_screen.dart';
 import '../../features/settings/presentation/screens/settings_screen.dart';
-import '../../features/social/presentation/screens/friends_screen.dart';
-import '../../features/social/presentation/screens/social_chat_screen.dart';
-import '../../features/social/presentation/screens/social_feed_screen.dart';
+import '../../features/feed/presentation/screens/friends_screen.dart';
+import '../../features/feed/presentation/screens/social_chat_screen.dart';
+import '../../features/feed/presentation/screens/feed_screen.dart';
 import '../../features/split_expenses/presentation/screens/create_split_expense_screen.dart';
 import '../../features/split_expenses/presentation/screens/split_expense_detail_screen.dart';
 import '../../features/split_expenses/presentation/screens/split_expenses_screen.dart';
@@ -445,13 +445,13 @@ GoRouter appRouter(AppRouterRef ref) {
       ),
 
       // ==========================================
-      // 9. PHÂN HỆ XÃ HỘI, BẠN BÈ & TIN NHẮN (Social)
+      // 9. PHÂN HỆ BẢNG TIN, BẠN BÈ & TIN NHẮN (Feed)
       // ==========================================
       GoRoute(
         parentNavigatorKey: _rootNavigatorKey,
-        path: RoutePaths.socialFeed,
-        name: RouteNames.socialFeed,
-        builder: (context, state) => const SocialFeedScreen(),
+        path: RoutePaths.feed,
+        name: RouteNames.feed,
+        builder: (context, state) => const FeedScreen(),
       ),
       GoRoute(
         parentNavigatorKey: _rootNavigatorKey,

@@ -183,6 +183,7 @@ class ApiConstants {
   // ─── 15. Financial Feed (/feed) ─────────────────────────────────────────────
   static const String feed = '/feed';
   static const String myFeed = '/feed/my';
+  static String feedPost(String transactionId) => '/feed/$transactionId';
   static String feedReactions(String transactionId) =>
       '/feed/$transactionId/reactions';
   static String feedComments(String transactionId) =>
@@ -201,6 +202,7 @@ class ApiConstants {
   static const String unreadNotificationsCount = '/notifications/unread-count';
   static const String markAllNotificationsAsRead = '/notifications/read-all';
   static String markNotificationAsRead(String id) => '/notifications/$id/read';
+  static String deleteNotification(String id) => '/notifications/$id';
 
   // ─── 18. Dashboard & Executive Analytics (/dashboard) ───────────────────────
   static const String dashboardOverview = '/dashboard/overview';
