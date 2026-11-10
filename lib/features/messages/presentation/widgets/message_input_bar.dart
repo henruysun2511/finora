@@ -84,9 +84,9 @@ class _MessageInputBarState extends State<MessageInputBar> {
                   },
                 ),
                 ListTile(
-                  leading: const CircleAvatar(
-                    backgroundColor: Color(0xFFE8F5E9),
-                    child: Icon(Icons.request_quote_rounded, color: AppColors.success),
+                  leading: CircleAvatar(
+                    backgroundColor: AppColors.success.withValues(alpha: 0.15),
+                    child: const Icon(Icons.request_quote_rounded, color: AppColors.success),
                   ),
                   title: const Text('Tạo yêu cầu chuyển tiền'),
                   subtitle: const Text('Nhắc nhẹ bạn bè thanh toán phần chia tiền'),

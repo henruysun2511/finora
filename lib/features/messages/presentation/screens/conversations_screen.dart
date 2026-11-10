@@ -88,14 +88,12 @@ class ConversationsScreen extends ConsumerWidget {
                       key: Key(conv.id),
                       direction: DismissDirection.endToStart,
                       confirmDismiss: (_) async {
-                        return await showDialog<bool>(
-                          context: context,
-                          builder: (_) => const ConfirmDialog(
-                            title: 'Xóa cuộc trò chuyện?',
-                            message: 'Toàn bộ tin nhắn với người này sẽ bị xóa.',
-                            confirmText: 'Xóa',
-                            isDestructive: true,
-                          ),
+                        return await showConfirmDialog(
+                          context,
+                          title: 'Xóa cuộc trò chuyện?',
+                          message: 'Toàn bộ tin nhắn với người này sẽ bị xóa.',
+                          confirmText: 'Xóa',
+                          isDestructive: true,
                         );
                       },
                       onDismissed: (_) {

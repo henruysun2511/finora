@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../app/theme/app_colors.dart';
+import '../../../../app/theme/app_text_styles.dart';
 import '../../domain/models/conversation.dart';
 import '../../domain/models/message_enums.dart';
 
@@ -55,20 +55,16 @@ class ConversationCard extends StatelessWidget {
             // Avatar + Online status badge
             Stack(
               children: [
-                CircleAvatar(
-                  radius: 26,
-                  backgroundColor: AppColors.primaryLight,
-                  child: Text(
-                    conversation.participant.displayName.isNotEmpty
-                        ? conversation.participant.displayName[0].toUpperCase()
-                        : '?',
-                    style: GoogleFonts.inter(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w700,
-                      color: AppColors.primary,
+                  CircleAvatar(
+                    radius: 26,
+                    backgroundColor: AppColors.primaryLight,
+                    child: Text(
+                      conversation.participant.displayName.isNotEmpty
+                          ? conversation.participant.displayName[0].toUpperCase()
+                          : '?',
+                      style: AppTextStyles.titleMedium(color: AppColors.primary),
                     ),
                   ),
-                ),
                 if (conversation.participant.isOnline)
                   Positioned(
                     right: 0,
@@ -100,23 +96,25 @@ class ConversationCard extends StatelessWidget {
                     children: [
                       Text(
                         conversation.participant.displayName,
-                        style: GoogleFonts.inter(
-                          fontSize: 15,
-                          fontWeight: conversation.unreadCount > 0
-                              ? FontWeight.w700
-                              : FontWeight.w600,
-                          color: isDark
-                              ? AppColors.darkForeground
-                              : AppColors.lightForeground,
-                        ),
+                        style: conversation.unreadCount > 0
+                            ? AppTextStyles.titleSmall(
+                                color: isDark
+                                    ? AppColors.darkForeground
+                                    : AppColors.lightForeground,
+                              )
+                            : AppTextStyles.bodyMedium(
+                                color: isDark
+                                    ? AppColors.darkForeground
+                                    : AppColors.lightForeground,
+                              ).copyWith(fontWeight: FontWeight.w600),
                       ),
                       Text(
                         timeStr,
-                        style: GoogleFonts.inter(
-                          fontSize: 12,
+                        style: AppTextStyles.bodySmall(
                           color: conversation.unreadCount > 0
                               ? AppColors.primary
                               : AppColors.lightMuted,
+                        ).copyWith(
                           fontWeight: conversation.unreadCount > 0
                               ? FontWeight.w600
                               : FontWeight.normal,
@@ -133,13 +131,13 @@ class ConversationCard extends StatelessWidget {
                           lastMessagePreview,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: GoogleFonts.inter(
-                            fontSize: 13,
+                          style: AppTextStyles.bodyMedium(
                             color: conversation.unreadCount > 0
                                 ? (isDark
                                     ? AppColors.darkForeground
                                     : AppColors.lightForeground)
                                 : AppColors.lightMuted,
+                          ).copyWith(
                             fontWeight: conversation.unreadCount > 0
                                 ? FontWeight.w600
                                 : FontWeight.normal,
@@ -159,11 +157,7 @@ class ConversationCard extends StatelessWidget {
                           ),
                           child: Text(
                             conversation.unreadCount.toString(),
-                            style: GoogleFonts.inter(
-                              color: Colors.white,
-                              fontSize: 11,
-                              fontWeight: FontWeight.w700,
-                            ),
+                            style: AppTextStyles.labelSmall(color: Colors.white),
                           ),
                         ),
                     ],

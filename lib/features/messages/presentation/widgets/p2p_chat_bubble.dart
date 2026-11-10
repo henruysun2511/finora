@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../app/theme/app_colors.dart';
+import '../../../../app/theme/app_text_styles.dart';
 import '../../domain/models/message.dart';
 import '../../domain/models/message_enums.dart';
 
@@ -87,17 +87,13 @@ class P2pChatBubble extends StatelessWidget {
                         children: [
                           Text(
                             message.transactionAttachment?.title ?? 'Giao dịch',
-                            style: GoogleFonts.inter(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w700,
+                            style: AppTextStyles.titleSmall(
                               color: isMine ? Colors.white : AppColors.primary,
                             ),
                           ),
                           Text(
                             currencyFormatter.format(message.transactionAttachment?.amount ?? 0),
-                            style: GoogleFonts.inter(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w800,
+                            style: AppTextStyles.amountCard(
                               color: isMine ? Colors.white : AppColors.danger,
                             ),
                           ),
@@ -112,14 +108,12 @@ class P2pChatBubble extends StatelessWidget {
             // Nội dung văn bản
             Text(
               message.content,
-              style: GoogleFonts.inter(
-                fontSize: 14,
+              style: AppTextStyles.bodyMedium(
                 color: isMine
                     ? Colors.white
                     : (isDark
                         ? AppColors.darkForeground
                         : AppColors.lightForeground),
-                height: 1.4,
               ),
             ),
             const SizedBox(height: 4),
@@ -130,8 +124,7 @@ class P2pChatBubble extends StatelessWidget {
               children: [
                 Text(
                   timeStr,
-                  style: GoogleFonts.inter(
-                    fontSize: 10,
+                  style: AppTextStyles.labelSmall(
                     color: isMine
                         ? Colors.white.withValues(alpha: 0.75)
                         : AppColors.lightMuted,
