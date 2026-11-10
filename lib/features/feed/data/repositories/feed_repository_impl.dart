@@ -197,33 +197,10 @@ class FeedRepositoryImpl implements FeedRepository {
   Future<List<PostReaction>> getReactions(String transactionId) async {
     try {
       final dtos = await _api.getReactions(transactionId);
-      final items = dtos.map(mapper.toDomainReaction).toList();
-      if (items.isNotEmpty) return items;
+      return dtos.map(mapper.toDomainReaction).toList();
     } catch (_) {
-      // Fallback
+      return [];
     }
-
-    // Default mock reactions
-    return [
-      PostReaction(
-        userId: 'u-minh',
-        fullName: 'Hoàng Văn Minh',
-        emoji: ReactionEmoji.love,
-        createdAt: DateTime.now().subtract(const Duration(minutes: 45)),
-      ),
-      PostReaction(
-        userId: 'u-nam',
-        fullName: 'Nguyễn Hải Nam',
-        emoji: ReactionEmoji.like,
-        createdAt: DateTime.now().subtract(const Duration(hours: 1)),
-      ),
-      PostReaction(
-        userId: 'u-vy',
-        fullName: 'Trần Thảo Vy',
-        emoji: ReactionEmoji.clap,
-        createdAt: DateTime.now().subtract(const Duration(hours: 2)),
-      ),
-    ];
   }
 
   @override

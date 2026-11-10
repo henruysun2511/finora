@@ -47,15 +47,13 @@ class BudgetDetailScreen extends ConsumerWidget {
         action: IconButton(
           icon: const Icon(Icons.delete_outline_rounded, color: AppColors.danger, size: 22),
           onPressed: () async {
-            final confirmed = await showDialog<bool>(
-              context: context,
-              builder: (_) => const ConfirmDialog(
-                title: 'Xóa ngân sách?',
-                message:
-                    'Bạn có chắc chắn muốn xóa ngân sách này? Dữ liệu lịch sử sẽ không thể phục hồi.',
-                confirmText: 'Xóa',
-                isDestructive: true,
-              ),
+            final confirmed = await showConfirmDialog(
+              context,
+              title: 'Xóa ngân sách?',
+              message:
+                  'Bạn có chắc chắn muốn xóa ngân sách này? Dữ liệu lịch sử sẽ không thể phục hồi.',
+              confirmText: 'Xóa',
+              isDestructive: true,
             );
 
             if (confirmed == true && context.mounted) {
@@ -298,17 +296,15 @@ class BudgetDetailScreen extends ConsumerWidget {
                     Expanded(
                       child: OutlinedButton.icon(
                         onPressed: () async {
-                          final confirmed = await showDialog<bool>(
-                            context: context,
-                            builder: (_) => const ConfirmDialog(
-                              title: 'Chốt kỳ sang chu kỳ mới?',
-                              message:
-                                  'Khoản thặng dư hoặc bội chi hiện tại sẽ được kết chuyển sang chu kỳ mới theo cơ chế Rollover.',
-                              confirmText: 'Chốt kỳ ngay',
-                              isDestructive: false,
-                              icon: Icons.autorenew_rounded,
-                              iconColor: AppColors.primary,
-                            ),
+                          final confirmed = await showConfirmDialog(
+                            context,
+                            title: 'Chốt kỳ sang chu kỳ mới?',
+                            message:
+                                'Khoản thặng dư hoặc bội chi hiện tại sẽ được kết chuyển sang chu kỳ mới theo cơ chế Rollover.',
+                            confirmText: 'Chốt kỳ ngay',
+                            isDestructive: false,
+                            icon: Icons.autorenew_rounded,
+                            iconColor: AppColors.primary,
                           );
 
                           if (confirmed == true && context.mounted) {

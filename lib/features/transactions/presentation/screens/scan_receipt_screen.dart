@@ -6,6 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 
 import 'package:finora_mb/app/theme/app_colors.dart';
+import 'package:finora_mb/core/widgets/app_toast.dart';
 import '../../../ai_chat/presentation/providers/ai_chat_notifier.dart';
 
 class ScanReceiptScreen extends ConsumerStatefulWidget {
@@ -41,9 +42,7 @@ class _ScanReceiptScreenState extends ConsumerState<ScanReceiptScreen> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Lỗi khi chọn ảnh: $e')),
-        );
+        AppToast.error(context, 'Lỗi khi chọn ảnh: $e');
       }
     }
   }
@@ -67,9 +66,7 @@ class _ScanReceiptScreenState extends ConsumerState<ScanReceiptScreen> {
     } catch (e) {
       if (mounted) {
         setState(() => _isUploading = false);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Lỗi khi bóc tách hóa đơn: $e')),
-        );
+        AppToast.error(context, 'Lỗi khi bóc tách hóa đơn: $e');
       }
     }
   }
