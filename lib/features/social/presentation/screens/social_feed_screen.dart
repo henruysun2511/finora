@@ -11,24 +11,23 @@ class SocialFeedScreen extends StatefulWidget {
 }
 
 class _SocialFeedScreenState extends State<SocialFeedScreen> {
-  int _selectedTab = 0;
-  String _searchQuery = '';
+  int selectedTab = 0;
+  String search = '';
 
-  final List<Map<String, dynamic>> _posts = [
+  final List<Map<String, dynamic>> posts = [
     {
       'id': 1,
       'author': 'Minh Anh',
       'initial': 'MA',
       'time': '2 giờ trước',
-      'content':
-          'Yayyy! 🎉 Mình đã hoàn thành thử thách tiết kiệm 30 ngày! Mỗi ngày cố gắng một chút, cuối cùng cũng đạt được mục tiêu đầu tiên.',
+      'content': '30 ngày tiết kiệm thành công! 🎉',
+      'image': 'https://picsum.photos/seed/finora-coffee/800/800',
       'likes': 128,
       'comments': 24,
-      'amount': '3.000.000 ₫',
-      'progress': 1.0,
       'category': 'Thành tựu',
       'accent': AppColors.primary,
-      'trending': true,
+      'amount': '3.000.000 ₫',
+      'progress': 1.0,
       'following': true,
     },
     {
@@ -36,15 +35,14 @@ class _SocialFeedScreenState extends State<SocialFeedScreen> {
       'author': 'Hoàng Nam',
       'initial': 'HN',
       'time': '5 giờ trước',
-      'content':
-          'Một mẹo nhỏ giúp mình quản lý chi tiêu: hãy thử quy tắc 50/30/20. Chia thu nhập thành nhu cầu thiết yếu, mong muốn và tiết kiệm nhé! 💡',
+      'content': 'Một buổi chiều bình yên và một kế hoạch tài chính mới ☕',
+      'image': 'https://picsum.photos/seed/finora-city/800/800',
       'likes': 86,
       'comments': 12,
+      'category': 'Khoảnh khắc',
+      'accent': AppColors.teal,
       'amount': null,
       'progress': null,
-      'category': 'Mẹo tài chính',
-      'accent': AppColors.teal,
-      'trending': true,
       'following': false,
     },
     {
@@ -52,15 +50,14 @@ class _SocialFeedScreenState extends State<SocialFeedScreen> {
       'author': 'Thảo Vy',
       'initial': 'TV',
       'time': 'Hôm qua',
-      'content':
-          'Quỹ du lịch của mình đã đạt 75%! ✈️ Mình đang cố gắng hoàn thành mục tiêu trước cuối năm.',
+      'content': 'Quỹ du lịch đã đạt 75%. Biển xanh đang chờ mình! 🌊',
+      'image': 'https://picsum.photos/seed/finora-beach/800/800',
       'likes': 42,
       'comments': 8,
-      'amount': '7.500.000 ₫',
-      'progress': 0.75,
-      'category': 'Thành tựu',
+      'category': 'Mục tiêu',
       'accent': AppColors.orange,
-      'trending': false,
+      'amount': '10.000.000 ₫',
+      'progress': 0.75,
       'following': true,
     },
     {
@@ -68,141 +65,176 @@ class _SocialFeedScreenState extends State<SocialFeedScreen> {
       'author': 'Ngọc Hà',
       'initial': 'NH',
       'time': '2 ngày trước',
-      'content':
-          'Đừng so sánh hành trình tài chính của mình với người khác. Chỉ cần hôm nay tiến bộ hơn hôm qua là đã rất đáng tự hào rồi! 💙',
+      'content': 'Mỗi ngày một chút, tương lai sẽ tốt hơn 💙',
+      'image': 'https://picsum.photos/seed/finora-sky/800/800',
       'likes': 67,
       'comments': 15,
-      'amount': null,
-      'progress': null,
       'category': 'Cảm hứng',
       'accent': AppColors.violet,
-      'trending': false,
+      'amount': null,
+      'progress': null,
       'following': false,
     },
   ];
 
-  void _showMessage(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
-  }
-
-  void _createPost() {
-    final controller = TextEditingController();
+  void createPost() {
+    final captionController = TextEditingController();
+    final imageController = TextEditingController();
 
     showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
       showDragHandle: true,
-      builder: (sheetContext) {
-        final theme = Theme.of(sheetContext);
-        final dark = theme.brightness == Brightness.dark;
+      builder: (ctx) {
+        final dark = Theme.of(ctx).brightness == Brightness.dark;
+        final surface =
+            dark ? AppColors.darkSurface : AppColors.lightBackground;
 
         return Padding(
           padding: EdgeInsets.fromLTRB(
-            18,
-            8,
-            18,
-            MediaQuery.viewInsetsOf(sheetContext).bottom + 20,
+            20,
+            10,
+            20,
+            MediaQuery.viewInsetsOf(ctx).bottom + 24,
           ),
           child: SafeArea(
             top: false,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Text(
-                  'Tạo bài đăng',
-                  style: theme.textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.w800,
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Text(
+                    'Chia sẻ khoảnh khắc',
+                    style: Theme.of(ctx).textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.w800,
+                        ),
                   ),
-                ),
-                const SizedBox(height: 16),
-                TextField(
-                  controller: controller,
-                  minLines: 4,
-                  maxLines: 6,
-                  maxLength: 1000,
-                  decoration: InputDecoration(
-                    hintText: 'Hôm nay bạn muốn chia sẻ điều gì?',
-                    filled: true,
-                    fillColor: dark
-                        ? AppColors.darkSurface
-                        : AppColors.lightBackground,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(
-                        AppColors.radiusMd,
+                  const SizedBox(height: 18),
+                  Container(
+                    height: 130,
+                    decoration: BoxDecoration(
+                      color: surface,
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(
+                        color: AppColors.primary.withValues(alpha: 0.2),
                       ),
-                      borderSide: BorderSide.none,
+                    ),
+                    child: const Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.add_a_photo_rounded,
+                          size: 40,
+                          color: AppColors.primary,
+                        ),
+                        SizedBox(height: 8),
+                        Text('Thêm ảnh bằng đường dẫn URL'),
+                      ],
                     ),
                   ),
-                ),
-                const SizedBox(height: 12),
-                SizedBox(
-                  height: 50,
-                  child: ElevatedButton.icon(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primary,
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(
-                          AppColors.radiusMd,
+                  const SizedBox(height: 14),
+                  TextField(
+                    controller: imageController,
+                    keyboardType: TextInputType.url,
+                    decoration: InputDecoration(
+                      labelText: 'URL ảnh (không bắt buộc)',
+                      prefixIcon: const Icon(Icons.link_rounded),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: captionController,
+                    maxLines: 3,
+                    maxLength: 300,
+                    decoration: InputDecoration(
+                      hintText: 'Viết một lời nhắn ngắn...',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 14),
+                  SizedBox(
+                    height: 52,
+                    child: ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primary,
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
                         ),
                       ),
-                    ),
-                    onPressed: () {
-                      final content = controller.text.trim();
-                      if (content.isEmpty) return;
+                      onPressed: () {
+                        final caption = captionController.text.trim();
+                        final image = imageController.text.trim();
 
-                      setState(() {
-                        _posts.insert(0, {
-                          'id': DateTime.now().microsecondsSinceEpoch,
-                          'author': 'Bạn',
-                          'initial': 'B',
-                          'time': 'Vừa xong',
-                          'content': content,
-                          'likes': 0,
-                          'comments': 0,
-                          'amount': null,
-                          'progress': null,
-                          'category': 'Chia sẻ',
-                          'accent': AppColors.primary,
-                          'trending': false,
-                          'following': true,
+                        if (caption.isEmpty && image.isEmpty) {
+                          ScaffoldMessenger.of(ctx).showSnackBar(
+                            const SnackBar(
+                              content: Text(
+                                'Hãy nhập ảnh hoặc lời nhắn.',
+                              ),
+                            ),
+                          );
+                          return;
+                        }
+
+                        final uri = Uri.tryParse(image);
+                        final validImage = image.isEmpty ||
+                            (uri != null &&
+                                (uri.scheme == 'http' ||
+                                    uri.scheme == 'https') &&
+                                uri.host.isNotEmpty);
+
+                        if (!validImage) {
+                          ScaffoldMessenger.of(ctx).showSnackBar(
+                            const SnackBar(
+                              content: Text('URL ảnh không hợp lệ.'),
+                            ),
+                          );
+                          return;
+                        }
+
+                        setState(() {
+                          posts.insert(0, {
+                            'id': DateTime.now().microsecondsSinceEpoch,
+                            'author': 'Bạn',
+                            'initial': 'B',
+                            'time': 'Vừa xong',
+                            'content': caption,
+                            'image': image,
+                            'likes': 0,
+                            'comments': 0,
+                            'category': 'Khoảnh khắc',
+                            'accent': AppColors.primary,
+                            'amount': null,
+                            'progress': null,
+                            'following': true,
+                          });
+                          selectedTab = 0;
+                          search = '';
                         });
-                        _selectedTab = 0;
-                        _searchQuery = '';
-                      });
 
-                      Navigator.pop(sheetContext);
-                      _showMessage(
-                        'Đã thêm bài đăng vào bảng tin!',
-                      );
-                    },
-                    icon: const Icon(Icons.send_rounded),
-                    label: const Text('Đăng bài'),
+                        Navigator.pop(ctx);
+                      },
+                      icon: const Icon(Icons.send_rounded),
+                      label: const Text('Đăng khoảnh khắc'),
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         );
       },
-    ).whenComplete(controller.dispose);
-  }
-
-  void _openSearch() {
-    showSearch<void>(
-      context: context,
-      delegate: _FeedSearchDelegate(
-        onSearch: (value) {
-          setState(() => _searchQuery = value);
-        },
-      ),
-    );
+    ).whenComplete(() {
+      captionController.dispose();
+      imageController.dispose();
+    });
   }
 
   @override
@@ -210,66 +242,83 @@ class _SocialFeedScreenState extends State<SocialFeedScreen> {
     final theme = Theme.of(context);
     final dark = theme.brightness == Brightness.dark;
 
-    final background =
-        dark ? AppColors.darkBackground : AppColors.lightBackground;
+    final bg = dark ? AppColors.darkBackground : AppColors.lightBackground;
     final surface = dark ? AppColors.darkSurface : AppColors.lightSurface;
-    final foreground =
-        dark ? AppColors.darkForeground : AppColors.lightForeground;
+    final fg = dark ? AppColors.darkForeground : AppColors.lightForeground;
     final muted = dark ? AppColors.darkMuted : AppColors.lightMuted;
     final border = dark ? AppColors.darkBorder : AppColors.lightBorder;
 
-    final visiblePosts = _posts.where((post) {
-      final query = _searchQuery.toLowerCase();
+    final filtered = posts.where((post) {
+      final matchSearch = '${post['author']} ${post['content']}'
+          .toLowerCase()
+          .contains(search.toLowerCase());
 
-      final matchesSearch = query.isEmpty ||
-          (post['author'] as String).toLowerCase().contains(query) ||
-          (post['content'] as String).toLowerCase().contains(query);
+      final matchTab =
+          selectedTab == 0 || (selectedTab == 1 && post['following'] == true);
 
-      final matchesTab = switch (_selectedTab) {
-        1 => post['trending'] == true,
-        2 => post['following'] == true,
-        _ => true,
-      };
-
-      return matchesSearch && matchesTab;
+      return matchSearch && matchTab;
     }).toList();
 
     return Scaffold(
-      backgroundColor: background,
+      backgroundColor: bg,
       appBar: AppBar(
-        backgroundColor: background,
+        backgroundColor: bg,
         surfaceTintColor: Colors.transparent,
         elevation: 0,
-        title: Text(
-          'Bảng tin tài chính',
-          style: theme.textTheme.titleLarge?.copyWith(
-            color: foreground,
-            fontWeight: FontWeight.w800,
-          ),
+        title: Row(
+          children: [
+            const Icon(
+              Icons.favorite_rounded,
+              color: AppColors.primary,
+              size: 27,
+            ),
+            const SizedBox(width: 9),
+            Text(
+              'Khoảnh khắc',
+              style: theme.textTheme.titleLarge?.copyWith(
+                color: fg,
+                fontWeight: FontWeight.w900,
+              ),
+            ),
+          ],
         ),
         actions: [
           IconButton(
-            tooltip: 'Tìm kiếm bài đăng',
-            onPressed: _openSearch,
-            icon: Icon(
-              Icons.search_rounded,
-              color: foreground,
+            tooltip: 'Tìm kiếm',
+            onPressed: () {
+              showSearch<String?>(
+                context: context,
+                delegate: _PostSearch(),
+              ).then((value) {
+                if (!mounted || value == null) return;
+                setState(() => search = value);
+              });
+            },
+            icon: Icon(Icons.search_rounded, color: fg),
+          ),
+          IconButton(
+            tooltip: 'Tạo bài đăng',
+            onPressed: createPost,
+            icon: const Icon(
+              Icons.add_circle_rounded,
+              color: AppColors.primary,
+              size: 29,
             ),
           ),
           const SizedBox(width: 8),
         ],
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: _createPost,
+      floatingActionButton: FloatingActionButton(
+        onPressed: createPost,
         backgroundColor: AppColors.primary,
         foregroundColor: Colors.white,
-        icon: const Icon(Icons.edit_rounded),
-        label: const Text('Viết bài'),
+        tooltip: 'Chia sẻ khoảnh khắc',
+        child: const Icon(Icons.camera_alt_rounded, size: 28),
       ),
       body: SafeArea(
         child: Center(
           child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 720),
+            constraints: const BoxConstraints(maxWidth: 650),
             child: RefreshIndicator(
               color: AppColors.primary,
               onRefresh: () async {
@@ -279,175 +328,60 @@ class _SocialFeedScreenState extends State<SocialFeedScreen> {
               },
               child: ListView(
                 physics: const AlwaysScrollableScrollPhysics(),
-                padding: const EdgeInsets.fromLTRB(
-                  18,
-                  18,
-                  18,
-                  100,
-                ),
+                padding: const EdgeInsets.fromLTRB(18, 12, 18, 100),
                 children: [
                   Container(
-                    padding: const EdgeInsets.all(22),
+                    padding: const EdgeInsets.all(18),
                     decoration: BoxDecoration(
-                     gradient: const LinearGradient(
-  begin: Alignment.topLeft,
-  end: Alignment.bottomRight,
-  colors: [
-    AppColors.balanceGradStart,
-    AppColors.balanceGradMid,
-    AppColors.balanceGradEnd,
-  ],
-  stops: [0, 0.70, 1],
-),
+                      gradient: const LinearGradient(
+                        colors: [
+                          AppColors.balanceGradStart,
+                          AppColors.balanceGradMid,
+                          AppColors.balanceGradEnd,
+                        ],
+                        stops: [0, 0.75, 1],
+                      ),
                       borderRadius: BorderRadius.circular(
                         AppColors.radiusLg,
                       ),
-                     boxShadow: const [
-  BoxShadow(
-    color: AppColors.primaryGlow,
-    blurRadius: 20,
-    offset: Offset(0, 8),
-  ),
-],
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            const Icon(
-                              Icons.auto_awesome_rounded,
-                              color: Colors.white,
-                              size: 18,
-                            ),
-                            const SizedBox(width: 8),
-                            Text(
-                              'FINORA COMMUNITY',
-                              style: theme.textTheme.labelSmall?.copyWith(
-                                color: Colors.white70,
-                                fontWeight: FontWeight.w800,
-                                letterSpacing: 1,
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 16),
-                        Text(
-                          'Cùng nhau phát triển\n'
-                          'tài chính thông minh',
-                          style: theme.textTheme.headlineSmall?.copyWith(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w900,
-                            height: 1.3,
-                          ),
-                        ),
-                        const SizedBox(height: 10),
-                        Text(
-                          'Chia sẻ kinh nghiệm, kết nối cộng đồng '
-                          'và chinh phục mục tiêu tài chính.',
-                          style: theme.textTheme.bodyMedium?.copyWith(
-                            color: Colors.white.withValues(
-                              alpha: 0.85,
-                            ),
-                            height: 1.5,
-                          ),
-                        ),
-                        const SizedBox(height: 18),
-                        OutlinedButton.icon(
-                          onPressed: _createPost,
-                          style: OutlinedButton.styleFrom(
-                            backgroundColor: Colors.white,
-                            foregroundColor: AppColors.primaryDark,
-                            side: BorderSide.none,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(
-                                AppColors.radiusSm,
-                              ),
-                            ),
-                          ),
-                          icon: const Icon(
-                            Icons.edit_note_rounded,
-                          ),
-                          label: const Text('Chia sẻ ngay'),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  Container(
-                    padding: const EdgeInsets.all(14),
-                    decoration: BoxDecoration(
-                      color: surface,
-                      borderRadius: BorderRadius.circular(
-                        AppColors.radiusLg,
-                      ),
-                      border: Border.all(color: border),
                     ),
                     child: Row(
                       children: [
-                        Container(
-                          width: 44,
-                          height: 44,
-                          decoration: BoxDecoration(
-                            color: AppColors.primaryLight,
-                            borderRadius: BorderRadius.circular(
-                              AppColors.radiusMd,
-                            ),
-                          ),
-                          child: const Icon(
-                            Icons.person_rounded,
-                            color: AppColors.primary,
-                          ),
-                        ),
-                        const SizedBox(width: 12),
                         Expanded(
-                          child: InkWell(
-                            onTap: _createPost,
-                            borderRadius: BorderRadius.circular(
-                              AppColors.radiusSm,
-                            ),
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(
-                                vertical: 12,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'FINORA MOMENTS',
+                                style: theme.textTheme.labelSmall?.copyWith(
+                                  color: Colors.white70,
+                                  fontWeight: FontWeight.w800,
+                                  letterSpacing: 1.3,
+                                ),
                               ),
-                              child: Text(
-                                'Hôm nay bạn muốn chia sẻ gì?',
-                                style: theme.textTheme.bodyMedium
-                                    ?.copyWith(color: muted),
+                              const SizedBox(height: 8),
+                              Text(
+                                'Lưu giữ những\nkhoảnh khắc nhỏ 💙',
+                                style: theme.textTheme.titleLarge?.copyWith(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w900,
+                                  height: 1.3,
+                                ),
                               ),
-                            ),
+                              const SizedBox(height: 8),
+                              Text(
+                                'Chia sẻ hành trình cùng bạn bè.',
+                                style: theme.textTheme.bodySmall?.copyWith(
+                                  color: Colors.white70,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                        IconButton(
-                          tooltip: 'Tạo bài đăng',
-                          onPressed: _createPost,
-                          icon: const Icon(
-                            Icons.add_circle_rounded,
-                            color: AppColors.primary,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 22),
-                  SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
-                      children: [
-                        _filterChip(
-                          'Dành cho bạn',
-                          Icons.auto_awesome_rounded,
-                          0,
-                        ),
-                        _filterChip(
-                          'Xu hướng',
-                          Icons.local_fire_department_rounded,
-                          1,
-                        ),
-                        _filterChip(
-                          'Đang theo dõi',
-                          Icons.people_alt_rounded,
-                          2,
+                        const Icon(
+                          Icons.photo_camera_rounded,
+                          size: 65,
+                          color: Colors.white70,
                         ),
                       ],
                     ),
@@ -457,71 +391,139 @@ class _SocialFeedScreenState extends State<SocialFeedScreen> {
                     children: [
                       Expanded(
                         child: Text(
-                          'Bài viết nổi bật',
+                          'Bạn bè của bạn',
                           style: theme.textTheme.titleMedium?.copyWith(
-                            color: foreground,
+                            color: fg,
                             fontWeight: FontWeight.w800,
                           ),
                         ),
                       ),
-                      if (_searchQuery.isNotEmpty)
+                      Text(
+                        'Đang kết nối',
+                        style: theme.textTheme.labelSmall?.copyWith(
+                          color: muted,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 14),
+                  SizedBox(
+                    height: 95,
+                    child: ListView(
+                      scrollDirection: Axis.horizontal,
+                      children: [
+                        _friend('Bạn', 'B', AppColors.primary, true),
+                        _friend('Minh Anh', 'MA', AppColors.primary, false),
+                        _friend('Hoàng Nam', 'HN', AppColors.teal, false),
+                        _friend('Thảo Vy', 'TV', AppColors.orange, false),
+                        _friend('Ngọc Hà', 'NH', AppColors.violet, false),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: surface,
+                      borderRadius: BorderRadius.circular(
+                        AppColors.radiusLg,
+                      ),
+                      border: Border.all(color: border),
+                    ),
+                    child: InkWell(
+                      onTap: createPost,
+                      borderRadius: BorderRadius.circular(18),
+                      child: Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: AppColors.primaryLight,
+                              borderRadius: BorderRadius.circular(14),
+                            ),
+                            child: const Icon(
+                              Icons.camera_alt_rounded,
+                              color: AppColors.primary,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Text(
+                              'Chia sẻ khoảnh khắc của bạn...',
+                              style: theme.textTheme.bodyMedium?.copyWith(
+                                color: muted,
+                              ),
+                            ),
+                          ),
+                          const Icon(
+                            Icons.add_circle_rounded,
+                            color: AppColors.primary,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 22),
+                  Row(
+                    children: [
+                      _tab('Dành cho bạn', 0),
+                      const SizedBox(width: 9),
+                      _tab('Đang theo dõi', 1),
+                    ],
+                  ),
+                  const SizedBox(height: 22),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          'Khoảnh khắc gần đây',
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            color: fg,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                      ),
+                      if (search.isNotEmpty)
                         TextButton(
-                          onPressed: () {
-                            setState(() => _searchQuery = '');
-                          },
-                          child: const Text('Xóa tìm kiếm'),
+                          onPressed: () => setState(() => search = ''),
+                          child: const Text('Xóa lọc'),
                         ),
                     ],
                   ),
                   const SizedBox(height: 14),
-                  if (visiblePosts.isEmpty)
-                    Container(
-                      padding: const EdgeInsets.all(35),
-                      decoration: BoxDecoration(
-                        color: surface,
-                        borderRadius: BorderRadius.circular(
-                          AppColors.radiusLg,
-                        ),
-                        border: Border.all(color: border),
-                      ),
+                  if (filtered.isEmpty)
+                    Padding(
+                      padding: const EdgeInsets.all(30),
                       child: Column(
                         children: [
                           const Icon(
-                            Icons.article_outlined,
-                            size: 44,
+                            Icons.photo_library_outlined,
                             color: AppColors.primary,
+                            size: 45,
                           ),
                           const SizedBox(height: 12),
                           Text(
-                            'Chưa có bài đăng phù hợp',
-                            style: theme.textTheme.titleMedium?.copyWith(
-                              color: foreground,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            'Hãy thử bộ lọc hoặc từ khóa khác.',
-                            style: theme.textTheme.bodySmall
-                                ?.copyWith(color: muted),
+                            'Chưa có khoảnh khắc phù hợp',
+                            style: TextStyle(color: fg),
                           ),
                         ],
                       ),
                     )
                   else
-                    ...visiblePosts.map(
+                    ...filtered.map(
                       (post) => PostCard(
                         key: ValueKey(post['id']),
                         author: post['author'] as String,
                         initial: post['initial'] as String,
                         time: post['time'] as String,
                         content: post['content'] as String,
+                        imageUrl: post['image'] as String?,
                         likes: post['likes'] as int,
                         comments: post['comments'] as int,
-                        amount: post['amount'] as String?,
-                        progress: post['progress'] as double?,
                         category: post['category'] as String,
                         accentColor: post['accent'] as Color,
+                        amount: post['amount'] as String?,
+                        progress: post['progress'] as double?,
                       ),
                     ),
                 ],
@@ -533,114 +535,133 @@ class _SocialFeedScreenState extends State<SocialFeedScreen> {
     );
   }
 
-  Widget _filterChip(
-    String label,
-    IconData icon,
-    int index,
+  Widget _friend(
+    String name,
+    String initials,
+    Color accent,
+    bool isMe,
   ) {
-    final selected = _selectedTab == index;
-
     return Padding(
-      padding: const EdgeInsets.only(right: 9),
-      child: ChoiceChip(
-        selected: selected,
-        showCheckmark: false,
-        selectedColor: AppColors.primary,
-        backgroundColor: Theme.of(context).brightness == Brightness.dark
-            ? AppColors.darkSurface
-            : AppColors.lightSurface,
-        side: BorderSide(
-          color: selected
-              ? AppColors.primary
-              : (Theme.of(context).brightness == Brightness.dark
-                  ? AppColors.darkBorder
-                  : AppColors.lightBorder),
+      padding: const EdgeInsets.only(right: 18),
+      child: InkWell(
+        onTap: isMe
+            ? createPost
+            : () {
+                setState(() {
+                  selectedTab = 0;
+                  search = name;
+                });
+              },
+        child: Column(
+          children: [
+            Stack(
+              children: [
+                Container(
+                  width: 58,
+                  height: 58,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: accent.withValues(alpha: 0.12),
+                    border: Border.all(color: accent, width: 2.5),
+                  ),
+                  child: Text(
+                    initials,
+                    style: TextStyle(
+                      color: accent,
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
+                ),
+                if (isMe)
+                  const Positioned(
+                    bottom: 0,
+                    right: 0,
+                    child: Icon(
+                      Icons.add_circle_rounded,
+                      color: AppColors.primary,
+                      size: 21,
+                    ),
+                  ),
+              ],
+            ),
+            const SizedBox(height: 7),
+            Text(
+              name,
+              style: Theme.of(context).textTheme.labelSmall,
+            ),
+          ],
         ),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppColors.radiusSm),
-        ),
-        avatar: Icon(
-          icon,
-          size: 17,
-          color: selected ? Colors.white : AppColors.primary,
-        ),
-        label: Text(
-          label,
-          style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                fontWeight: FontWeight.w700,
-                color: selected
-                    ? Colors.white
-                    : (Theme.of(context).brightness == Brightness.dark
-                        ? AppColors.darkForeground
-                        : AppColors.lightForeground),
-              ),
-        ),
-        onSelected: (_) {
-          setState(() => _selectedTab = index);
-        },
       ),
+    );
+  }
+
+  Widget _tab(String label, int index) {
+    final active = selectedTab == index;
+    final dark = Theme.of(context).brightness == Brightness.dark;
+
+    return ChoiceChip(
+      selected: active,
+      showCheckmark: false,
+      label: Text(label),
+      selectedColor: AppColors.primary,
+      backgroundColor: dark ? AppColors.darkSurface : AppColors.lightSurface,
+      labelStyle: TextStyle(
+        color: active
+            ? Colors.white
+            : (dark ? AppColors.darkForeground : AppColors.lightForeground),
+        fontWeight: FontWeight.w700,
+      ),
+      side: BorderSide(
+        color: active
+            ? AppColors.primary
+            : (dark ? AppColors.darkBorder : AppColors.lightBorder),
+      ),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(14),
+      ),
+      onSelected: (_) => setState(() => selectedTab = index),
     );
   }
 }
 
-class _FeedSearchDelegate extends SearchDelegate<void> {
-  _FeedSearchDelegate({required this.onSearch});
-
-  final ValueChanged<String> onSearch;
+class _PostSearch extends SearchDelegate<String?> {
+  @override
+  String get searchFieldLabel => 'Tìm bạn bè hoặc khoảnh khắc...';
 
   @override
-  String get searchFieldLabel => 'Tìm bài đăng, tác giả...';
+  List<Widget> buildActions(BuildContext context) => [
+        IconButton(
+          onPressed: () => query = '',
+          icon: const Icon(Icons.clear_rounded),
+        ),
+      ];
 
   @override
-  List<Widget> buildActions(BuildContext context) {
-    return [
-      IconButton(
-        onPressed: () {
-          query = '';
-          onSearch('');
-        },
-        icon: const Icon(Icons.clear_rounded),
-      ),
-    ];
-  }
+  Widget buildLeading(BuildContext context) => IconButton(
+        onPressed: () => close(context, null),
+        icon: const Icon(Icons.arrow_back_rounded),
+      );
 
   @override
-  Widget buildLeading(BuildContext context) {
-    return IconButton(
-      onPressed: () => close(context, null),
-      icon: const Icon(Icons.arrow_back_rounded),
-    );
-  }
+  Widget buildResults(BuildContext context) => ListTile(
+        leading: const Icon(
+          Icons.search,
+          color: AppColors.primary,
+        ),
+        title: Text('Tìm "$query"'),
+        onTap: () => close(context, query.trim()),
+      );
 
   @override
-  Widget buildResults(BuildContext context) {
-    return ListTile(
-      leading: const Icon(
-        Icons.search_rounded,
-        color: AppColors.primary,
-      ),
-      title: Text('Tìm kiếm "$query"'),
-      onTap: () {
-        onSearch(query.trim());
-        close(context, null);
-      },
-    );
-  }
-
-  @override
-  Widget buildSuggestions(BuildContext context) {
-    return ListTile(
-      leading: const Icon(
-        Icons.search_rounded,
-        color: AppColors.primary,
-      ),
-      title: Text(
-        query.isEmpty ? 'Nhập từ khóa để tìm kiếm' : 'Tìm kiếm "$query"',
-      ),
-      onTap: () {
-        onSearch(query.trim());
-        close(context, null);
-      },
-    );
-  }
+  Widget buildSuggestions(BuildContext context) => ListTile(
+        leading: const Icon(
+          Icons.search,
+          color: AppColors.primary,
+        ),
+        title: Text(
+          query.isEmpty ? 'Nhập từ khóa...' : 'Tìm "$query"',
+        ),
+        onTap: () => close(context, query.trim()),
+      );
 }

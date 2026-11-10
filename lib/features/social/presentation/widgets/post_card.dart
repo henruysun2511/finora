@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import '../../../../app/theme/app_colors.dart';
 
 class PostCard extends StatefulWidget {
   const PostCard({
@@ -10,75 +10,130 @@ class PostCard extends StatefulWidget {
     required this.content,
     required this.likes,
     required this.comments,
+    this.imageUrl,
+    this.category = 'Khoảnh khắc',
+    this.accentColor = AppColors.primary,
     this.amount,
     this.progress,
-    this.category = 'Chia sẻ',
-    this.accentColor = const Color(0xFFA78BFA),
   });
 
-  final String author;
-  final String initial;
-  final String time;
-  final String content;
-  final int likes;
-  final int comments;
-  final String? amount;
+  final String author, initial, time, content, category;
+  final String? imageUrl, amount;
   final double? progress;
-  final String category;
+  final int likes, comments;
   final Color accentColor;
 
   @override
   State<PostCard> createState() => _PostCardState();
 }
 
-class _PostCardState extends State<PostCard>
-    with SingleTickerProviderStateMixin {
-  bool _liked = false;
-  bool _saved = false;
-  late final AnimationController _heartController;
-  late final Animation<double> _heartScale;
+class _PostCardState extends State<PostCard> {
+  bool liked = false;
+  bool saved = false;
+  final List<String> replies = [];
 
-  static const lavender = Color(0xFFA78BFA);
-  static const pink = Color(0xFFFB7185);
-  static const mint = Color(0xFF34BFA3);
-  static const ink = Color(0xFF302B49);
+  void openComments() {
+    final controller = TextEditingController();
 
-  @override
-  void initState() {
-    super.initState();
-    _heartController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 260),
-    );
-    _heartScale = Tween<double>(
-      begin: 1,
-      end: 1.28,
-    ).animate(
-      CurvedAnimation(
-        parent: _heartController,
-        curve: Curves.easeOutBack,
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      showDragHandle: true,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, refresh) {
+          final dark = Theme.of(ctx).brightness == Brightness.dark;
+          final fg =
+              dark ? AppColors.darkForeground : AppColors.lightForeground;
+
+          return Padding(
+            padding: EdgeInsets.fromLTRB(
+              20,
+              10,
+              20,
+              MediaQuery.viewInsetsOf(ctx).bottom + 24,
+            ),
+            child: SafeArea(
+              top: false,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'Bình luận',
+                    style: Theme.of(ctx).textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.w800,
+                        ),
+                  ),
+                  const SizedBox(height: 18),
+                  if (replies.isEmpty)
+                    const Padding(
+                      padding: EdgeInsets.all(20),
+                      child: Text('Chưa có bình luận mới 💬'),
+                    ),
+                  if (replies.isNotEmpty)
+                    ConstrainedBox(
+                      constraints: const BoxConstraints(maxHeight: 220),
+                      child: ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: replies.length,
+                        itemBuilder: (_, i) => ListTile(
+                          leading: const CircleAvatar(
+                            backgroundColor: AppColors.primaryLight,
+                            child: Icon(
+                              Icons.person,
+                              color: AppColors.primary,
+                            ),
+                          ),
+                          title: const Text('Bạn'),
+                          subtitle: Text(replies[i]),
+                        ),
+                      ),
+                    ),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextField(
+                          controller: controller,
+                          style: TextStyle(color: fg),
+                          decoration: InputDecoration(
+                            hintText: 'Viết bình luận...',
+                            filled: true,
+                            fillColor: dark
+                                ? AppColors.darkSurface
+                                : AppColors.lightBackground,
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(18),
+                              borderSide: BorderSide.none,
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      IconButton.filled(
+                        style: IconButton.styleFrom(
+                          backgroundColor: AppColors.primary,
+                        ),
+                        onPressed: () {
+                          final value = controller.text.trim();
+                          if (value.isEmpty) return;
+                          refresh(() => replies.add(value));
+                          setState(() {});
+                          controller.clear();
+                        },
+                        icon: const Icon(Icons.send_rounded),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
       ),
-    );
+    ).whenComplete(controller.dispose);
   }
 
-  @override
-  void dispose() {
-    _heartController.dispose();
-    super.dispose();
-  }
-
-  void _toggleLike() {
-    setState(() => _liked = !_liked);
-    if (_liked) {
-      _heartController.forward().then((_) {
-        if (mounted) _heartController.reverse();
-      });
-    } else {
-      _heartController.reverse();
-    }
-  }
-
-  void _showMessage(String message) {
+  void showMessage(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
@@ -87,181 +142,56 @@ class _PostCardState extends State<PostCard>
     );
   }
 
-  void _openComments() {
-    final controller = TextEditingController();
-    final messages = <String>[
-      'Bài viết rất truyền cảm hứng! 💜',
-      'Cảm ơn bạn đã chia sẻ 🌷',
-    ];
-
-    showModalBottomSheet<void>(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (sheetContext) {
-        return StatefulBuilder(
-          builder: (sheetContext, updateSheet) {
-            final bottomInset = MediaQuery.viewInsetsOf(sheetContext).bottom;
-
-            return Padding(
-              padding: EdgeInsets.only(bottom: bottomInset),
-              child: Container(
-                constraints: BoxConstraints(
-                  maxHeight: MediaQuery.sizeOf(sheetContext).height * 0.75,
-                ),
-                padding: const EdgeInsets.fromLTRB(20, 20, 20, 16),
-                decoration: BoxDecoration(
-                  color: Theme.of(sheetContext).brightness == Brightness.dark
-                      ? const Color(0xFF29263C)
-                      : Colors.white,
-                  borderRadius: const BorderRadius.vertical(
-                    top: Radius.circular(30),
-                  ),
-                ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Container(
-                      width: 42,
-                      height: 5,
-                      decoration: BoxDecoration(
-                        color: lavender.withValues(alpha: 0.35),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      'Bình luận 💬',
-                      style: GoogleFonts.inter(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                    const SizedBox(height: 18),
-                    Flexible(
-                      child: ListView.separated(
-                        shrinkWrap: true,
-                        itemCount: messages.length,
-                        separatorBuilder: (_, __) => const SizedBox(height: 10),
-                        itemBuilder: (_, index) {
-                          return Container(
-                            padding: const EdgeInsets.all(13),
-                            decoration: BoxDecoration(
-                              color: lavender.withValues(
-                                alpha: 0.09,
-                              ),
-                              borderRadius: BorderRadius.circular(16),
-                            ),
-                            child: Text(
-                              messages[index],
-                              style: GoogleFonts.inter(
-                                fontSize: 13,
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: TextField(
-                            controller: controller,
-                            decoration: InputDecoration(
-                              hintText: 'Viết bình luận...',
-                              filled: true,
-                              fillColor: lavender.withValues(
-                                alpha: 0.08,
-                              ),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(18),
-                                borderSide: BorderSide.none,
-                              ),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        IconButton.filled(
-                          style: IconButton.styleFrom(
-                            backgroundColor: lavender,
-                          ),
-                          onPressed: () {
-                            final text = controller.text.trim();
-                            if (text.isEmpty) return;
-                            updateSheet(() {
-                              messages.add(text);
-                              controller.clear();
-                            });
-                          },
-                          icon: const Icon(Icons.send_rounded),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            );
-          },
-        );
-      },
-    ).whenComplete(controller.dispose);
-  }
-
   @override
   Widget build(BuildContext context) {
-    final dark = Theme.of(context).brightness == Brightness.dark;
-
-    final textColor = dark ? const Color(0xFFF4F0FF) : ink;
-    final secondary = dark ? const Color(0xFFBDB7D0) : const Color(0xFF89839B);
-    final surface = dark ? const Color(0xFF29263C) : Colors.white;
-
-    final accent = widget.accentColor;
+    final theme = Theme.of(context);
+    final dark = theme.brightness == Brightness.dark;
+    final surface = dark ? AppColors.darkSurface : AppColors.lightSurface;
+    final fg = dark ? AppColors.darkForeground : AppColors.lightForeground;
+    final muted = dark ? AppColors.darkMuted : AppColors.lightMuted;
+    final border = dark ? AppColors.darkBorder : AppColors.lightBorder;
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 18),
+      margin: const EdgeInsets.only(bottom: 20),
       decoration: BoxDecoration(
         color: surface,
-        borderRadius: BorderRadius.circular(27),
-        border: Border.all(
-          color: accent.withValues(alpha: dark ? 0.22 : 0.16),
-        ),
+        borderRadius: BorderRadius.circular(AppColors.radiusLg),
+        border: Border.all(color: border),
         boxShadow: dark
             ? null
             : [
                 BoxShadow(
-                  color: lavender.withValues(alpha: 0.09),
-                  blurRadius: 28,
-                  offset: const Offset(0, 9),
+                  color: AppColors.primary.withValues(alpha: 0.05),
+                  blurRadius: 18,
+                  offset: const Offset(0, 6),
                 ),
               ],
       ),
-      child: Padding(
-        padding: const EdgeInsets.all(18),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
+      clipBehavior: Clip.antiAlias,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(15),
+            child: Row(
               children: [
                 Container(
-                  width: 48,
-                  height: 48,
+                  width: 44,
+                  height: 44,
                   alignment: Alignment.center,
                   decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [
-                        accent.withValues(alpha: 0.85),
-                        pink.withValues(alpha: 0.55),
-                      ],
-                    ),
+                    color: widget.accentColor.withValues(alpha: 0.14),
                     shape: BoxShape.circle,
+                    border: Border.all(
+                      color: widget.accentColor,
+                      width: 2,
+                    ),
                   ),
                   child: Text(
                     widget.initial,
-                    style: GoogleFonts.inter(
-                      fontSize: 14,
+                    style: theme.textTheme.labelLarge?.copyWith(
+                      color: dark ? fg : widget.accentColor,
                       fontWeight: FontWeight.w800,
-                      color: Colors.white,
                     ),
                   ),
                 ),
@@ -270,253 +200,211 @@ class _PostCardState extends State<PostCard>
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Row(
-                        children: [
-                          Flexible(
-                            child: Text(
-                              widget.author,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: GoogleFonts.inter(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w800,
-                                color: textColor,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 5),
-                          const Icon(
-                            Icons.verified_rounded,
-                            size: 16,
-                            color: lavender,
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 4),
                       Text(
-                        '${widget.time} · Công khai',
-                        style: GoogleFonts.inter(
-                          fontSize: 11,
-                          color: secondary,
+                        widget.author,
+                        style: theme.textTheme.titleSmall?.copyWith(
+                          color: fg,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                      const SizedBox(height: 3),
+                      Text(
+                        widget.time,
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: muted,
                         ),
                       ),
                     ],
                   ),
                 ),
                 IconButton(
-                  tooltip: 'Tùy chọn bài viết',
-                  onPressed: () => _showMessage(
-                    'Đây là bài đăng minh họa.',
-                  ),
-                  icon: Icon(
-                    Icons.more_horiz_rounded,
-                    color: secondary,
-                  ),
+                  onPressed: () => showMessage('Bài đăng minh họa'),
+                  icon: Icon(Icons.more_horiz_rounded, color: muted),
                 ),
               ],
             ),
-            const SizedBox(height: 15),
-            Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 12,
-                vertical: 7,
-              ),
-              decoration: BoxDecoration(
-                color: accent.withValues(alpha: 0.13),
-                borderRadius: BorderRadius.circular(30),
-              ),
-              child: Text(
-                _categoryLabel(widget.category),
-                style: GoogleFonts.inter(
-                  fontSize: 11,
-                  fontWeight: FontWeight.w700,
-                  color: dark ? const Color(0xFFE4D7FF) : _darken(accent),
-                ),
-              ),
-            ),
-            const SizedBox(height: 14),
-            Text(
-              widget.content,
-              style: GoogleFonts.inter(
-                fontSize: 13.5,
-                height: 1.7,
-                color: textColor,
-              ),
-            ),
-            if (widget.amount != null) ...[
-              const SizedBox(height: 18),
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(18),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: dark
-                        ? [
-                            accent.withValues(alpha: 0.23),
-                            mint.withValues(alpha: 0.09),
-                          ]
-                        : [
-                            const Color(0xFFF1EAFE),
-                            const Color(0xFFE6FBF3),
-                          ],
+          ),
+
+          // Ảnh lớn theo phong cách Locket.
+          AspectRatio(
+            aspectRatio: 1,
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        widget.accentColor.withValues(alpha: 0.45),
+                        AppColors.primaryDark,
+                      ],
+                    ),
                   ),
-                  borderRadius: BorderRadius.circular(22),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        const Icon(
-                          Icons.emoji_events_rounded,
-                          color: Color(0xFFF3B64B),
-                          size: 19,
-                        ),
-                        const SizedBox(width: 7),
-                        Text(
-                          'THÀNH TỰU TIẾT KIỆM',
-                          style: GoogleFonts.inter(
-                            fontSize: 10,
-                            fontWeight: FontWeight.w800,
-                            letterSpacing: 0.7,
-                            color: dark
-                                ? const Color(0xFFE5D6FF)
-                                : const Color(0xFF7957B8),
+                  child: widget.imageUrl == null || widget.imageUrl!.isEmpty
+                      ? const Center(
+                          child: Icon(
+                            Icons.photo_camera_rounded,
+                            color: Colors.white70,
+                            size: 72,
                           ),
+                        )
+                      : Image.network(
+                          widget.imageUrl!,
+                          fit: BoxFit.cover,
+                          errorBuilder: (_, __, ___) => const Center(
+                            child: Icon(
+                              Icons.photo_camera_rounded,
+                              size: 72,
+                              color: Colors.white70,
+                            ),
+                          ),
+                        ),
+                ),
+                Positioned(
+                  top: 14,
+                  left: 14,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 8,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.black.withValues(alpha: 0.42),
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                    child: Text(
+                      widget.category,
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                ),
+                Positioned(
+                  bottom: 15,
+                  left: 15,
+                  right: 15,
+                  child: Text(
+                    widget.content,
+                    maxLines: 4,
+                    overflow: TextOverflow.ellipsis,
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w800,
+                      height: 1.35,
+                      shadows: const [
+                        Shadow(
+                          color: Colors.black87,
+                          blurRadius: 12,
                         ),
                       ],
                     ),
-                    const SizedBox(height: 11),
-                    Text(
-                      widget.amount!,
-                      style: GoogleFonts.inter(
-                        fontSize: 25,
-                        fontWeight: FontWeight.w900,
-                        color: textColor,
-                      ),
-                    ),
-                    const SizedBox(height: 13),
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(12),
-                      child: LinearProgressIndicator(
-                        value: (widget.progress ?? 1).clamp(0.0, 1.0),
-                        minHeight: 9,
-                        backgroundColor: lavender.withValues(alpha: 0.19),
-                        valueColor: const AlwaysStoppedAnimation<Color>(
-                          mint,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    Text(
-                      '${((widget.progress ?? 1).clamp(0.0, 1.0) * 100).round()}% mục tiêu hoàn thành ✨',
-                      style: GoogleFonts.inter(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w600,
-                        color: secondary,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-            const SizedBox(height: 17),
-            Divider(
-              height: 1,
-              color: accent.withValues(alpha: 0.13),
-            ),
-            const SizedBox(height: 8),
-            Row(
-              children: [
-                ScaleTransition(
-                  scale: _heartScale,
-                  child: _action(
-                    icon: _liked
-                        ? Icons.favorite_rounded
-                        : Icons.favorite_border_rounded,
-                    label: '${widget.likes + (_liked ? 1 : 0)}',
-                    color: _liked ? pink : secondary,
-                    onPressed: _toggleLike,
-                  ),
-                ),
-                _action(
-                  icon: Icons.mode_comment_outlined,
-                  label: '${widget.comments}',
-                  color: lavender,
-                  onPressed: _openComments,
-                ),
-                _action(
-                  icon: Icons.ios_share_rounded,
-                  label: 'Chia sẻ',
-                  color: mint,
-                  onPressed: () => _showMessage(
-                    'Chia sẻ bài đăng sẽ được kết nối sau.',
-                  ),
-                ),
-                const Spacer(),
-                IconButton(
-                  tooltip: _saved ? 'Bỏ lưu bài' : 'Lưu bài',
-                  onPressed: () {
-                    setState(() => _saved = !_saved);
-                  },
-                  icon: Icon(
-                    _saved
-                        ? Icons.bookmark_rounded
-                        : Icons.bookmark_border_rounded,
-                    color: _saved ? const Color(0xFFF2B94B) : secondary,
                   ),
                 ),
               ],
             ),
-          ],
-        ),
-      ),
-    );
-  }
+          ),
 
-  String _categoryLabel(String value) {
-    switch (value) {
-      case 'Thành tựu':
-        return '🏆 Thành tựu';
-      case 'Mẹo tài chính':
-        return '💡 Mẹo tài chính';
-      case 'Cảm hứng':
-        return '🌷 Cảm hứng';
-      default:
-        return '✨ $value';
-    }
-  }
+          if (widget.amount != null)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 14, 16, 0),
+              child: Container(
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  color:
+                      dark ? AppColors.darkBackground : AppColors.primaryLight,
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(
+                      Icons.emoji_events_rounded,
+                      color: AppColors.orange,
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Text(
+                        'Mục tiêu: ${widget.amount}',
+                        style: theme.textTheme.titleSmall?.copyWith(
+                          color: fg,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                    ),
+                    if (widget.progress != null)
+                      Text(
+                        '${(widget.progress!.clamp(0.0, 1.0) * 100).round()}%',
+                        style: const TextStyle(
+                          color: AppColors.teal,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+            ),
 
-  Color _darken(Color color) {
-    return Color.lerp(color, Colors.black, 0.24)!;
-  }
-
-  Widget _action({
-    required IconData icon,
-    required String label,
-    required Color color,
-    required VoidCallback onPressed,
-  }) {
-    return TextButton.icon(
-      onPressed: onPressed,
-      style: TextButton.styleFrom(
-        padding: const EdgeInsets.symmetric(
-          horizontal: 5,
-          vertical: 8,
-        ),
-        minimumSize: Size.zero,
-        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-      ),
-      icon: Icon(icon, size: 18, color: color),
-      label: Text(
-        label,
-        style: GoogleFonts.inter(
-          fontSize: 11,
-          fontWeight: FontWeight.w700,
-          color: color,
-        ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(12, 10, 12, 12),
+            child: Row(
+              children: [
+                IconButton(
+                  tooltip: 'Thích',
+                  onPressed: () => setState(() => liked = !liked),
+                  icon: Icon(
+                    liked
+                        ? Icons.favorite_rounded
+                        : Icons.favorite_border_rounded,
+                    color: liked ? AppColors.pink : fg,
+                    size: 27,
+                  ),
+                ),
+                Text(
+                  '${widget.likes + (liked ? 1 : 0)}',
+                  style: theme.textTheme.labelMedium,
+                ),
+                const SizedBox(width: 9),
+                IconButton(
+                  tooltip: 'Bình luận',
+                  onPressed: openComments,
+                  icon: Icon(
+                    Icons.chat_bubble_outline_rounded,
+                    color: fg,
+                    size: 25,
+                  ),
+                ),
+                Text(
+                  '${widget.comments + replies.length}',
+                  style: theme.textTheme.labelMedium,
+                ),
+                const Spacer(),
+                IconButton(
+                  tooltip: 'Chia sẻ',
+                  onPressed: () => showMessage(
+                    'Chức năng chia sẻ sẽ được kết nối sau.',
+                  ),
+                  icon: const Icon(
+                    Icons.send_outlined,
+                    color: AppColors.primary,
+                  ),
+                ),
+                IconButton(
+                  tooltip: 'Lưu bài',
+                  onPressed: () => setState(() => saved = !saved),
+                  icon: Icon(
+                    saved
+                        ? Icons.bookmark_rounded
+                        : Icons.bookmark_border_rounded,
+                    color: saved ? AppColors.primary : fg,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
