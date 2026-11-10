@@ -1,9 +1,9 @@
-import '../../domain/models/recurring-transaction.dart';
-import '../../domain/models/recurring-transaction-input.dart';
-import '../../domain/models/recurring-transaction-filter.dart';
-import '../../domain/repositories/recurring-transaction-repository.dart';
-import '../services/recurring-transaction-api-service.dart';
-import '../mapper/recurring-transaction-mapper.dart';
+import '../../domain/models/recurring_transaction.dart';
+import '../../domain/models/recurring_transaction_input.dart';
+import '../../domain/models/recurring_transaction_filter.dart';
+import '../../domain/repositories/recurring_transaction_repository.dart';
+import '../services/recurring_transaction_api_service.dart';
+import '../mapper/recurring_transaction_mapper.dart';
 
 class RecurringTransactionRepositoryImpl implements RecurringTransactionRepository {
   RecurringTransactionRepositoryImpl(this._api);
@@ -27,6 +27,14 @@ class RecurringTransactionRepositoryImpl implements RecurringTransactionReposito
       RecurringTransactionInput input) async {
     final req = RecurringTransactionMapper.toCreateRequest(input);
     final res = await _api.createRecurringTransaction(req);
+    return RecurringTransactionMapper.toDomain(res);
+  }
+
+  @override
+  Future<RecurringTransaction> updateRecurringTransaction(
+      String id, RecurringTransactionInput input) async {
+    final req = RecurringTransactionMapper.toUpdateRequest(input);
+    final res = await _api.updateRecurringTransaction(id, req);
     return RecurringTransactionMapper.toDomain(res);
   }
 

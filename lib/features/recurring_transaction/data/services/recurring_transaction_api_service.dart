@@ -1,7 +1,8 @@
 import 'package:dio/dio.dart';
 import '../../../../core/constants/api_constants.dart';
-import '../dto/recurring-transaction-response.dart';
-import '../dto/create-recurring-transaction-request.dart';
+import '../dto/recurring_transaction_response.dart';
+import '../dto/create_recurring_transaction_request.dart';
+import '../dto/update_recurring_transaction_request.dart';
 
 class RecurringTransactionApiService {
   RecurringTransactionApiService(this._dio);
@@ -18,14 +19,14 @@ class RecurringTransactionApiService {
         ? (responseData['items'] ?? responseData['data'] ?? [])
         : (responseData ?? []);
     return items
-        .map((e) => RecurringTransactionResponse.fromJson(e))
+        .map((e) => RecurringTransactionResponse.fromJson(e as Map<String, dynamic>))
         .toList();
   }
 
   Future<RecurringTransactionResponse> getRecurringTransactionById(
       String id) async {
     final res = await _dio.get(ApiConstants.recurringTransactionDetail(id));
-    return RecurringTransactionResponse.fromJson(res.data['data']);
+    return RecurringTransactionResponse.fromJson(res.data['data'] as Map<String, dynamic>);
   }
 
   Future<RecurringTransactionResponse> createRecurringTransaction(
@@ -34,17 +35,24 @@ class RecurringTransactionApiService {
       ApiConstants.recurringTransactions,
       data: req.toJson(),
     );
-    return RecurringTransactionResponse.fromJson(res.data['data']);
+    return RecurringTransactionResponse.fromJson(res.data['data'] as Map<String, dynamic>);
+  }
+
+  Future<RecurringTransactionResponse> updateRecurringTransaction(
+      String id, UpdateRecurringTransactionRequest req) async {
+    final res = await _dio.patch(
+      ApiConstants.recurringTransactionDetail(id),
+      data: req.toJson(),
+    );
+    return RecurringTransactionResponse.fromJson(res.data['data'] as Map<String, dynamic>);
   }
 
   Future<void> executeNow(String id) async {
-    await _dio.post(
-        '${ApiConstants.recurringTransactions}/$id/execute-now');
+    await _dio.post(ApiConstants.recurringTransactionExecuteNow(id));
   }
 
   Future<bool> togglePause(String id) async {
-    final res = await _dio
-        .patch('${ApiConstants.recurringTransactions}/$id/toggle-pause');
+    final res = await _dio.patch(ApiConstants.recurringTransactionTogglePause(id));
     final data = res.data['data'] as Map<String, dynamic>?;
     return data?['isPaused'] as bool? ?? false;
   }

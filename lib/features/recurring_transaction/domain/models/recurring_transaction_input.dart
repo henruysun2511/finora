@@ -1,7 +1,8 @@
-import 'recurring-enum.dart';
+import 'package:finora_mb/features/transactions/domain/models/transaction_enums.dart';
+import 'recurring_enums.dart';
 
-/// Input model khi tạo quy tắc định kỳ mới
-/// Khớp với CreateRecurringTransactionDto của backend
+/// Input model khi tạo / cập nhật quy tắc định kỳ
+/// Khớp với CreateRecurringTransactionDto & UpdateRecurringTransactionDto của backend
 class RecurringTransactionInput {
   const RecurringTransactionInput({
     required this.walletId,
@@ -15,6 +16,7 @@ class RecurringTransactionInput {
     this.currency = 'VND',
     this.endDate,
     this.executeImmediately = false,
+    this.isPaused,
   });
 
   final String walletId;
@@ -28,4 +30,5 @@ class RecurringTransactionInput {
   final String currency;
   final DateTime? endDate;
   final bool executeImmediately;
+  final bool? isPaused;
 }

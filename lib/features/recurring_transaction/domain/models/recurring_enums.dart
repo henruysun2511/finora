@@ -1,3 +1,8 @@
+import 'package:finora_mb/features/transactions/domain/models/transaction_enums.dart';
+
+export 'package:finora_mb/features/transactions/domain/models/transaction_enums.dart'
+    show TransactionType;
+
 /// Chu kỳ lặp lại - khớp với RecurrencePeriod enum của backend
 enum RecurringFrequency {
   daily,
@@ -45,24 +50,7 @@ enum RecurringFrequency {
   }
 }
 
-/// Loại giao dịch - khớp với TransactionType enum của backend
-enum TransactionType {
-  expense,
-  income;
-
-  String get backendValue => name.toUpperCase();
-
-  String get displayName {
-    switch (this) {
-      case TransactionType.expense:
-        return 'Chi tiêu (EXPENSE)';
-      case TransactionType.income:
-        return 'Thu nhập (INCOME)';
-    }
-  }
-
-  static TransactionType fromBackend(String value) {
-    if (value.toUpperCase() == 'INCOME') return TransactionType.income;
-    return TransactionType.expense;
-  }
+extension RecurringTransactionTypeX on TransactionType {
+  String get backendValue => code;
+  String get displayName => label;
 }

@@ -1,4 +1,5 @@
-import 'recurring-enum.dart';
+import 'package:finora_mb/features/transactions/domain/models/transaction_enums.dart';
+import 'recurring_enums.dart';
 
 /// Domain Entity cho một quy tắc giao dịch định kỳ
 /// Khớp với RecurringTransactionResponseDto của backend

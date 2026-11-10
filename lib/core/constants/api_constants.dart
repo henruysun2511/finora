@@ -121,7 +121,12 @@ class ApiConstants {
 
   // ─── 7. Recurring Transactions (/recurring-transactions) ────────────────────
   static const String recurringTransactions = '/recurring-transactions';
-  static String recurringTransactionDetail(String id) => '/recurring-transactions/$id';
+  static String recurringTransactionDetail(String id) =>
+      '/recurring-transactions/$id';
+  static String recurringTransactionExecuteNow(String id) =>
+      '/recurring-transactions/$id/execute-now';
+  static String recurringTransactionTogglePause(String id) =>
+      '/recurring-transactions/$id/toggle-pause';
   static String recurringTransactionStatus(String id) =>
       '/recurring-transactions/$id/status';
 

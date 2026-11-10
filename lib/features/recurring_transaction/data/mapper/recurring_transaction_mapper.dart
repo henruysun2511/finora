@@ -1,8 +1,10 @@
-import '../../domain/models/recurring-transaction.dart';
-import '../../domain/models/recurring-transaction-input.dart';
-import '../../domain/models/recurring-enum.dart';
-import '../dto/recurring-transaction-response.dart';
-import '../dto/create-recurring-transaction-request.dart';
+import 'package:finora_mb/features/transactions/domain/models/transaction_enums.dart';
+import '../../domain/models/recurring_transaction.dart';
+import '../../domain/models/recurring_transaction_input.dart';
+import '../../domain/models/recurring_enums.dart';
+import '../dto/recurring_transaction_response.dart';
+import '../dto/create_recurring_transaction_request.dart';
+import '../dto/update_recurring_transaction_request.dart';
 
 class RecurringTransactionMapper {
   /// Chuyển DTO → Domain Entity
@@ -11,7 +13,7 @@ class RecurringTransactionMapper {
       id: dto.id,
       name: dto.name,
       amount: dto.amount.toDouble(),
-      type: TransactionType.fromBackend(dto.type),
+      type: TransactionType.fromString(dto.type),
       frequency: RecurringFrequency.fromBackend(dto.frequency),
       currency: dto.currency,
       isPaused: dto.isPaused,
@@ -50,6 +52,24 @@ class RecurringTransactionMapper {
       currency: input.currency,
       endDate: input.endDate?.toIso8601String(),
       executeImmediately: input.executeImmediately,
+    );
+  }
+
+  /// Chuyển Input → Update Request DTO
+  static UpdateRecurringTransactionRequest toUpdateRequest(
+      RecurringTransactionInput input) {
+    return UpdateRecurringTransactionRequest(
+      walletId: input.walletId,
+      accountId: input.accountId,
+      categoryId: input.categoryId,
+      name: input.name,
+      type: input.type.backendValue,
+      amount: input.amount,
+      frequency: input.frequency.backendValue,
+      startDate: input.startDate.toIso8601String(),
+      currency: input.currency,
+      endDate: input.endDate?.toIso8601String(),
+      isPaused: input.isPaused,
     );
   }
 

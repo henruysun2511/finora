@@ -31,6 +31,7 @@ class RouteNames {
   static const String captureReceipt = 'captureReceipt';
   static const String recurringTransactions = 'recurringTransactions';
   static const String createRecurringTransaction = 'createRecurringTransaction';
+  static const String recurringTransactionDetail = 'recurringTransactionDetail';
 
   // 4. Wallets & Accounts (Ví & Tài khoản ngân hàng)
   static const String wallets = 'wallets';
@@ -115,6 +116,7 @@ class RoutePaths {
   static const String captureReceipt = '/transactions/capture';
   static const String recurringTransactions = '/transactions/recurring';
   static const String createRecurringTransaction = '/transactions/recurring/create';
+  static const String recurringTransactionDetail = '/transactions/recurring/:id';
 
   // 4. Wallets & Accounts
   static const String wallets = '/wallets';
