@@ -63,8 +63,9 @@ class RouteNames {
   static const String categoryReport = 'categoryReport';
   static const String exchangeRates = 'exchangeRates';
 
-  // 9. Social, Friends & Messages (Bảng tin, Bạn bè & Tin nhắn)
-  static const String socialFeed = 'socialFeed';
+  // 9. Feed, Friends & Messages (Bảng tin, Bạn bè & Tin nhắn)
+  static const String feed = 'feed';
+  static const String socialFeed = 'feed';
   static const String friends = 'friends';
   static const String socialChat = 'socialChat';
 
@@ -148,7 +149,8 @@ class RoutePaths {
   static const String categoryReport = '/reports/category';
   static const String exchangeRates = '/exchange-rates';
 
-  // 9. Social, Friends & Messages
+  // 9. Feed, Friends & Messages
+  static const String feed = '/feed';
   static const String socialFeed = '/feed';
   static const String friends = '/friends';
   static const String socialChat = '/social-chat';

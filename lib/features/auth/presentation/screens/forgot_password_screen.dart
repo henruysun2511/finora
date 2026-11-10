@@ -1,4 +1,4 @@
-﻿import 'dart:async';
+import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -45,7 +45,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
 
   // Quản lý đếm ngược 30 giây thời gian thực cho mã OTP
   Timer? _countdownTimer;
-  int _secondsRemaining = 180;
+  int _secondsRemaining = 30;
 
   @override
   void initState() {
@@ -116,12 +116,13 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
         await ref.read(forgotPasswordProvider.notifier).sendOtp(email);
 
     if (success && mounted) {
+      final expiresIn = ref.read(forgotPasswordProvider).expiresIn;
       AppToast.success(
         context,
-        'Mã xác thực OTP đã được gửi về email của bạn (hiệu lực 180 giây)',
+        'Mã xác thực OTP đã được gửi về email của bạn (hiệu lực $expiresIn giây)',
       );
       _clearOtpInputs();
-      _startCountdown(180);
+      _startCountdown(expiresIn);
     }
   }
 
@@ -132,12 +133,13 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
         await ref.read(forgotPasswordProvider.notifier).resendOtp();
 
     if (success && mounted) {
+      final expiresIn = ref.read(forgotPasswordProvider).expiresIn;
       AppToast.success(
         context,
-        'Đã gửi lại mã xác thực mới (hiệu lực 180 giây)',
+        'Đã gửi lại mã xác thực mới (hiệu lực $expiresIn giây)',
       );
       _clearOtpInputs();
-      _startCountdown(180);
+      _startCountdown(expiresIn);
     }
   }
 

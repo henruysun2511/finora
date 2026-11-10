@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'package:finora_mb/app/theme/app_colors.dart';
+import 'package:finora_mb/core/widgets/page_header.dart';
 
 class FriendsScreen extends StatelessWidget {
   const FriendsScreen({super.key});
@@ -13,19 +14,9 @@ class FriendsScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor:
           isDark ? AppColors.darkBackground : AppColors.lightBackground,
-      appBar: AppBar(
-        title: Text(
-          'Bạn bè & Kết nối',
-          style: GoogleFonts.inter(
-            fontWeight: FontWeight.w700,
-            fontSize: 18,
-            color:
-                isDark ? AppColors.darkForeground : AppColors.lightForeground,
-          ),
-        ),
-        centerTitle: true,
-        backgroundColor: isDark ? AppColors.darkSurface : Colors.white,
-        elevation: 0,
+      appBar: const PageHeader.subPage(
+        title: 'Bạn bè & Kết nối',
+        subtitle: 'Quản lý kết nối & danh sách bạn bè',
       ),
       body: Center(
         child: Padding(
