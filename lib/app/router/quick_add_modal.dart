@@ -118,8 +118,9 @@ class QuickAddModal extends StatelessWidget {
                       subtitle: 'VietOCR bóc tách số tiền tức thì',
                       gradient: const [Color(0xFFF97316), Color(0xFFFB923C)],
                       onTap: () {
+                        final router = GoRouter.of(context);
                         Navigator.pop(context);
-                        context.push(RoutePaths.scanReceipt);
+                        router.push(RoutePaths.scanReceipt);
                       },
                     ),
                   ),
@@ -135,8 +136,9 @@ class QuickAddModal extends StatelessWidget {
                       subtitle: 'Ghi chép thu chi truyền thống',
                       gradient: const [Color(0xFF10B981), Color(0xFF34D399)],
                       onTap: () {
+                        final router = GoRouter.of(context);
                         Navigator.pop(context);
-                        context.push(RoutePaths.createTransaction);
+                        router.push(RoutePaths.createTransaction);
                       },
                     ),
                   ),
@@ -148,8 +150,9 @@ class QuickAddModal extends StatelessWidget {
                       subtitle: 'Giữa các ví và tài khoản NH',
                       gradient: const [Color(0xFF8B5CF6), Color(0xFFA78BFA)],
                       onTap: () {
+                        final router = GoRouter.of(context);
                         Navigator.pop(context);
-                        context.push(RoutePaths.transfer);
+                        router.push(RoutePaths.transfer);
                       },
                     ),
                   ),
@@ -165,8 +168,9 @@ class QuickAddModal extends StatelessWidget {
                       subtitle: 'Thiết lập hóa đơn lặp lại',
                       gradient: const [Color(0xFF059669), Color(0xFF10B981)],
                       onTap: () {
+                        final router = GoRouter.of(context);
                         Navigator.pop(context);
-                        context.push(RoutePaths.createRecurringTransaction);
+                        router.push(RoutePaths.createRecurringTransaction);
                       },
                     ),
                   ),
@@ -178,8 +182,9 @@ class QuickAddModal extends StatelessWidget {
                       subtitle: 'Hạn mức chi tiêu theo tháng',
                       gradient: const [Color(0xFF6366F1), Color(0xFF818CF8)],
                       onTap: () {
+                        final router = GoRouter.of(context);
                         Navigator.pop(context);
-                        context.push(RoutePaths.createBudget);
+                        router.push(RoutePaths.createBudget);
                       },
                     ),
                   ),
@@ -195,8 +200,9 @@ class QuickAddModal extends StatelessWidget {
                       subtitle: 'Khoản cho vay hoặc đi vay',
                       gradient: const [Color(0xFFD97706), Color(0xFFF59E0B)],
                       onTap: () {
+                        final router = GoRouter.of(context);
                         Navigator.pop(context);
-                        context.push(RoutePaths.createLoan);
+                        router.push(RoutePaths.createLoan);
                       },
                     ),
                   ),

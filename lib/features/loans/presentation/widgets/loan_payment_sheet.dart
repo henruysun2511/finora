@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../app/theme/app_colors.dart';
+import '../../../../core/widgets/form_card.dart';
 import '../../../../app/theme/app_text_styles.dart';
 import '../../../../core/errors/app_exception.dart';
 import '../../../../core/utils/currency_formatter.dart';
@@ -171,16 +172,21 @@ class _LoanPaymentSheetState extends ConsumerState<LoanPaymentSheet> {
                 ],
               ),
               const SizedBox(height: 12),
-              SwitchListTile(
-                contentPadding: EdgeInsets.zero,
-                title: Text(
-                  widget.loan.type == LoanType.lent
-                      ? 'Tự động cộng vào ví nhận tiền'
-                      : 'Tự động trừ từ ví thanh toán',
-                  style: AppTextStyles.bodyMedium(),
+              FormCard(
+                title: 'Đồng bộ ví tiền',
+                margin: const EdgeInsets.symmetric(vertical: 6),
+                padding: const EdgeInsets.all(12),
+                child: SwitchListTile(
+                  contentPadding: EdgeInsets.zero,
+                  title: Text(
+                    widget.loan.type == LoanType.lent
+                        ? 'Tự động cộng vào ví nhận tiền'
+                        : 'Tự động trừ từ ví thanh toán',
+                    style: AppTextStyles.bodyMedium(),
+                  ),
+                  value: _affectsBalance,
+                  onChanged: (value) => setState(() => _affectsBalance = value),
                 ),
-                value: _affectsBalance,
-                onChanged: (value) => setState(() => _affectsBalance = value),
               ),
               const SizedBox(height: 8),
               OutlinedButton.icon(

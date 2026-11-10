@@ -47,23 +47,23 @@ class LoanFilterRow<T> extends StatelessWidget {
                     option.icon,
                     size: 16,
                     color: isSelected
-                        ? AppColors.primary
+                        ? Colors.white
                         : (isDark ? AppColors.darkMuted : AppColors.lightMuted),
                   )
                 : null,
             label: Text(option.label),
             selected: isSelected,
             onSelected: (_) => onSelected(option.value),
-            selectedColor: AppColors.primary.withValues(alpha: 0.14),
+            selectedColor: AppColors.primary,
             backgroundColor: isDark ? AppColors.darkSurface : Colors.white,
             labelStyle: AppTextStyles.bodySmall(
               color: isSelected
-                  ? AppColors.primary
+                  ? Colors.white
                   : isDark
                       ? AppColors.darkForeground
                       : AppColors.lightForeground,
             ).copyWith(
-              fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
+              fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
             ),
             side: BorderSide(
               color: isSelected
@@ -71,7 +71,7 @@ class LoanFilterRow<T> extends StatelessWidget {
                   : isDark
                       ? AppColors.darkBorder
                       : AppColors.lightBorder,
-              width: isSelected ? 1.4 : 1,
+              width: 1,
             ),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),

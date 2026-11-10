@@ -9,7 +9,7 @@ import '../../../../core/widgets/lucide_icon.dart';
 import '../../../../core/widgets/mascot/mascot_model.dart';
 import '../../../../core/widgets/mascot/mascot_registry.dart';
 import '../../../../core/widgets/mascot/mascot_widget.dart';
-import '../../../../core/widgets/solarn_header.dart';
+import '../../../../core/widgets/page_header.dart';
 import '../providers/current_mascot_provider.dart';
 
 /// Màn hình giới thiệu chi tiết 7 Linh vật AI Finora
@@ -51,7 +51,7 @@ class _MascotShowcaseScreenState extends ConsumerState<MascotShowcaseScreen> {
     return Scaffold(
       backgroundColor:
           isDark ? AppColors.darkBackground : AppColors.lightBackground,
-      appBar: const SolarnHeader.subPage(
+      appBar: const PageHeader.subPage(
         title: 'Linh vật AI Finora',
         subtitle: 'Khám phá 7 phong cách tài chính cá nhân hóa',
       ),

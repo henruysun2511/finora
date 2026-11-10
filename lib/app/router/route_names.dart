@@ -28,6 +28,7 @@ class RouteNames {
   static const String transactionDetail = 'transactionDetail';
   static const String createTransaction = 'createTransaction';
   static const String scanReceipt = 'scanReceipt';
+  static const String captureReceipt = 'captureReceipt';
   static const String recurringTransactions = 'recurringTransactions';
   static const String createRecurringTransaction = 'createRecurringTransaction';
 
@@ -111,6 +112,7 @@ class RoutePaths {
   static const String transactionDetail = '/transactions/:id';
   static const String createTransaction = '/transactions/create';
   static const String scanReceipt = '/transactions/scan';
+  static const String captureReceipt = '/transactions/capture';
   static const String recurringTransactions = '/transactions/recurring';
   static const String createRecurringTransaction = '/transactions/recurring/create';
 

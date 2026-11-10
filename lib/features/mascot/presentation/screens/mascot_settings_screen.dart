@@ -4,7 +4,8 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/widgets/app_toast.dart';
-import '../../../../core/widgets/solarn_header.dart';
+import '../../../../core/widgets/form_card.dart';
+import '../../../../core/widgets/page_header.dart';
 import '../providers/current_mascot_provider.dart';
 import '../providers/mascot_lineup_provider.dart';
 import '../widgets/current_mascot_card.dart';
@@ -93,7 +94,7 @@ class _MascotSettingsScreenState extends ConsumerState<MascotSettingsScreen> {
     return Scaffold(
       backgroundColor:
           isDark ? AppColors.darkBackground : AppColors.lightBackground,
-      appBar: const SolarnHeader.subPage(
+      appBar: const PageHeader.subPage(
         title: 'Linh vật & Nhân cách AI',
         subtitle: 'Tùy chỉnh trợ lý tài chính đồng hành',
       ),
@@ -126,60 +127,38 @@ class _MascotSettingsScreenState extends ConsumerState<MascotSettingsScreen> {
 
                   const SizedBox(height: 24),
 
-                  // ── 2. Cài đặt hiển thị linh vật ──
-                  _buildSectionHeader(
-                    context: context,
-                    title: 'Hiển thị linh vật',
-                    subtitle: 'Bật/tắt avatar linh vật trên Dashboard và Chat',
-                  ),
-                  Material(
-                    color: isDark ? AppColors.darkSurface : Colors.white,
-                    borderRadius: BorderRadius.circular(16),
-                    clipBehavior: Clip.antiAlias,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                      side: BorderSide(
-                        color: isDark
-                            ? AppColors.darkBorder
-                            : AppColors.lightBorder,
-                      ),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 6,
-                      ),
-                      child: SwitchListTile(
-                        contentPadding: EdgeInsets.zero,
-                        title: Text(
-                          'Hiển thị linh vật Finora',
-                          style: GoogleFonts.inter(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w700,
-                            color: isDark
-                                ? AppColors.darkForeground
-                                : AppColors.lightForeground,
-                          ),
+                  // ── 2. Cài đặt hiển thị linh vật (FormCard) ──
+                  FormCard(
+                    title: 'Cài đặt hiển thị',
+                    child: SwitchListTile(
+                      contentPadding: EdgeInsets.zero,
+                      title: Text(
+                        'Hiển thị linh vật Finora',
+                        style: GoogleFonts.inter(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w700,
+                          color: isDark
+                              ? AppColors.darkForeground
+                              : AppColors.lightForeground,
                         ),
-                        subtitle: Text(
-                          curMascot.showMascot
-                              ? 'Linh vật đang đồng hành và đưa ra lời khuyên'
-                              : 'Đã ẩn linh vật trên giao diện ứng dụng',
-                          style: GoogleFonts.inter(
-                            fontSize: 12,
-                            color: isDark
-                                ? AppColors.darkMuted
-                                : AppColors.lightMuted,
-                          ),
-                        ),
-                        activeColor: AppColors.primary,
-                        value: curMascot.showMascot,
-                        onChanged: (val) {
-                          ref
-                              .read(currentMascotProvider.notifier)
-                              .updateShowMascot(val);
-                        },
                       ),
+                      subtitle: Text(
+                        curMascot.showMascot
+                            ? 'Linh vật đang đồng hành và đưa ra lời khuyên'
+                            : 'Đã ẩn linh vật trên giao diện ứng dụng',
+                        style: GoogleFonts.inter(
+                          fontSize: 12,
+                          color: isDark
+                              ? AppColors.darkMuted
+                              : AppColors.lightMuted,
+                        ),
+                      ),
+                      value: curMascot.showMascot,
+                      onChanged: (val) {
+                        ref
+                            .read(currentMascotProvider.notifier)
+                            .updateShowMascot(val);
+                      },
                     ),
                   ),
 

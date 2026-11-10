@@ -7,7 +7,7 @@ import '../../../../core/widgets/app_toast.dart';
 import '../../../../core/widgets/category_icon.dart';
 import '../../../../core/widgets/confirm_dialog.dart';
 import '../../../../core/widgets/lucide_icon.dart';
-import '../../../../core/widgets/solarn_header.dart';
+import '../../../../core/widgets/page_header.dart';
 import '../../domain/models/category.dart';
 import '../providers/category_list_provider.dart';
 import '../widgets/category_form_sheet.dart';
@@ -353,7 +353,7 @@ class CategoryListScreen extends ConsumerWidget {
       backgroundColor:
           isDark ? AppColors.darkBackground : AppColors.lightBackground,
       // Đã bỏ nút thêm ở Header theo đúng yêu cầu
-      appBar: const SolarnHeader.subPage(
+      appBar: const PageHeader.subPage(
         title: 'Danh mục thu chi',
         subtitle: 'Cấu hình và phân loại giao dịch',
       ),

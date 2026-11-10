@@ -6,13 +6,21 @@ import 'package:intl/intl.dart';
 
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/widgets/app_toast.dart';
-import '../../../../core/widgets/solarn_header.dart';
+import '../../../../core/widgets/form_card.dart';
+import '../../../../core/widgets/category_icon.dart';
+import '../../../../core/widgets/lucide_icon.dart';
+
+import '../../../../core/widgets/page_header.dart';
 import '../../domain/models/budget.dart';
 import '../../domain/models/budget_enums.dart';
 import '../../domain/models/budget_input.dart';
 import '../../domain/validators/budget_validators.dart';
 import '../providers/budget_detail_provider.dart';
 import '../providers/budget_form_provider.dart';
+import '../../../ai_chat/domain/models/wallet_item_model.dart';
+import '../../../categories/domain/models/category.dart';
+import '../../../categories/presentation/providers/category_providers.dart';
+import '../../../wallets/presentation/providers/wallets_provider.dart';
 
 class BudgetFormScreen extends ConsumerStatefulWidget {
   const BudgetFormScreen({
@@ -72,35 +80,259 @@ class _BudgetFormScreenState extends ConsumerState<BudgetFormScreen> {
     super.dispose();
   }
 
-  List<DropdownMenuItem<String>> _buildWalletItems(Budget? currentBudget) {
-    final map = <String, String>{
-      '11111111-1111-4111-8111-111111111111': 'Ví Cá Nhân (VND)',
-      '22222222-2222-4222-8222-222222222222': 'Ví Gia Đình (VND)',
-    };
-    if (_selectedWalletId != null && !map.containsKey(_selectedWalletId)) {
-      map[_selectedWalletId!] =
-          currentBudget?.walletName ?? 'Ví chi tiêu (${_selectedWalletId!.substring(0, 8)})';
+  List<DropdownMenuItem<String>> _buildWalletItems(
+    Budget? currentBudget,
+    List<WalletItemModel> wallets,
+  ) {
+    final list = <DropdownMenuItem<String>>[];
+    final seen = <String>{};
+
+    for (final w in wallets) {
+      seen.add(w.id);
+      list.add(
+        DropdownMenuItem(
+          value: w.id,
+          child: Row(
+            children: [
+              Container(
+                width: 28,
+                height: 28,
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                alignment: Alignment.center,
+                child: LucideIcon(
+                  name: LucideIcon.normalizeIconName(w.icon ?? 'wallet'),
+                  size: 16,
+                  color: AppColors.primary,
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  '${w.name} (${w.defaultCurrency})',
+                  overflow: TextOverflow.ellipsis,
+                  style: GoogleFonts.inter(fontSize: 14),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
     }
-    return map.entries
-        .map((e) => DropdownMenuItem(value: e.key, child: Text(e.value)))
-        .toList();
+
+    if (_selectedWalletId != null && !seen.contains(_selectedWalletId)) {
+      seen.add(_selectedWalletId!);
+      final name = currentBudget?.walletName ??
+          'Ví chi tiêu (${_selectedWalletId!.substring(0, 8)})';
+      list.add(
+        DropdownMenuItem(
+          value: _selectedWalletId!,
+          child: Row(
+            children: [
+              Container(
+                width: 28,
+                height: 28,
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                alignment: Alignment.center,
+                child: const LucideIcon(
+                  name: 'wallet',
+                  size: 16,
+                  color: AppColors.primary,
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  name,
+                  overflow: TextOverflow.ellipsis,
+                  style: GoogleFonts.inter(fontSize: 14),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    if (list.isEmpty) {
+      list.add(
+        DropdownMenuItem(
+          value: '11111111-1111-4111-8111-111111111111',
+          child: Row(
+            children: [
+              Container(
+                width: 28,
+                height: 28,
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                alignment: Alignment.center,
+                child: const LucideIcon(
+                  name: 'wallet',
+                  size: 16,
+                  color: AppColors.primary,
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  'Ví Cá Nhân (VND)',
+                  overflow: TextOverflow.ellipsis,
+                  style: GoogleFonts.inter(fontSize: 14),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    return list;
   }
 
-  List<DropdownMenuItem<String>> _buildCategoryItems(Budget? currentBudget) {
-    final map = <String, String>{
-      'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa': '🍔 Ăn uống & Tiệc tùng',
-      'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb': '🛍️ Mua sắm & Thời trang',
-      'cccccccc-cccc-4ccc-8ccc-cccccccccccc': '☕ Cà phê & Gặp gỡ',
-      'dddddddd-dddd-4ddd-8ddd-dddddddddddd': '🚗 Di chuyển & Xăng xe',
-      'eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee': '⚡ Hoá đơn & Tiện ích',
-    };
-    if (_selectedCategoryId != null && !map.containsKey(_selectedCategoryId)) {
-      map[_selectedCategoryId!] =
-          currentBudget?.categoryName ?? 'Danh mục (${_selectedCategoryId!.substring(0, 8)})';
+  List<DropdownMenuItem<String>> _buildCategoryItems(
+    Budget? currentBudget,
+    List<Category> categories,
+  ) {
+    final list = <DropdownMenuItem<String>>[];
+    final seen = <String>{};
+
+    for (final c in categories) {
+      seen.add(c.id);
+      list.add(
+        DropdownMenuItem(
+          value: c.id,
+          child: Row(
+            children: [
+              CategoryIcon(
+                icon: c.icon,
+                colorHex: c.color,
+                size: 28,
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  c.name,
+                  overflow: TextOverflow.ellipsis,
+                  style: GoogleFonts.inter(fontSize: 14),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
     }
-    return map.entries
-        .map((e) => DropdownMenuItem(value: e.key, child: Text(e.value)))
-        .toList();
+
+    if (_selectedCategoryId != null && !seen.contains(_selectedCategoryId)) {
+      seen.add(_selectedCategoryId!);
+      final name = currentBudget?.categoryName ??
+          'Danh mục (${_selectedCategoryId!.substring(0, 8)})';
+      list.add(
+        DropdownMenuItem(
+          value: _selectedCategoryId!,
+          child: Row(
+            children: [
+              const CategoryIcon(
+                icon: 'tag',
+                colorHex: '#1E5BD8',
+                size: 28,
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  name,
+                  overflow: TextOverflow.ellipsis,
+                  style: GoogleFonts.inter(fontSize: 14),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    if (list.isEmpty) {
+      list.add(
+        DropdownMenuItem(
+          value: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',
+          child: Row(
+            children: [
+              const CategoryIcon(
+                icon: 'utensils',
+                colorHex: '#F97316',
+                size: 28,
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  'Ăn uống & Tiệc tùng',
+                  overflow: TextOverflow.ellipsis,
+                  style: GoogleFonts.inter(fontSize: 14),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    return list;
+  }
+
+  Widget _buildWalletDropdown(
+    BuildContext context,
+    bool isDark,
+    Budget? currentBudget,
+    List<WalletItemModel> wallets,
+  ) {
+    final items = _buildWalletItems(currentBudget, wallets);
+    final value = items.any((i) => i.value == _selectedWalletId)
+        ? _selectedWalletId
+        : items.first.value;
+
+    return DropdownButtonFormField<String>(
+      value: value,
+      isExpanded: true,
+      decoration: InputDecoration(
+        filled: true,
+        fillColor: isDark ? AppColors.darkSurface : Colors.white,
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+      ),
+      validator: BudgetValidators.validateWalletId,
+      items: items,
+      onChanged: (val) => setState(() => _selectedWalletId = val),
+    );
+  }
+
+  Widget _buildCategoryDropdown(
+    BuildContext context,
+    bool isDark,
+    Budget? currentBudget,
+    List<Category> categories,
+  ) {
+    final items = _buildCategoryItems(currentBudget, categories);
+    final value = items.any((i) => i.value == _selectedCategoryId)
+        ? _selectedCategoryId
+        : items.first.value;
+
+    return DropdownButtonFormField<String>(
+      value: value,
+      isExpanded: true,
+      decoration: InputDecoration(
+        filled: true,
+        fillColor: isDark ? AppColors.darkSurface : Colors.white,
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+      ),
+      validator: BudgetValidators.validateCategoryId,
+      items: items,
+      onChanged: (val) => setState(() => _selectedCategoryId = val),
+    );
   }
 
   Future<void> _submit(String? activeId) async {
@@ -181,11 +413,13 @@ class _BudgetFormScreenState extends ConsumerState<BudgetFormScreen> {
     Budget? currentBudget,
   ) {
     final formState = ref.watch(budgetFormProvider(activeId));
+    final walletsAsync = ref.watch(walletsListProvider);
+    final categoriesAsync = ref.watch(expenseCategoriesProvider);
 
     return Scaffold(
       backgroundColor:
           isDark ? AppColors.darkBackground : AppColors.lightBackground,
-      appBar: SolarnHeader.subPage(
+      appBar: PageHeader.subPage(
         title: widget.isEditing ? 'Chỉnh sửa ngân sách' : 'Thiết lập ngân sách mới',
       ),
       body: Form(
@@ -221,28 +455,37 @@ class _BudgetFormScreenState extends ConsumerState<BudgetFormScreen> {
               const SizedBox(height: 16),
             ],
 
-            // 1. Chọn ví chi tiêu
+            // 1. Chọn ví chi tiêu (API GET /wallets)
             Text(
               '1. Chọn Ví chi tiêu *',
               style:
                   GoogleFonts.inter(fontWeight: FontWeight.w600, fontSize: 14),
             ),
             const SizedBox(height: 8),
-            DropdownButtonFormField<String>(
-              initialValue: _selectedWalletId,
-              decoration: InputDecoration(
-                filled: true,
-                fillColor: isDark ? AppColors.darkSurface : Colors.white,
-                border:
-                    OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+            walletsAsync.when(
+              loading: () => const Padding(
+                padding: EdgeInsets.symmetric(vertical: 8),
+                child: LinearProgressIndicator(),
               ),
-              validator: BudgetValidators.validateWalletId,
-              items: _buildWalletItems(currentBudget),
-              onChanged: (val) => setState(() => _selectedWalletId = val),
+              error: (_, __) =>
+                  _buildWalletDropdown(context, isDark, currentBudget, []),
+              data: (wallets) {
+                if (_selectedWalletId == null &&
+                    wallets.isNotEmpty &&
+                    currentBudget == null) {
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    if (mounted && _selectedWalletId == null) {
+                      setState(() => _selectedWalletId = wallets.first.id);
+                    }
+                  });
+                }
+                return _buildWalletDropdown(
+                    context, isDark, currentBudget, wallets);
+              },
             ),
             const SizedBox(height: 20),
 
-            // 2. Chọn Danh mục chi tiêu
+            // 2. Chọn Danh mục chi tiêu (API GET /categories?type=EXPENSE)
             Text(
               '2. Chọn Danh mục chi tiêu *',
               style:
@@ -257,17 +500,26 @@ class _BudgetFormScreenState extends ConsumerState<BudgetFormScreen> {
                   fontStyle: FontStyle.italic),
             ),
             const SizedBox(height: 8),
-            DropdownButtonFormField<String>(
-              initialValue: _selectedCategoryId,
-              decoration: InputDecoration(
-                filled: true,
-                fillColor: isDark ? AppColors.darkSurface : Colors.white,
-                border:
-                    OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+            categoriesAsync.when(
+              loading: () => const Padding(
+                padding: EdgeInsets.symmetric(vertical: 8),
+                child: LinearProgressIndicator(),
               ),
-              validator: BudgetValidators.validateCategoryId,
-              items: _buildCategoryItems(currentBudget),
-              onChanged: (val) => setState(() => _selectedCategoryId = val),
+              error: (_, __) =>
+                  _buildCategoryDropdown(context, isDark, currentBudget, []),
+              data: (categories) {
+                if (_selectedCategoryId == null &&
+                    categories.isNotEmpty &&
+                    currentBudget == null) {
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    if (mounted && _selectedCategoryId == null) {
+                      setState(() => _selectedCategoryId = categories.first.id);
+                    }
+                  });
+                }
+                return _buildCategoryDropdown(
+                    context, isDark, currentBudget, categories);
+              },
             ),
             const SizedBox(height: 20),
 
@@ -372,53 +624,36 @@ class _BudgetFormScreenState extends ConsumerState<BudgetFormScreen> {
             ),
             const SizedBox(height: 20),
 
-            // 6. Tính năng Rollover
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: isDark ? AppColors.darkSurface : Colors.white,
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(
-                    color:
-                        isDark ? AppColors.darkBorder : AppColors.lightBorder),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Row(
-                        children: [
-                          const Icon(Icons.autorenew_rounded,
-                              color: AppColors.primary, size: 20),
-                          const SizedBox(width: 8),
-                          Text(
-                            'Cộng dồn ngân sách (Rollover)',
-                            style: GoogleFonts.inter(
-                                fontWeight: FontWeight.w600, fontSize: 14),
-                          ),
-                        ],
-                      ),
-                      Switch.adaptive(
-                        value: _isRolloverEnabled,
-                        activeTrackColor: AppColors.primary,
-                        onChanged: (val) =>
-                            setState(() => _isRolloverEnabled = val),
-                      ),
-                    ],
+            // 6. Tính năng Rollover (Cài đặt bổ sung)
+            FormCard(
+              title: 'Cài đặt bổ sung',
+              child: SwitchListTile(
+                contentPadding: EdgeInsets.zero,
+                secondary: const Icon(Icons.autorenew_rounded,
+                    color: AppColors.primary, size: 22),
+                title: Text(
+                  'Cộng dồn ngân sách (Rollover)',
+                  style: GoogleFonts.inter(
+                    fontWeight: FontWeight.w700,
+                    fontSize: 14,
+                    color: isDark
+                        ? AppColors.darkForeground
+                        : AppColors.lightForeground,
                   ),
-                  const SizedBox(height: 8),
-                  Text(
+                ),
+                subtitle: Padding(
+                  padding: const EdgeInsets.only(top: 4),
+                  child: Text(
                     'Tự động cộng dồn số tiền chưa dùng hết của kỳ trước sang kỳ tiếp theo, hoặc trừ bớt nếu bạn chi tiêu vượt quá hạn mức.',
                     style: GoogleFonts.inter(
                       fontSize: 12,
-                      color:
-                          isDark ? AppColors.darkMuted : AppColors.lightMuted,
+                      color: isDark ? AppColors.darkMuted : AppColors.lightMuted,
                       height: 1.4,
                     ),
                   ),
-                ],
+                ),
+                value: _isRolloverEnabled,
+                onChanged: (val) => setState(() => _isRolloverEnabled = val),
               ),
             ),
             const SizedBox(height: 32),

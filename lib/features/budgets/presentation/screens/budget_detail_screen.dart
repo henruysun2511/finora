@@ -9,7 +9,7 @@ import '../../../../app/theme/app_colors.dart';
 import '../../../../core/widgets/app_toast.dart';
 import '../../../../core/widgets/category_icon.dart';
 import '../../../../core/widgets/confirm_dialog.dart';
-import '../../../../core/widgets/solarn_header.dart';
+import '../../../../core/widgets/page_header.dart';
 import '../../domain/models/budget_enums.dart';
 import '../providers/budget_detail_provider.dart';
 import '../providers/budget_list_provider.dart';
@@ -35,7 +35,7 @@ class BudgetDetailScreen extends ConsumerWidget {
     return Scaffold(
       backgroundColor:
           isDark ? AppColors.darkBackground : AppColors.lightBackground,
-      appBar: SolarnHeader.subPage(
+      appBar: PageHeader.subPage(
         title: detailAsync.maybeWhen(
           data: (data) => data.budget.categoryName ?? 'Chi tiết ngân sách',
           orElse: () => 'Chi tiết ngân sách',

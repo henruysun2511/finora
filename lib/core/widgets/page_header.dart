@@ -4,12 +4,12 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../app/theme/app_colors.dart';
 
-/// Header thống nhất cho toàn bộ ứng dụng chuẩn Solarn FinTech Style (`static-ui/ui-sample-3`).
+/// Header thống nhất cho toàn bộ ứng dụng chuẩn FinTech Style (`static-ui/ui-sample-3`).
 ///
 /// Hỗ trợ 2 kiểu giao diện:
-/// 1. [SolarnHeader.page]: Dành cho các màn hình chính (Tabs) có tiêu đề lớn + nút tác vụ (`.page-hdr`).
-/// 2. [SolarnHeader.subPage]: Dành cho các màn hình con/form/chi tiết có nút Back bo góc mềm (`.tx-hdr`).
-class SolarnHeader extends StatelessWidget implements PreferredSizeWidget {
+/// 1. [PageHeader.page]: Dành cho các màn hình chính (Tabs) có tiêu đề lớn + nút tác vụ (`.page-hdr`).
+/// 2. [PageHeader.subPage]: Dành cho các màn hình con/form/chi tiết có nút Back bo góc mềm (`.tx-hdr`).
+class PageHeader extends StatelessWidget implements PreferredSizeWidget {
   final String title;
   final String? subtitle;
   final Widget? action;
@@ -18,7 +18,7 @@ class SolarnHeader extends StatelessWidget implements PreferredSizeWidget {
   final bool showBottomBorder;
   final Color? backgroundColor;
 
-  const SolarnHeader.page({
+  const PageHeader.page({
     super.key,
     required this.title,
     this.subtitle,
@@ -28,7 +28,7 @@ class SolarnHeader extends StatelessWidget implements PreferredSizeWidget {
         showBottomBorder = false,
         backgroundColor = null;
 
-  const SolarnHeader.subPage({
+  const PageHeader.subPage({
     super.key,
     required this.title,
     this.subtitle,
@@ -194,4 +194,7 @@ class SolarnHeader extends StatelessWidget implements PreferredSizeWidget {
     );
   }
 }
+
+/// Alias tương thích ngược
+typedef SolarnHeader = PageHeader;
 

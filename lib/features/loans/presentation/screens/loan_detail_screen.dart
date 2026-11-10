@@ -13,6 +13,7 @@ import '../../../../core/errors/app_exception.dart';
 import '../../../../core/utils/currency_formatter.dart';
 import '../../../../core/widgets/app_toast.dart';
 import '../../../../core/widgets/confirm_dialog.dart';
+import '../../../../core/widgets/page_header.dart';
 import '../../domain/models/loan.dart';
 import '../../domain/models/loan_payment.dart';
 import '../../domain/models/loan_status.dart';
@@ -144,11 +145,73 @@ class _LoanDetailScreenState extends ConsumerState<LoanDetailScreen> {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final loanAsync = ref.watch(loanDetailProvider(widget.loanId));
+    final loan = loanAsync.valueOrNull;
 
     return Scaffold(
       backgroundColor:
           isDark ? AppColors.darkBackground : AppColors.lightBackground,
-      // Không dùng AppBar tiêu đề riêng biệt – Nút quay lại và tiêu đề được đưa vào trong Hero Banner
+      appBar: PageHeader.subPage(
+        title: 'Chi tiết khoản nợ',
+        subtitle: loan != null
+            ? '${loan.type == LoanType.lent ? "Cho vay" : "Đi vay"} · ${loan.counterpartyName}'
+            : null,
+        action: loan == null
+            ? null
+            : PopupMenuButton<String>(
+                icon: Container(
+                  width: 36,
+                  height: 36,
+                  decoration: BoxDecoration(
+                    color: isDark
+                        ? const Color(0xFF1E293B)
+                        : const Color(0xFFF1F5F9),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: isDark
+                          ? AppColors.darkBorder
+                          : AppColors.lightBorder,
+                    ),
+                  ),
+                  child: Icon(
+                    Icons.more_horiz_rounded,
+                    color: isDark
+                        ? AppColors.darkForeground
+                        : AppColors.lightForeground,
+                    size: 20,
+                  ),
+                ),
+                onSelected: (val) {
+                  if (val == 'edit') {
+                    context.pushNamed(
+                      RouteNames.editLoan,
+                      pathParameters: {'id': loan.id},
+                    );
+                  }
+                  if (val == 'delete') _deleteLoan(loan);
+                },
+                itemBuilder: (context) => [
+                  const PopupMenuItem(
+                    value: 'edit',
+                    child: ListTile(
+                      contentPadding: EdgeInsets.zero,
+                      leading: Icon(Icons.edit_outlined),
+                      title: Text('Chỉnh sửa'),
+                    ),
+                  ),
+                  const PopupMenuItem(
+                    value: 'delete',
+                    child: ListTile(
+                      contentPadding: EdgeInsets.zero,
+                      leading: Icon(
+                        Icons.delete_outline_rounded,
+                        color: AppColors.danger,
+                      ),
+                      title: Text('Xóa khoản nợ'),
+                    ),
+                  ),
+                ],
+              ),
+      ),
       body: loanAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (error, _) {
@@ -189,22 +252,8 @@ class _LoanDetailScreenState extends ConsumerState<LoanDetailScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // ── Banner Chi Tiết Khoản Nợ (có nút quay lại và menu thao tác) ──
-          _DetailHeroBanner(
-            loan: loan,
-            onBack: () {
-              if (context.canPop()) {
-                context.pop();
-              } else {
-                context.go(RoutePaths.loans);
-              }
-            },
-            onEdit: () => context.pushNamed(
-              RouteNames.editLoan,
-              pathParameters: {'id': loan.id},
-            ),
-            onDelete: () => _deleteLoan(loan),
-          ),
+          // ── Banner Chi Tiết Khoản Nợ ──
+          _DetailHeroBanner(loan: loan),
 
           // ── Phần nội dung thân màn hình ──
           Padding(
@@ -334,26 +383,21 @@ class _LoanDetailScreenState extends ConsumerState<LoanDetailScreen> {
 }
 
 class _DetailHeroBanner extends StatelessWidget {
-  const _DetailHeroBanner({
-    required this.loan,
-    required this.onBack,
-    required this.onEdit,
-    required this.onDelete,
-  });
+  const _DetailHeroBanner({required this.loan});
 
   final Loan loan;
-  final VoidCallback onBack;
-  final VoidCallback onEdit;
-  final VoidCallback onDelete;
 
   @override
   Widget build(BuildContext context) {
     final loanStatus = loan.effectiveStatus;
+    final formatter = DateFormat('dd/MM/yyyy');
     final dueText = loan.dueDate == null
         ? 'Chưa đặt hạn thanh toán'
-        : 'Hạn: ${DateFormat('dd/MM/yyyy').format(loan.dueDate!)}';
+        : 'Hạn: ' + formatter.format(loan.dueDate!);
 
     return Container(
+      margin: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 22),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
           colors: [
@@ -365,189 +409,101 @@ class _DetailHeroBanner extends StatelessWidget {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        borderRadius: const BorderRadius.only(
-          bottomLeft: Radius.circular(30),
-          bottomRight: Radius.circular(30),
-        ),
+        borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: AppColors.primary.withValues(alpha: 0.32),
-            blurRadius: 24,
-            offset: const Offset(0, 10),
+            color: AppColors.primary.withValues(alpha: 0.28),
+            blurRadius: 18,
+            offset: const Offset(0, 6),
           ),
         ],
       ),
-      child: SafeArea(
-        bottom: false,
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(18, 12, 18, 26),
-          child: Column(
+      child: Column(
+        children: [
+          // Hero Content: Avatar + Tên + Số tiền lớn + Badge hạn trả
+          CircleAvatar(
+            radius: 28,
+            backgroundColor: Colors.white.withValues(alpha: 0.22),
+            child: Text(
+              loan.counterpartyName.isEmpty
+                  ? '?'
+                  : loan.counterpartyName.substring(0, 1).toUpperCase(),
+              style: const TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.w900,
+                color: Colors.white,
+              ),
+            ),
+          ),
+          const SizedBox(height: 8),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // Hàng 1: Nút quay lại + Tiêu đề + Menu sửa/xóa ở trong banner
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  InkWell(
-                    onTap: onBack,
-                    borderRadius: BorderRadius.circular(12),
-                    child: Container(
-                      width: 38,
-                      height: 38,
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.16),
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: Colors.white.withValues(alpha: 0.2),
-                        ),
-                      ),
-                      child: const Icon(
-                        Icons.arrow_back_ios_new_rounded,
-                        color: Colors.white,
-                        size: 17,
-                      ),
-                    ),
-                  ),
-                  Text(
-                    'Chi tiết khoản nợ',
-                    style: GoogleFonts.inter(
-                      fontSize: 17,
-                      fontWeight: FontWeight.w900,
-                      color: Colors.white,
-                    ),
-                  ),
-                  PopupMenuButton<String>(
-                    icon: Container(
-                      width: 38,
-                      height: 38,
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.16),
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: Colors.white.withValues(alpha: 0.2),
-                        ),
-                      ),
-                      child: const Icon(
-                        Icons.more_horiz_rounded,
-                        color: Colors.white,
-                        size: 20,
-                      ),
-                    ),
-                    onSelected: (val) {
-                      if (val == 'edit') onEdit();
-                      if (val == 'delete') onDelete();
-                    },
-                    itemBuilder: (context) => [
-                      const PopupMenuItem(
-                        value: 'edit',
-                        child: ListTile(
-                          contentPadding: EdgeInsets.zero,
-                          leading: Icon(Icons.edit_outlined),
-                          title: Text('Chỉnh sửa'),
-                        ),
-                      ),
-                      const PopupMenuItem(
-                        value: 'delete',
-                        child: ListTile(
-                          contentPadding: EdgeInsets.zero,
-                          leading: Icon(
-                            Icons.delete_outline_rounded,
-                            color: AppColors.danger,
-                          ),
-                          title: Text('Xóa khoản nợ'),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-              const SizedBox(height: 20),
-
-              // Hero Content: Avatar + Tên + Số tiền lớn + Badge hạn trả
-              CircleAvatar(
-                radius: 30,
-                backgroundColor: Colors.white.withValues(alpha: 0.22),
-                child: Text(
-                  loan.counterpartyName.isEmpty
-                      ? '?'
-                      : loan.counterpartyName.substring(0, 1).toUpperCase(),
-                  style: const TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.w900,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 8),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    loan.counterpartyName,
-                    textAlign: TextAlign.center,
-                    style: GoogleFonts.inter(
-                      fontSize: 17,
-                      fontWeight: FontWeight.w900,
-                      color: Colors.white,
-                    ),
-                  ),
-                  if (loan.isLinkedToFriend) ...[
-                    const SizedBox(width: 6),
-                    const Icon(Icons.star_rounded, color: Colors.amber, size: 18),
-                  ],
-                ],
-              ),
-              const SizedBox(height: 4),
               Text(
-                CurrencyFormatter.formatVnd(loan.remainingAmount),
-                style: GoogleFonts.outfit(
-                  fontSize: 32,
+                loan.counterpartyName,
+                textAlign: TextAlign.center,
+                style: GoogleFonts.inter(
+                  fontSize: 17,
                   fontWeight: FontWeight.w900,
-                  letterSpacing: -0.6,
                   color: Colors.white,
                 ),
               ),
-              Text(
-                'Số nợ còn lại · Đã thanh toán ${(loan.repaidPercent * 100).toStringAsFixed(1)}%',
-                style: GoogleFonts.inter(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.white.withValues(alpha: 0.85),
-                ),
-              ),
-              const SizedBox(height: 14),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.18),
-                  borderRadius: BorderRadius.circular(99),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      loanStatus == LoanStatus.overdue
-                          ? Icons.warning_amber_rounded
-                          : Icons.calendar_today_rounded,
-                      color: Colors.white,
-                      size: 14,
-                    ),
-                    const SizedBox(width: 6),
-                    Text(
-                      loanStatus == LoanStatus.overdue
-                          ? 'Quá hạn ${loan.overdueDays ?? 0} ngày'
-                          : dueText,
-                      style: GoogleFonts.inter(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w700,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+              if (loan.isLinkedToFriend) ...[
+                const SizedBox(width: 6),
+                const Icon(Icons.star_rounded, color: Colors.amber, size: 18),
+              ],
             ],
           ),
-        ),
+          const SizedBox(height: 4),
+          Text(
+            CurrencyFormatter.formatVnd(loan.remainingAmount),
+            style: GoogleFonts.outfit(
+              fontSize: 32,
+              fontWeight: FontWeight.w900,
+              letterSpacing: -0.6,
+              color: Colors.white,
+            ),
+          ),
+          Text(
+            'Số nợ còn lại · Đã thanh toán ' + (loan.repaidPercent * 100).toStringAsFixed(1) + '%',
+            style: GoogleFonts.inter(
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+              color: Colors.white.withValues(alpha: 0.85),
+            ),
+          ),
+          const SizedBox(height: 14),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.18),
+              borderRadius: BorderRadius.circular(99),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  loanStatus == LoanStatus.overdue
+                      ? Icons.warning_amber_rounded
+                      : Icons.calendar_today_rounded,
+                  color: Colors.white,
+                  size: 14,
+                ),
+                const SizedBox(width: 6),
+                Text(
+                  loanStatus == LoanStatus.overdue
+                      ? 'Quá hạn ' + (loan.overdueDays ?? 0).toString() + ' ngày'
+                      : dueText,
+                  style: GoogleFonts.inter(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.white,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

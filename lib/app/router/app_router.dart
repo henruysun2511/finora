@@ -7,7 +7,7 @@ import '../../features/ai_chat/presentation/screens/ai_chat_screen.dart';
 import '../../features/analytics/presentation/screens/analytics_screen.dart';
 import '../../features/analytics/presentation/screens/cashflow_report_screen.dart';
 import '../../features/analytics/presentation/screens/category_report_screen.dart';
-import '../../features/analytics/presentation/screens/exchange_rates_screen.dart';
+import '../../features/exchange_rates/presentation/screens/exchange_rates_screen.dart';
 import '../../features/auth/presentation/providers/auth_provider.dart';
 import '../../features/auth/presentation/screens/forgot_password_screen.dart';
 import '../../features/auth/presentation/screens/login_screen.dart';
@@ -47,6 +47,7 @@ import '../../features/transactions/presentation/screens/create_transaction_scre
 import '../../features/recurring_transaction/presentation/screens/recurring-transaction-screen.dart' as recurring_list;
 import '../../features/recurring_transaction/presentation/screens/recurring-transaction-form-screen.dart' as recurring_form;
 import '../../features/transactions/presentation/screens/scan_receipt_screen.dart';
+import '../../features/transactions/presentation/screens/receipt_capture_screen.dart';
 import '../../features/transactions/presentation/screens/transaction_detail_screen.dart';
 import '../../features/transactions/presentation/screens/transactions_screen.dart';
 import '../../features/wallets/presentation/screens/account_detail_screen.dart';
@@ -231,6 +232,12 @@ GoRouter appRouter(AppRouterRef ref) {
       ),
       GoRoute(
         parentNavigatorKey: _rootNavigatorKey,
+        path: RoutePaths.captureReceipt,
+        name: RouteNames.captureReceipt,
+        builder: (context, state) => const ReceiptCaptureScreen(),
+      ),
+      GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
         path: RoutePaths.recurringTransactions,
         name: RouteNames.recurringTransactions,
         builder: (context, state) =>
@@ -249,6 +256,9 @@ GoRouter appRouter(AppRouterRef ref) {
         name: RouteNames.transactionDetail,
         builder: (context, state) {
           final id = state.pathParameters['id'] ?? '';
+          if (id == 'create') {
+            return const CreateTransactionScreen();
+          }
           return TransactionDetailScreen(transactionId: id);
         },
       ),
