@@ -73,3 +73,4 @@ class MessageResponse {
         'updatedAt': updatedAt?.toIso8601String(),
       };
 }
+
