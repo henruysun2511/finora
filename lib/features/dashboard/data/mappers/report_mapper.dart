@@ -1,6 +1,6 @@
-import '../../../dashboard/domain/models/cash_flow_model.dart';
-import '../../../dashboard/domain/models/category_breakdown_model.dart';
-import '../../../dashboard/domain/models/dashboard_overview_model.dart';
+import '../../domain/models/cash_flow_model.dart';
+import '../../domain/models/category_breakdown_model.dart';
+import '../../domain/models/dashboard_overview_model.dart';
 import '../../domain/models/report_overview_data.dart';
 import '../../domain/models/report_period.dart';
 
@@ -59,54 +59,56 @@ class ReportMapper {
     double savingsRate = 0;
     double momIncomeChange = 0;
     double momExpenseChange = 0;
-    String compareLabel = 'so với kỳ trước';
 
-    if (overview != null) {
-      final monthly = overview.monthlyCashflow;
-      totalIncome = monthly.income;
-      totalExpense = monthly.expense;
-      netSavings = monthly.netCashflow;
-      savingsRate = monthly.savingsRate;
-      momIncomeChange = monthly.momIncomeChange;
-      momExpenseChange = monthly.momExpenseChange;
-
-      final prevMonthNumber = targetDate.month == 1 ? 12 : targetDate.month - 1;
-      compareLabel = 'so với T$prevMonthNumber';
-    } else if (cashFlow != null) {
+    if (cashFlow != null) {
       totalIncome = cashFlow.totalIncome;
       totalExpense = cashFlow.totalExpense;
       netSavings = cashFlow.netSavings;
-      savingsRate = totalIncome > 0 ? (netSavings / totalIncome) * 100 : 0;
-      compareLabel = 'so với kỳ trước';
+      savingsRate = cashFlow.savingsRate;
+      momIncomeChange = cashFlow.momIncomeChange;
+      momExpenseChange = cashFlow.momExpenseChange;
+    } else if (overview != null) {
+      totalIncome = overview.monthlyCashflow.income;
+      totalExpense = overview.monthlyCashflow.expense;
+      netSavings = overview.monthlyCashflow.netCashflow;
+      savingsRate = overview.monthlyCashflow.savingsRate;
     }
 
-    // Nếu category breakdown có tổng chi tiêu khác 0 và tổng chi tiêu của stat đang là 0
-    if (totalExpense == 0 && categoryBreakdown != null && categoryBreakdown.totalAmount > 0) {
-      totalExpense = categoryBreakdown.totalAmount;
-      if (totalIncome > 0) {
-        netSavings = totalIncome - totalExpense;
-        savingsRate = (netSavings / totalIncome) * 100;
-      }
+    final summary = ReportFinancialSummary(
+      totalIncome: totalIncome,
+      totalExpense: totalExpense,
+      netSavings: netSavings,
+      savingsRate: savingsRate,
+      momIncomeChange: momIncomeChange,
+      momExpenseChange: momExpenseChange,
+    );
+
+    // 3. Quy tắc 50/30/20
+    ReportRule503020? rule503020;
+    if (categoryBreakdown?.rule503020Evaluation != null) {
+      final r = categoryBreakdown!.rule503020Evaluation!;
+      rule503020 = ReportRule503020(
+        needsAmount: r.needs.amount,
+        needsPercentage: r.needs.percentage,
+        wantsAmount: r.wants.amount,
+        wantsPercentage: r.wants.percentage,
+        savingsAmount: r.savings.amount,
+        savingsPercentage: r.savings.percentage,
+        isNeedsCompliant: r.needs.percentage <= 50,
+        isWantsCompliant: r.wants.percentage <= 30,
+        isSavingsCompliant: r.savings.percentage >= 20,
+      );
     }
 
     return ReportOverviewData(
       period: period,
       targetDate: targetDate,
-      customStart: customStart,
-      customEnd: customEnd,
-      statMetrics: ReportStatMetrics(
-        totalIncome: totalIncome,
-        totalExpense: totalExpense,
-        netSavings: netSavings,
-        savingsRate: savingsRate,
-        momIncomeChange: momIncomeChange,
-        momExpenseChange: momExpenseChange,
-        targetSavingsRate: 40.0,
-        comparePeriodLabel: compareLabel,
-      ),
+      summary: summary,
       slices: slices,
       categories: categories,
-      currency: 'VND',
+      rule503020: rule503020,
+      customStart: customStart,
+      customEnd: customEnd,
     );
   }
 }

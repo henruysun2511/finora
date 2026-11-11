@@ -1,45 +1,62 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../../app/router/route_names.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/utils/currency_formatter.dart';
+import '../../../../core/widgets/app_toast.dart';
 import '../../../../core/widgets/banner_header.dart';
-import 'package:go_router/go_router.dart';
 import '../../domain/models/dashboard_overview_model.dart';
+import '../../domain/models/export_format.dart';
 import '../providers/dashboard_providers.dart';
+import '../providers/report_overview_provider.dart';
+import '../widgets/report_category_breakdown_list.dart';
+import '../widgets/report_donut_chart.dart';
+import '../widgets/report_export_sheet.dart';
+import '../widgets/report_period_selector.dart';
+import '../widgets/report_stat_grid.dart';
 
-class DashboardScreen extends ConsumerWidget {
+class DashboardScreen extends ConsumerStatefulWidget {
   const DashboardScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<DashboardScreen> createState() => _DashboardScreenState();
+}
+
+class _DashboardScreenState extends ConsumerState<DashboardScreen>
+    with SingleTickerProviderStateMixin {
+  late TabController _tabController;
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 6, vsync: this);
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final overviewAsync = ref.watch(dashboardOverviewProvider);
 
     return Scaffold(
       backgroundColor:
           isDark ? AppColors.darkBackground : AppColors.lightBackground,
-      body: RefreshIndicator(
-        color: AppColors.primary,
-        onRefresh: () async {
-          ref.invalidate(dashboardOverviewProvider);
-          ref.invalidate(dashboardCashFlowProvider);
-          ref.invalidate(dashboardCategoryBreakdownProvider);
-          ref.invalidate(dashboardBudgetHealthProvider);
-          ref.invalidate(dashboardDebtsProvider);
-          ref.invalidate(dashboardCalendarProvider);
-        },
-        child: SingleChildScrollView(
-          physics: const AlwaysScrollableScrollPhysics(),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              // ── 1. Hero Banner Header (.acc-hero chuẩn FinTech) ─────────
-              BannerHeader(
+      body: NestedScrollView(
+        headerSliverBuilder: (context, innerBoxIsScrolled) {
+          return [
+            // ── 1. Hero Banner Header (.acc-hero chuẩn FinTech) ─────────
+            SliverToBoxAdapter(
+              child: BannerHeader(
                 title: 'Dashboard Tài chính',
-                subtitle: 'Báo cáo & Phân tích chuyên sâu toàn cảnh',
+                subtitle: 'Trung tâm Báo cáo & Phân tích chuyên sâu',
                 showBackButton: false,
                 gradient: const LinearGradient(
                   colors: [
@@ -51,72 +68,113 @@ class DashboardScreen extends ConsumerWidget {
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
-                action: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    BannerHeader.glassButton(
-                      icon: const Icon(
-                        Icons.pie_chart_outline_rounded,
-                        size: 20,
-                        color: Colors.white,
-                      ),
-                      onTap: () => context.push(RoutePaths.reportsOverview),
-                      tooltip: 'Báo cáo tổng quan',
-                    ),
-                    const SizedBox(width: 8),
-                    BannerHeader.glassButton(
-                      icon: const Icon(
-                        Icons.refresh_rounded,
-                        size: 20,
-                        color: Colors.white,
-                      ),
-                      onTap: () {
-                        ref.invalidate(dashboardOverviewProvider);
-                        ref.invalidate(dashboardCashFlowProvider);
-                        ref.invalidate(dashboardCategoryBreakdownProvider);
-                        ref.invalidate(dashboardBudgetHealthProvider);
-                        ref.invalidate(dashboardDebtsProvider);
-                        ref.invalidate(dashboardCalendarProvider);
-                      },
-                      tooltip: 'Làm mới dữ liệu',
-                    ),
-                  ],
+                action: BannerHeader.glassButton(
+                  icon: const Icon(
+                    Icons.refresh_rounded,
+                    size: 20,
+                    color: Colors.white,
+                  ),
+                  onTap: () {
+                    ref.invalidate(dashboardOverviewProvider);
+                    ref.invalidate(dashboardCashFlowProvider);
+                    ref.invalidate(dashboardCategoryBreakdownProvider);
+                    ref.invalidate(dashboardBudgetHealthProvider);
+                    ref.invalidate(dashboardDebtsProvider);
+                    ref.invalidate(dashboardCalendarProvider);
+                    ref.invalidate(reportOverviewProvider);
+                  },
+                  tooltip: 'Làm mới toàn bộ dữ liệu',
                 ),
                 child: _DashboardHeroBanner(overviewAsync: overviewAsync),
               ),
+            ),
 
-              // ── 2. Nội dung các phân hệ Dashboard (Single Feed) ───────────
-              Padding(
-                padding: const EdgeInsets.fromLTRB(16, 16, 16, 40),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    // PHÂN HỆ 1: DÒNG TIỀN & XU HƯỚNG
-                    _CashFlowSection(isDark: isDark),
-                    const SizedBox(height: 24),
-
-                    // PHÂN HỆ 2: CƠ CẤU 50/30/20 & DANH MỤC
-                    _CategoryBreakdownSection(isDark: isDark),
-                    const SizedBox(height: 24),
-
-                    // PHÂN HỆ 3: SỨC KHỎE NGÂN SÁCH & TỐC ĐỘ TIÊU TIỀN
-                    _BudgetHealthSection(isDark: isDark),
-                    const SizedBox(height: 24),
-
-                    // PHÂN HỆ 4: SỔ NỢ & NGHĨA VỤ TÀI CHÍNH
-                    _DebtsSection(isDark: isDark),
-                    const SizedBox(height: 24),
-
-                    // PHÂN HỆ 5: LỊCH TÀI CHÍNH & HÓA ĐƠN ĐỊNH KỲ
-                    _CalendarSection(isDark: isDark),
+            // ── 2. Pinned TabBar (Chuẩn Tab Selection FinTech GEMINI.md) ─
+            SliverPersistentHeader(
+              pinned: true,
+              delegate: _DashboardTabBarDelegate(
+                isDark: isDark,
+                tabBar: TabBar(
+                  controller: _tabController,
+                  isScrollable: true,
+                  tabAlignment: TabAlignment.start,
+                  indicatorSize: TabBarIndicatorSize.tab,
+                  indicator: BoxDecoration(
+                    color: AppColors.primary,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  labelColor: Colors.white,
+                  unselectedLabelColor:
+                      isDark ? AppColors.darkMuted : AppColors.lightMuted,
+                  labelStyle: GoogleFonts.inter(
+                    fontSize: 12.5,
+                    fontWeight: FontWeight.w700,
+                  ),
+                  unselectedLabelStyle: GoogleFonts.inter(
+                    fontSize: 12.5,
+                    fontWeight: FontWeight.w500,
+                  ),
+                  dividerColor: Colors.transparent,
+                  tabs: const [
+                    Tab(text: 'Tổng quan'),
+                    Tab(text: 'Dòng tiền'),
+                    Tab(text: 'Cơ cấu 50/30/20'),
+                    Tab(text: 'Sức khỏe ngân sách'),
+                    Tab(text: 'Sổ nợ & Nghĩa vụ'),
+                    Tab(text: 'Lịch & Hóa đơn'),
                   ],
                 ),
               ),
-            ],
-          ),
+            ),
+          ];
+        },
+        body: TabBarView(
+          controller: _tabController,
+          children: [
+            _OverviewTab(isDark: isDark),
+            _CashFlowTab(isDark: isDark),
+            _CategoryBreakdownTab(isDark: isDark),
+            _BudgetHealthTab(isDark: isDark),
+            _DebtsTab(isDark: isDark),
+            _CalendarTab(isDark: isDark),
+          ],
         ),
       ),
     );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// DELEGATE PINNED TABBAR
+// ─────────────────────────────────────────────────────────────────────────────
+class _DashboardTabBarDelegate extends SliverPersistentHeaderDelegate {
+  final TabBar tabBar;
+  final bool isDark;
+
+  const _DashboardTabBarDelegate({
+    required this.tabBar,
+    required this.isDark,
+  });
+
+  @override
+  double get minExtent => 52.0;
+
+  @override
+  double get maxExtent => 52.0;
+
+  @override
+  Widget build(
+      BuildContext context, double shrinkOffset, bool overlapsContent) {
+    return Container(
+      color: isDark ? AppColors.darkSurface : Colors.white,
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+      child: tabBar,
+    );
+  }
+
+  @override
+  bool shouldRebuild(covariant _DashboardTabBarDelegate oldDelegate) {
+    return oldDelegate.isDark != isDark || oldDelegate.tabBar != tabBar;
   }
 }
 
@@ -315,119 +373,152 @@ class _DashboardHeroBanner extends StatelessWidget {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// TIÊU ĐỀ PHÂN HỆ
+// TAB 1: BÁO CÁO TỔNG QUAN (DONUT CHART + PERIODS + EXPORT PDF)
 // ─────────────────────────────────────────────────────────────────────────────
-class _SectionHeader extends StatelessWidget {
+class _OverviewTab extends ConsumerWidget {
   final bool isDark;
-  final IconData icon;
-  final String title;
-  final Color color;
-  final String? actionText;
-  final VoidCallback? onAction;
+  const _OverviewTab({required this.isDark});
 
-  const _SectionHeader({
-    required this.isDark,
-    required this.icon,
-    required this.title,
-    required this.color,
-    this.actionText,
-    this.onAction,
-  });
+  void _handleExport(
+    BuildContext context,
+    WidgetRef ref,
+    ExportFormat format,
+  ) async {
+    final fileName =
+        await ref.read(reportOverviewProvider.notifier).exportReport(format);
+    if (!context.mounted) return;
+
+    if (fileName != null) {
+      AppToast.success(context, 'Đã xuất file $fileName thành công!');
+    } else {
+      AppToast.error(
+          context, 'Xuất báo cáo không thành công, vui lòng thử lại.');
+    }
+  }
+
+  void _showExportOptions(BuildContext context, WidgetRef ref) {
+    final state = ref.read(reportOverviewProvider);
+    final data = state.data;
+    if (data == null) {
+      AppToast.info(context, 'Chưa có dữ liệu báo cáo để xuất file.');
+      return;
+    }
+
+    ReportExportSheet.show(
+      context,
+      data: data,
+      onSelectFormat: (format) => _handleExport(context, ref, format),
+    );
+  }
 
   @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Expanded(
-          child: Row(
+  Widget build(BuildContext context, WidgetRef ref) {
+    final state = ref.watch(reportOverviewProvider);
+    final notifier = ref.read(reportOverviewProvider.notifier);
+
+    return SingleChildScrollView(
+      padding: const EdgeInsets.fromLTRB(16, 14, 16, 32),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          // 1. Bộ chọn Chu kỳ (Tuần / Tháng / Quý / Năm / Tùy chọn)
+          ReportPeriodSelector(
+            selectedPeriod: state.period,
+            targetDate: state.targetDate,
+            customStart: state.customStart,
+            customEnd: state.customEnd,
+            onPeriodChanged: notifier.setPeriod,
+            onPrevious: notifier.previousPeriod,
+            onNext: notifier.nextPeriod,
+            onCustomRangeSelected: notifier.setCustomRange,
+          ),
+          const SizedBox(height: 14),
+
+          // Nút xuất báo cáo PDF/Excel
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              Container(
-                padding: const EdgeInsets.all(6),
-                decoration: BoxDecoration(
-                  color: color.withValues(alpha: 0.15),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Icon(icon, size: 16, color: color),
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  title,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
+              TextButton.icon(
+                onPressed: () => _showExportOptions(context, ref),
+                icon: const Icon(Icons.file_download_outlined, size: 16),
+                label: Text(
+                  'Xuất báo cáo (PDF/Excel)',
                   style: GoogleFonts.inter(
-                    fontSize: 12.5,
-                    fontWeight: FontWeight.w900,
-                    letterSpacing: 0.5,
-                    color: isDark
-                        ? AppColors.darkForeground
-                        : AppColors.lightForeground,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                style: TextButton.styleFrom(
+                  foregroundColor: AppColors.primary,
+                  backgroundColor: AppColors.primary.withValues(alpha: 0.1),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
                   ),
                 ),
               ),
             ],
           ),
-        ),
-        if (actionText != null && onAction != null)
-          TextButton(
-            onPressed: onAction,
-            style: TextButton.styleFrom(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-              minimumSize: Size.zero,
-              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          const SizedBox(height: 12),
+
+          if (state.isLoading)
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 40),
+              child: Center(child: CircularProgressIndicator()),
+            )
+          else if (state.data != null) ...[
+            // 2. Lưới 4 Thống kê Chỉ số Vàng
+            ReportStatGrid(
+              summary: state.data!.summary,
+              isDark: isDark,
             ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  actionText!,
-                  style: GoogleFonts.inter(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.primary,
-                  ),
-                ),
-                const Icon(Icons.chevron_right_rounded,
-                    size: 16, color: AppColors.primary),
-              ],
+            const SizedBox(height: 20),
+
+            // 3. Biểu đồ tròn Donut Tỷ trọng chi tiêu
+            if (state.data!.slices.isNotEmpty)
+              ReportDonutChart(
+                slices: state.data!.slices,
+                totalExpense: state.data!.summary.totalExpense,
+                selectedCategoryId: state.selectedCategoryId,
+                onSliceSelected: notifier.selectCategory,
+              ),
+            const SizedBox(height: 20),
+
+            // 4. Danh sách Danh mục chi tiết
+            ReportCategoryBreakdownList(
+              categories: state.data!.categories,
+              selectedCategoryId: state.selectedCategoryId,
+              onCategorySelected: notifier.selectCategory,
+              isDark: isDark,
             ),
-          ),
-      ],
+          ],
+        ],
+      ),
     );
   }
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// PHÂN HỆ 1: DÒNG TIỀN (CASH FLOW TIMELINE + HEATMAP + KHUNG GIỜ)
+// TAB 2: DÒNG TIỀN (CASH FLOW TIMELINE + HEATMAP + KHUNG GIỜ)
 // ─────────────────────────────────────────────────────────────────────────────
-class _CashFlowSection extends ConsumerWidget {
+class _CashFlowTab extends ConsumerWidget {
   final bool isDark;
-  const _CashFlowSection({required this.isDark});
+  const _CashFlowTab({required this.isDark});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final cashFlowAsync = ref.watch(dashboardCashFlowProvider);
 
     return cashFlowAsync.when(
-      loading: () => const Padding(
-        padding: EdgeInsets.symmetric(vertical: 24),
-        child: Center(child: CircularProgressIndicator()),
-      ),
+      loading: () => const Center(child: CircularProgressIndicator()),
       error: (e, _) => Center(child: Text('Lỗi tải dữ liệu: $e')),
       data: (cf) {
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            _SectionHeader(
-              isDark: isDark,
-              icon: Icons.trending_up_rounded,
-              title: 'DÒNG TIỀN & XU HƯỚNG CHI TIÊU',
-              color: AppColors.primary,
-              actionText: 'Báo cáo',
-              onAction: () => context.push(RoutePaths.cashflowReport),
-            ),
-            const SizedBox(height: 12),
+        return SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(16, 14, 16, 32),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
               // Summary 3 Ô Stat
               Row(
                 children: [
@@ -643,9 +734,9 @@ class _CashFlowSection extends ConsumerWidget {
                           ),
                           Text(
                             CurrencyFormatter.formatCompact(item.amount),
-                            style: GoogleFonts.outfit(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w800,
+                            style: GoogleFonts.inter(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w700,
                               color: isDark
                                   ? AppColors.darkForeground
                                   : AppColors.lightForeground,
@@ -658,7 +749,7 @@ class _CashFlowSection extends ConsumerWidget {
                               vertical: 2,
                             ),
                             decoration: BoxDecoration(
-                              color: AppColors.primary.withValues(alpha: 0.12),
+                              color: AppColors.primary.withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(6),
                             ),
                             child: Text(
@@ -677,44 +768,35 @@ class _CashFlowSection extends ConsumerWidget {
                 ),
               ),
             ],
-          );
+          ),
+        );
       },
     );
   }
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// PHÂN HỆ 2: CƠ CẤU 50/30/20 & DANH MỤC CHI TIÊU
+// TAB 3: CƠ CẤU 50/30/20 & DANH MỤC CHI TIÊU
 // ─────────────────────────────────────────────────────────────────────────────
-class _CategoryBreakdownSection extends ConsumerWidget {
+class _CategoryBreakdownTab extends ConsumerWidget {
   final bool isDark;
-  const _CategoryBreakdownSection({required this.isDark});
+  const _CategoryBreakdownTab({required this.isDark});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final catAsync = ref.watch(dashboardCategoryBreakdownProvider);
 
     return catAsync.when(
-      loading: () => const Padding(
-        padding: EdgeInsets.symmetric(vertical: 24),
-        child: Center(child: CircularProgressIndicator()),
-      ),
+      loading: () => const Center(child: CircularProgressIndicator()),
       error: (e, _) => Center(child: Text('Lỗi tải dữ liệu: $e')),
       data: (cat) {
         final rule = cat.rule503020Evaluation;
 
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            _SectionHeader(
-              isDark: isDark,
-              icon: Icons.pie_chart_rounded,
-              title: 'CƠ CẤU 50/30/20 & DANH MỤC',
-              color: const Color(0xFFEC4899),
-              actionText: 'Báo cáo',
-              onAction: () => context.push(RoutePaths.categoryReport),
-            ),
-            const SizedBox(height: 12),
+        return SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(16, 14, 16, 32),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
               // Quy tắc 50/30/20 Card
               if (rule != null)
                 _SectionContainer(
@@ -770,7 +852,8 @@ class _CategoryBreakdownSection extends ConsumerWidget {
                           borderRadius: BorderRadius.circular(10),
                         ),
                         alignment: Alignment.center,
-                        child: Text(c.icon, style: const TextStyle(fontSize: 18)),
+                        child: Text(c.icon,
+                            style: const TextStyle(fontSize: 18)),
                       ),
                       title: Text(
                         c.name,
@@ -805,16 +888,16 @@ class _CategoryBreakdownSection extends ConsumerWidget {
                               Text(
                                 sub.name,
                                 style: GoogleFonts.inter(
-                                  fontSize: 12,
+                                  fontSize: 12.5,
                                   color: isDark
                                       ? AppColors.darkMuted
                                       : AppColors.lightMuted,
                                 ),
                               ),
                               Text(
-                                '${CurrencyFormatter.formatCompact(sub.amount)} (${sub.percentage.toStringAsFixed(1)}%)',
+                                CurrencyFormatter.format(sub.amount),
                                 style: GoogleFonts.inter(
-                                  fontSize: 11.5,
+                                  fontSize: 12.5,
                                   fontWeight: FontWeight.w600,
                                   color: isDark
                                       ? AppColors.darkForeground
@@ -831,28 +914,22 @@ class _CategoryBreakdownSection extends ConsumerWidget {
               ),
               const SizedBox(height: 18),
 
-              // Top khoản chi tiêu lớn nhất
+              // Top 3 khoản chi tiêu lớn nhất
               _SectionContainer(
                 isDark: isDark,
-                title: 'KHOẢN CHI TIÊU LỚN TRONG THÁNG',
+                title: 'TOP KHOẢN CHI TIÊU LỚN NHẤT',
                 child: Column(
-                  children: cat.topSpendingItems.map((item) {
+                  children: cat.topExpenses.map((item) {
                     return Padding(
                       padding: const EdgeInsets.symmetric(vertical: 8),
                       child: Row(
                         children: [
-                          const Icon(
-                            Icons.receipt_rounded,
-                            size: 20,
-                            color: Color(0xFFF97316),
-                          ),
-                          const SizedBox(width: 10),
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  item.name,
+                                  item.title,
                                   style: GoogleFonts.inter(
                                     fontSize: 13,
                                     fontWeight: FontWeight.w700,
@@ -862,7 +939,7 @@ class _CategoryBreakdownSection extends ConsumerWidget {
                                   ),
                                 ),
                                 Text(
-                                  '${item.categoryName} · ${item.date}',
+                                  '${item.categoryName} • ${item.date}',
                                   style: GoogleFonts.inter(
                                     fontSize: 11,
                                     color: isDark
@@ -888,7 +965,8 @@ class _CategoryBreakdownSection extends ConsumerWidget {
                 ),
               ),
             ],
-          );
+          ),
+        );
       },
     );
   }
@@ -972,37 +1050,27 @@ class _RuleRow extends StatelessWidget {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// PHÂN HỆ 3: SỨC KHỎE NGÂN SÁCH (BURN-RATE + RUNWAY PREDICTION)
+// TAB 4: SỨC KHỎE NGÂN SÁCH (BURN-RATE + RUNWAY PREDICTION)
 // ─────────────────────────────────────────────────────────────────────────────
-class _BudgetHealthSection extends ConsumerWidget {
+class _BudgetHealthTab extends ConsumerWidget {
   final bool isDark;
-  const _BudgetHealthSection({required this.isDark});
+  const _BudgetHealthTab({required this.isDark});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final healthAsync = ref.watch(dashboardBudgetHealthProvider);
 
     return healthAsync.when(
-      loading: () => const Padding(
-        padding: EdgeInsets.symmetric(vertical: 24),
-        child: Center(child: CircularProgressIndicator()),
-      ),
+      loading: () => const Center(child: CircularProgressIndicator()),
       error: (e, _) => Center(child: Text('Lỗi tải dữ liệu: $e')),
       data: (health) {
         final br = health.burnRateMetrics;
 
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            _SectionHeader(
-              isDark: isDark,
-              icon: Icons.shield_rounded,
-              title: 'SỨC KHỎE NGÂN SÁCH & BURN-RATE',
-              color: const Color(0xFF0D9488),
-              actionText: 'Ngân sách',
-              onAction: () => context.push(RoutePaths.budgets),
-            ),
-            const SizedBox(height: 12),
+        return SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(16, 14, 16, 32),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
               // Burn-rate AI Prediction Card
               Container(
                 padding: const EdgeInsets.all(18),
@@ -1051,7 +1119,9 @@ class _BudgetHealthSection extends ConsumerWidget {
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Text(
-                            br.willOverspend ? 'Cảnh báo vượt ngân sách' : 'An toàn',
+                            br.willOverspend
+                                ? 'Cảnh báo vượt chi'
+                                : 'An toàn',
                             style: GoogleFonts.inter(
                               fontSize: 10,
                               fontWeight: FontWeight.w700,
@@ -1061,130 +1131,64 @@ class _BudgetHealthSection extends ConsumerWidget {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 10),
+                    const SizedBox(height: 8),
                     Text(
-                      '${CurrencyFormatter.formatCompact(br.actualDailyBurnRate)} / ngày',
-                      style: GoogleFonts.outfit(
-                        fontSize: 26,
-                        fontWeight: FontWeight.w900,
-                        color: Colors.white,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      'Tốc độ khuyến nghị an toàn: ${CurrencyFormatter.formatCompact(br.recommendedDailyBurnRate)} / ngày',
+                      br.aiPredictionText,
                       style: GoogleFonts.inter(
-                        fontSize: 12,
-                        color: Colors.white.withValues(alpha: 0.85),
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
+                        height: 1.4,
                       ),
                     ),
-                    if (br.projectedRunwayDate != null) ...[
-                      const SizedBox(height: 12),
-                      Container(
-                        padding: const EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          color: Colors.black.withValues(alpha: 0.15),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Row(
-                          children: [
-                            const Icon(
-                              Icons.calendar_month_rounded,
-                              size: 16,
-                              color: Colors.white,
-                            ),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: Text(
-                                'Dự báo cạn ngân sách vào ngày: ${br.projectedRunwayDate}',
+                    const SizedBox(height: 14),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Burn-rate thực tế/ngày',
                                 style: GoogleFonts.inter(
-                                  fontSize: 11.5,
-                                  fontWeight: FontWeight.w600,
+                                  fontSize: 10.5,
+                                  color: Colors.white70,
+                                ),
+                              ),
+                              Text(
+                                CurrencyFormatter.format(
+                                    br.actualDailyBurnRate),
+                                style: GoogleFonts.outfit(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w800,
                                   color: Colors.white,
                                 ),
                               ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ],
-                ),
-              ),
-              const SizedBox(height: 18),
-
-              // Tổng ngân sách vs Đã chi
-              _SectionContainer(
-                isDark: isDark,
-                title: 'TỔNG QUAN HẠN MỨC THÁNG',
-                child: Column(
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          'Đã chi ${CurrencyFormatter.format(health.totalSpent)}',
-                          style: GoogleFonts.inter(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w700,
-                            color: isDark
-                                ? AppColors.darkForeground
-                                : AppColors.lightForeground,
+                            ],
                           ),
                         ),
-                        Text(
-                          'Hạn mức: ${CurrencyFormatter.format(health.totalBudgetLimit)}',
-                          style: GoogleFonts.inter(
-                            fontSize: 12,
-                            color: isDark
-                                ? AppColors.darkMuted
-                                : AppColors.lightMuted,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
-                    Container(
-                      height: 10,
-                      decoration: BoxDecoration(
-                        color: isDark
-                            ? AppColors.darkBorder
-                            : const Color(0xFFF1F5F9),
-                        borderRadius: BorderRadius.circular(99),
-                      ),
-                      child: FractionallySizedBox(
-                        alignment: Alignment.centerLeft,
-                        widthFactor:
-                            (health.spentPercentage / 100.0).clamp(0.0, 1.0),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: health.spentPercentage > 85
-                                ? AppColors.danger
-                                : AppColors.primary,
-                            borderRadius: BorderRadius.circular(99),
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          'Còn lại: ${CurrencyFormatter.format(health.remainingBudget)}',
-                          style: GoogleFonts.inter(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w700,
-                            color: AppColors.success,
-                          ),
-                        ),
-                        Text(
-                          'Còn ${health.daysRemaining} ngày',
-                          style: GoogleFonts.inter(
-                            fontSize: 12,
-                            color: isDark
-                                ? AppColors.darkMuted
-                                : AppColors.lightMuted,
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Số ngày cạn dự kiến',
+                                style: GoogleFonts.inter(
+                                  fontSize: 10.5,
+                                  color: Colors.white70,
+                                ),
+                              ),
+                              Text(
+                                '${br.predictedRunwayDays} ngày',
+                                style: GoogleFonts.outfit(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w800,
+                                  color: br.willOverspend
+                                      ? const Color(0xFFFCA5A5)
+                                      : Colors.white,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       ],
@@ -1194,23 +1198,26 @@ class _BudgetHealthSection extends ConsumerWidget {
               ),
               const SizedBox(height: 18),
 
-              // Danh sách từng ngân sách
+              // Danh sách tình trạng từng ngân sách
               _SectionContainer(
                 isDark: isDark,
-                title: 'TIẾN ĐỘ NGÂN SÁCH DANH MỤC',
+                title: 'TÌNH TRẠNG NGÂN SÁCH THEO DANH MỤC',
                 child: Column(
-                  children: health.categoryBudgets.map((item) {
-                    Color stColor = AppColors.success;
-                    if (item.colorStatus == 'ORANGE') stColor = const Color(0xFFF97316);
-                    if (item.colorStatus == 'RED') stColor = AppColors.danger;
+                  children: health.budgets.map((item) {
+                    final pct = (item.spentPercentage / 100.0).clamp(0.0, 1.0);
+                    Color color = AppColors.success;
+                    if (item.colorStatus == 'ORANGE') color = AppColors.orange;
+                    if (item.colorStatus == 'RED') color = AppColors.danger;
 
                     return Padding(
                       padding: const EdgeInsets.symmetric(vertical: 8),
                       child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Row(
                             children: [
-                              Text(item.icon, style: const TextStyle(fontSize: 18)),
+                              Text(item.icon,
+                                  style: const TextStyle(fontSize: 18)),
                               const SizedBox(width: 8),
                               Expanded(
                                 child: Text(
@@ -1227,16 +1234,16 @@ class _BudgetHealthSection extends ConsumerWidget {
                               Text(
                                 '${item.spentPercentage.toStringAsFixed(0)}%',
                                 style: GoogleFonts.inter(
-                                  fontSize: 12.5,
-                                  fontWeight: FontWeight.w900,
-                                  color: stColor,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w800,
+                                  color: color,
                                 ),
                               ),
                             ],
                           ),
                           const SizedBox(height: 6),
                           Container(
-                            height: 6,
+                            height: 7,
                             decoration: BoxDecoration(
                               color: isDark
                                   ? AppColors.darkBorder
@@ -1245,11 +1252,10 @@ class _BudgetHealthSection extends ConsumerWidget {
                             ),
                             child: FractionallySizedBox(
                               alignment: Alignment.centerLeft,
-                              widthFactor:
-                                  (item.spentPercentage / 100.0).clamp(0.0, 1.0),
+                              widthFactor: pct,
                               child: Container(
                                 decoration: BoxDecoration(
-                                  color: stColor,
+                                  color: color,
                                   borderRadius: BorderRadius.circular(99),
                                 ),
                               ),
@@ -1260,7 +1266,7 @@ class _BudgetHealthSection extends ConsumerWidget {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                '${CurrencyFormatter.formatCompact(item.spentAmount)} / ${CurrencyFormatter.formatCompact(item.limitAmount)}',
+                                'Đã chi: ${CurrencyFormatter.formatCompact(item.spentAmount)} / ${CurrencyFormatter.formatCompact(item.limitAmount)}',
                                 style: GoogleFonts.inter(
                                   fontSize: 10.5,
                                   color: isDark
@@ -1270,7 +1276,7 @@ class _BudgetHealthSection extends ConsumerWidget {
                               ),
                               Text(
                                 item.remainingAmount > 0
-                                    ? 'Còn lại: ${CurrencyFormatter.formatCompact(item.remainingAmount)}'
+                                    ? 'Còn: ${CurrencyFormatter.formatCompact(item.remainingAmount)}'
                                     : 'Vượt: ${CurrencyFormatter.formatCompact(item.spentAmount - item.limitAmount)}',
                                 style: GoogleFonts.inter(
                                   fontSize: 10.5,
@@ -1289,44 +1295,35 @@ class _BudgetHealthSection extends ConsumerWidget {
                 ),
               ),
             ],
-          );
+          ),
+        );
       },
     );
   }
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// PHÂN HỆ 4: SỔ NỢ & NGHĨA VỤ TÀI CHÍNH (DEBTS DASHBOARD)
+// TAB 5: SỔ NỢ & NGHĨA VỤ TÀI CHÍNH (DEBTS DASHBOARD)
 // ─────────────────────────────────────────────────────────────────────────────
-class _DebtsSection extends ConsumerWidget {
+class _DebtsTab extends ConsumerWidget {
   final bool isDark;
-  const _DebtsSection({required this.isDark});
+  const _DebtsTab({required this.isDark});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final debtsAsync = ref.watch(dashboardDebtsProvider);
 
     return debtsAsync.when(
-      loading: () => const Padding(
-        padding: EdgeInsets.symmetric(vertical: 24),
-        child: Center(child: CircularProgressIndicator()),
-      ),
+      loading: () => const Center(child: CircularProgressIndicator()),
       error: (e, _) => Center(child: Text('Lỗi tải dữ liệu: $e')),
       data: (debts) {
         final overdue = debts.overdueStats;
 
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            _SectionHeader(
-              isDark: isDark,
-              icon: Icons.account_balance_wallet_rounded,
-              title: 'SỔ NỢ & NGHĨA VỤ TÀI CHÍNH',
-              color: AppColors.orange,
-              actionText: 'Sổ nợ',
-              onAction: () => context.push(RoutePaths.loans),
-            ),
-            const SizedBox(height: 12),
+        return SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(16, 14, 16, 32),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
               // 1. Metric Cards
               Row(
                 children: [
@@ -1334,7 +1331,8 @@ class _DebtsSection extends ConsumerWidget {
                     child: _MetricCard(
                       isDark: isDark,
                       label: 'Phải thu',
-                      value: CurrencyFormatter.formatCompact(debts.totalReceivables),
+                      value: CurrencyFormatter.formatCompact(
+                          debts.totalReceivables),
                       color: AppColors.success,
                       icon: Icons.call_received_rounded,
                     ),
@@ -1344,7 +1342,8 @@ class _DebtsSection extends ConsumerWidget {
                     child: _MetricCard(
                       isDark: isDark,
                       label: 'Phải trả',
-                      value: CurrencyFormatter.formatCompact(debts.totalPayables),
+                      value: CurrencyFormatter.formatCompact(
+                          debts.totalPayables),
                       color: AppColors.danger,
                       icon: Icons.call_made_rounded,
                     ),
@@ -1354,8 +1353,11 @@ class _DebtsSection extends ConsumerWidget {
                     child: _MetricCard(
                       isDark: isDark,
                       label: 'Vị thế ròng',
-                      value: CurrencyFormatter.formatCompact(debts.netDebtPosition),
-                      color: debts.netDebtPosition >= 0 ? AppColors.primary : AppColors.danger,
+                      value: CurrencyFormatter.formatCompact(
+                          debts.netDebtPosition),
+                      color: debts.netDebtPosition >= 0
+                          ? AppColors.primary
+                          : AppColors.danger,
                       icon: Icons.account_balance_rounded,
                     ),
                   ),
@@ -1364,7 +1366,8 @@ class _DebtsSection extends ConsumerWidget {
               const SizedBox(height: 18),
 
               // 2. Cảnh báo quá hạn
-              if (overdue.overduePayableCount > 0 || overdue.overdueReceivableCount > 0)
+              if (overdue.overduePayableCount > 0 ||
+                  overdue.overdueReceivableCount > 0)
                 Container(
                   margin: const EdgeInsets.only(bottom: 18),
                   padding: const EdgeInsets.all(16),
@@ -1383,7 +1386,8 @@ class _DebtsSection extends ConsumerWidget {
                           color: AppColors.danger.withValues(alpha: 0.15),
                           shape: BoxShape.circle,
                         ),
-                        child: const Icon(Icons.warning_amber_rounded, color: AppColors.danger, size: 22),
+                        child: const Icon(Icons.warning_amber_rounded,
+                            color: AppColors.danger, size: 22),
                       ),
                       const SizedBox(width: 12),
                       Expanded(
@@ -1404,7 +1408,9 @@ class _DebtsSection extends ConsumerWidget {
                               style: GoogleFonts.inter(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w500,
-                                color: isDark ? AppColors.darkForeground : AppColors.lightForeground,
+                                color: isDark
+                                    ? AppColors.darkForeground
+                                    : AppColors.lightForeground,
                               ),
                             ),
                           ],
@@ -1426,7 +1432,9 @@ class _DebtsSection extends ConsumerWidget {
                             'Không có dữ liệu nợ đối tác',
                             style: GoogleFonts.inter(
                               fontSize: 12.5,
-                              color: isDark ? AppColors.darkMuted : AppColors.lightMuted,
+                              color: isDark
+                                  ? AppColors.darkMuted
+                                  : AppColors.lightMuted,
                             ),
                           ),
                         ),
@@ -1440,27 +1448,37 @@ class _DebtsSection extends ConsumerWidget {
                               children: [
                                 CircleAvatar(
                                   radius: 18,
-                                  backgroundColor: (isReceivable ? AppColors.success : AppColors.danger).withValues(alpha: 0.12),
+                                  backgroundColor: (isReceivable
+                                          ? AppColors.success
+                                          : AppColors.danger)
+                                      .withValues(alpha: 0.12),
                                   child: Text(
-                                    debtor.counterpartyName.isNotEmpty ? debtor.counterpartyName[0] : '?',
+                                    debtor.counterpartyName.isNotEmpty
+                                        ? debtor.counterpartyName[0]
+                                        : '?',
                                     style: GoogleFonts.inter(
                                       fontWeight: FontWeight.w800,
                                       fontSize: 13,
-                                      color: isReceivable ? AppColors.success : AppColors.danger,
+                                      color: isReceivable
+                                          ? AppColors.success
+                                          : AppColors.danger,
                                     ),
                                   ),
                                 ),
                                 const SizedBox(width: 12),
                                 Expanded(
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Text(
                                         debtor.counterpartyName,
                                         style: GoogleFonts.inter(
                                           fontSize: 13.5,
                                           fontWeight: FontWeight.w700,
-                                          color: isDark ? AppColors.darkForeground : AppColors.lightForeground,
+                                          color: isDark
+                                              ? AppColors.darkForeground
+                                              : AppColors.lightForeground,
                                         ),
                                       ),
                                       if (debtor.dueDate != null)
@@ -1468,8 +1486,14 @@ class _DebtsSection extends ConsumerWidget {
                                           'Hạn: ${debtor.dueDate} ${debtor.isOverdue ? "(${debtor.daysOverdue} ngày quá hạn)" : ""}',
                                           style: GoogleFonts.inter(
                                             fontSize: 11,
-                                            fontWeight: debtor.isOverdue ? FontWeight.w700 : FontWeight.w500,
-                                            color: debtor.isOverdue ? AppColors.danger : (isDark ? AppColors.darkMuted : AppColors.lightMuted),
+                                            fontWeight: debtor.isOverdue
+                                                ? FontWeight.w700
+                                                : FontWeight.w500,
+                                            color: debtor.isOverdue
+                                                ? AppColors.danger
+                                                : (isDark
+                                                    ? AppColors.darkMuted
+                                                    : AppColors.lightMuted),
                                           ),
                                         ),
                                     ],
@@ -1483,7 +1507,9 @@ class _DebtsSection extends ConsumerWidget {
                                       style: GoogleFonts.outfit(
                                         fontSize: 14,
                                         fontWeight: FontWeight.w800,
-                                        color: isReceivable ? AppColors.success : AppColors.danger,
+                                        color: isReceivable
+                                            ? AppColors.success
+                                            : AppColors.danger,
                                       ),
                                     ),
                                     Text(
@@ -1491,7 +1517,9 @@ class _DebtsSection extends ConsumerWidget {
                                       style: GoogleFonts.inter(
                                         fontSize: 10.5,
                                         fontWeight: FontWeight.w600,
-                                        color: isReceivable ? AppColors.success : AppColors.danger,
+                                        color: isReceivable
+                                            ? AppColors.success
+                                            : AppColors.danger,
                                       ),
                                     ),
                                   ],
@@ -1524,7 +1552,9 @@ class _DebtsSection extends ConsumerWidget {
                                   style: GoogleFonts.inter(
                                     fontSize: 13.5,
                                     fontWeight: FontWeight.w700,
-                                    color: isDark ? AppColors.darkForeground : AppColors.lightForeground,
+                                    color: isDark
+                                        ? AppColors.darkForeground
+                                        : AppColors.lightForeground,
                                   ),
                                 ),
                                 Text(
@@ -1541,12 +1571,16 @@ class _DebtsSection extends ConsumerWidget {
                             Container(
                               height: 8,
                               decoration: BoxDecoration(
-                                color: isDark ? AppColors.darkBorder : const Color(0xFFF1F5F9),
+                                color: isDark
+                                    ? AppColors.darkBorder
+                                    : const Color(0xFFF1F5F9),
                                 borderRadius: BorderRadius.circular(99),
                               ),
                               child: FractionallySizedBox(
                                 alignment: Alignment.centerLeft,
-                                widthFactor: (inst.progressPercentage / 100.0).clamp(0.0, 1.0),
+                                widthFactor:
+                                    (inst.progressPercentage / 100.0)
+                                        .clamp(0.0, 1.0),
                                 child: Container(
                                   decoration: BoxDecoration(
                                     color: AppColors.primary,
@@ -1557,13 +1591,16 @@ class _DebtsSection extends ConsumerWidget {
                             ),
                             const SizedBox(height: 6),
                             Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              mainAxisAlignment:
+                                  MainAxisAlignment.spaceBetween,
                               children: [
                                 Text(
                                   'Đã trả: ${CurrencyFormatter.formatCompact(inst.paidAmount)} / ${CurrencyFormatter.formatCompact(inst.totalPrincipal)}',
                                   style: GoogleFonts.inter(
                                     fontSize: 11,
-                                    color: isDark ? AppColors.darkMuted : AppColors.lightMuted,
+                                    color: isDark
+                                        ? AppColors.darkMuted
+                                        : AppColors.lightMuted,
                                   ),
                                 ),
                                 if (inst.nextDueDate != null)
@@ -1584,44 +1621,35 @@ class _DebtsSection extends ConsumerWidget {
                   ),
                 ),
             ],
-          );
+          ),
+        );
       },
     );
   }
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// PHÂN HỆ 5: LỊCH TÀI CHÍNH & HÓA ĐƠN ĐỊNH KỲ
+// TAB 6: LỊCH TÀI CHÍNH & HÓA ĐƠN ĐỊNH KỲ
 // ─────────────────────────────────────────────────────────────────────────────
-class _CalendarSection extends ConsumerWidget {
+class _CalendarTab extends ConsumerWidget {
   final bool isDark;
-  const _CalendarSection({required this.isDark});
+  const _CalendarTab({required this.isDark});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final calAsync = ref.watch(dashboardCalendarProvider);
 
     return calAsync.when(
-      loading: () => const Padding(
-        padding: EdgeInsets.symmetric(vertical: 24),
-        child: Center(child: CircularProgressIndicator()),
-      ),
+      loading: () => const Center(child: CircularProgressIndicator()),
       error: (e, _) => Center(child: Text('Lỗi tải dữ liệu: $e')),
       data: (cal) {
         final bills = cal.upcomingBillsSummary.bills;
 
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            _SectionHeader(
-              isDark: isDark,
-              icon: Icons.calendar_month_rounded,
-              title: 'LỊCH TÀI CHÍNH & HÓA ĐƠN ĐỊNH KỲ',
-              color: const Color(0xFF6366F1),
-              actionText: 'Định kỳ',
-              onAction: () => context.push(RoutePaths.recurringTransactions),
-            ),
-            const SizedBox(height: 12),
+        return SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(16, 14, 16, 32),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
               // Hóa đơn 30 ngày tới Summary
               Container(
                 padding: const EdgeInsets.all(18),
@@ -1643,32 +1671,46 @@ class _CalendarSection extends ConsumerWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      'HÓA ĐƠN SẮP TỚI (30 NGÀY TỚI)',
-                      style: GoogleFonts.inter(
-                        fontSize: 10.5,
-                        fontWeight: FontWeight.w800,
-                        letterSpacing: 0.8,
-                        color: Colors.white70,
-                      ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'DỰ PHÓNG HÓA ĐƠN 30 NGÀY TỚI',
+                          style: GoogleFonts.inter(
+                            fontSize: 10.5,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: 0.8,
+                            color: Colors.white70,
+                          ),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 3,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withValues(alpha: 0.2),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Text(
+                            '${cal.upcomingBillsSummary.totalBillsCount} hóa đơn',
+                            style: GoogleFonts.inter(
+                              fontSize: 10.5,
+                              fontWeight: FontWeight.w700,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                     const SizedBox(height: 8),
                     Text(
                       CurrencyFormatter.format(
-                        cal.upcomingBillsSummary.totalUpcoming30Days,
-                      ),
+                          cal.upcomingBillsSummary.totalProjectedAmount),
                       style: GoogleFonts.outfit(
                         fontSize: 26,
                         fontWeight: FontWeight.w900,
                         color: Colors.white,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      'Tiền mặt khả dụng dự kiến còn: ${CurrencyFormatter.format(cal.upcomingBillsSummary.projectedDisposableCash)}',
-                      style: GoogleFonts.inter(
-                        fontSize: 12,
-                        color: Colors.white.withValues(alpha: 0.85),
                       ),
                     ),
                   ],
@@ -1676,148 +1718,132 @@ class _CalendarSection extends ConsumerWidget {
               ),
               const SizedBox(height: 18),
 
-              // Danh sách hóa đơn
+              // Danh sách hóa đơn sắp tới
               _SectionContainer(
                 isDark: isDark,
-                title: 'DANH SÁCH HÓA ĐƠN CẦN THANH TOÁN',
-                child: Column(
-                  children: bills.map((b) {
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 8),
-                      child: Row(
-                        children: [
-                          Container(
-                            width: 36,
-                            height: 36,
-                            decoration: BoxDecoration(
-                              color: const Color(0xFF6366F1).withValues(alpha: 0.12),
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            alignment: Alignment.center,
-                            child: const Icon(
-                              Icons.receipt_long_rounded,
-                              size: 18,
-                              color: Color(0xFF6366F1),
+                title: 'HÓA ĐƠN ĐỊNH KỲ SẮP ĐẾN HẠN',
+                child: bills.isEmpty
+                    ? Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        child: Center(
+                          child: Text(
+                            'Không có hóa đơn nào sắp tới',
+                            style: GoogleFonts.inter(
+                              fontSize: 12.5,
+                              color: isDark
+                                  ? AppColors.darkMuted
+                                  : AppColors.lightMuted,
                             ),
                           ),
-                          const SizedBox(width: 10),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                        ),
+                      )
+                    : Column(
+                        children: bills.map((bill) {
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 8),
+                            child: Row(
                               children: [
+                                Container(
+                                  width: 36,
+                                  height: 36,
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFF6366F1)
+                                        .withValues(alpha: 0.12),
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  alignment: Alignment.center,
+                                  child: const Icon(
+                                    Icons.receipt_long_rounded,
+                                    size: 18,
+                                    color: Color(0xFF6366F1),
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        bill.name,
+                                        style: GoogleFonts.inter(
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.w700,
+                                          color: isDark
+                                              ? AppColors.darkForeground
+                                              : AppColors.lightForeground,
+                                        ),
+                                      ),
+                                      Text(
+                                        'Hạn: ${bill.nextRunDate} • Còn ${bill.daysRemaining} ngày',
+                                        style: GoogleFonts.inter(
+                                          fontSize: 11,
+                                          fontWeight: FontWeight.w600,
+                                          color: bill.daysRemaining <= 3
+                                              ? AppColors.danger
+                                              : (isDark
+                                                  ? AppColors.darkMuted
+                                                  : AppColors.lightMuted),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
                                 Text(
-                                  b.name,
-                                  style: GoogleFonts.inter(
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.w700,
+                                  '-${CurrencyFormatter.format(bill.amount)}',
+                                  style: GoogleFonts.outfit(
+                                    fontSize: 13.5,
+                                    fontWeight: FontWeight.w800,
                                     color: isDark
                                         ? AppColors.darkForeground
                                         : AppColors.lightForeground,
                                   ),
                                 ),
-                                Text(
-                                  'Ngày chạy: ${b.nextRunDate} (còn ${b.daysRemaining} ngày)',
-                                  style: GoogleFonts.inter(
-                                    fontSize: 11,
-                                    color: isDark
-                                        ? AppColors.darkMuted
-                                        : AppColors.lightMuted,
-                                  ),
-                                ),
                               ],
                             ),
-                          ),
-                          Text(
-                            CurrencyFormatter.format(b.amount),
-                            style: GoogleFonts.outfit(
-                              fontSize: 13.5,
-                              fontWeight: FontWeight.w800,
-                              color: AppColors.danger,
-                            ),
-                          ),
-                        ],
+                          );
+                        }).toList(),
                       ),
-                    );
-                  }).toList(),
-                ),
               ),
               const SizedBox(height: 18),
 
-              // Lịch theo ngày
-              _SectionContainer(
-                isDark: isDark,
-                title: 'LỊCH CHI TIÊU CÁC NGÀY TRONG THÁNG',
-                child: Column(
-                  children: cal.days.map((d) {
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 6),
-                      child: Row(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 4,
+              // Cảnh báo đột biến chi tiêu
+              if (cal.spendingSpikes.isNotEmpty)
+                _SectionContainer(
+                  isDark: isDark,
+                  title: 'CẢNH BÁO ĐỘT BIẾN CHI TIÊU',
+                  child: Column(
+                    children: cal.spendingSpikes.map((spike) {
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 6),
+                        child: Row(
+                          children: [
+                            const Icon(
+                              Icons.warning_amber_rounded,
+                              size: 18,
+                              color: AppColors.orange,
                             ),
-                            decoration: BoxDecoration(
-                              color: d.hasSpikeExpense
-                                  ? AppColors.danger.withValues(alpha: 0.12)
-                                  : (isDark
-                                      ? AppColors.darkBackground
-                                      : const Color(0xFFF1F5F9)),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Text(
-                              d.date,
-                              style: GoogleFonts.inter(
-                                fontSize: 11,
-                                fontWeight: FontWeight.w700,
-                                color: d.hasSpikeExpense
-                                    ? AppColors.danger
-                                    : (isDark
-                                        ? AppColors.darkForeground
-                                        : AppColors.lightForeground),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 10),
-                          if (d.hasSpikeExpense)
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 6,
-                                vertical: 2,
-                              ),
-                              decoration: BoxDecoration(
-                                color: AppColors.danger.withValues(alpha: 0.1),
-                                borderRadius: BorderRadius.circular(4),
-                              ),
+                            const SizedBox(width: 8),
+                            Expanded(
                               child: Text(
-                                '⚡ Đột biến',
+                                'Ngày ${spike.date}: Chi tiêu đột biến ${CurrencyFormatter.format(spike.amount)} (+${spike.deviationPercentage.toStringAsFixed(0)}% so với trung bình)',
                                 style: GoogleFonts.inter(
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.w700,
-                                  color: AppColors.danger,
+                                  fontSize: 12,
+                                  color: isDark
+                                      ? AppColors.darkForeground
+                                      : AppColors.lightForeground,
                                 ),
                               ),
                             ),
-                          const Spacer(),
-                          Text(
-                            '-${CurrencyFormatter.formatCompact(d.totalExpense)}',
-                            style: GoogleFonts.outfit(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w800,
-                              color: isDark
-                                  ? AppColors.darkForeground
-                                  : AppColors.lightForeground,
-                            ),
-                          ),
-                        ],
-                      ),
-                    );
-                  }).toList(),
+                          ],
+                        ),
+                      );
+                    }).toList(),
+                  ),
                 ),
-              ),
             ],
-          );
+          ),
+        );
       },
     );
   }

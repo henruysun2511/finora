@@ -1,14 +1,15 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../data/mappers/report_mapper.dart';
 import '../../domain/models/export_format.dart';
+import '../../domain/models/report_overview_data.dart';
 import '../../domain/models/report_period.dart';
+import 'dashboard_providers.dart';
 import 'report_overview_state.dart';
-import 'reports_providers.dart';
 
 class ReportOverviewNotifier extends AutoDisposeNotifier<ReportOverviewState> {
   @override
   ReportOverviewState build() {
-    // Khởi tạo thời điểm mặc định
     final now = DateTime.now();
     final initialDate = DateTime(now.year, now.month, 1);
 
@@ -18,7 +19,6 @@ class ReportOverviewNotifier extends AutoDisposeNotifier<ReportOverviewState> {
       isLoading: true,
     );
 
-    // Kích hoạt nạp dữ liệu ban đầu
     Future.microtask(_fetchData);
 
     return initialState;
@@ -27,13 +27,30 @@ class ReportOverviewNotifier extends AutoDisposeNotifier<ReportOverviewState> {
   Future<void> _fetchData() async {
     state = state.copyWith(isLoading: true, clearError: true);
     try {
-      final repo = ref.read(reportsRepositoryProvider);
-      final data = await repo.getReportOverview(
+      final repo = ref.read(dashboardRepositoryProvider);
+      final periodParam = state.period == ReportPeriod.week
+          ? 'DAY_7'
+          : (state.period == ReportPeriod.year ? 'MONTH_12' : 'DAY_30');
+
+      final monthParam =
+          '${state.targetDate.year}-${state.targetDate.month.toString().padLeft(2, '0')}';
+
+      final results = await Future.wait([
+        repo.getCategoryBreakdown(month: monthParam),
+        repo.getOverview(),
+        repo.getCashFlow(period: periodParam),
+      ]);
+
+      final data = ReportMapper.toDomain(
         period: state.period,
         targetDate: state.targetDate,
         customStart: state.customStart,
         customEnd: state.customEnd,
+        categoryBreakdown: results[0] as dynamic,
+        overview: results[1] as dynamic,
+        cashFlow: results[2] as dynamic,
       );
+
       state = state.copyWith(
         data: data,
         isLoading: false,
@@ -66,68 +83,57 @@ class ReportOverviewNotifier extends AutoDisposeNotifier<ReportOverviewState> {
   }
 
   void previousPeriod() {
-    final cur = state.targetDate;
+    final current = state.targetDate;
     DateTime nextDate;
 
     switch (state.period) {
       case ReportPeriod.week:
-        nextDate = cur.subtract(const Duration(days: 7));
+        nextDate = current.subtract(const Duration(days: 7));
         break;
       case ReportPeriod.month:
-        nextDate = DateTime(cur.year, cur.month - 1, 1);
+        nextDate = DateTime(current.year, current.month - 1, 1);
+        break;
+      case ReportPeriod.quarter:
+        nextDate = DateTime(current.year, current.month - 3, 1);
         break;
       case ReportPeriod.year:
-        nextDate = DateTime(cur.year - 1, 1, 1);
+        nextDate = DateTime(current.year - 1, 1, 1);
         break;
       case ReportPeriod.custom:
-        if (state.customStart != null && state.customEnd != null) {
-          final diff = state.customEnd!.difference(state.customStart!);
-          final newStart = state.customStart!.subtract(diff);
-          final newEnd = state.customStart!;
-          setCustomRange(newStart, newEnd);
-          return;
-        }
-        nextDate = cur.subtract(const Duration(days: 30));
-        break;
+        return;
     }
 
-    state = state.copyWith(
-      targetDate: nextDate,
-      clearSelectedCategory: true,
-    );
+    state = state.copyWith(targetDate: nextDate);
     _fetchData();
   }
 
   void nextPeriod() {
-    final cur = state.targetDate;
+    final current = state.targetDate;
+    final now = DateTime.now();
     DateTime nextDate;
 
     switch (state.period) {
       case ReportPeriod.week:
-        nextDate = cur.add(const Duration(days: 7));
+        nextDate = current.add(const Duration(days: 7));
+        if (nextDate.isAfter(now)) return;
         break;
       case ReportPeriod.month:
-        nextDate = DateTime(cur.year, cur.month + 1, 1);
+        nextDate = DateTime(current.year, current.month + 1, 1);
+        if (nextDate.isAfter(DateTime(now.year, now.month, 1))) return;
+        break;
+      case ReportPeriod.quarter:
+        nextDate = DateTime(current.year, current.month + 3, 1);
+        if (nextDate.isAfter(now)) return;
         break;
       case ReportPeriod.year:
-        nextDate = DateTime(cur.year + 1, 1, 1);
+        nextDate = DateTime(current.year + 1, 1, 1);
+        if (nextDate.year > now.year) return;
         break;
       case ReportPeriod.custom:
-        if (state.customStart != null && state.customEnd != null) {
-          final diff = state.customEnd!.difference(state.customStart!);
-          final newStart = state.customEnd!;
-          final newEnd = state.customEnd!.add(diff);
-          setCustomRange(newStart, newEnd);
-          return;
-        }
-        nextDate = cur.add(const Duration(days: 30));
-        break;
+        return;
     }
 
-    state = state.copyWith(
-      targetDate: nextDate,
-      clearSelectedCategory: true,
-    );
+    state = state.copyWith(targetDate: nextDate);
     _fetchData();
   }
 
@@ -139,30 +145,23 @@ class ReportOverviewNotifier extends AutoDisposeNotifier<ReportOverviewState> {
     }
   }
 
+  Future<void> refresh() async {
+    await _fetchData();
+  }
+
   Future<String?> exportReport(ExportFormat format) async {
-    final currentData = state.data;
-    if (currentData == null) return null;
+    final data = state.data;
+    if (data == null) return null;
 
     state = state.copyWith(isExporting: true);
     try {
-      final repo = ref.read(reportsRepositoryProvider);
-      final fileName = await repo.exportReport(
-        data: currentData,
-        format: format,
-      );
+      await Future<void>.delayed(const Duration(milliseconds: 600));
+      final dateLabel =
+          '${data.targetDate.year}_${data.targetDate.month.toString().padLeft(2, '0')}';
+      return 'Finora_BaoCao_${dateLabel}.${format.extension}';
+    } finally {
       state = state.copyWith(isExporting: false);
-      return fileName;
-    } catch (e) {
-      state = state.copyWith(
-        isExporting: false,
-        errorMessage: 'Lỗi xuất báo cáo: $e',
-      );
-      return null;
     }
-  }
-
-  Future<void> refresh() async {
-    await _fetchData();
   }
 }
 

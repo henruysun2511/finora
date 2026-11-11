@@ -9,10 +9,6 @@ import '../../../../core/widgets/mascot_banner.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
 import '../../../dashboard/domain/models/dashboard_overview_model.dart';
 import '../../../dashboard/presentation/providers/dashboard_providers.dart';
-import '../widgets/dashboard_analytics_section.dart';
-import '../widgets/dashboard_budget_section.dart';
-import '../widgets/dashboard_loans_section.dart';
-import '../widgets/dashboard_recurring_section.dart';
 import '../widgets/home_accounts_section.dart';
 import '../widgets/home_header.dart';
 import '../widgets/home_mascot_section.dart';
@@ -149,22 +145,6 @@ class HomeScreen extends ConsumerWidget {
 
                       // ── Giao dịch gần đây (GET /dashboard/overview) ────
                       const RecentTransactionsSection(),
-                      const SizedBox(height: 22),
-
-                      // ── Ngân sách & Burn-rate (GET /dashboard/budget-health)
-                      const DashboardBudgetSection(),
-                      const SizedBox(height: 22),
-
-                      // ── Sổ nợ & Nghĩa vụ (GET /dashboard/debts) ────────
-                      const DashboardLoansSection(),
-                      const SizedBox(height: 22),
-
-                      // ── Báo cáo & Dòng tiền (GET /dashboard/cash-flow) ──
-                      const DashboardAnalyticsSection(),
-                      const SizedBox(height: 22),
-
-                      // ── Hóa đơn & Định kỳ sắp tới (GET /dashboard/calendar)
-                      const DashboardRecurringSection(),
                       const SizedBox(height: 22),
 
                       // ── Linh vật AI đồng hành ──────────────────────────

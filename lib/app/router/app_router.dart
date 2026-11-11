@@ -7,7 +7,6 @@ import '../../features/ai_chat/presentation/screens/ai_chat_screen.dart';
 import '../../features/dashboard/presentation/screens/dashboard_screen.dart';
 import '../../features/dashboard/presentation/screens/cashflow_report_screen.dart';
 import '../../features/dashboard/presentation/screens/category_report_screen.dart';
-import '../../features/reports/presentation/screens/reports_overview_screen.dart';
 import '../../features/exchange_rates/presentation/screens/exchange_rates_screen.dart';
 import '../../features/auth/presentation/providers/auth_provider.dart';
 import '../../features/auth/presentation/screens/forgot_password_screen.dart';
@@ -435,7 +434,7 @@ GoRouter appRouter(AppRouterRef ref) {
         parentNavigatorKey: _rootNavigatorKey,
         path: RoutePaths.reportsOverview,
         name: RouteNames.reportsOverview,
-        builder: (context, state) => const ReportsOverviewScreen(),
+        builder: (context, state) => const DashboardScreen(),
       ),
       GoRoute(
         parentNavigatorKey: _rootNavigatorKey,
