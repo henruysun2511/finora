@@ -7,6 +7,7 @@ import '../../../../app/router/route_names.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/utils/currency_formatter.dart';
 import '../../../../core/widgets/lucide_icon.dart';
+import '../../../../core/widgets/mascot/mascot_widget.dart';
 import '../../../dashboard/domain/models/budget_health_model.dart';
 import '../../../dashboard/domain/models/dashboard_overview_model.dart';
 import '../../../dashboard/presentation/providers/dashboard_providers.dart';
@@ -490,17 +491,17 @@ class HomeBudgetHealthCard extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
-                width: 32,
-                height: 32,
+                width: 38,
+                height: 38,
                 decoration: BoxDecoration(
-                  color: AppColors.primary,
-                  borderRadius: BorderRadius.circular(9),
+                  color: AppColors.primary.withValues(alpha: isDark ? 0.2 : 0.12),
+                  borderRadius: BorderRadius.circular(12),
                 ),
-                child: const Center(
-                  child: Text(
-                    '🤖',
-                    style: TextStyle(fontSize: 16),
-                  ),
+                alignment: Alignment.center,
+                child: const MascotWidget(
+                  mascotId: 'nora',
+                  size: 32,
+                  float: false,
                 ),
               ),
               const SizedBox(width: 10),
