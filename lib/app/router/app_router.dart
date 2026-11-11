@@ -192,13 +192,13 @@ GoRouter appRouter(AppRouterRef ref) {
             ],
           ),
 
-          // Branch 1: Ngân sách & Sổ GD (Budgets)
+          // Branch 1: Dashboard Báo cáo & Phân tích (Analytics / Dashboard)
           StatefulShellBranch(
             routes: [
               GoRoute(
-                path: RoutePaths.budgets,
-                name: RouteNames.budgets,
-                builder: (context, state) => const BudgetsScreen(),
+                path: RoutePaths.analytics,
+                name: RouteNames.analytics,
+                builder: (context, state) => const AnalyticsScreen(),
               ),
             ],
           ),
@@ -342,6 +342,12 @@ GoRouter appRouter(AppRouterRef ref) {
       // ==========================================
       GoRoute(
         parentNavigatorKey: _rootNavigatorKey,
+        path: RoutePaths.budgets,
+        name: RouteNames.budgets,
+        builder: (context, state) => const BudgetsScreen(),
+      ),
+      GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
         path: RoutePaths.createBudget,
         name: RouteNames.createBudget,
         builder: (context, state) => const BudgetFormScreen(),
@@ -430,12 +436,6 @@ GoRouter appRouter(AppRouterRef ref) {
         path: RoutePaths.reportsOverview,
         name: RouteNames.reportsOverview,
         builder: (context, state) => const ReportsOverviewScreen(),
-      ),
-      GoRoute(
-        parentNavigatorKey: _rootNavigatorKey,
-        path: RoutePaths.analytics,
-        name: RouteNames.analytics,
-        builder: (context, state) => const AnalyticsScreen(),
       ),
       GoRoute(
         parentNavigatorKey: _rootNavigatorKey,

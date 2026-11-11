@@ -47,45 +47,66 @@ class PageHeader extends StatelessWidget implements PreferredSizeWidget {
 
     if (!isSubPage) {
       // ── 1. Root Page Header (.page-hdr) ──
-      return Padding(
-        padding: const EdgeInsets.only(bottom: 16),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    title,
-                    style: GoogleFonts.inter(
-                      fontSize: 22,
-                      fontWeight: FontWeight.w900,
-                      letterSpacing: -0.5,
-                      color: isDark
-                          ? AppColors.darkForeground
-                          : AppColors.lightForeground,
-                    ),
+      final bgColor = backgroundColor ??
+          (isDark ? AppColors.darkSurface : Colors.white);
+      return Container(
+        color: bgColor,
+        decoration: BoxDecoration(
+          color: bgColor,
+          border: showBottomBorder
+              ? Border(
+                  bottom: BorderSide(
+                    color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
+                    width: 0.8,
                   ),
-                  if (subtitle != null) ...[
-                    const SizedBox(height: 2),
-                    Text(
-                      subtitle!,
-                      style: GoogleFonts.inter(
-                        fontSize: 12,
-                        color:
-                            isDark ? AppColors.darkMuted : AppColors.lightMuted,
-                        fontWeight: FontWeight.w500,
+                )
+              : null,
+        ),
+        child: SafeArea(
+          bottom: false,
+          child: Container(
+            height: 64,
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        title,
+                        style: GoogleFonts.inter(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w900,
+                          letterSpacing: -0.5,
+                          color: isDark
+                              ? AppColors.darkForeground
+                              : AppColors.lightForeground,
+                        ),
                       ),
-                    ),
-                  ],
-                ],
-              ),
+                      if (subtitle != null) ...[
+                        const SizedBox(height: 2),
+                        Text(
+                          subtitle!,
+                          style: GoogleFonts.inter(
+                            fontSize: 12,
+                            color: isDark
+                                ? AppColors.darkMuted
+                                : AppColors.lightMuted,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+                if (action != null) action!,
+              ],
             ),
-            if (action != null) action!,
-          ],
+          ),
         ),
       );
     }

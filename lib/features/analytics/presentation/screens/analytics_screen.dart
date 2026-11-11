@@ -39,7 +39,7 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen>
     return Scaffold(
       backgroundColor:
           isDark ? AppColors.darkBackground : AppColors.lightBackground,
-      appBar: PageHeader.subPage(
+      appBar: PageHeader.page(
         title: 'Báo cáo & Phân tích',
         subtitle: 'Bức tranh chi tiết toàn cảnh tài chính',
         action: Row(
