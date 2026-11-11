@@ -101,4 +101,5 @@ class ReportOverviewData {
   double get totalIncome => statMetrics.totalIncome;
   double get netSavings => statMetrics.netSavings;
   double get savingsRate => statMetrics.savingsRate;
+  ReportStatMetrics get summary => statMetrics;
 }

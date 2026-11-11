@@ -6,6 +6,12 @@ class BurnRateMetricsModel {
   final bool willOverspend;
   final double estimatedOverspendAmount;
 
+  String get aiPredictionText => willOverspend
+      ? 'Cảnh báo: Dự kiến vượt ngân sách ${estimatedOverspendAmount > 0 ? (estimatedOverspendAmount / 1000000).toStringAsFixed(1) + "M đ" : ""} vào cuối tháng.'
+      : 'Tình trạng tốt: Tốc độ chi tiêu hiện tại đang nằm trong ngưỡng an toàn so với định mức ngân sách.';
+
+  int get predictedRunwayDays => projectedRunwayDate != null ? 15 : 30;
+
   const BurnRateMetricsModel({
     required this.actualDailyBurnRate,
     required this.recommendedDailyBurnRate,
@@ -75,6 +81,8 @@ class BudgetHealthModel {
   final double spentPercentage;
   final BurnRateMetricsModel burnRateMetrics;
   final List<CategoryBudgetProgressModel> categoryBudgets;
+
+  List<CategoryBudgetProgressModel> get budgets => categoryBudgets;
 
   const BudgetHealthModel({
     required this.month,

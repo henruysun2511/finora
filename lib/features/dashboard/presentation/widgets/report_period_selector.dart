@@ -36,6 +36,9 @@ class ReportPeriodSelector extends StatelessWidget {
         return 'Tuần ${DateFormat('dd/MM').format(startOfWeek)} - ${DateFormat('dd/MM/yyyy').format(endOfWeek)}';
       case ReportPeriod.month:
         return 'Tháng ${targetDate.month}, ${targetDate.year}';
+      case ReportPeriod.quarter:
+        final quarterNum = ((targetDate.month - 1) ~/ 3) + 1;
+        return 'Quý $quarterNum, ${targetDate.year}';
       case ReportPeriod.year:
         return 'Năm ${targetDate.year}';
       case ReportPeriod.custom:

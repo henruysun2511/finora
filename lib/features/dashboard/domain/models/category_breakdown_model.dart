@@ -138,6 +138,8 @@ class CategoryBreakdownModel {
   final List<CategoryBreakdownItemModel> categories;
   final List<TopSpendingItemModel> topSpendingItems;
 
+  List<TopSpendingItemModel> get topExpenses => topSpendingItems;
+
   const CategoryBreakdownModel({
     required this.month,
     required this.type,

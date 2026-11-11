@@ -476,8 +476,7 @@ class _OverviewTab extends ConsumerWidget {
           else if (state.data != null) ...[
             // 2. Lưới 4 Thống kê Chỉ số Vàng
             ReportStatGrid(
-              summary: state.data!.summary,
-              isDark: isDark,
+              metrics: state.data!.summary,
             ),
             const SizedBox(height: 20),
 
@@ -485,7 +484,7 @@ class _OverviewTab extends ConsumerWidget {
             if (state.data!.slices.isNotEmpty)
               ReportDonutChart(
                 slices: state.data!.slices,
-                totalExpense: state.data!.summary.totalExpense,
+                totalExpense: state.data!.totalExpense,
                 selectedCategoryId: state.selectedCategoryId,
                 onSliceSelected: notifier.selectCategory,
               ),
@@ -495,8 +494,7 @@ class _OverviewTab extends ConsumerWidget {
             ReportCategoryBreakdownList(
               categories: state.data!.categories,
               selectedCategoryId: state.selectedCategoryId,
-              onCategorySelected: notifier.selectCategory,
-              isDark: isDark,
+              onCategoryTap: notifier.selectCategory,
             ),
           ],
         ],
