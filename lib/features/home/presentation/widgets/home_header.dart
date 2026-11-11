@@ -190,7 +190,6 @@ class HomeHeader extends ConsumerWidget {
               onTap: () => context.push(RoutePaths.analytics),
             ),
           ),
-          ),
         ],
       ),
     );
