@@ -11,6 +11,7 @@ import '../../../../core/widgets/lucide_icon.dart';
 import '../../../dashboard/domain/models/calendar_dashboard_model.dart';
 import '../../../dashboard/domain/models/dashboard_overview_model.dart';
 import '../../../dashboard/presentation/providers/dashboard_providers.dart';
+import '../../../transactions/presentation/providers/transaction_list_provider.dart';
 import 'section_header.dart';
 
 /// Khối Lịch ảnh chi tiêu trên Trang chủ (Photo Expense Calendar)
@@ -481,7 +482,7 @@ class _HomePhotoCalendarSectionState
                 overflow: TextOverflow.ellipsis,
               ),
             ),
-            if (hasExpense)
+            if (hasExpense) ...[
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
                 decoration: BoxDecoration(
@@ -497,6 +498,51 @@ class _HomePhotoCalendarSectionState
                   ),
                 ),
               ),
+              const SizedBox(width: 8),
+              Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  onTap: () => _openTransactionDetailModal(
+                    context: context,
+                    dateStr: formattedDate,
+                    dayItem: dayItem,
+                    dayNum: dayNum,
+                    isDark: isDark,
+                  ),
+                  borderRadius: BorderRadius.circular(8),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 8, vertical: 3.5),
+                    decoration: BoxDecoration(
+                      color: AppColors.primary.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(
+                        color: AppColors.primary.withValues(alpha: 0.25),
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          'Xem chi tiết',
+                          style: GoogleFonts.inter(
+                            fontSize: 10.5,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.primary,
+                          ),
+                        ),
+                        const SizedBox(width: 2),
+                        const Icon(
+                          Icons.chevron_right_rounded,
+                          size: 13,
+                          color: AppColors.primary,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ],
         ),
         const SizedBox(height: 10),
@@ -508,6 +554,14 @@ class _HomePhotoCalendarSectionState
             name: 'Ăn uống',
             meta: 'bữa chính · Tiền mặt',
             amount: -dayItem.totalExpense * 0.65,
+            onTap: () => _openTransactionDetailModal(
+              context: context,
+              dateStr: formattedDate,
+              dayItem: dayItem,
+              dayNum: dayNum,
+              isDark: isDark,
+              initialIndex: 0,
+            ),
           ),
           if (dayItem.transactionCount > 1) ...[
             const SizedBox(height: 8),
@@ -517,6 +571,14 @@ class _HomePhotoCalendarSectionState
               name: 'Cà phê & Đồ uống',
               meta: 'Highlands Coffee · MoMo',
               amount: -dayItem.totalExpense * 0.35,
+              onTap: () => _openTransactionDetailModal(
+                context: context,
+                dateStr: formattedDate,
+                dayItem: dayItem,
+                dayNum: dayNum,
+                isDark: isDark,
+                initialIndex: 1,
+              ),
             ),
           ],
         ] else ...[
@@ -552,6 +614,94 @@ class _HomePhotoCalendarSectionState
           ),
         ],
       ],
+    );
+  }
+
+  void _openTransactionDetailModal({
+    required BuildContext context,
+    required String dateStr,
+    required CalendarDayItemModel? dayItem,
+    required int dayNum,
+    required bool isDark,
+    int initialIndex = 0,
+  }) {
+    if (dayItem == null) return;
+
+    final dailySummary = ref.read(dailyGridProvider).value;
+    final List<_DetailTxEntry> entries = [];
+
+    if (dailySummary != null) {
+      for (final g in dailySummary.dailyGroups) {
+        if (g.date.day == dayNum && g.date.month == _currentMonth.month) {
+          for (final tx in g.transactions) {
+            entries.add(
+              _DetailTxEntry(
+                title: tx.name.isNotEmpty
+                    ? tx.name
+                    : (tx.categoryName ?? 'Chi tiêu'),
+                category: tx.categoryName ?? 'Chi tiêu',
+                categoryIcon: tx.categoryIcon ?? 'receipt',
+                account: tx.accountName ?? 'Ví chính',
+                time:
+                    '${tx.transactionDate.hour.toString().padLeft(2, '0')}:${tx.transactionDate.minute.toString().padLeft(2, '0')}',
+                amount: tx.isExpense ? -tx.amount : tx.amount,
+                note: tx.note,
+                photoUrl: tx.photoUrl,
+              ),
+            );
+          }
+          break;
+        }
+      }
+    }
+
+    if (entries.isEmpty) {
+      final total =
+          dayItem.totalExpense > 0 ? dayItem.totalExpense : 155000.0;
+      final p1 = dayItem.highlightPhotoUrl ??
+          'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=700&auto=format&fit=crop';
+      const p2 =
+          'https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=700&auto=format&fit=crop';
+
+      entries.add(
+        _DetailTxEntry(
+          title: 'Ăn uống',
+          category: 'Ăn uống & Nhà hàng',
+          categoryIcon: 'utensils',
+          account: 'Tiền mặt',
+          time: '12:30',
+          amount: -total * 0.65,
+          note: 'Bữa trưa chính cùng đồng nghiệp dự án FINORA',
+          photoUrl: p1,
+        ),
+      );
+
+      if (dayItem.transactionCount > 1) {
+        entries.add(
+          _DetailTxEntry(
+            title: 'Cà phê & Đồ uống',
+            category: 'Cà phê & Giải khát',
+            categoryIcon: 'coffee',
+            account: 'Ví MoMo',
+            time: '14:45',
+            amount: -total * 0.35,
+            note: 'Highlands Coffee - 2 Ly Phin Sữa Đá Cỡ Vừa',
+            photoUrl: p2,
+          ),
+        );
+      }
+    }
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => _DayTransactionDetailSheet(
+        dateStr: dateStr,
+        entries: entries,
+        initialIndex: initialIndex.clamp(0, entries.length - 1),
+        isDark: isDark,
+      ),
     );
   }
 }
@@ -796,6 +946,7 @@ class _DayDetailRow extends StatelessWidget {
   final String name;
   final String meta;
   final double amount;
+  final VoidCallback? onTap;
 
   const _DayDetailRow({
     required this.isDark,
@@ -803,61 +954,99 @@ class _DayDetailRow extends StatelessWidget {
     required this.name,
     required this.meta,
     required this.amount,
+    this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Container(
-          width: 32,
-          height: 32,
-          decoration: BoxDecoration(
-            color: isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9),
-            borderRadius: BorderRadius.circular(9),
-          ),
-          child: Center(
-            child: LucideIcon(
-              name: iconName,
-              size: 15,
-              color: AppColors.primary,
-            ),
-          ),
-        ),
-        const SizedBox(width: 9),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(10),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 2),
+          child: Row(
             children: [
-              Text(
-                name,
-                style: GoogleFonts.inter(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w700,
+              Container(
+                width: 32,
+                height: 32,
+                decoration: BoxDecoration(
                   color: isDark
-                      ? AppColors.darkForeground
-                      : AppColors.lightForeground,
+                      ? const Color(0xFF1E293B)
+                      : const Color(0xFFF1F5F9),
+                  borderRadius: BorderRadius.circular(9),
+                ),
+                child: Center(
+                  child: LucideIcon(
+                    name: iconName,
+                    size: 15,
+                    color: AppColors.primary,
+                  ),
                 ),
               ),
-              Text(
-                meta,
-                style: GoogleFonts.inter(
-                  fontSize: 10.5,
-                  color: isDark ? AppColors.darkMuted : AppColors.lightMuted,
+              const SizedBox(width: 9),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      name,
+                      style: GoogleFonts.inter(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700,
+                        color: isDark
+                            ? AppColors.darkForeground
+                            : AppColors.lightForeground,
+                      ),
+                    ),
+                    Text(
+                      meta,
+                      style: GoogleFonts.inter(
+                        fontSize: 10.5,
+                        color: isDark
+                            ? AppColors.darkMuted
+                            : AppColors.lightMuted,
+                      ),
+                    ),
+                  ],
                 ),
+              ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text(
+                    CurrencyFormatter.format(amount),
+                    style: GoogleFonts.outfit(
+                      fontSize: 13.5,
+                      fontWeight: FontWeight.w900,
+                      color: AppColors.danger,
+                    ),
+                  ),
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        'Chi tiết',
+                        style: GoogleFonts.inter(
+                          fontSize: 9.5,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.primary,
+                        ),
+                      ),
+                      const Icon(
+                        Icons.chevron_right_rounded,
+                        size: 11,
+                        color: AppColors.primary,
+                      ),
+                    ],
+                  ),
+                ],
               ),
             ],
           ),
         ),
-        Text(
-          CurrencyFormatter.format(amount),
-          style: GoogleFonts.outfit(
-            fontSize: 13.5,
-            fontWeight: FontWeight.w900,
-            color: AppColors.danger,
-          ),
-        ),
-      ],
+      ),
     );
   }
 }
@@ -904,5 +1093,572 @@ class _CellVisuals {
   final String icon;
 
   const _CellVisuals(this.front, this.back, this.icon);
+}
+
+class _DetailTxEntry {
+  final String title;
+  final String category;
+  final String categoryIcon;
+  final String account;
+  final String time;
+  final double amount;
+  final String? note;
+  final String? photoUrl;
+
+  const _DetailTxEntry({
+    required this.title,
+    required this.category,
+    required this.categoryIcon,
+    required this.account,
+    required this.time,
+    required this.amount,
+    this.note,
+    this.photoUrl,
+  });
+}
+
+class _DayTransactionDetailSheet extends StatefulWidget {
+  final String dateStr;
+  final List<_DetailTxEntry> entries;
+  final int initialIndex;
+  final bool isDark;
+
+  const _DayTransactionDetailSheet({
+    required this.dateStr,
+    required this.entries,
+    required this.initialIndex,
+    required this.isDark,
+  });
+
+  @override
+  State<_DayTransactionDetailSheet> createState() =>
+      _DayTransactionDetailSheetState();
+}
+
+class _DayTransactionDetailSheetState extends State<_DayTransactionDetailSheet> {
+  late int _selectedIndex;
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedIndex = widget.initialIndex;
+  }
+
+  void _showZoomDialog(BuildContext context, String imageUrl) {
+    showDialog(
+      context: context,
+      builder: (ctx) => Dialog(
+        backgroundColor: Colors.transparent,
+        insetPadding: const EdgeInsets.all(16),
+        child: Stack(
+          alignment: Alignment.topRight,
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(16),
+              child: InteractiveViewer(
+                child: Image.network(imageUrl, fit: BoxFit.contain),
+              ),
+            ),
+            IconButton(
+              onPressed: () => Navigator.pop(ctx),
+              icon: const CircleAvatar(
+                backgroundColor: Colors.black54,
+                child: Icon(Icons.close_rounded, color: Colors.white, size: 20),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final entry = widget.entries[_selectedIndex];
+    final isDark = widget.isDark;
+
+    return Container(
+      constraints: BoxConstraints(
+        maxHeight: MediaQuery.of(context).size.height * 0.88,
+      ),
+      decoration: BoxDecoration(
+        color: isDark ? AppColors.darkSurface : Colors.white,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(26)),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // Drag handle
+          const SizedBox(height: 10),
+          Container(
+            width: 38,
+            height: 4,
+            decoration: BoxDecoration(
+              color: isDark ? Colors.white24 : Colors.black12,
+              borderRadius: BorderRadius.circular(99),
+            ),
+          ),
+          const SizedBox(height: 12),
+
+          // Header
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Chi tiết giao dịch',
+                      style: GoogleFonts.inter(
+                        fontSize: 16.5,
+                        fontWeight: FontWeight.w900,
+                        color: isDark
+                            ? AppColors.darkForeground
+                            : const Color(0xFF0F172A),
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      widget.dateStr,
+                      style: GoogleFonts.inter(
+                        fontSize: 11.5,
+                        color:
+                            isDark ? AppColors.darkMuted : AppColors.lightMuted,
+                      ),
+                    ),
+                  ],
+                ),
+                IconButton(
+                  onPressed: () => Navigator.pop(context),
+                  icon: Container(
+                    width: 30,
+                    height: 30,
+                    decoration: BoxDecoration(
+                      color: isDark
+                          ? const Color(0xFF1E293B)
+                          : const Color(0xFFF1F5F9),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      Icons.close_rounded,
+                      size: 18,
+                      color: isDark
+                          ? AppColors.darkForeground
+                          : const Color(0xFF0F172A),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const Divider(height: 16),
+
+          Expanded(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.fromLTRB(20, 4, 20, 20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  // Nếu ngày có nhiều hơn 1 GD -> Hiện thanh chuyển tab giao dịch
+                  if (widget.entries.length > 1) ...[
+                    SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        children: List.generate(widget.entries.length, (i) {
+                          final item = widget.entries[i];
+                          final isSel = i == _selectedIndex;
+                          return Padding(
+                            padding: const EdgeInsets.only(right: 8),
+                            child: ChoiceChip(
+                              showCheckmark: false,
+                              label: Text(
+                                  '${item.title} (${CurrencyFormatter.formatCompact(item.amount.abs())})'),
+                              selected: isSel,
+                              selectedColor: AppColors.primary,
+                              labelStyle: GoogleFonts.inter(
+                                fontSize: 11.5,
+                                fontWeight:
+                                    isSel ? FontWeight.w700 : FontWeight.w500,
+                                color: isSel
+                                    ? Colors.white
+                                    : (isDark
+                                        ? AppColors.darkForeground
+                                        : AppColors.lightForeground),
+                              ),
+                              backgroundColor: isDark
+                                  ? const Color(0xFF1E293B)
+                                  : const Color(0xFFF1F5F9),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                side: BorderSide(
+                                  color: isSel
+                                      ? AppColors.primary
+                                      : (isDark
+                                          ? AppColors.darkBorder
+                                          : AppColors.lightBorder),
+                                ),
+                              ),
+                              onSelected: (_) {
+                                setState(() {
+                                  _selectedIndex = i;
+                                });
+                              },
+                            ),
+                          );
+                        }),
+                      ),
+                    ),
+                    const SizedBox(height: 14),
+                  ],
+
+                  // ── Khối 1: Ảnh hóa đơn / Biên lai ────────────────────────
+                  Container(
+                    height: 195,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(18),
+                      border: Border.all(
+                        color: isDark
+                            ? AppColors.darkBorder
+                            : const Color(0xFFE2E8F0),
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black
+                              .withValues(alpha: isDark ? 0.3 : 0.05),
+                          blurRadius: 8,
+                          offset: const Offset(0, 3),
+                        ),
+                      ],
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(18),
+                      child: Stack(
+                        fit: StackFit.expand,
+                        children: [
+                          if (entry.photoUrl != null &&
+                              entry.photoUrl!.isNotEmpty)
+                            Image.network(
+                              entry.photoUrl!,
+                              fit: BoxFit.cover,
+                              loadingBuilder: (_, child, progress) {
+                                if (progress == null) return child;
+                                return Center(
+                                  child: CircularProgressIndicator(
+                                    value: progress.expectedTotalBytes != null
+                                        ? progress.cumulativeBytesLoaded /
+                                            progress.expectedTotalBytes!
+                                        : null,
+                                    color: AppColors.primary,
+                                  ),
+                                );
+                              },
+                              errorBuilder: (_, __, ___) =>
+                                  _buildPlaceholderReceipt(isDark),
+                            )
+                          else
+                            _buildPlaceholderReceipt(isDark),
+
+                          // Huy hiệu overlay
+                          Positioned(
+                            top: 10,
+                            left: 10,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 8, vertical: 4),
+                              decoration: BoxDecoration(
+                                color: Colors.black.withValues(alpha: 0.65),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  const LucideIcon(
+                                    name: 'camera',
+                                    size: 13,
+                                    color: Colors.white,
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    'Ảnh hóa đơn / Biên lai',
+                                    style: GoogleFonts.inter(
+                                      fontSize: 10.5,
+                                      fontWeight: FontWeight.w700,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+
+                          // Nút phóng to ảnh
+                          if (entry.photoUrl != null &&
+                              entry.photoUrl!.isNotEmpty)
+                            Positioned(
+                              bottom: 10,
+                              right: 10,
+                              child: GestureDetector(
+                                onTap: () => _showZoomDialog(
+                                    context, entry.photoUrl!),
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 9, vertical: 5),
+                                  decoration: BoxDecoration(
+                                    color: Colors.black.withValues(alpha: 0.7),
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      const Icon(
+                                        Icons.zoom_in_rounded,
+                                        size: 15,
+                                        color: Colors.white,
+                                      ),
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        'Phóng to',
+                                        style: GoogleFonts.inter(
+                                          fontSize: 10.5,
+                                          fontWeight: FontWeight.w700,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+
+                  // ── Khối 2: Số tiền lớn & Trạng thái ──────────────────────
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 14),
+                    decoration: BoxDecoration(
+                      color: isDark
+                          ? const Color(0xFF1E293B)
+                          : const Color(0xFFF8FAFC),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                        color: isDark
+                            ? AppColors.darkBorder
+                            : const Color(0xFFE2E8F0),
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Số tiền chi tiêu',
+                              style: GoogleFonts.inter(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w600,
+                                color: isDark
+                                    ? AppColors.darkMuted
+                                    : AppColors.lightMuted,
+                              ),
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              CurrencyFormatter.format(entry.amount),
+                              style: GoogleFonts.outfit(
+                                fontSize: 22,
+                                fontWeight: FontWeight.w900,
+                                color: AppColors.danger,
+                              ),
+                            ),
+                          ],
+                        ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 10, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF10B981)
+                                .withValues(alpha: 0.12),
+                            borderRadius: BorderRadius.circular(99),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(
+                                Icons.check_circle_rounded,
+                                size: 14,
+                                color: Color(0xFF10B981),
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                'Đã xác thực',
+                                style: GoogleFonts.inter(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w700,
+                                  color: const Color(0xFF10B981),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 14),
+
+                  // ── Khối 3: Bảng thông tin chi tiết các trường ──────────────
+                  Container(
+                    decoration: BoxDecoration(
+                      color: isDark ? AppColors.darkSurface : Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                        color: isDark
+                            ? AppColors.darkBorder
+                            : const Color(0xFFE2E8F0),
+                      ),
+                    ),
+                    child: Column(
+                      children: [
+                        _buildDetailItemRow(
+                          isDark: isDark,
+                          iconName: entry.categoryIcon,
+                          label: 'Danh mục',
+                          value: entry.category,
+                        ),
+                        const Divider(height: 1),
+                        _buildDetailItemRow(
+                          isDark: isDark,
+                          iconName: 'wallet',
+                          label: 'Nguồn tiền',
+                          value: entry.account,
+                        ),
+                        const Divider(height: 1),
+                        _buildDetailItemRow(
+                          isDark: isDark,
+                          iconName: 'clock',
+                          label: 'Thời gian',
+                          value: '${entry.time} · ${widget.dateStr}',
+                        ),
+                        if (entry.note != null && entry.note!.isNotEmpty) ...[
+                          const Divider(height: 1),
+                          _buildDetailItemRow(
+                            isDark: isDark,
+                            iconName: 'file-text',
+                            label: 'Ghi chú',
+                            value: entry.note!,
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+
+                  // ── Nút xem trong sổ giao dịch ─────────────────────────────
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                      context.push(RoutePaths.transactions);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primary,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                      elevation: 0,
+                    ),
+                    child: Text(
+                      'Xem trong Sổ giao dịch',
+                      style: GoogleFonts.inter(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPlaceholderReceipt(bool isDark) {
+    return Container(
+      color: isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9),
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.receipt_long_rounded,
+              size: 44,
+              color: isDark ? AppColors.darkMuted : AppColors.lightMuted,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Chưa có ảnh chụp biên lai',
+              style: GoogleFonts.inter(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                color: isDark ? AppColors.darkMuted : AppColors.lightMuted,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDetailItemRow({
+    required bool isDark,
+    required String iconName,
+    required String label,
+    required String value,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      child: Row(
+        children: [
+          LucideIcon(
+            name: iconName,
+            size: 15,
+            color: AppColors.primary,
+          ),
+          const SizedBox(width: 10),
+          Text(
+            label,
+            style: GoogleFonts.inter(
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+              color: isDark ? AppColors.darkMuted : AppColors.lightMuted,
+            ),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              value,
+              textAlign: TextAlign.right,
+              style: GoogleFonts.inter(
+                fontSize: 12.5,
+                fontWeight: FontWeight.w700,
+                color: isDark
+                    ? AppColors.darkForeground
+                    : const Color(0xFF0F172A),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }
 
