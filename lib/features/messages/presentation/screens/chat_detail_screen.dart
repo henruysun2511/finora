@@ -21,6 +21,21 @@ class ChatDetailScreen extends ConsumerStatefulWidget {
 class _ChatDetailScreenState extends ConsumerState<ChatDetailScreen> {
   final ScrollController _scrollController = ScrollController();
 
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(_onScroll);
+  }
+
+  void _onScroll() {
+    if (_scrollController.hasClients) {
+      // In reverse ListView, scrolling towards top approaches maxScrollExtent
+      if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent - 200) {
+        ref.read(chatDetailProvider(widget.conversation.id).notifier).loadMore();
+      }
+    }
+  }
+
   String _formatError(dynamic e) {
     if (e is DioException) {
       final data = e.response?.data;
@@ -37,7 +52,7 @@ class _ChatDetailScreenState extends ConsumerState<ChatDetailScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (_scrollController.hasClients) {
         _scrollController.animateTo(
-          _scrollController.position.maxScrollExtent,
+          0,
           duration: const Duration(milliseconds: 250),
           curve: Curves.easeOut,
         );
@@ -160,8 +175,8 @@ class _ChatDetailScreenState extends ConsumerState<ChatDetailScreen> {
               error: (err, _) => Center(
                 child: Text('Lỗi tải tin nhắn: $err', style: TextStyle(color: muted)),
               ),
-              data: (messages) {
-                WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToBottom());
+              data: (chatState) {
+                final messages = chatState.messages;
 
                 if (messages.isEmpty) {
                   return Center(
@@ -174,9 +189,26 @@ class _ChatDetailScreenState extends ConsumerState<ChatDetailScreen> {
 
                 return ListView.builder(
                   controller: _scrollController,
+                  reverse: true,
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-                  itemCount: messages.length,
+                  itemCount: messages.length + (chatState.isLoadingMore ? 1 : 0),
                   itemBuilder: (ctx, i) {
+                    if (i == messages.length) {
+                      return const Center(
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(vertical: 12),
+                          child: SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: AppColors.primary,
+                            ),
+                          ),
+                        ),
+                      );
+                    }
+
                     final msg = messages[i];
                     return ChatBubble(
                       message: msg,
