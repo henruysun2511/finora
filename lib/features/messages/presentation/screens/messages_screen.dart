@@ -147,13 +147,16 @@ class _MessagesScreenState extends ConsumerState<MessagesScreen> {
                       final conv = list[i];
                       return ConversationTile(
                         conversation: conv,
-                        onTap: () {
-                          Navigator.push(
+                        onTap: () async {
+                          await Navigator.push(
                             context,
                             MaterialPageRoute(
                               builder: (_) => ChatDetailScreen(conversation: conv),
                             ),
                           );
+                          if (context.mounted) {
+                            ref.read(conversationListProvider.notifier).refresh();
+                          }
                         },
                       );
                     },
@@ -467,9 +470,9 @@ class _NewChatFriendsSheetState extends ConsumerState<_NewChatFriendsSheet> {
                           color: AppColors.primary,
                         ),
                       ),
-                      onTap: () {
+                      onTap: () async {
                         Navigator.pop(context);
-                        Navigator.push(
+                        await Navigator.push(
                           context,
                           MaterialPageRoute(
                             builder: (_) => ChatDetailScreen(
@@ -483,6 +486,9 @@ class _NewChatFriendsSheetState extends ConsumerState<_NewChatFriendsSheet> {
                             ),
                           ),
                         );
+                        if (context.mounted) {
+                          ref.read(conversationListProvider.notifier).refresh();
+                        }
                       },
                     );
                   },

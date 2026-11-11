@@ -29,7 +29,7 @@ class ConversationResponseDto {
       lastMessageContent: json['lastMessageContent'] as String? ?? json['lastMessage'] as String? ?? '',
       lastMessageSenderId: json['lastMessageSenderId'] as String?,
       lastMessageAt: (json['lastMessageAt'] ?? json['updatedAt'] ?? DateTime.now().toIso8601String()).toString(),
-      unreadCount: json['unreadCount'] as int? ?? 0,
+      unreadCount: (json['unreadCount'] as num?)?.toInt() ?? int.tryParse(json['unreadCount']?.toString() ?? '') ?? 0,
       isGroup: json['isGroup'] as bool? ?? false,
       groupWalletName: json['groupWalletName'] as String?,
     );

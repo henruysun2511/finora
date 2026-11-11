@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../domain/models/direct_message.dart';
+import 'conversation_list_provider.dart';
 import 'messages_providers.dart';
 
 final chatDetailProvider =
@@ -36,6 +37,7 @@ class ChatDetailNotifier extends AutoDisposeFamilyAsyncNotifier<List<DirectMessa
       final saved = await repo.sendMessage(conversationId: arg, content: text);
       final updated = (state.value ?? []).map((m) => m.id == tempMsg.id ? saved : m).toList();
       state = AsyncData(updated);
+      ref.invalidate(conversationListProvider);
     } catch (e) {
       // Revert if error
       state = AsyncData(currentList);
