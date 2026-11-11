@@ -402,28 +402,6 @@ class _HomePhotoCalendarSectionState
                                     _selectedDate =
                                         DateTime(year, month, dayNum);
                                   });
-                                  if (hasExpense) {
-                                    final weekdayNames = [
-                                      'Thứ hai',
-                                      'Thứ ba',
-                                      'Thứ tư',
-                                      'Thứ năm',
-                                      'Thứ sáu',
-                                      'Thứ bảy',
-                                      'Chủ nhật'
-                                    ];
-                                    final dt = DateTime(year, month, dayNum);
-                                    final weekdayStr =
-                                        weekdayNames[dt.weekday - 1];
-                                    _openTransactionDetailModal(
-                                      context: context,
-                                      dateStr:
-                                          '$weekdayStr, $dayNum/$month/$year',
-                                      dayItem: item,
-                                      dayNum: dayNum,
-                                      isDark: isDark,
-                                    );
-                                  }
                                 },
                               ),
                             ),
