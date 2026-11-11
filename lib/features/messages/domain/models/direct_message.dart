@@ -20,6 +20,7 @@ class DirectMessage {
     this.isRead = false,
     required this.createdAt,
     this.reactions = const [],
+    this.isRecalled = false,
   });
 
   final String id;
@@ -34,6 +35,7 @@ class DirectMessage {
   final bool isRead;
   final DateTime createdAt;
   final List<String> reactions;
+  final bool isRecalled;
 
   DirectMessage copyWith({
     String? id,
@@ -48,6 +50,7 @@ class DirectMessage {
     bool? isRead,
     DateTime? createdAt,
     List<String>? reactions,
+    bool? isRecalled,
   }) {
     return DirectMessage(
       id: id ?? this.id,
@@ -62,6 +65,7 @@ class DirectMessage {
       isRead: isRead ?? this.isRead,
       createdAt: createdAt ?? this.createdAt,
       reactions: reactions ?? this.reactions,
+      isRecalled: isRecalled ?? this.isRecalled,
     );
   }
 }

@@ -6,10 +6,15 @@ import '../mappers/messages_mapper.dart';
 import '../services/messages_api_service.dart';
 
 class MessagesRepositoryImpl implements MessagesRepository {
-  MessagesRepositoryImpl(this._api, {this.mapper = const MessagesMapper()});
+  MessagesRepositoryImpl(
+    this._api, {
+    this.mapper = const MessagesMapper(),
+    this.currentUserId = 'me',
+  });
 
   final MessagesApiService _api;
   final MessagesMapper mapper;
+  final String currentUserId;
 
   // ─── Mock Fallback Data ───────────────────────────────────────────────────
 
@@ -164,7 +169,7 @@ class MessagesRepositoryImpl implements MessagesRepository {
   Future<List<DirectMessage>> getMessages(String conversationId, {int page = 1, int limit = 30}) async {
     try {
       final dtos = await _api.getHistory(conversationId, page: page, limit: limit);
-      final items = dtos.map((d) => mapper.toDomainMessage(d, currentUserId: 'me')).toList();
+      final items = dtos.map((d) => mapper.toDomainMessage(d, currentUserId: currentUserId)).toList();
       if (items.isNotEmpty) return items;
     } catch (_) {
       // Fallback
@@ -193,7 +198,7 @@ class MessagesRepositoryImpl implements MessagesRepository {
         content: content,
         relatedTransactionId: relatedTransactionId,
       );
-      return mapper.toDomainMessage(dto, currentUserId: 'me');
+      return mapper.toDomainMessage(dto, currentUserId: currentUserId);
     } catch (_) {
       // Local fallback
     }
@@ -226,10 +231,40 @@ class MessagesRepositoryImpl implements MessagesRepository {
 
   @override
   Future<void> addReaction({required String messageId, required String emoji}) async {
+    final apiEmoji = MessagesMapper.toApiEmoji(emoji);
     try {
-      await _api.addReaction(messageId, emoji);
+      await _api.addReaction(messageId, apiEmoji);
     } catch (_) {
       // Bỏ qua lỗi mạng
+    }
+  }
+
+  @override
+  Future<void> removeReaction(String messageId) async {
+    try {
+      await _api.removeReaction(messageId);
+    } catch (_) {
+      // Bỏ qua lỗi mạng
+    }
+  }
+
+  @override
+  Future<void> recallMessage(String messageId) async {
+    try {
+      await _api.recallMessage(messageId);
+    } catch (_) {
+      // Bỏ qua lỗi mạng
+    }
+
+    // Cập nhật mock nếu đang dùng dữ liệu nội bộ
+    for (final list in _mockMessages.values) {
+      final idx = list.indexWhere((m) => m.id == messageId);
+      if (idx != -1) {
+        list[idx] = list[idx].copyWith(
+          content: 'Tin nhắn đã được thu hồi',
+          isRecalled: true,
+        );
+      }
     }
   }
 }

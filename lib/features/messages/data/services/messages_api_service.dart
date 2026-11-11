@@ -65,11 +65,21 @@ class MessagesApiService {
     await _dio.patch('${ApiConstants.friendMessages(friendId)}/read');
   }
 
+  /// DELETE /messages/:id
+  Future<void> recallMessage(String messageId) async {
+    await _dio.delete(ApiConstants.recallMessage(messageId));
+  }
+
   /// POST /messages/:id/reactions
   Future<void> addReaction(String messageId, String emoji) async {
     await _dio.post(
-      '/messages/$messageId/reactions',
+      ApiConstants.messageReactions(messageId),
       data: {'emoji': emoji},
     );
+  }
+
+  /// DELETE /messages/:id/reactions
+  Future<void> removeReaction(String messageId) async {
+    await _dio.delete(ApiConstants.messageReactions(messageId));
   }
 }

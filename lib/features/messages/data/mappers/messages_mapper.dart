@@ -7,6 +7,36 @@ import '../dto/message_response.dart';
 class MessagesMapper {
   const MessagesMapper();
 
+  static const Map<String, String> emojiToApiCode = {
+    '❤️': 'love',
+    '👍': 'like',
+    '😂': 'haha',
+    '😮': 'wow',
+    '😢': 'sad',
+    '👏': 'clap',
+    '😡': 'angry',
+    '🔥': 'love',
+  };
+
+  static const Map<String, String> apiCodeToEmoji = {
+    'love': '❤️',
+    'like': '👍',
+    'haha': '😂',
+    'laugh': '😂',
+    'wow': '😮',
+    'sad': '😢',
+    'clap': '👏',
+    'angry': '😡',
+  };
+
+  static String toApiEmoji(String emoji) {
+    return emojiToApiCode[emoji] ?? emoji.toLowerCase();
+  }
+
+  static String toDisplayEmoji(String code) {
+    return apiCodeToEmoji[code.toLowerCase()] ?? code;
+  }
+
   Conversation toDomainConversation(ConversationResponseDto dto) {
     return Conversation(
       id: dto.friendId,
@@ -49,7 +79,7 @@ class MessagesMapper {
       isMe: dto.senderId == currentUserId,
       isRead: dto.isRead,
       createdAt: DateTime.tryParse(dto.createdAt) ?? DateTime.now(),
-      reactions: dto.reactions,
+      reactions: dto.reactions.map(toDisplayEmoji).toList(),
     );
   }
 }

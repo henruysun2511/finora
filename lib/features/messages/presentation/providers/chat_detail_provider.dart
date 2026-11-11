@@ -84,4 +84,56 @@ class ChatDetailNotifier extends AutoDisposeFamilyAsyncNotifier<List<DirectMessa
       // Bỏ qua lỗi
     }
   }
+
+  /// Thả hoặc gỡ cảm xúc trên tin nhắn
+  Future<void> toggleReaction(String messageId, String emoji) async {
+    final currentList = state.value ?? [];
+    final idx = currentList.indexWhere((m) => m.id == messageId);
+    if (idx == -1) return;
+
+    final target = currentList[idx];
+    final hasSame = target.reactions.contains(emoji);
+    final nextReactions = hasSame
+        ? target.reactions.where((e) => e != emoji).toList()
+        : [...target.reactions.where((e) => e != emoji), emoji];
+
+    final updated = List<DirectMessage>.from(currentList);
+    updated[idx] = target.copyWith(reactions: nextReactions);
+    state = AsyncData(updated);
+
+    final repo = ref.read(messagesRepositoryProvider);
+    try {
+      if (hasSame) {
+        await repo.removeReaction(messageId);
+      } else {
+        await repo.addReaction(messageId: messageId, emoji: emoji);
+      }
+    } catch (_) {
+      // Bỏ qua lỗi mạng
+    }
+  }
+
+  /// Thu hồi tin nhắn (chỉ người gửi mới có quyền)
+  Future<void> recallMessage(String messageId) async {
+    final currentList = state.value ?? [];
+    final idx = currentList.indexWhere((m) => m.id == messageId);
+    if (idx == -1) return;
+
+    final target = currentList[idx];
+    if (!target.isMe) return;
+
+    final updated = List<DirectMessage>.from(currentList);
+    updated[idx] = target.copyWith(
+      content: 'Tin nhắn đã được thu hồi',
+      isRecalled: true,
+    );
+    state = AsyncData(updated);
+
+    final repo = ref.read(messagesRepositoryProvider);
+    try {
+      await repo.recallMessage(messageId);
+    } catch (_) {
+      // Bỏ qua lỗi mạng
+    }
+  }
 }

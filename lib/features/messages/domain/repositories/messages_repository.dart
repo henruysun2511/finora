@@ -20,4 +20,10 @@ abstract class MessagesRepository {
 
   /// Thả cảm xúc vào tin nhắn
   Future<void> addReaction({required String messageId, required String emoji});
+
+  /// Gỡ cảm xúc trên tin nhắn
+  Future<void> removeReaction(String messageId);
+
+  /// Thu hồi tin nhắn (trong vòng 15 phút, chỉ người gửi)
+  Future<void> recallMessage(String messageId);
 }

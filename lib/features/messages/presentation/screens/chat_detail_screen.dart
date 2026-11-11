@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../app/theme/app_colors.dart';
+import '../../../../core/widgets/page_header.dart';
 import '../../domain/models/conversation.dart';
 import '../providers/chat_detail_provider.dart';
 import '../widgets/chat_bubble.dart';
@@ -18,18 +19,6 @@ class ChatDetailScreen extends ConsumerStatefulWidget {
 class _ChatDetailScreenState extends ConsumerState<ChatDetailScreen> {
   final ScrollController _scrollController = ScrollController();
 
-  LinearGradient _avatarGradient(String seed) {
-    final gradients = [
-      const LinearGradient(colors: [Color(0xFFF59E0B), Color(0xFFEA580C)], begin: Alignment.topLeft, end: Alignment.bottomRight),
-      const LinearGradient(colors: [Color(0xFF0072D6), Color(0xFF0284C7)], begin: Alignment.topLeft, end: Alignment.bottomRight),
-      const LinearGradient(colors: [Color(0xFF10B981), Color(0xFF059669)], begin: Alignment.topLeft, end: Alignment.bottomRight),
-      const LinearGradient(colors: [Color(0xFFEC4899), Color(0xFFDB2777)], begin: Alignment.topLeft, end: Alignment.bottomRight),
-      const LinearGradient(colors: [Color(0xFF8B5CF6), Color(0xFF6366F1)], begin: Alignment.topLeft, end: Alignment.bottomRight),
-      const LinearGradient(colors: [Color(0xFF06B6D4), Color(0xFF0284C7)], begin: Alignment.topLeft, end: Alignment.bottomRight),
-    ];
-    return gradients[seed.hashCode.abs() % gradients.length];
-  }
-
   void _scrollToBottom() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (_scrollController.hasClients) {
@@ -42,6 +31,127 @@ class _ChatDetailScreenState extends ConsumerState<ChatDetailScreen> {
     });
   }
 
+  void _showConversationInfo(BuildContext context) {
+    final conv = widget.conversation;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final surface = isDark ? AppColors.darkSurface : Colors.white;
+    final foreground = isDark ? AppColors.darkForeground : AppColors.lightForeground;
+    final muted = isDark ? AppColors.darkMuted : AppColors.lightMuted;
+    final border = isDark ? AppColors.darkBorder : AppColors.lightBorder;
+
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) {
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+          decoration: BoxDecoration(
+            color: surface,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+            border: Border(top: BorderSide(color: border)),
+          ),
+          child: SafeArea(
+            top: false,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Center(
+                  child: Container(
+                    width: 36,
+                    height: 4,
+                    margin: const EdgeInsets.only(bottom: 16),
+                    decoration: BoxDecoration(
+                      color: muted.withValues(alpha: 0.3),
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                ),
+                Container(
+                  width: 56,
+                  height: 56,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: const LinearGradient(
+                      colors: [Color(0xFF0072D6), Color(0xFF0284C7)],
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.primary.withValues(alpha: 0.25),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  alignment: Alignment.center,
+                  child: Text(
+                    conv.initials,
+                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 18),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  conv.title,
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: foreground),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  conv.isGroup
+                      ? (conv.groupWalletName ?? 'Nhóm thảo luận hóa đơn chia tiền')
+                      : 'Bạn bè kết nối tài chính Finora',
+                  style: TextStyle(fontSize: 13, color: muted),
+                ),
+                const SizedBox(height: 20),
+                Divider(color: border, height: 1),
+                const SizedBox(height: 12),
+                ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  leading: Container(
+                    width: 36,
+                    height: 36,
+                    decoration: BoxDecoration(
+                      color: AppColors.primary.withValues(alpha: 0.1),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(Icons.receipt_long_rounded, color: AppColors.primary, size: 20),
+                  ),
+                  title: Text(
+                    'Chia sẻ hóa đơn',
+                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: foreground),
+                  ),
+                  subtitle: Text(
+                    'Hỗ trợ đính kèm chi tiêu và chia bill vào cuộc trò chuyện',
+                    style: TextStyle(fontSize: 12, color: muted),
+                  ),
+                ),
+                if (conv.isGroup)
+                  ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    leading: Container(
+                      width: 36,
+                      height: 36,
+                      decoration: BoxDecoration(
+                        color: AppColors.success.withValues(alpha: 0.1),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(Icons.account_balance_wallet_rounded, color: AppColors.success, size: 20),
+                    ),
+                    title: Text(
+                      'Ví chung kết nối',
+                      style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: foreground),
+                    ),
+                    subtitle: Text(
+                      conv.groupWalletName ?? 'Ví quỹ nhóm',
+                      style: TextStyle(fontSize: 12, color: muted),
+                    ),
+                  ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   @override
   void dispose() {
     _scrollController.dispose();
@@ -51,7 +161,6 @@ class _ChatDetailScreenState extends ConsumerState<ChatDetailScreen> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final surface = isDark ? AppColors.darkSurface : Colors.white;
     final bg = isDark ? AppColors.darkBackground : AppColors.lightBackground;
     final foreground = isDark ? AppColors.darkForeground : AppColors.lightForeground;
     final muted = isDark ? AppColors.darkMuted : AppColors.lightMuted;
@@ -59,68 +168,23 @@ class _ChatDetailScreenState extends ConsumerState<ChatDetailScreen> {
     final conv = widget.conversation;
     final messagesAsync = ref.watch(chatDetailProvider(conv.id));
 
+    final subtitle = conv.isGroup
+        ? (conv.groupWalletName != null
+            ? '${conv.groupWalletName!} · ${conv.membersCount ?? 5} thành viên'
+            : 'Nhóm thảo luận hóa đơn')
+        : (conv.isOnline ? 'Đang hoạt động' : 'Trò chuyện 1-1');
+
     return Scaffold(
       backgroundColor: bg,
-      appBar: AppBar(
-        backgroundColor: surface,
-        elevation: 0,
-        scrolledUnderElevation: 1,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back_rounded, color: foreground),
-          onPressed: () => Navigator.pop(context),
+      appBar: PageHeader.subPage(
+        title: conv.title,
+        subtitle: subtitle,
+        onBack: () => Navigator.pop(context),
+        action: IconButton(
+          icon: const Icon(Icons.info_outline_rounded, color: AppColors.primary),
+          tooltip: 'Thông tin',
+          onPressed: () => _showConversationInfo(context),
         ),
-        title: Row(
-          children: [
-            Container(
-              width: 38,
-              height: 38,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                gradient: _avatarGradient(conv.id),
-              ),
-              alignment: Alignment.center,
-              child: Text(
-                conv.initials,
-                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 13),
-              ),
-            ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    conv.title,
-                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800, color: foreground),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  if (conv.isGroup)
-                    Text(
-                      conv.groupWalletName != null
-                          ? '${conv.groupWalletName!} · ${conv.membersCount ?? 5} thành viên'
-                          : 'Nhóm thảo luận hóa đơn chia tiền',
-                      style: const TextStyle(fontSize: 11, color: AppColors.primary, fontWeight: FontWeight.w600),
-                    )
-                  else if (conv.isOnline)
-                    const Text(
-                      'Đang hoạt động',
-                      style: TextStyle(fontSize: 11, color: AppColors.success, fontWeight: FontWeight.w600),
-                    )
-                  else
-                    Text('Trò chuyện 1-1', style: TextStyle(fontSize: 11, color: muted)),
-                ],
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.info_outline_rounded, color: muted),
-            tooltip: 'Chi tiết nhóm/ví',
-            onPressed: () {},
-          ),
-        ],
       ),
       body: Column(
         children: [
@@ -171,6 +235,12 @@ class _ChatDetailScreenState extends ConsumerState<ChatDetailScreen> {
                     return ChatBubble(
                       message: msg,
                       isGroup: conv.isGroup,
+                      onToggleReaction: (emoji) {
+                        ref.read(chatDetailProvider(conv.id).notifier).toggleReaction(msg.id, emoji);
+                      },
+                      onRecall: () {
+                        ref.read(chatDetailProvider(conv.id).notifier).recallMessage(msg.id);
+                      },
                     );
                   },
                 );
