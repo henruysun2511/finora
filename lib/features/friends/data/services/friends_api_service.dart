@@ -53,9 +53,10 @@ class FriendsApiService {
 
   /// GET /friends/search?query=query - Tìm kiếm người dùng theo tên hoặc email
   Future<List<UserSearchResultDto>> searchUsers(String query) async {
+    final trimmed = query.trim();
     final res = await _dio.get(
       ApiConstants.searchFriends,
-      queryParameters: {'query': query, 'q': query},
+      queryParameters: trimmed.isNotEmpty ? {'query': trimmed} : null,
     );
     final data = res.data['data'];
     final List items = data is List
