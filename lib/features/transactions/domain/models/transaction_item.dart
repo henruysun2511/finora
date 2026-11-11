@@ -1,3 +1,4 @@
+import 'receipt_model.dart';
 import 'transaction_enums.dart';
 
 class TransactionItem {
@@ -26,6 +27,7 @@ class TransactionItem {
     this.visibility = 'PRIVATE',
     this.excludeFromReport = false,
     this.receiptId,
+    this.receipt,
     this.latitude,
     this.longitude,
     this.isRecurring = false,
@@ -53,6 +55,7 @@ class TransactionItem {
   final String visibility;
   final bool excludeFromReport;
   final String? receiptId;
+  final ReceiptModel? receipt;
   final double? latitude;
   final double? longitude;
   final bool isRecurring;

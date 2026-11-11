@@ -176,12 +176,17 @@ class TransactionDetailScreen extends ConsumerWidget {
                   TransactionDetailSplitCard(amount: item.amount),
                 ],
 
-                // ── 4. KHỐI HÓA ĐƠN ĐÍNH KÈM (NẾU CÓ) ──
-                if (item.photoUrl != null && item.photoUrl!.isNotEmpty) ...[
+                // ── 4. KHỐI HÓA ĐƠN & BẢNG KÊ CHỨNG TỪ (NẾU CÓ) ──
+                if ((item.photoUrl != null && item.photoUrl!.isNotEmpty) ||
+                    item.receipt != null) ...[
                   const SizedBox(height: 16),
                   TransactionDetailReceiptCard(
-                    photoUrl: item.photoUrl!,
-                    onTapImage: () => _showImageDialog(context, item.photoUrl!),
+                    receipt: item.receipt,
+                    photoUrl: (item.photoUrl != null && item.photoUrl!.isNotEmpty)
+                        ? item.photoUrl
+                        : item.receipt?.imageUrl,
+                    currency: item.currency,
+                    onTapImage: (url) => _showImageDialog(context, url),
                   ),
                 ],
 
