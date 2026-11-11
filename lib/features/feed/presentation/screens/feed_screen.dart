@@ -1,13 +1,24 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../app/router/route_names.dart';
 import '../../../../app/theme/app_colors.dart';
-import '../../../../core/widgets/page_header.dart';
+import '../../../../core/widgets/app_toast.dart';
+import '../../../../core/widgets/banner_header.dart';
+import '../../../../core/widgets/lucide_icon.dart';
+import '../../../../core/widgets/navigation/social_bottom_bar.dart';
+import '../../../../core/widgets/navigation/social_tab.dart';
+import '../../../friends/friends.dart';
+import '../../domain/models/feed_post.dart';
 import '../providers/feed_list_provider.dart';
-import '../widgets/feed_post_card.dart';
 import '../widgets/comments_bottom_sheet.dart';
+import '../widgets/feed_category_filter_bar.dart';
+import '../widgets/feed_empty_state.dart';
+import '../widgets/feed_grid_card.dart';
+import '../widgets/feed_post_card.dart';
+import '../widgets/feed_search_bar.dart';
+import '../widgets/feed_stories_bar.dart';
 import '../widgets/share_milestone_sheet.dart';
 
 class FeedScreen extends ConsumerStatefulWidget {
@@ -19,60 +30,33 @@ class FeedScreen extends ConsumerStatefulWidget {
 
 class _FeedScreenState extends ConsumerState<FeedScreen> {
   final TextEditingController _searchController = TextEditingController();
-  bool _isSearching = false;
-  int _feedTab = 0; // 0: Bạn bè, 1: Khám phá
   String _selectedCategory = 'all';
   String? _selectedFriendName;
 
-  final List<({String key, String label})> _categories = const [
-    (key: 'all', label: 'Tất cả'),
-    (key: 'food', label: '🍜 Ăn uống'),
-    (key: 'income', label: '💰 Thu nhập'),
-    (key: 'travel', label: '✈️ Du lịch'),
-    (key: 'coffee', label: '☕ Cà phê'),
-    (key: 'fitness', label: '🏋️ Thể thao'),
-    (key: 'shopping', label: '🛍️ Mua sắm'),
+  static const List<({String key, String label, String icon})> _categories = [
+    (key: 'all', label: 'Tất cả', icon: 'sparkles'),
+    (key: 'food', label: 'Ăn uống', icon: 'utensils'),
+    (key: 'income', label: 'Thu nhập', icon: 'banknote'),
+    (key: 'travel', label: 'Du lịch', icon: 'plane'),
+    (key: 'coffee', label: 'Cà phê', icon: 'coffee'),
+    (key: 'fitness', label: 'Thể thao', icon: 'dumbbell'),
+    (key: 'shopping', label: 'Mua sắm', icon: 'shopping-bag'),
   ];
 
-  final List<({String name, String initials, List<Color> gradient, bool isSeen})>
-      _stories = const [
-    (
-      name: 'Trần Ngọc',
-      initials: 'TN',
-      gradient: [Color(0xFFF59E0B), Color(0xFFEA580C)],
-      isSeen: false,
-    ),
-    (
-      name: 'Hùng Minh',
-      initials: 'HM',
-      gradient: [Color(0xFF0072D6), Color(0xFF0284C7)],
-      isSeen: false,
-    ),
-    (
-      name: 'Phạm Lan',
-      initials: 'PL',
-      gradient: [Color(0xFF10B981), Color(0xFF059669)],
-      isSeen: true,
-    ),
-    (
-      name: 'Anh Thư',
-      initials: 'AT',
-      gradient: [Color(0xFFEC4899), Color(0xFFDB2777)],
-      isSeen: true,
-    ),
-    (
-      name: 'Minh Tuấn',
-      initials: 'MT',
-      gradient: [Color(0xFF8B5CF6), Color(0xFF6366F1)],
-      isSeen: true,
-    ),
-    (
-      name: 'Hải Đăng',
-      initials: 'HĐ',
-      gradient: [Color(0xFF06B6D4), Color(0xFF0284C7)],
-      isSeen: true,
-    ),
+  static const List<List<Color>> _storyGradients = [
+    [Color(0xFFF59E0B), Color(0xFFEA580C)],
+    [Color(0xFF0072D6), Color(0xFF0284C7)],
+    [Color(0xFF10B981), Color(0xFF059669)],
+    [Color(0xFFEC4899), Color(0xFFDB2777)],
+    [Color(0xFF8B5CF6), Color(0xFF6366F1)],
+    [Color(0xFF06B6D4), Color(0xFF0284C7)],
+    [Color(0xFFF43F5E), Color(0xFFBE123C)],
   ];
+
+  List<Color> _getStoryGradient(String seed) {
+    final hash = seed.hashCode.abs();
+    return _storyGradients[hash % _storyGradients.length];
+  }
 
   @override
   void dispose() {
@@ -81,10 +65,45 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
   }
 
   void _sharePost(String title) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Đã sao chép liên kết bài đăng "$title"'),
-        behavior: SnackBarBehavior.floating,
+    AppToast.success(context, 'Đã sao chép liên kết bài đăng "$title"');
+  }
+
+  void _resetFilter() {
+    setState(() {
+      _selectedCategory = 'all';
+      _selectedFriendName = null;
+      _searchController.clear();
+      ref.read(feedSearchQueryProvider.notifier).state = '';
+    });
+  }
+
+  Widget _buildHeaderButton({
+    required String iconName,
+    required VoidCallback onTap,
+    String? tooltip,
+  }) {
+    final btn = Container(
+      width: 36,
+      height: 36,
+      decoration: BoxDecoration(
+        color: AppColors.primary,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      alignment: Alignment.center,
+      child: LucideIcon(
+        name: iconName,
+        size: 18,
+        color: Colors.white,
+        strokeWidth: 2.2,
+      ),
+    );
+
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(12),
+        child: tooltip != null ? Tooltip(message: tooltip, child: btn) : btn,
       ),
     );
   }
@@ -94,241 +113,93 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
     final theme = Theme.of(context);
     final dark = theme.brightness == Brightness.dark;
     final bg = dark ? AppColors.darkBackground : AppColors.lightBackground;
-    final surface = dark ? AppColors.darkSurface : Colors.white;
-    final border = dark ? AppColors.darkBorder : AppColors.lightBorder;
-    final foreground = dark ? AppColors.darkForeground : AppColors.lightForeground;
+    final foreground =
+        dark ? AppColors.darkForeground : AppColors.lightForeground;
     final muted = dark ? AppColors.darkMuted : AppColors.lightMuted;
 
     final searchQuery = ref.watch(feedSearchQueryProvider);
     final feedAsync = ref.watch(feedListProvider);
+    final friendsAsync = ref.watch(friendsListProvider);
+    final viewMode = ref.watch(feedViewModeProvider);
+
+    final friends = friendsAsync.value?.friends ?? const [];
+    final stories = friends.map((f) {
+      final name = f.fullName.isNotEmpty ? f.fullName : f.displayName;
+      return FeedStoryItem(
+        id: f.id,
+        name: name,
+        initials: f.initials,
+        avatar: f.avatar,
+        gradient: _getStoryGradient(f.id.isNotEmpty ? f.id : name),
+        isSeen: true,
+      );
+    }).toList();
 
     return Scaffold(
       backgroundColor: bg,
-      floatingActionButton: FloatingActionButton.extended(
-        backgroundColor: AppColors.primary,
-        onPressed: () => ShareMilestoneSheet.show(context),
-        icon: const Icon(Icons.celebration_rounded, color: Colors.white, size: 20),
-        label: const Text(
-          'Đăng cột mốc',
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.w800,
-            fontSize: 13,
-          ),
-        ),
-      ),
-      appBar: PageHeader.subPage(
-        title: 'Bảng tin tài chính',
-        subtitle: 'Khoảnh khắc & chi tiêu cùng bạn bè',
-        action: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            IconButton(
-              icon: Icon(
-                _isSearching ? Icons.close_rounded : Icons.search_rounded,
-                color: foreground,
-              ),
-              onPressed: () {
-                setState(() {
-                  _isSearching = !_isSearching;
-                  if (!_isSearching) {
-                    _searchController.clear();
-                    ref.read(feedSearchQueryProvider.notifier).state = '';
-                  }
-                });
-              },
-            ),
-            IconButton(
-              icon: const Icon(
-                Icons.people_alt_rounded,
-                color: AppColors.primary,
-              ),
-              tooltip: 'Danh sách bạn bè',
-              onPressed: () => context.push(RoutePaths.friends),
-            ),
-            const SizedBox(width: 4),
-            InkWell(
-              onTap: () => context.push(RoutePaths.createTransaction),
-              borderRadius: BorderRadius.circular(99),
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6.5),
-                decoration: BoxDecoration(
-                  color: AppColors.primary,
-                  borderRadius: BorderRadius.circular(99),
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppColors.primary.withValues(alpha: 0.35),
-                      blurRadius: 10,
-                      offset: const Offset(0, 3),
-                    ),
-                  ],
-                ),
-                child: const Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(Icons.add_rounded, size: 16, color: Colors.white),
-                    SizedBox(width: 4),
-                    Text(
-                      'Chia bill',
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w800,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            const SizedBox(width: 8),
-          ],
-        ),
-      ),
       body: Column(
         children: [
-          // ── Mode Switcher Tab Bar: Bảng tin Bạn bè | Khám phá ──
-          Container(
-            color: surface,
-            padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
-            child: Container(
-              padding: const EdgeInsets.all(4),
-              decoration: BoxDecoration(
-                color: dark ? AppColors.darkBackground : AppColors.lightBackground,
-                borderRadius: BorderRadius.circular(14),
-                border: Border.all(color: border),
-              ),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: _buildFeedModeTab(
-                      label: 'Bảng tin Bạn bè',
-                      icon: Icons.people_alt_rounded,
-                      isSelected: _feedTab == 0,
-                      onTap: () => setState(() => _feedTab = 0),
-                      dark: dark,
-                    ),
-                  ),
-                  const SizedBox(width: 4),
-                  Expanded(
-                    child: _buildFeedModeTab(
-                      label: 'Khám phá',
-                      icon: Icons.explore_rounded,
-                      isSelected: _feedTab == 1,
-                      onTap: () => setState(() => _feedTab = 1),
-                      dark: dark,
-                    ),
-                  ),
-                ],
-              ),
+          // ── Banner Header Hero theo chuẩn .acc-hero (không subtitle, nút màu xanh hệ thống không outline) ──
+          BannerHeader(
+            title: 'Bảng tin tài chính',
+            subtitle: null,
+            leading: _buildHeaderButton(
+              iconName: 'arrow-left',
+              onTap: () {
+                if (context.canPop()) {
+                  context.pop();
+                } else {
+                  context.go(RoutePaths.home);
+                }
+              },
+              tooltip: 'Quay lại',
+            ),
+            action: _buildHeaderButton(
+              iconName: 'trophy',
+              onTap: () => ShareMilestoneSheet.show(context),
+              tooltip: 'Chia sẻ cột mốc tài chính',
+            ),
+            showBackButton: false,
+            gradient: const LinearGradient(
+              colors: [
+                Color(0xFF0F4B92),
+                AppColors.primary,
+                Color(0xFF0284C7),
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            child: FeedStoriesBar(
+              stories: stories,
+              isLoading: friendsAsync.isLoading,
+              selectedFriendName: _selectedFriendName,
+              onFriendSelected: (friend) {
+                setState(() => _selectedFriendName = friend);
+              },
+              onAddBill: () => context.push(RoutePaths.createTransaction),
+              onAddFriend: () => context.push(RoutePaths.friends),
             ),
           ),
-          // ── Search Bar (Conditional) ──
-          if (_isSearching)
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-              child: TextField(
-                controller: _searchController,
-                autofocus: true,
-                onChanged: (val) {
-                  ref.read(feedSearchQueryProvider.notifier).state = val.trim();
-                },
-                decoration: InputDecoration(
-                  hintText: 'Tìm theo bạn bè, địa điểm hoặc nội dung...',
-                  prefixIcon: const Icon(Icons.search_rounded, size: 20),
-                  suffixIcon: _searchController.text.isNotEmpty
-                      ? IconButton(
-                          icon: const Icon(Icons.clear_rounded, size: 18),
-                          onPressed: () {
-                            _searchController.clear();
-                            ref.read(feedSearchQueryProvider.notifier).state = '';
-                          },
-                        )
-                      : null,
-                  filled: true,
-                  fillColor: surface,
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 16),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(14),
-                    borderSide: BorderSide(color: border),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(14),
-                    borderSide: BorderSide(color: border),
-                  ),
-                ),
-              ),
-            ),
 
-          // ── Stories Bar (.lf-stories) ──
-          Container(
-            padding: const EdgeInsets.symmetric(vertical: 10),
-            decoration: BoxDecoration(
-              color: surface,
-              border: Border(
-                bottom: BorderSide(
-                  color: border.withValues(alpha: 0.6),
-                ),
-              ),
-            ),
-            child: SizedBox(
-              height: 94,
-              child: ListView.separated(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                scrollDirection: Axis.horizontal,
-                itemCount: _stories.length + 2,
-                separatorBuilder: (_, __) => const SizedBox(width: 14),
-                itemBuilder: (context, index) {
-                  if (index == 0) {
-                    return _buildAddBillStory(context, dark);
-                  }
-                  if (index == 1) {
-                    return _buildShareMilestoneStory(context, dark);
-                  }
-                  final story = _stories[index - 2];
-                  final isFilterActive = _selectedFriendName == story.name;
-                  return _buildFriendStory(
-                    story: story,
-                    isActive: isFilterActive,
-                    onTap: () {
-                      setState(() {
-                        if (_selectedFriendName == story.name) {
-                          _selectedFriendName = null;
-                        } else {
-                          _selectedFriendName = story.name;
-                        }
-                      });
-                    },
-                  );
-                },
-              ),
-            ),
+          // ── Thanh Tìm kiếm ngay trên phần lọc ──
+          FeedSearchBar(
+            controller: _searchController,
+            onChanged: (val) {
+              ref.read(feedSearchQueryProvider.notifier).state = val.trim();
+            },
+            onClear: () {
+              _searchController.clear();
+              ref.read(feedSearchQueryProvider.notifier).state = '';
+            },
           ),
 
           // ── Category Filter Chips (.filter-scroll) ──
-          Container(
-            padding: const EdgeInsets.symmetric(vertical: 10),
-            child: SizedBox(
-              height: 40,
-              child: ListView.separated(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                scrollDirection: Axis.horizontal,
-                itemCount: _categories.length,
-                separatorBuilder: (_, __) => const SizedBox(width: 8),
-                itemBuilder: (context, index) {
-                  final cat = _categories[index];
-                  final isSelected = _selectedCategory == cat.key;
-                  return _buildFilterChip(
-                    label: cat.label,
-                    isSelected: isSelected,
-                    onSelected: () {
-                      setState(() {
-                        _selectedCategory = cat.key;
-                      });
-                    },
-                  );
-                },
-              ),
-            ),
+          FeedCategoryFilterBar(
+            categories: _categories,
+            selectedCategory: _selectedCategory,
+            onCategorySelected: (catKey) {
+              setState(() => _selectedCategory = catKey);
+            },
           ),
 
           // ── Active Friend Filter Badge Indicator ──
@@ -347,8 +218,11 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Icon(Icons.person_pin_rounded,
-                            size: 14, color: AppColors.primary),
+                        const LucideIcon(
+                          name: 'user',
+                          size: 14,
+                          color: AppColors.primary,
+                        ),
                         const SizedBox(width: 4),
                         Text(
                           'Đang lọc theo: $_selectedFriendName',
@@ -363,8 +237,8 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
                           onTap: () {
                             setState(() => _selectedFriendName = null);
                           },
-                          child: const Icon(
-                            Icons.close_rounded,
+                          child: const LucideIcon(
+                            name: 'x',
                             size: 14,
                             color: AppColors.primary,
                           ),
@@ -388,8 +262,11 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(Icons.error_outline_rounded,
-                          size: 48, color: Colors.redAccent),
+                      const LucideIcon(
+                        name: 'alert-circle',
+                        size: 48,
+                        color: Colors.redAccent,
+                      ),
                       const SizedBox(height: 12),
                       Text(
                         'Không thể tải Bảng tin',
@@ -410,9 +287,15 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
                         style: FilledButton.styleFrom(
                           backgroundColor: AppColors.primary,
                         ),
-                        onPressed: () =>
-                            ref.read(feedListProvider.notifier).refresh(),
-                        icon: const Icon(Icons.refresh_rounded),
+                        onPressed: () {
+                          ref.read(feedListProvider.notifier).refresh();
+                          ref.read(friendsListProvider.notifier).refresh();
+                        },
+                        icon: const LucideIcon(
+                          name: 'refresh-cw',
+                          size: 16,
+                          color: Colors.white,
+                        ),
                         label: const Text('Thử lại'),
                       ),
                     ],
@@ -420,13 +303,11 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
                 ),
               ),
               data: (posts) {
-                // Filter posts
                 final filtered = posts.where((p) {
                   // Friend filter
                   if (_selectedFriendName != null &&
-                      !p.author.displayName
-                          .toLowerCase()
-                          .contains(_selectedFriendName!.toLowerCase())) {
+                      p.author.displayName != _selectedFriendName &&
+                      p.author.fullName != _selectedFriendName) {
                     return false;
                   }
 
@@ -435,12 +316,21 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
                     final catName = (p.category?.name ?? '').toLowerCase();
                     final pName = p.name.toLowerCase();
                     final match = switch (_selectedCategory) {
-                      'food' => catName.contains('ăn') || pName.contains('bún') || pName.contains('phở'),
-                      'income' => catName.contains('thu') || pName.contains('lương'),
-                      'travel' => catName.contains('du lịch') || pName.contains('đà lạt') || pName.contains('vé'),
-                      'coffee' => catName.contains('cà phê') || pName.contains('coffee') || pName.contains('brew'),
-                      'fitness' => catName.contains('thể thao') || pName.contains('gym'),
-                      'shopping' => catName.contains('sắm') || pName.contains('mua'),
+                      'food' => catName.contains('ăn') ||
+                          pName.contains('bún') ||
+                          pName.contains('phở'),
+                      'income' =>
+                        catName.contains('thu') || pName.contains('lương'),
+                      'travel' => catName.contains('du lịch') ||
+                          pName.contains('đà lạt') ||
+                          pName.contains('vé'),
+                      'coffee' => catName.contains('cà phê') ||
+                          pName.contains('coffee') ||
+                          pName.contains('brew'),
+                      'fitness' =>
+                        catName.contains('thể thao') || pName.contains('gym'),
+                      'shopping' =>
+                        catName.contains('sắm') || pName.contains('mua'),
                       _ => true,
                     };
                     if (!match) return false;
@@ -456,7 +346,10 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
                         (p.note ?? '').toLowerCase().contains(query);
                     final matchLocation =
                         (p.locationName ?? '').toLowerCase().contains(query);
-                    if (!matchAuthor && !matchName && !matchNote && !matchLocation) {
+                    if (!matchAuthor &&
+                        !matchName &&
+                        !matchNote &&
+                        !matchLocation) {
                       return false;
                     }
                   }
@@ -465,381 +358,186 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
                 }).toList();
 
                 if (filtered.isEmpty) {
-                  return _buildEmptyState(context);
+                  return FeedEmptyState(onResetFilter: _resetFilter);
                 }
 
                 return RefreshIndicator(
                   color: AppColors.primary,
-                  onRefresh: () =>
+                  onRefresh: () async {
+                    await Future.wait([
                       ref.read(feedListProvider.notifier).refresh(),
-                  child: ListView.builder(
-                    padding: const EdgeInsets.only(bottom: 24, top: 4),
-                    itemCount: filtered.length,
-                    itemBuilder: (context, index) {
-                      final post = filtered[index];
-                      return FeedPostCard(
-                        post: post,
-                        onToggleReaction: (emoji) {
-                          ref
-                              .read(feedListProvider.notifier)
-                              .toggleReaction(post.id, emoji);
-                        },
-                        onFetchReactions: () {
-                          return ref
-                              .read(feedListProvider.notifier)
-                              .getReactions(post.id);
-                        },
-                        onUpdatePost: ({amountHidden, note}) {
-                          ref.read(feedListProvider.notifier).updatePost(
-                                transactionId: post.id,
-                                amountHidden: amountHidden,
-                                note: note,
-                              );
-                        },
-                        onChatWithAuthor: () {
-                          context.push(RoutePaths.socialChat);
-                        },
-                        onShare: () {
-                          _sharePost(post.name);
-                        },
-                        onOpenComments: () {
-                          CommentsBottomSheet.show(
-                            context,
-                            transactionId: post.id,
-                            postTitle: post.name,
-                          );
-                        },
-                      );
-                    },
-                  ),
+                      ref.read(friendsListProvider.notifier).refresh(),
+                    ]);
+                  },
+                  child: viewMode == FeedViewMode.grid
+                      ? GridView.builder(
+                          padding: const EdgeInsets.fromLTRB(10, 6, 10, 24),
+                          gridDelegate:
+                              const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 3,
+                            crossAxisSpacing: 6,
+                            mainAxisSpacing: 6,
+                            childAspectRatio: 1.0,
+                          ),
+                          itemCount: filtered.length,
+                          itemBuilder: (context, index) {
+                            final post = filtered[index];
+                            return FeedGridCard(
+                              post: post,
+                              onTap: () => _showPostDetailModal(context, post),
+                            );
+                          },
+                        )
+                      : ListView.builder(
+                          padding: const EdgeInsets.only(bottom: 24, top: 4),
+                          itemCount: filtered.length,
+                          itemBuilder: (context, index) {
+                            final post = filtered[index];
+                            return FeedPostCard(
+                              post: post,
+                              onToggleReaction: ({emoji, symbol, label}) {
+                                ref
+                                    .read(feedListProvider.notifier)
+                                    .toggleReaction(
+                                      post.id,
+                                      emoji: emoji,
+                                      symbol: symbol,
+                                      label: label,
+                                    );
+                              },
+                              onFetchReactions: () {
+                                return ref
+                                    .read(feedListProvider.notifier)
+                                    .getReactions(post.id);
+                              },
+                              onUpdatePost: ({amountHidden, note}) {
+                                ref.read(feedListProvider.notifier).updatePost(
+                                      transactionId: post.id,
+                                      amountHidden: amountHidden,
+                                      note: note,
+                                    );
+                              },
+                              onChatWithAuthor: () {
+                                context.push(RoutePaths.socialChat);
+                              },
+                              onShare: () {
+                                _sharePost(post.name);
+                              },
+                              onOpenComments: () {
+                                CommentsBottomSheet.show(
+                                  context,
+                                  transactionId: post.id,
+                                  postTitle: post.name,
+                                );
+                              },
+                            );
+                          },
+                        ),
                 );
               },
             ),
           ),
         ],
       ),
+      bottomNavigationBar: SocialBottomBar(
+        currentTab: viewMode == FeedViewMode.grid
+            ? SocialTab.feedGrid
+            : SocialTab.feed,
+      ),
     );
   }
 
-  Widget _buildFeedModeTab({
-    required String label,
-    required IconData icon,
-    required bool isSelected,
-    required VoidCallback onTap,
-    required bool dark,
-  }) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(10),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(vertical: 8),
-        decoration: BoxDecoration(
-          color: isSelected ? AppColors.primary : Colors.transparent,
-          borderRadius: BorderRadius.circular(10),
-          boxShadow: isSelected
-              ? [
-                  BoxShadow(
-                    color: AppColors.primary.withValues(alpha: 0.3),
-                    blurRadius: 6,
-                    offset: const Offset(0, 2),
+  /// Hiển thị Bottom Sheet chi tiết bài đăng khi chạm vào ô vuông trong chế độ Lưới
+  void _showPostDetailModal(BuildContext context, FeedPost initialPost) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) {
+        return Consumer(
+          builder: (context, ref, _) {
+            final posts = ref.watch(feedListProvider).value ?? [];
+            final currentPost = posts.firstWhere(
+              (p) => p.id == initialPost.id,
+              orElse: () => initialPost,
+            );
+
+            final isDark = Theme.of(context).brightness == Brightness.dark;
+            final bg = isDark ? AppColors.darkSurface : Colors.white;
+
+            return Container(
+              constraints: BoxConstraints(
+                maxHeight: MediaQuery.of(context).size.height * 0.88,
+              ),
+              decoration: BoxDecoration(
+                color: bg,
+                borderRadius:
+                    const BorderRadius.vertical(top: Radius.circular(24)),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const SizedBox(height: 12),
+                  Container(
+                    width: 36,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: Colors.grey.withValues(alpha: 0.3),
+                      borderRadius: BorderRadius.circular(2),
+                    ),
                   ),
-                ]
-              : null,
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              icon,
-              size: 16,
-              color: isSelected
-                  ? Colors.white
-                  : (dark ? AppColors.darkMuted : AppColors.lightMuted),
-            ),
-            const SizedBox(width: 6),
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 13,
-                fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
-                color: isSelected
-                    ? Colors.white
-                    : (dark ? AppColors.darkForeground : AppColors.lightForeground),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildShareMilestoneStory(BuildContext context, bool dark) {
-    return InkWell(
-      onTap: () => ShareMilestoneSheet.show(context),
-      borderRadius: BorderRadius.circular(16),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            width: 58,
-            height: 58,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              gradient: const LinearGradient(
-                colors: [Color(0xFFF59E0B), Color(0xFFEA580C)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: const Color(0xFFF59E0B).withValues(alpha: 0.35),
-                  blurRadius: 8,
-                  offset: const Offset(0, 2),
-                ),
-              ],
-            ),
-            child: const Icon(
-              Icons.celebration_rounded,
-              color: Colors.white,
-              size: 24,
-            ),
-          ),
-          const SizedBox(height: 6),
-          const Text(
-            'Cột mốc',
-            style: TextStyle(
-              fontSize: 11,
-              fontWeight: FontWeight.w800,
-              color: Color(0xFFEA580C),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildAddBillStory(BuildContext context, bool dark) {
-    return InkWell(
-      onTap: () => context.push(RoutePaths.createTransaction),
-      borderRadius: BorderRadius.circular(16),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            width: 58,
-            height: 58,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: AppColors.primary.withValues(alpha: 0.1),
-              border: Border.all(
-                color: AppColors.primary,
-                width: 2,
-                style: BorderStyle.solid,
-              ),
-            ),
-            child: const Icon(
-              Icons.add_rounded,
-              color: AppColors.primary,
-              size: 24,
-            ),
-          ),
-          const SizedBox(height: 6),
-          const Text(
-            'Chia bill',
-            style: TextStyle(
-              fontSize: 11,
-              fontWeight: FontWeight.w800,
-              color: AppColors.primary,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildFriendStory({
-    required ({String name, String initials, List<Color> gradient, bool isSeen})
-        story,
-    required bool isActive,
-    required VoidCallback onTap,
-  }) {
-    final dark = Theme.of(context).brightness == Brightness.dark;
-    final foreground = dark ? AppColors.darkForeground : AppColors.lightForeground;
-
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(16),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            width: 58,
-            height: 58,
-            padding: const EdgeInsets.all(2.5),
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              gradient: isActive
-                  ? const LinearGradient(
-                      colors: [AppColors.primary, Color(0xFF00C6FF)],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    )
-                  : (story.isSeen
-                      ? const LinearGradient(
-                          colors: [Color(0xFFCBD5E1), Color(0xFF94A3B8)],
-                        )
-                      : LinearGradient(
-                          colors: story.gradient,
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        )),
-              boxShadow: isActive
-                  ? [
-                      BoxShadow(
-                        color: AppColors.primary.withValues(alpha: 0.4),
-                        blurRadius: 8,
-                        offset: const Offset(0, 2),
+                  const SizedBox(height: 10),
+                  Flexible(
+                    child: SingleChildScrollView(
+                      padding: const EdgeInsets.only(bottom: 24),
+                      child: FeedPostCard(
+                        post: currentPost,
+                        onToggleReaction: ({emoji, symbol, label}) {
+                          ref
+                              .read(feedListProvider.notifier)
+                              .toggleReaction(
+                                currentPost.id,
+                                emoji: emoji,
+                                symbol: symbol,
+                                label: label,
+                              );
+                        },
+                        onFetchReactions: () {
+                          return ref
+                              .read(feedListProvider.notifier)
+                              .getReactions(currentPost.id);
+                        },
+                        onUpdatePost: ({amountHidden, note}) {
+                          ref.read(feedListProvider.notifier).updatePost(
+                                transactionId: currentPost.id,
+                                amountHidden: amountHidden,
+                                note: note,
+                              );
+                        },
+                        onChatWithAuthor: () {
+                          Navigator.pop(ctx);
+                          context.push(RoutePaths.socialChat);
+                        },
+                        onShare: () {
+                          _sharePost(currentPost.name);
+                        },
+                        onOpenComments: () {
+                          Navigator.pop(ctx);
+                          CommentsBottomSheet.show(
+                            context,
+                            transactionId: currentPost.id,
+                            postTitle: currentPost.name,
+                          );
+                        },
                       ),
-                    ]
-                  : null,
-            ),
-            child: Container(
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                gradient: LinearGradient(
-                  colors: story.gradient,
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-                border: Border.all(
-                  color: dark ? AppColors.darkSurface : Colors.white,
-                  width: 2,
-                ),
+                    ),
+                  ),
+                ],
               ),
-              alignment: Alignment.center,
-              child: Text(
-                story.initials,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w900,
-                  fontSize: 14,
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(height: 6),
-          Text(
-            story.name,
-            style: TextStyle(
-              fontSize: 11,
-              fontWeight: isActive ? FontWeight.w900 : FontWeight.w700,
-              color: isActive ? AppColors.primary : foreground,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildFilterChip({
-    required String label,
-    required bool isSelected,
-    required VoidCallback onSelected,
-  }) {
-    final dark = Theme.of(context).brightness == Brightness.dark;
-
-    return ChoiceChip(
-      label: Text(label),
-      selected: isSelected,
-      showCheckmark: false,
-      onSelected: (_) => onSelected(),
-      labelStyle: TextStyle(
-        fontSize: 12.5,
-        fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
-        color: isSelected
-            ? Colors.white
-            : (dark ? AppColors.darkForeground : AppColors.lightForeground),
-      ),
-      backgroundColor: dark ? AppColors.darkSurface : Colors.white,
-      selectedColor: AppColors.primary,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(99),
-        side: BorderSide(
-          color: isSelected
-              ? AppColors.primary
-              : (dark ? AppColors.darkBorder : AppColors.lightBorder),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildEmptyState(BuildContext context) {
-    final dark = Theme.of(context).brightness == Brightness.dark;
-    final foreground = dark ? AppColors.darkForeground : AppColors.lightForeground;
-    final muted = dark ? AppColors.darkMuted : AppColors.lightMuted;
-
-    return Center(
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.all(32),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 80,
-              height: 80,
-              decoration: BoxDecoration(
-                color: AppColors.primary.withValues(alpha: 0.12),
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(
-                Icons.dynamic_feed_rounded,
-                size: 40,
-                color: AppColors.primary,
-              ),
-            ),
-            const SizedBox(height: 20),
-            Text(
-              'Không tìm thấy bài đăng phù hợp',
-              style: TextStyle(
-                fontSize: 17,
-                fontWeight: FontWeight.w700,
-                color: foreground,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Hãy thử chọn danh mục khác hoặc xóa bộ lọc để xem toàn bộ bảng tin bạn bè.',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 13,
-                height: 1.4,
-                color: muted,
-              ),
-            ),
-            const SizedBox(height: 20),
-            OutlinedButton.icon(
-              style: OutlinedButton.styleFrom(
-                foregroundColor: AppColors.primary,
-                side: const BorderSide(color: AppColors.primary),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-              onPressed: () {
-                setState(() {
-                  _selectedCategory = 'all';
-                  _selectedFriendName = null;
-                  _searchController.clear();
-                  ref.read(feedSearchQueryProvider.notifier).state = '';
-                });
-              },
-              icon: const Icon(Icons.refresh_rounded, size: 18),
-              label: const Text('Đặt lại bộ lọc'),
-            ),
-          ],
-        ),
-      ),
+            );
+          },
+        );
+      },
     );
   }
 }

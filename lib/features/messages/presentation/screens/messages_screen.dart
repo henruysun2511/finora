@@ -4,6 +4,8 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../app/router/route_names.dart';
 import '../../../../app/theme/app_colors.dart';
+import '../../../../core/widgets/navigation/social_bottom_bar.dart';
+import '../../../../core/widgets/navigation/social_tab.dart';
 import '../../../../core/widgets/page_header.dart';
 import '../providers/conversation_list_provider.dart';
 import '../widgets/conversation_tile.dart';
@@ -169,6 +171,7 @@ class _MessagesScreenState extends ConsumerState<MessagesScreen> {
           ),
         ],
       ),
+      bottomNavigationBar: const SocialBottomBar(currentTab: SocialTab.messages),
     );
   }
 

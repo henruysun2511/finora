@@ -6,6 +6,8 @@ import '../../../../app/router/route_names.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/widgets/app_toast.dart';
 import '../../../../core/widgets/confirm_dialog.dart';
+import '../../../../core/widgets/navigation/social_bottom_bar.dart';
+import '../../../../core/widgets/navigation/social_tab.dart';
 import '../../domain/models/friend.dart';
 import '../../domain/models/friend_request.dart';
 import '../../domain/models/user_search_result.dart';
@@ -192,6 +194,7 @@ class _FriendsListScreenState extends ConsumerState<FriendsListScreen>
             ],
           ),
         ),
+        bottomNavigationBar: const SocialBottomBar(currentTab: SocialTab.friends),
       ),
     );
   }
