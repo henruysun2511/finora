@@ -23,6 +23,14 @@ class HomeCategoryBreakdownCard extends ConsumerStatefulWidget {
 class _HomeCategoryBreakdownCardState
     extends ConsumerState<HomeCategoryBreakdownCard> {
   int _selectedCategoryIndex = 0;
+  late DateTime _selectedMonth;
+
+  @override
+  void initState() {
+    super.initState();
+    final now = DateTime.now();
+    _selectedMonth = DateTime(now.year, now.month);
+  }
 
   static const List<Color> _palette = [
     Color(0xFF0072D6), // Xanh thương hiệu - Ăn uống
@@ -35,8 +43,10 @@ class _HomeCategoryBreakdownCardState
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final breakdownAsync = ref.watch(dashboardCategoryBreakdownProvider);
-    final now = DateTime.now();
+    final monthParam =
+        '${_selectedMonth.year}-${_selectedMonth.month.toString().padLeft(2, '0')}';
+    final breakdownAsync =
+        ref.watch(dashboardCategoryBreakdownByMonthProvider(monthParam));
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -68,13 +78,15 @@ class _HomeCategoryBreakdownCardState
               ),
               error: (_, __) => _buildContent(
                 isDark: isDark,
-                month: now.month,
+                month: _selectedMonth.month,
+                year: _selectedMonth.year,
                 totalExpense: 8300000,
                 items: _mockCategories(),
               ),
               data: (data) => _buildContent(
                 isDark: isDark,
-                month: now.month,
+                month: _selectedMonth.month,
+                year: _selectedMonth.year,
                 totalExpense:
                     data.totalAmount > 0 ? data.totalAmount : 8300000,
                 items: data.categories.isNotEmpty
@@ -136,6 +148,7 @@ class _HomeCategoryBreakdownCardState
   Widget _buildContent({
     required bool isDark,
     required int month,
+    required int year,
     required double totalExpense,
     required List<CategoryBreakdownItemModel> items,
   }) {
@@ -176,25 +189,42 @@ class _HomeCategoryBreakdownCardState
                 ),
               ],
             ),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-              decoration: BoxDecoration(
-                color: isDark
-                    ? const Color(0xFF1E293B)
-                    : const Color(0xFFEFF6FF),
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(
+            // Nút bộ lọc chọn tháng tương tác
+            GestureDetector(
+              onTap: () => _showMonthPicker(context, isDark),
+              behavior: HitTestBehavior.opaque,
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                decoration: BoxDecoration(
                   color: isDark
-                      ? AppColors.darkBorder
-                      : const Color(0xFFBFDBFE),
+                      ? const Color(0xFF1E293B)
+                      : const Color(0xFFEFF6FF),
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(
+                    color: isDark
+                        ? AppColors.darkBorder
+                        : const Color(0xFFBFDBFE),
+                  ),
                 ),
-              ),
-              child: Text(
-                'Tháng $month',
-                style: GoogleFonts.inter(
-                  fontSize: 10.5,
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.primary,
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      'Tháng $month',
+                      style: GoogleFonts.inter(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w800,
+                        color: AppColors.primary,
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    const Icon(
+                      Icons.keyboard_arrow_down_rounded,
+                      size: 15,
+                      color: AppColors.primary,
+                    ),
+                  ],
                 ),
               ),
             ),
@@ -385,6 +415,137 @@ class _HomeCategoryBreakdownCardState
           ),
         ),
       ],
+    );
+  }
+
+  void _showMonthPicker(BuildContext context, bool isDark) {
+    final now = DateTime.now();
+    // Tạo danh sách 12 tháng gần nhất từ hiện tại lùi về
+    final months = List.generate(12, (index) {
+      return DateTime(now.year, now.month - index);
+    });
+
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (ctx) {
+        return Container(
+          decoration: BoxDecoration(
+            color: isDark ? AppColors.darkSurface : Colors.white,
+            borderRadius:
+                const BorderRadius.vertical(top: Radius.circular(24)),
+          ),
+          padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // Thanh kéo
+              Center(
+                child: Container(
+                  width: 36,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: isDark
+                        ? AppColors.darkBorder
+                        : AppColors.lightBorder,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'CHỌN THÁNG XEM CƠ CẤU CHI TIÊU',
+                    style: GoogleFonts.inter(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 0.6,
+                      color: AppColors.primary,
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: () => Navigator.pop(ctx),
+                    child: Icon(
+                      Icons.close_rounded,
+                      size: 20,
+                      color: isDark
+                          ? AppColors.darkMuted
+                          : AppColors.lightMuted,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              GridView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 3,
+                  mainAxisSpacing: 10,
+                  crossAxisSpacing: 10,
+                  childAspectRatio: 2.2,
+                ),
+                itemCount: months.length,
+                itemBuilder: (context, i) {
+                  final m = months[i];
+                  final isSelected = m.year == _selectedMonth.year &&
+                      m.month == _selectedMonth.month;
+
+                  return Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      onTap: () {
+                        setState(() {
+                          _selectedMonth = DateTime(m.year, m.month);
+                          _selectedCategoryIndex = 0;
+                        });
+                        Navigator.pop(ctx);
+                      },
+                      borderRadius: BorderRadius.circular(12),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: isSelected
+                              ? AppColors.primary
+                              : (isDark
+                                  ? AppColors.darkBackground
+                                  : const Color(0xFFF8FAFC)),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: isSelected
+                                ? AppColors.primary
+                                : (isDark
+                                    ? AppColors.darkBorder
+                                    : AppColors.lightBorder),
+                          ),
+                        ),
+                        alignment: Alignment.center,
+                        child: Text(
+                          'Tháng ${m.month}/${m.year}',
+                          style: GoogleFonts.inter(
+                            fontSize: 12,
+                            fontWeight: isSelected
+                                ? FontWeight.w800
+                                : FontWeight.w600,
+                            color: isSelected
+                                ? Colors.white
+                                : (isDark
+                                    ? AppColors.darkForeground
+                                    : AppColors.lightForeground),
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }

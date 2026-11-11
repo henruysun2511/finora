@@ -36,6 +36,13 @@ final dashboardBudgetHealthProvider =
   return repo.getBudgetHealth();
 });
 
+/// 2b. Provider nạp Sức khỏe ngân sách có lọc theo tháng (yyyy-MM)
+final dashboardBudgetHealthByMonthProvider =
+    FutureProvider.autoDispose.family<BudgetHealthModel, String?>((ref, month) async {
+  final repo = ref.watch(dashboardRepositoryProvider);
+  return repo.getBudgetHealth(month: month);
+});
+
 /// 3. Provider nạp Dòng tiền & Xu hướng chi tiêu
 final dashboardCashFlowProvider =
     FutureProvider.autoDispose<CashFlowModel>((ref) async {
@@ -48,6 +55,13 @@ final dashboardCategoryBreakdownProvider =
     FutureProvider.autoDispose<CategoryBreakdownModel>((ref) async {
   final repo = ref.watch(dashboardRepositoryProvider);
   return repo.getCategoryBreakdown();
+});
+
+/// 4b. Provider nạp Cơ cấu danh mục có lọc theo tháng (yyyy-MM)
+final dashboardCategoryBreakdownByMonthProvider =
+    FutureProvider.autoDispose.family<CategoryBreakdownModel, String?>((ref, month) async {
+  final repo = ref.watch(dashboardRepositoryProvider);
+  return repo.getCategoryBreakdown(month: month);
 });
 
 /// 5. Provider nạp Sổ nợ & Vị thế nợ ròng
