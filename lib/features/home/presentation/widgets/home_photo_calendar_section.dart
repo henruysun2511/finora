@@ -631,7 +631,7 @@ class _HomePhotoCalendarSectionState
     final List<_DetailTxEntry> entries = [];
 
     if (dailySummary != null) {
-      for (final g in dailySummary.dailyGroups) {
+      for (final g in dailySummary.days) {
         if (g.date.day == dayNum && g.date.month == _currentMonth.month) {
           for (final tx in g.transactions) {
             entries.add(
