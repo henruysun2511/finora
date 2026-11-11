@@ -50,7 +50,6 @@ class PageHeader extends StatelessWidget implements PreferredSizeWidget {
       final bgColor = backgroundColor ??
           (isDark ? AppColors.darkSurface : Colors.white);
       return Container(
-        color: bgColor,
         decoration: BoxDecoration(
           color: bgColor,
           border: showBottomBorder
