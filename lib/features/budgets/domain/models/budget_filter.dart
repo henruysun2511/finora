@@ -20,10 +20,11 @@ class BudgetFilter {
     BudgetPeriodType? periodType,
     String? searchQuery,
     bool clearWalletId = false,
+    bool clearPeriodType = false,
   }) {
     return BudgetFilter(
       walletId: clearWalletId ? null : (walletId ?? this.walletId),
-      periodType: periodType ?? this.periodType,
+      periodType: clearPeriodType ? null : (periodType ?? this.periodType),
       searchQuery: searchQuery ?? this.searchQuery,
     );
   }

@@ -5,6 +5,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../app/theme/app_colors.dart';
+import '../../../../core/widgets/form_card.dart';
+import '../../../../core/widgets/page_header.dart';
 import '../../../../app/theme/app_text_styles.dart';
 import '../../../../core/utils/currency_formatter.dart';
 import '../../../../core/widgets/app_toast.dart';
@@ -161,7 +163,7 @@ class _LoanFormScreenState extends ConsumerState<LoanFormScreen> {
           body: Center(child: CircularProgressIndicator()),
         ),
         error: (err, _) => Scaffold(
-          appBar: AppBar(title: const Text('Lỗi')),
+          appBar: const PageHeader.subPage(title: 'Lỗi tải khoản nợ'),
           body: Center(child: Text(err.toString())),
         ),
         data: (loan) {
@@ -179,82 +181,17 @@ class _LoanFormScreenState extends ConsumerState<LoanFormScreen> {
     return Scaffold(
       backgroundColor:
           isDark ? AppColors.darkBackground : AppColors.lightBackground,
-      body: Column(
-        children: [
-          // Banner đầu trang phong cách Solarn chứa nút quay lại và tiêu đề
-          Container(
-            width: double.infinity,
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [
-                  AppColors.balanceGradStart,
-                  AppColors.balanceGradMid,
-                  AppColors.balanceGradEnd,
-                ],
-                stops: [0.0, 0.55, 1.0],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              borderRadius: const BorderRadius.only(
-                bottomLeft: Radius.circular(28),
-                bottomRight: Radius.circular(28),
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: AppColors.primary.withValues(alpha: 0.32),
-                  blurRadius: 20,
-                  offset: const Offset(0, 8),
-                ),
-              ],
-            ),
-            child: SafeArea(
-              bottom: false,
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(18, 12, 18, 20),
-                child: Row(
-                  children: [
-                    InkWell(
-                      onTap: () => Navigator.of(context).pop(),
-                      borderRadius: BorderRadius.circular(12),
-                      child: Container(
-                        width: 38,
-                        height: 38,
-                        decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.16),
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
-                            color: Colors.white.withValues(alpha: 0.2),
-                          ),
-                        ),
-                        child: const Icon(
-                          Icons.arrow_back_ios_new_rounded,
-                          color: Colors.white,
-                          size: 17,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 14),
-                    Expanded(
-                      child: Text(
-                        widget.isEditing
-                            ? 'Chỉnh sửa khoản nợ'
-                            : 'Thêm khoản Vay / Nợ mới',
-                        style: GoogleFonts.inter(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w900,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-          Expanded(
-            child: Form(
-              key: _formKey,
-              child: ListView(
+      appBar: PageHeader.subPage(
+        title: widget.isEditing
+            ? 'Chỉnh sửa khoản nợ'
+            : 'Thêm khoản Vay / Nợ mới',
+        subtitle: widget.isEditing
+            ? 'Cập nhật số tiền và thông tin liên hệ'
+            : 'Ghi nhận khoản cho vay hoặc đi vay',
+      ),
+      body: Form(
+        key: _formKey,
+        child: ListView(
                 padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
           children: [
             if (formState.errorMessage != null)
@@ -280,77 +217,74 @@ class _LoanFormScreenState extends ConsumerState<LoanFormScreen> {
                 ),
               ),
 
-            // Segmented Type Toggle
+            // Phân loại khoản nợ (Chuẩn ChoiceChip đồng bộ form thiết lập ngân sách)
             if (!widget.isEditing)
-              Container(
-                margin: const EdgeInsets.only(bottom: 16),
-                decoration: BoxDecoration(
-                  color: isDark ? AppColors.darkSurface : const Color(0xFFE2E8F0),
-                  borderRadius: BorderRadius.circular(14),
-                ),
-                padding: const EdgeInsets.all(4),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 16),
                 child: Row(
-                  children: [
-                    for (final type in LoanType.values)
-                      Expanded(
-                        child: GestureDetector(
-                          onTap: () => setState(() {
+                  children: LoanType.values.map((type) {
+                    final isSelected = _type == type;
+                    final icon = switch (type) {
+                      LoanType.lent => Icons.arrow_outward_rounded,
+                      LoanType.borrowed => Icons.south_west_rounded,
+                      LoanType.installment => Icons.credit_card_rounded,
+                    };
+                    return Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 3),
+                        child: ChoiceChip(
+                          avatar: Icon(
+                            icon,
+                            size: 15,
+                            color: isSelected
+                                ? Colors.white
+                                : (isDark
+                                    ? AppColors.darkMuted
+                                    : AppColors.lightMuted),
+                          ),
+                          label: Center(
+                            child: Text(
+                              type.displayName,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          selected: isSelected,
+                          selectedColor: AppColors.primary,
+                          backgroundColor:
+                              isDark ? AppColors.darkSurface : Colors.white,
+                          side: BorderSide(
+                            color: isSelected
+                                ? AppColors.primary
+                                : (isDark
+                                    ? AppColors.darkBorder
+                                    : AppColors.lightBorder),
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          labelStyle: TextStyle(
+                            color: isSelected
+                                ? Colors.white
+                                : (isDark
+                                    ? AppColors.darkForeground
+                                    : AppColors.lightForeground),
+                            fontWeight: isSelected
+                                ? FontWeight.w700
+                                : FontWeight.w500,
+                            fontSize: 12.5,
+                          ),
+                          showCheckmark: false,
+                          onSelected: (_) => setState(() {
                             _type = type;
                             if (type != LoanType.installment) {
                               _installmentMonths = null;
                             }
                           }),
-                          child: AnimatedContainer(
-                            duration: const Duration(milliseconds: 180),
-                            padding: const EdgeInsets.symmetric(vertical: 10),
-                            decoration: BoxDecoration(
-                              color: _type == type
-                                  ? (isDark ? AppColors.primary : Colors.white)
-                                  : Colors.transparent,
-                              borderRadius: BorderRadius.circular(11),
-                              boxShadow: _type == type
-                                  ? [
-                                      BoxShadow(
-                                        color: Colors.black.withValues(alpha: 0.08),
-                                        blurRadius: 10,
-                                        offset: const Offset(0, 3),
-                                      ),
-                                    ]
-                                  : null,
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(
-                                  switch (type) {
-                                    LoanType.lent => Icons.arrow_outward_rounded,
-                                    LoanType.borrowed => Icons.south_west_rounded,
-                                    LoanType.installment => Icons.credit_card_rounded,
-                                  },
-                                  size: 15,
-                                  color: _type == type
-                                      ? (_type == type && isDark ? Colors.white : AppColors.primary)
-                                      : (isDark ? AppColors.darkMuted : AppColors.lightMuted),
-                                ),
-                                const SizedBox(width: 5),
-                                Text(
-                                  type.displayName,
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                    fontSize: 12.5,
-                                    fontWeight: FontWeight.w800,
-                                    color: _type == type
-                                        ? (_type == type && isDark ? Colors.white : AppColors.primary)
-                                        : (isDark ? AppColors.darkMuted : AppColors.lightMuted),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
                         ),
                       ),
-                  ],
+                    );
+                  }).toList(),
                 ),
               ),
 
@@ -436,8 +370,32 @@ class _LoanFormScreenState extends ConsumerState<LoanFormScreen> {
                         return ChoiceChip(
                           label: Text('$m tháng'),
                           selected: isSel,
-                          onSelected: (_) => setState(() => _installmentMonths = m),
-                          selectedColor: AppColors.primary.withValues(alpha: 0.16),
+                          onSelected: (_) =>
+                              setState(() => _installmentMonths = m),
+                          selectedColor: AppColors.primary,
+                          backgroundColor:
+                              isDark ? AppColors.darkSurface : Colors.white,
+                          side: BorderSide(
+                            color: isSel
+                                ? AppColors.primary
+                                : (isDark
+                                    ? AppColors.darkBorder
+                                    : AppColors.lightBorder),
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          labelStyle: TextStyle(
+                            color: isSel
+                                ? Colors.white
+                                : (isDark
+                                    ? AppColors.darkForeground
+                                    : AppColors.lightForeground),
+                            fontWeight:
+                                isSel ? FontWeight.w700 : FontWeight.w500,
+                            fontSize: 13,
+                          ),
+                          showCheckmark: false,
                         );
                       }).toList(),
                     ),
@@ -586,53 +544,8 @@ class _LoanFormScreenState extends ConsumerState<LoanFormScreen> {
           ],
         ),
       ),
-    ),
-  ],
-),
     );
   }
 }
 
-class _FormCard extends StatelessWidget {
-  const _FormCard({required this.title, required this.child});
-
-  final String title;
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
-    return Material(
-      color: isDark ? AppColors.darkSurface : Colors.white,
-      borderRadius: BorderRadius.circular(18),
-      elevation: 0,
-      child: Container(
-        margin: const EdgeInsets.only(bottom: 14),
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(18),
-          border: Border.all(
-            color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
-          ),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              title.toUpperCase(),
-              style: const TextStyle(
-                fontSize: 11,
-                fontWeight: FontWeight.w800,
-                letterSpacing: 0.5,
-                color: AppColors.primary,
-              ),
-            ),
-            const SizedBox(height: 12),
-            child,
-          ],
-        ),
-      ),
-    );
-  }
-}
+typedef _FormCard = FormCard;

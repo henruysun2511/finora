@@ -121,7 +121,12 @@ class ApiConstants {
 
   // ─── 7. Recurring Transactions (/recurring-transactions) ────────────────────
   static const String recurringTransactions = '/recurring-transactions';
-  static String recurringTransactionDetail(String id) => '/recurring-transactions/$id';
+  static String recurringTransactionDetail(String id) =>
+      '/recurring-transactions/$id';
+  static String recurringTransactionExecuteNow(String id) =>
+      '/recurring-transactions/$id/execute-now';
+  static String recurringTransactionTogglePause(String id) =>
+      '/recurring-transactions/$id/toggle-pause';
   static String recurringTransactionStatus(String id) =>
       '/recurring-transactions/$id/status';
 
@@ -178,6 +183,7 @@ class ApiConstants {
   // ─── 15. Financial Feed (/feed) ─────────────────────────────────────────────
   static const String feed = '/feed';
   static const String myFeed = '/feed/my';
+  static String feedPost(String transactionId) => '/feed/$transactionId';
   static String feedReactions(String transactionId) =>
       '/feed/$transactionId/reactions';
   static String feedComments(String transactionId) =>
@@ -190,12 +196,16 @@ class ApiConstants {
   static const String sendP2PMessage = '/messages';
   static String conversationDetail(String id) => '/messages/conversations/$id';
   static String friendMessages(String friendId) => '/messages/$friendId';
+  static String markMessagesAsRead(String friendId) => '/messages/$friendId/read';
+  static String recallMessage(String messageId) => '/messages/$messageId';
+  static String messageReactions(String messageId) => '/messages/$messageId/reactions';
 
   // ─── 17. Notifications (/notifications) ─────────────────────────────────────
   static const String notifications = '/notifications';
   static const String unreadNotificationsCount = '/notifications/unread-count';
   static const String markAllNotificationsAsRead = '/notifications/read-all';
   static String markNotificationAsRead(String id) => '/notifications/$id/read';
+  static String deleteNotification(String id) => '/notifications/$id';
 
   // ─── 18. Dashboard & Executive Analytics (/dashboard) ───────────────────────
   static const String dashboardOverview = '/dashboard/overview';

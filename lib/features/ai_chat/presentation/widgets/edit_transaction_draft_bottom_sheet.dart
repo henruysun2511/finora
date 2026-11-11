@@ -6,6 +6,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../app/theme/app_colors.dart';
+import '../../../../core/widgets/app_toast.dart';
 import '../../../../core/services/cloudinary_service.dart';
 import '../../domain/models/send_message_input.dart';
 
@@ -234,25 +235,14 @@ class _EditTransactionDraftBottomSheetState
           _photoUrl = result.secureUrl;
           _isUploadingPhoto = false;
         });
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Tải ảnh hóa đơn lên thành công!'),
-            backgroundColor: Color(0xFF10B981),
-            duration: Duration(seconds: 2),
-          ),
-        );
+        AppToast.success(context, 'Tải ảnh hóa đơn lên thành công!');
       }
     } catch (e) {
       if (mounted) {
         setState(() {
           _isUploadingPhoto = false;
         });
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Không thể tải ảnh: $e'),
-            backgroundColor: const Color(0xFFEF4444),
-          ),
-        );
+        AppToast.error(context, 'Không thể tải ảnh: $e');
       }
     }
   }
@@ -303,16 +293,12 @@ class _EditTransactionDraftBottomSheetState
     final amount = double.tryParse(amountText);
 
     if (name.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Vui lòng nhập tên khoản giao dịch')),
-      );
+      AppToast.warning(context, 'Vui lòng nhập tên khoản giao dịch');
       return;
     }
 
     if (amount == null || amount <= 0) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Vui lòng nhập số tiền hợp lệ (> 0)')),
-      );
+      AppToast.warning(context, 'Vui lòng nhập số tiền hợp lệ (> 0)');
       return;
     }
 

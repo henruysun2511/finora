@@ -1,5 +1,3 @@
-import 'package:intl/intl.dart';
-
 extension DateTimeX on DateTime {
   String get timeAgo {
     final diff = DateTime.now().difference(this);
@@ -7,9 +5,15 @@ extension DateTimeX on DateTime {
     if (diff.inMinutes < 60) return '${diff.inMinutes} phút trước';
     if (diff.inHours < 24) return '${diff.inHours} giờ trước';
     if (diff.inDays < 7) return '${diff.inDays} ngày trước';
-    return DateFormat('dd/MM/yyyy').format(this);
+    final d = day.toString().padLeft(2, '0');
+    final m = month.toString().padLeft(2, '0');
+    final y = year.toString();
+    return '$d/$m/$y';
   }
 
-  String get formattedDate => DateFormat('dd/MM/yyyy').format(this);
-  String get formattedDateTime => DateFormat('dd/MM/yyyy HH:mm').format(this);
+  String get formattedDate =>
+      '${day.toString().padLeft(2, '0')}/${month.toString().padLeft(2, '0')}/$year';
+
+  String get formattedDateTime =>
+      '${day.toString().padLeft(2, '0')}/${month.toString().padLeft(2, '0')}/$year ${hour.toString().padLeft(2, '0')}:${minute.toString().padLeft(2, '0')}';
 }

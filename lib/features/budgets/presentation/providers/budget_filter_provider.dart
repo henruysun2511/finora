@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../domain/models/budget_enums.dart';
 import '../../domain/models/budget_filter.dart';
 
 /// State quản lý bộ lọc danh sách ngân sách (lọc theo Ví hoặc Chu kỳ)
@@ -11,6 +12,13 @@ class BudgetFilterNotifier extends Notifier<BudgetFilter> {
     state = state.copyWith(walletId: walletId, clearWalletId: walletId == null);
   }
 
+  void setPeriodType(BudgetPeriodType? periodType) {
+    state = state.copyWith(
+      periodType: periodType,
+      clearPeriodType: periodType == null,
+    );
+  }
+
   void setSearchQuery(String? query) {
     state = state.copyWith(searchQuery: query);
   }
@@ -19,4 +27,3 @@ class BudgetFilterNotifier extends Notifier<BudgetFilter> {
 final budgetFilterProvider = NotifierProvider<BudgetFilterNotifier, BudgetFilter>(
   BudgetFilterNotifier.new,
 );
-

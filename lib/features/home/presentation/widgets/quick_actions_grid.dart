@@ -134,6 +134,14 @@ class QuickActionsGrid extends StatelessWidget {
                 bgColor: const Color(0xFF14B8A6),
                 onTap: () => context.push(RoutePaths.createAccount),
               ),
+              // 11. Danh mục thu chi
+              _QuickActionItem(
+                isDark: isDark,
+                icon: Icons.category_rounded,
+                label: 'Danh mục',
+                bgColor: const Color(0xFF14B8A6),
+                onTap: () => context.push(RoutePaths.categorySettings),
+              ),
               // 12. Lịch sử giao dịch
               _QuickActionItem(
                 isDark: isDark,

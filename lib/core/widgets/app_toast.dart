@@ -21,14 +21,15 @@ class AppToast {
     Duration duration = const Duration(seconds: 3),
     SnackBarAction? action,
   }) {
-    final messenger = ScaffoldMessenger.maybeOf(context);
-    if (messenger == null) return;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final messenger = ScaffoldMessenger.maybeOf(context);
+      if (messenger == null) return;
 
-    final config = _getToastConfig(type);
+      final config = _getToastConfig(type);
 
-    messenger
-      ..hideCurrentSnackBar()
-      ..showSnackBar(
+      messenger
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
         SnackBar(
           elevation: 6,
           behavior: SnackBarBehavior.floating,
@@ -75,6 +76,7 @@ class AppToast {
           ),
         ),
       );
+    });
   }
 
   static void success(

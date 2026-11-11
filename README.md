@@ -1,5 +1,5 @@
 # 🪙 FINORA - AI-Powered Personal Finance Management
-
+flutter run -d chrome --web-port 8080
 <div align="center">
 
 ![Flutter](https://img.shields.io/badge/Flutter-3.x-02569B?style=for-the-badge&logo=flutter&logoColor=white)

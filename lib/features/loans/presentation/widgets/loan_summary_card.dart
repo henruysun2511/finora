@@ -8,6 +8,7 @@ import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_text_styles.dart';
 import '../../../../core/errors/app_exception.dart';
 import '../../../../core/utils/currency_formatter.dart';
+import '../../../../core/widgets/banner_header.dart';
 import '../../domain/models/loan_filter.dart';
 import '../providers/loan_list_provider.dart';
 
@@ -25,245 +26,204 @@ class LoanSummaryCard extends ConsumerWidget {
   final VoidCallback? onToggleSort;
   final LoanSortOrder? sortOrder;
 
+  Widget _buildBlueButton({
+    required Widget icon,
+    required VoidCallback onTap,
+    String? tooltip,
+  }) {
+    Widget btn = Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(12),
+        child: Container(
+          width: 36,
+          height: 36,
+          decoration: BoxDecoration(
+            color: AppColors.primary,
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.primary.withValues(alpha: 0.35),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          alignment: Alignment.center,
+          child: icon,
+        ),
+      ),
+    );
+    if (tooltip != null) {
+      btn = Tooltip(message: tooltip, child: btn);
+    }
+    return btn;
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final summary = ref.watch(loanSummaryProvider);
 
-    return Container(
-      width: double.infinity,
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [
-            AppColors.balanceGradStart,
-            AppColors.balanceGradMid,
-            AppColors.balanceGradEnd,
+    return BannerHeader(
+      title: 'Sổ ghi nợ',
+      centerTitle: true,
+      onBack: onBack,
+      borderRadius: const BorderRadius.only(
+        bottomLeft: Radius.circular(28),
+        bottomRight: Radius.circular(28),
+      ),
+      gradient: const LinearGradient(
+        colors: [
+          Color(0xFF0F4B92),
+          AppColors.primary,
+          Color(0xFFF5B53F),
+        ],
+        stops: [0.0, 0.55, 1.0],
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+      ),
+      action: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (onToggleSort != null) ...[
+            _buildBlueButton(
+              icon: Icon(
+                sortOrder == LoanSortOrder.asc
+                    ? Icons.arrow_downward_rounded
+                    : Icons.arrow_upward_rounded,
+                color: Colors.white,
+                size: 18,
+              ),
+              onTap: onToggleSort!,
+              tooltip: 'Đổi thứ tự hiển thị',
+            ),
+            const SizedBox(width: 8),
           ],
-          stops: [0.0, 0.55, 1.0],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: const BorderRadius.only(
-          bottomLeft: Radius.circular(28),
-          bottomRight: Radius.circular(28),
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.primary.withValues(alpha: 0.32),
-            blurRadius: 24,
-            offset: const Offset(0, 10),
+          _buildBlueButton(
+            icon: const Icon(
+              Icons.add_rounded,
+              color: Colors.white,
+              size: 22,
+            ),
+            onTap: onAdd ?? () => context.push(RoutePaths.createLoan),
+            tooltip: 'Thêm khoản nợ',
           ),
         ],
       ),
-      child: SafeArea(
-        bottom: false,
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(18, 12, 18, 22),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+      child: summary.when(
+        loading: () => const SizedBox(
+          height: 110,
+          child: Center(
+            child: CircularProgressIndicator(color: Colors.white),
+          ),
+        ),
+        error: (error, _) => Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: Colors.white.withValues(alpha: 0.12),
+            borderRadius: BorderRadius.circular(14),
+          ),
+          child: Row(
             children: [
-              // ── Hàng 1: Nút quay lại trong banner + Tiêu đề + Hành động ──
-              Row(
-                children: [
-                  // Nút quay lại đặt trực tiếp trong banner
-                  InkWell(
-                    onTap: onBack ??
-                        () {
-                          if (context.canPop()) {
-                            context.pop();
-                          } else {
-                            context.go(RoutePaths.home);
-                          }
-                        },
-                    borderRadius: BorderRadius.circular(12),
-                    child: Container(
-                      width: 38,
-                      height: 38,
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.16),
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: Colors.white.withValues(alpha: 0.2),
-                        ),
-                      ),
-                      child: const Icon(
-                        Icons.arrow_back_ios_new_rounded,
-                        color: Colors.white,
-                        size: 17,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Text(
-                      'Sổ ghi nợ',
-                      style: GoogleFonts.inter(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w900,
-                        letterSpacing: -0.4,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                  if (onToggleSort != null)
-                    IconButton(
-                      tooltip: 'Đổi thứ tự hiển thị',
-                      onPressed: onToggleSort,
-                      icon: Icon(
-                        sortOrder == LoanSortOrder.asc
-                            ? Icons.arrow_downward_rounded
-                            : Icons.arrow_upward_rounded,
-                        color: Colors.white,
-                        size: 20,
-                      ),
-                    ),
-                  FilledButton.icon(
-                    style: FilledButton.styleFrom(
-                      backgroundColor: Colors.white,
-                      foregroundColor: AppColors.primary,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 8,
-                      ),
-                      visualDensity: VisualDensity.compact,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(99),
-                      ),
-                      elevation: 0,
-                    ),
-                    onPressed: onAdd ?? () => context.push(RoutePaths.createLoan),
-                    icon: const Icon(Icons.add_rounded, size: 16),
-                    label: const Text(
-                      'Thêm',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w900,
-                        fontSize: 12.5,
-                      ),
-                    ),
-                  ),
-                ],
+              Expanded(
+                child: Text(
+                  'Không tải được tổng quan: '
+                  '${error is AppException ? error.message : error}',
+                  style: AppTextStyles.bodySmall(color: Colors.white),
+                ),
               ),
-              const SizedBox(height: 18),
-
-              // ── Hàng 2: Vị thế nợ ròng Hero Figure ──
-              summary.when(
-                loading: () => const SizedBox(
-                  height: 110,
-                  child: Center(
-                    child: CircularProgressIndicator(color: Colors.white),
-                  ),
-                ),
-                error: (error, _) => Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.12),
-                    borderRadius: BorderRadius.circular(14),
-                  ),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          'Không tải được tổng quan: '
-                          '${error is AppException ? error.message : error}',
-                          style: AppTextStyles.bodySmall(color: Colors.white),
-                        ),
-                      ),
-                      IconButton(
-                        tooltip: 'Tải lại tổng quan',
-                        onPressed: () => ref.invalidate(loanSummaryProvider),
-                        icon: const Icon(Icons.refresh_rounded, color: Colors.white),
-                      ),
-                    ],
-                  ),
-                ),
-                data: (data) => Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          'VỊ THẾ NỢ RÒNG',
-                          style: GoogleFonts.inter(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w800,
-                            letterSpacing: 0.8,
-                            color: Colors.white.withValues(alpha: 0.85),
-                          ),
-                        ),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 9,
-                            vertical: 3,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.18),
-                            borderRadius: BorderRadius.circular(99),
-                          ),
-                          child: Text(
-                            '${data.activeCount} khoản đang nợ',
-                            style: GoogleFonts.inter(
-                              fontSize: 11,
-                              fontWeight: FontWeight.w700,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      '${data.netPosition >= 0 ? '+ ' : '- '}${CurrencyFormatter.formatVnd(data.netPosition.abs())}',
-                      style: GoogleFonts.outfit(
-                        fontSize: 28,
-                        fontWeight: FontWeight.w900,
-                        letterSpacing: -0.6,
-                        color: data.netPosition < 0
-                            ? const Color(0xFFFCA5A5)
-                            : const Color(0xFF86EFAC),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-
-                    // ── 3 Ô tóm tắt (Frosted Boxes theo chuẩn ui-sample-3) ──
-                    Row(
-                      children: [
-                        Expanded(
-                          child: _FrostedBox(
-                            label: 'Cần thu về',
-                            value: CurrencyFormatter.formatCompact(data.totalLent),
-                            valueColor: const Color(0xFF86EFAC),
-                            icon: Icons.arrow_downward_rounded,
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: _FrostedBox(
-                            label: 'Phải trả',
-                            value: CurrencyFormatter.formatCompact(
-                              data.totalBorrowed + data.totalInstallment,
-                            ),
-                            valueColor: const Color(0xFFFCA5A5),
-                            icon: Icons.arrow_upward_rounded,
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: _FrostedBox(
-                            label: 'Quá hạn',
-                            value: '${data.overdueCount} khoản',
-                            valueColor: data.overdueCount > 0
-                                ? const Color(0xFFFCA5A5)
-                                : Colors.white,
-                            icon: Icons.warning_amber_rounded,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
+              IconButton(
+                tooltip: 'Tải lại tổng quan',
+                onPressed: () => ref.invalidate(loanSummaryProvider),
+                icon: const Icon(Icons.refresh_rounded, color: Colors.white),
               ),
             ],
           ),
+        ),
+        data: (data) => Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'VỊ THẾ NỢ RÒNG',
+                  style: GoogleFonts.inter(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 0.8,
+                    color: Colors.white.withValues(alpha: 0.85),
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 9,
+                    vertical: 3,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.18),
+                    borderRadius: BorderRadius.circular(99),
+                  ),
+                  child: Text(
+                    '${data.activeCount} khoản đang nợ',
+                    style: GoogleFonts.inter(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w700,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 4),
+            Text(
+              '${data.netPosition >= 0 ? '+ ' : '- '}${CurrencyFormatter.formatVnd(data.netPosition.abs())}',
+              style: GoogleFonts.outfit(
+                fontSize: 32,
+                fontWeight: FontWeight.w900,
+                letterSpacing: -0.8,
+                color: Colors.white,
+              ),
+            ),
+            const SizedBox(height: 16),
+
+            // ── 3 Ô tóm tắt (Frosted Boxes theo chuẩn ui-sample-3) ──
+            Row(
+              children: [
+                Expanded(
+                  child: _FrostedBox(
+                    label: 'Cần thu về',
+                    value: CurrencyFormatter.formatCompact(data.totalLent),
+                    valueColor: const Color(0xFF86EFAC),
+                    icon: Icons.arrow_downward_rounded,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: _FrostedBox(
+                    label: 'Phải trả',
+                    value: CurrencyFormatter.formatCompact(
+                      data.totalBorrowed + data.totalInstallment,
+                    ),
+                    valueColor: const Color(0xFFFCA5A5),
+                    icon: Icons.arrow_upward_rounded,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: _FrostedBox(
+                    label: 'Quá hạn',
+                    value: '${data.overdueCount} khoản',
+                    valueColor: data.overdueCount > 0
+                        ? const Color(0xFFFCA5A5)
+                        : Colors.white,
+                    icon: Icons.warning_amber_rounded,
+                  ),
+                ),
+              ],
+            ),
+          ],
         ),
       ),
     );

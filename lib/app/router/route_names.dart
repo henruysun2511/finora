@@ -28,8 +28,10 @@ class RouteNames {
   static const String transactionDetail = 'transactionDetail';
   static const String createTransaction = 'createTransaction';
   static const String scanReceipt = 'scanReceipt';
+  static const String captureReceipt = 'captureReceipt';
   static const String recurringTransactions = 'recurringTransactions';
   static const String createRecurringTransaction = 'createRecurringTransaction';
+  static const String recurringTransactionDetail = 'recurringTransactionDetail';
 
   // 4. Wallets & Accounts (Ví & Tài khoản ngân hàng)
   static const String wallets = 'wallets';
@@ -61,8 +63,9 @@ class RouteNames {
   static const String categoryReport = 'categoryReport';
   static const String exchangeRates = 'exchangeRates';
 
-  // 9. Social, Friends & Messages (Bảng tin, Bạn bè & Tin nhắn)
-  static const String socialFeed = 'socialFeed';
+  // 9. Feed, Friends & Messages (Bảng tin, Bạn bè & Tin nhắn)
+  static const String feed = 'feed';
+  static const String socialFeed = 'feed';
   static const String friends = 'friends';
   static const String socialChat = 'socialChat';
 
@@ -111,8 +114,10 @@ class RoutePaths {
   static const String transactionDetail = '/transactions/:id';
   static const String createTransaction = '/transactions/create';
   static const String scanReceipt = '/transactions/scan';
+  static const String captureReceipt = '/transactions/capture';
   static const String recurringTransactions = '/transactions/recurring';
   static const String createRecurringTransaction = '/transactions/recurring/create';
+  static const String recurringTransactionDetail = '/transactions/recurring/:id';
 
   // 4. Wallets & Accounts
   static const String wallets = '/wallets';
@@ -146,7 +151,8 @@ class RoutePaths {
   static const String categoryReport = '/reports/category';
   static const String exchangeRates = '/exchange-rates';
 
-  // 9. Social, Friends & Messages
+  // 9. Feed, Friends & Messages
+  static const String feed = '/feed';
   static const String socialFeed = '/feed';
   static const String friends = '/friends';
   static const String socialChat = '/social-chat';

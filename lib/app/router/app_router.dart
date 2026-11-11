@@ -7,7 +7,7 @@ import '../../features/ai_chat/presentation/screens/ai_chat_screen.dart';
 import '../../features/analytics/presentation/screens/analytics_screen.dart';
 import '../../features/analytics/presentation/screens/cashflow_report_screen.dart';
 import '../../features/analytics/presentation/screens/category_report_screen.dart';
-import '../../features/analytics/presentation/screens/exchange_rates_screen.dart';
+import '../../features/exchange_rates/presentation/screens/exchange_rates_screen.dart';
 import '../../features/auth/presentation/providers/auth_provider.dart';
 import '../../features/auth/presentation/screens/forgot_password_screen.dart';
 import '../../features/auth/presentation/screens/login_screen.dart';
@@ -37,16 +37,18 @@ import '../../features/categories/presentation/screens/category_list_screen.dart
 import '../../features/settings/presentation/screens/notification_settings_screen.dart';
 import '../../features/settings/presentation/screens/security_settings_screen.dart';
 import '../../features/settings/presentation/screens/settings_screen.dart';
-import '../../features/social/presentation/screens/friends_screen.dart';
-import '../../features/social/presentation/screens/social_chat_screen.dart';
-import '../../features/social/presentation/screens/social_feed_screen.dart';
+import '../../features/feed/presentation/screens/friends_screen.dart';
+import '../../features/feed/presentation/screens/social_chat_screen.dart';
+import '../../features/feed/presentation/screens/feed_screen.dart';
 import '../../features/split_expenses/presentation/screens/create_split_expense_screen.dart';
 import '../../features/split_expenses/presentation/screens/split_expense_detail_screen.dart';
 import '../../features/split_expenses/presentation/screens/split_expenses_screen.dart';
-import '../../features/transactions/presentation/screens/create_recurring_transaction_screen.dart';
 import '../../features/transactions/presentation/screens/create_transaction_screen.dart';
-import '../../features/transactions/presentation/screens/recurring_transactions_screen.dart';
+import '../../features/recurring_transaction/presentation/screens/recurring_transaction_screen.dart' as recurring_list;
+import '../../features/recurring_transaction/presentation/screens/recurring_transaction_form_screen.dart' as recurring_form;
+import '../../features/recurring_transaction/presentation/screens/recurring_transaction_detail_screen.dart' as recurring_detail;
 import '../../features/transactions/presentation/screens/scan_receipt_screen.dart';
+import '../../features/transactions/presentation/screens/receipt_capture_screen.dart';
 import '../../features/transactions/presentation/screens/transaction_detail_screen.dart';
 import '../../features/transactions/presentation/screens/transactions_screen.dart';
 import '../../features/wallets/presentation/screens/account_detail_screen.dart';
@@ -249,15 +251,32 @@ GoRouter appRouter(AppRouterRef ref) {
       ),
       GoRoute(
         parentNavigatorKey: _rootNavigatorKey,
+        path: RoutePaths.captureReceipt,
+        name: RouteNames.captureReceipt,
+        builder: (context, state) => const ReceiptCaptureScreen(),
+      ),
+      GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
         path: RoutePaths.recurringTransactions,
         name: RouteNames.recurringTransactions,
-        builder: (context, state) => const RecurringTransactionsScreen(),
+        builder: (context, state) =>
+            const recurring_list.RecurringTransactionsScreen(),
       ),
       GoRoute(
         parentNavigatorKey: _rootNavigatorKey,
         path: RoutePaths.createRecurringTransaction,
         name: RouteNames.createRecurringTransaction,
-        builder: (context, state) => const CreateRecurringTransactionScreen(),
+        builder: (context, state) =>
+            const recurring_form.RecurringTransactionFormScreen(),
+      ),
+      GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
+        path: RoutePaths.recurringTransactionDetail,
+        name: RouteNames.recurringTransactionDetail,
+        builder: (context, state) {
+          final id = state.pathParameters['id'] ?? '';
+          return recurring_detail.RecurringTransactionDetailScreen(id: id);
+        },
       ),
       GoRoute(
         parentNavigatorKey: _rootNavigatorKey,
@@ -265,6 +284,9 @@ GoRouter appRouter(AppRouterRef ref) {
         name: RouteNames.transactionDetail,
         builder: (context, state) {
           final id = state.pathParameters['id'] ?? '';
+          if (id == 'create') {
+            return const CreateTransactionScreen();
+          }
           return TransactionDetailScreen(transactionId: id);
         },
       ),
@@ -421,13 +443,13 @@ GoRouter appRouter(AppRouterRef ref) {
       ),
 
       // ==========================================
-      // 9. PHÂN HỆ XÃ HỘI, BẠN BÈ & TIN NHẮN (Social)
+      // 9. PHÂN HỆ BẢNG TIN, BẠN BÈ & TIN NHẮN (Feed)
       // ==========================================
       GoRoute(
         parentNavigatorKey: _rootNavigatorKey,
-        path: RoutePaths.socialFeed,
-        name: RouteNames.socialFeed,
-        builder: (context, state) => const SocialFeedScreen(),
+        path: RoutePaths.feed,
+        name: RouteNames.feed,
+        builder: (context, state) => const FeedScreen(),
       ),
       GoRoute(
         parentNavigatorKey: _rootNavigatorKey,
