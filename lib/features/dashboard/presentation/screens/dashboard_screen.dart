@@ -14,11 +14,15 @@ import '../../domain/models/dashboard_overview_model.dart';
 import '../../domain/models/export_format.dart';
 import '../providers/dashboard_providers.dart';
 import '../providers/report_overview_provider.dart';
+import '../widgets/burn_rate_gauge_chart_widget.dart';
+import '../widgets/debt_balance_bar_chart_widget.dart';
+import '../widgets/dual_bar_chart_widget.dart';
 import '../widgets/report_category_breakdown_list.dart';
 import '../widgets/report_donut_chart.dart';
 import '../widgets/report_export_sheet.dart';
 import '../widgets/report_period_selector.dart';
 import '../widgets/report_stat_grid.dart';
+import '../widgets/rule_503020_stacked_chart_widget.dart';
 
 class DashboardScreen extends ConsumerStatefulWidget {
   const DashboardScreen({super.key});
@@ -559,6 +563,13 @@ class _CashFlowTab extends ConsumerWidget {
               ),
               const SizedBox(height: 18),
 
+              // Biểu đồ Cột đôi Tương tác Thu & Chi
+              DualBarChartWidget(
+                timeline: cf.timeline,
+                isDark: isDark,
+              ),
+              const SizedBox(height: 18),
+
               // Diễn biến dòng tiền theo timeline
               _SectionContainer(
                 isDark: isDark,
@@ -801,41 +812,12 @@ class _CategoryBreakdownTab extends ConsumerWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Quy tắc 50/30/20 Card
+              // Biểu đồ Thanh Phân Tầng Quy tắc 50/30/20
               if (rule != null)
-                _SectionContainer(
+                Rule503020StackedChartWidget(
+                  rule: rule,
+                  totalAmount: cat.totalAmount,
                   isDark: isDark,
-                  title: 'ĐÁNH GIÁ QUY TẮC TÀI CHÍNH 50/30/20',
-                  child: Column(
-                    children: [
-                      _RuleRow(
-                        isDark: isDark,
-                        label: 'Nhu cầu thiết yếu (Needs)',
-                        target: 'Mục tiêu: 50%',
-                        actualPct: rule.needs.percentage,
-                        amount: rule.needs.amount,
-                        color: const Color(0xFF3B82F6),
-                      ),
-                      const SizedBox(height: 12),
-                      _RuleRow(
-                        isDark: isDark,
-                        label: 'Mong muốn linh hoạt (Wants)',
-                        target: 'Mục tiêu: 30%',
-                        actualPct: rule.wants.percentage,
-                        amount: rule.wants.amount,
-                        color: const Color(0xFFF97316),
-                      ),
-                      const SizedBox(height: 12),
-                      _RuleRow(
-                        isDark: isDark,
-                        label: 'Tích lũy & Đầu tư (Savings)',
-                        target: 'Mục tiêu: 20%',
-                        actualPct: rule.savings.percentage,
-                        amount: rule.savings.amount,
-                        color: AppColors.success,
-                      ),
-                    ],
-                  ),
                 ),
               const SizedBox(height: 18),
 
@@ -1074,6 +1056,13 @@ class _BudgetHealthTab extends ConsumerWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              // Biểu đồ Vòng cung Tốc độ Đốt tiền Ngân sách (Gauge Chart)
+              BurnRateGaugeChartWidget(
+                health: health,
+                isDark: isDark,
+              ),
+              const SizedBox(height: 18),
+
               // Burn-rate AI Prediction Card
               Container(
                 padding: const EdgeInsets.all(18),
@@ -1367,6 +1356,13 @@ class _DebtsTab extends ConsumerWidget {
                     ),
                   ),
                 ],
+              ),
+              const SizedBox(height: 18),
+
+              // Biểu đồ Cân đối Vị thế Nợ
+              DebtBalanceBarChartWidget(
+                debts: debts,
+                isDark: isDark,
               ),
               const SizedBox(height: 18),
 
