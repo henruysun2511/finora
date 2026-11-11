@@ -63,6 +63,8 @@ class TopSpendingItemModel {
   final String categoryName;
   final String date;
 
+  String get title => name;
+
   const TopSpendingItemModel({
     required this.name,
     required this.amount,
