@@ -19,8 +19,6 @@ class FeedPost {
     this.reactionsCount = 0,
     this.topReactions = const [],
     this.myReaction,
-    this.myReactionSymbol,
-    this.myReactionLabel,
   });
 
   final String id;
@@ -38,10 +36,8 @@ class FeedPost {
   final int reactionsCount;
   final List<ReactionEmoji> topReactions;
   final ReactionEmoji? myReaction;
-  final String? myReactionSymbol;
-  final String? myReactionLabel;
 
-  bool get hasReacted => myReaction != null || myReactionSymbol != null;
+  bool get hasReacted => myReaction != null;
 
   FeedPost copyWith({
     String? id,
@@ -59,8 +55,6 @@ class FeedPost {
     int? reactionsCount,
     List<ReactionEmoji>? topReactions,
     ReactionEmoji? myReaction,
-    String? myReactionSymbol,
-    String? myReactionLabel,
     bool clearMyReaction = false,
   }) {
     return FeedPost(
@@ -79,10 +73,6 @@ class FeedPost {
       reactionsCount: reactionsCount ?? this.reactionsCount,
       topReactions: topReactions ?? this.topReactions,
       myReaction: clearMyReaction ? null : (myReaction ?? this.myReaction),
-      myReactionSymbol:
-          clearMyReaction ? null : (myReactionSymbol ?? this.myReactionSymbol),
-      myReactionLabel:
-          clearMyReaction ? null : (myReactionLabel ?? this.myReactionLabel),
     );
   }
 }

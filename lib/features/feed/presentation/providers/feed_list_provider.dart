@@ -10,11 +10,6 @@ final feedTabFilterProvider = StateProvider.autoDispose<int>((ref) => 0);
 
 final feedSearchQueryProvider = StateProvider.autoDispose<String>((ref) => '');
 
-enum FeedViewMode { list, grid }
-
-final feedViewModeProvider =
-    StateProvider<FeedViewMode>((ref) => FeedViewMode.list);
-
 final feedListProvider =
     AsyncNotifierProvider.autoDispose<FeedListNotifier, List<FeedPost>>(() {
   return FeedListNotifier();
@@ -36,37 +31,33 @@ class FeedListNotifier extends AutoDisposeAsyncNotifier<List<FeedPost>> {
   }
 
   /// Thả hoặc gỡ cảm xúc với Optimistic UI
-  Future<void> toggleReaction(
-    String transactionId, {
-    ReactionEmoji? emoji,
-    String? symbol,
-    String? label,
-  }) async {
+  Future<void> toggleReaction(String transactionId, ReactionEmoji emoji) async {
     final repo = ref.read(feedRepositoryProvider);
     final currentList = state.value;
     if (currentList == null) return;
 
-    final isRemoving = emoji == null;
+    final targetPost = currentList.firstWhere(
+      (p) => p.id == transactionId,
+      orElse: () => currentList.first,
+    );
+
+    final isRemoving = targetPost.myReaction == emoji;
 
     // 1. Optimistic Update
     state = AsyncData(currentList.map((post) {
       if (post.id == transactionId) {
         if (isRemoving) {
-          final newCount =
-              post.reactionsCount > 0 ? post.reactionsCount - 1 : 0;
+          final newCount = post.reactionsCount > 0 ? post.reactionsCount - 1 : 0;
           return post.copyWith(
             reactionsCount: newCount,
             clearMyReaction: true,
           );
         } else {
-          final wasReacted = post.hasReacted;
-          final newCount =
-              wasReacted ? post.reactionsCount : post.reactionsCount + 1;
+          final wasReacted = post.myReaction != null;
+          final newCount = wasReacted ? post.reactionsCount : post.reactionsCount + 1;
           return post.copyWith(
             reactionsCount: newCount,
             myReaction: emoji,
-            myReactionSymbol: symbol ?? emoji.symbol,
-            myReactionLabel: label ?? emoji.label,
           );
         }
       }

@@ -1,10 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import '../../../../app/theme/app_colors.dart';
-import '../../../../core/widgets/app_toast.dart';
-import '../../../../core/widgets/lucide_icon.dart';
-
 class PostCard extends StatefulWidget {
   const PostCard({
     super.key,
@@ -83,7 +79,12 @@ class _PostCardState extends State<PostCard>
   }
 
   void _showMessage(String message) {
-    AppToast.info(context, message);
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
   }
 
   void _openComments() {
@@ -193,7 +194,7 @@ class _PostCardState extends State<PostCard>
                               controller.clear();
                             });
                           },
-                          icon: const LucideIcon(name: 'send', size: 18, color: AppColors.primary),
+                          icon: const Icon(Icons.send_rounded),
                         ),
                       ],
                     ),
@@ -284,8 +285,8 @@ class _PostCardState extends State<PostCard>
                             ),
                           ),
                           const SizedBox(width: 5),
-                          const LucideIcon(
-                            name: 'shield-check',
+                          const Icon(
+                            Icons.verified_rounded,
                             size: 16,
                             color: lavender,
                           ),
@@ -307,9 +308,8 @@ class _PostCardState extends State<PostCard>
                   onPressed: () => _showMessage(
                     'Đây là bài đăng minh họa.',
                   ),
-                  icon: LucideIcon(
-                    name: 'more-horizontal',
-                    size: 18,
+                  icon: Icon(
+                    Icons.more_horiz_rounded,
                     color: secondary,
                   ),
                 ),
@@ -369,8 +369,8 @@ class _PostCardState extends State<PostCard>
                   children: [
                     Row(
                       children: [
-                        const LucideIcon(
-                          name: 'sparkles',
+                        const Icon(
+                          Icons.emoji_events_rounded,
                           color: Color(0xFFF3B64B),
                           size: 19,
                         ),
@@ -433,20 +433,22 @@ class _PostCardState extends State<PostCard>
                 ScaleTransition(
                   scale: _heartScale,
                   child: _action(
-                    iconName: 'heart',
+                    icon: _liked
+                        ? Icons.favorite_rounded
+                        : Icons.favorite_border_rounded,
                     label: '${widget.likes + (_liked ? 1 : 0)}',
                     color: _liked ? pink : secondary,
                     onPressed: _toggleLike,
                   ),
                 ),
                 _action(
-                  iconName: 'message-circle',
+                  icon: Icons.mode_comment_outlined,
                   label: '${widget.comments}',
                   color: lavender,
                   onPressed: _openComments,
                 ),
                 _action(
-                  iconName: 'share-2',
+                  icon: Icons.ios_share_rounded,
                   label: 'Chia sẻ',
                   color: mint,
                   onPressed: () => _showMessage(
@@ -459,9 +461,10 @@ class _PostCardState extends State<PostCard>
                   onPressed: () {
                     setState(() => _saved = !_saved);
                   },
-                  icon: LucideIcon(
-                    name: 'bookmark',
-                    size: 20,
+                  icon: Icon(
+                    _saved
+                        ? Icons.bookmark_rounded
+                        : Icons.bookmark_border_rounded,
                     color: _saved ? const Color(0xFFF2B94B) : secondary,
                   ),
                 ),
@@ -491,7 +494,7 @@ class _PostCardState extends State<PostCard>
   }
 
   Widget _action({
-    required String iconName,
+    required IconData icon,
     required String label,
     required Color color,
     required VoidCallback onPressed,
@@ -506,7 +509,7 @@ class _PostCardState extends State<PostCard>
         minimumSize: Size.zero,
         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
       ),
-      icon: LucideIcon(name: iconName, size: 18, color: color),
+      icon: Icon(icon, size: 18, color: color),
       label: Text(
         label,
         style: GoogleFonts.inter(

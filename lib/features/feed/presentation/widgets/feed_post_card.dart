@@ -1,12 +1,10 @@
-import 'dart:ui';
+﻿import 'dart:ui';
 import 'package:flutter/material.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/utils/currency_formatter.dart';
-import '../../../../core/widgets/lucide_icon.dart';
 import '../../domain/models/feed_post.dart';
 import '../../domain/models/post_reaction.dart';
 import '../../domain/models/reaction_emoji.dart';
-import 'feed_reaction_picker_sheet.dart';
 import 'post_reactions_sheet.dart';
 
 class FeedPostCard extends StatelessWidget {
@@ -18,15 +16,16 @@ class FeedPostCard extends StatelessWidget {
     this.onUpdatePost,
     this.onChatWithAuthor,
     this.onShare,
+    this.onOpenComments,
   });
 
   final FeedPost post;
-  final void Function({ReactionEmoji? emoji, String? symbol, String? label})
-      onToggleReaction;
+  final void Function(ReactionEmoji emoji) onToggleReaction;
   final Future<List<PostReaction>> Function() onFetchReactions;
   final void Function({bool? amountHidden, String? note})? onUpdatePost;
   final VoidCallback? onChatWithAuthor;
   final VoidCallback? onShare;
+  final VoidCallback? onOpenComments;
 
   String _formatTimeAgo(DateTime dateTime) {
     final diff = DateTime.now().difference(dateTime);
@@ -69,19 +68,58 @@ class FeedPostCard extends StatelessWidget {
     return gradients[hash % gradients.length];
   }
 
-  Future<void> _showReactionPickerSheet(BuildContext context) async {
-    final selected = await FeedReactionPickerSheet.show(
-      context,
-      currentReaction: post.myReaction,
-      currentSymbol: post.myReactionSymbol,
+  void _showReactionPicker(BuildContext context) {
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) {
+        final dark = Theme.of(ctx).brightness == Brightness.dark;
+        return Container(
+          margin: const EdgeInsets.all(16),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          decoration: BoxDecoration(
+            color: dark ? AppColors.darkSurface : Colors.white,
+            borderRadius: BorderRadius.circular(32),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.2),
+                blurRadius: 18,
+                offset: const Offset(0, 4),
+              ),
+            ],
+            border: Border.all(
+              color: dark ? AppColors.darkBorder : AppColors.lightBorder,
+            ),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: ReactionEmoji.values.map((emoji) {
+              final isSelected = post.myReaction == emoji;
+              return InkWell(
+                onTap: () {
+                  Navigator.pop(ctx);
+                  onToggleReaction(emoji);
+                },
+                borderRadius: BorderRadius.circular(24),
+                child: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: isSelected
+                        ? AppColors.primary.withValues(alpha: 0.15)
+                        : Colors.transparent,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Text(
+                    emoji.symbol,
+                    style: const TextStyle(fontSize: 28),
+                  ),
+                ),
+              );
+            }).toList(),
+          ),
+        );
+      },
     );
-    if (selected != null) {
-      onToggleReaction(
-        emoji: selected.emoji,
-        symbol: selected.symbol,
-        label: selected.label,
-      );
-    }
   }
 
   void _showPostOptions(BuildContext context) {
@@ -119,7 +157,7 @@ class FeedPostCard extends StatelessWidget {
                     style: TextStyle(fontSize: 12),
                   ),
                   value: post.isAmountHidden,
-                  activeThumbColor: AppColors.primary,
+                  activeColor: AppColors.primary,
                   onChanged: (val) {
                     Navigator.pop(ctx);
                     onUpdatePost?.call(amountHidden: val);
@@ -128,11 +166,8 @@ class FeedPostCard extends StatelessWidget {
                 const Divider(),
                 ListTile(
                   contentPadding: EdgeInsets.zero,
-                  leading: const LucideIcon(
-                    name: 'edit-3',
-                    color: AppColors.primary,
-                    size: 20,
-                  ),
+                  leading: const Icon(Icons.edit_note_rounded,
+                      color: AppColors.primary),
                   title: const Text('Chỉnh sửa cảm nghĩ (caption)'),
                   onTap: () {
                     Navigator.pop(ctx);
@@ -307,14 +342,6 @@ class FeedPostCard extends StatelessWidget {
                                     ),
                                     Row(
                                       children: [
-                                        LucideIcon(
-                                          name: 'clock',
-                                          size: 10.5,
-                                          color: Colors.white
-                                              .withValues(alpha: 0.72),
-                                          strokeWidth: 2.0,
-                                        ),
-                                        const SizedBox(width: 4),
                                         Text(
                                           _formatTimeAgo(post.transactionDate),
                                           style: TextStyle(
@@ -325,15 +352,14 @@ class FeedPostCard extends StatelessWidget {
                                           ),
                                         ),
                                         if (post.locationName != null) ...[
-                                          const SizedBox(width: 6),
-                                          LucideIcon(
-                                            name: 'map-pin',
-                                            size: 10.5,
-                                            color: Colors.white
-                                                .withValues(alpha: 0.72),
-                                            strokeWidth: 2.0,
+                                          Text(
+                                            ' · ',
+                                            style: TextStyle(
+                                              color: Colors.white
+                                                  .withValues(alpha: 0.72),
+                                              fontSize: 10.5,
+                                            ),
                                           ),
-                                          const SizedBox(width: 3),
                                           ConstrainedBox(
                                             constraints: const BoxConstraints(
                                                 maxWidth: 120),
@@ -375,12 +401,10 @@ class FeedPostCard extends StatelessWidget {
                                   color: Colors.white.withValues(alpha: 0.18),
                                 ),
                               ),
-                              child: const Center(
-                                child: LucideIcon(
-                                  name: 'more-horizontal',
-                                  color: Colors.white,
-                                  size: 18,
-                                ),
+                              child: const Icon(
+                                Icons.more_horiz_rounded,
+                                color: Colors.white,
+                                size: 18,
                               ),
                             ),
                           ),
@@ -462,8 +486,8 @@ class FeedPostCard extends StatelessWidget {
                                   child: Row(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
-                                      LucideIcon(
-                                        name: post.category?.icon ?? 'receipt',
+                                      Icon(
+                                        _getCategoryIcon(post.category!.icon),
                                         size: 13,
                                         color: Colors.white,
                                       ),
@@ -511,72 +535,44 @@ class FeedPostCard extends StatelessWidget {
             ),
           ),
 
-          // ── 2. VIEW INTERACTIONS BAR ──
+          // ── 2. REACTION ROW (.lf-reaction-row) ──
           Padding(
-            padding: const EdgeInsets.fromLTRB(16, 10, 16, 6),
-            child: post.reactionsCount > 0
-                ? InkWell(
-                    onTap: () {
-                      PostReactionsSheet.show(
-                        context,
-                        onFetchReactions: onFetchReactions,
-                      );
-                    },
-                    borderRadius: BorderRadius.circular(8),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 4),
-                      child: Row(
-                        children: [
-                          Text(
-                            'Xem danh sách tương tác',
-                            style: TextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w600,
-                              color: muted,
-                            ),
-                          ),
-                          const SizedBox(width: 6),
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 7, vertical: 1.5),
-                            decoration: BoxDecoration(
-                              color: AppColors.primary.withValues(alpha: 0.12),
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: Text(
-                              '${post.reactionsCount}',
-                              style: const TextStyle(
-                                fontSize: 11,
-                                fontWeight: FontWeight.w700,
-                                color: AppColors.primary,
-                              ),
-                            ),
-                          ),
-                          const Spacer(),
-                          LucideIcon(
-                            name: 'chevron-right',
-                            size: 15,
-                            color: muted,
-                          ),
-                        ],
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+            child: Row(
+              children: [
+                _buildQuickReactChip('🔥', ReactionEmoji.love),
+                const SizedBox(width: 7),
+                _buildQuickReactChip('😋', ReactionEmoji.haha),
+                const SizedBox(width: 7),
+                _buildQuickReactChip('❤️', ReactionEmoji.love),
+                const SizedBox(width: 7),
+                _buildQuickReactChip('👏', ReactionEmoji.clap),
+                const SizedBox(width: 7),
+                _buildQuickReactChip('🦊', ReactionEmoji.mascot),
+                const Spacer(),
+                InkWell(
+                  onTap: () async {
+                    final list = await onFetchReactions();
+                    if (context.mounted) {
+                      PostReactionsSheet.show(context, reactions: list);
+                    }
+                  },
+                  borderRadius: BorderRadius.circular(8),
+                  child: Padding(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                    child: Text(
+                      '${post.reactionsCount} tương tác',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700,
+                        color: muted,
                       ),
                     ),
-                  )
-                : Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 4),
-                    child: Row(
-                      children: [
-                        Text(
-                          'Chưa có hoạt động nào',
-                          style: TextStyle(
-                            fontSize: 12.5,
-                            fontWeight: FontWeight.w500,
-                            color: muted.withValues(alpha: 0.8),
-                          ),
-                        ),
-                      ],
-                    ),
                   ),
+                ),
+              ],
+            ),
           ),
 
           // ── 3. ACTIONS BAR (.lf-actions) ──
@@ -594,15 +590,13 @@ class FeedPostCard extends StatelessWidget {
                 // React Button (.lf-act-btn.react)
                 InkWell(
                   onTap: () {
-                    if (post.hasReacted) {
-                      // Đã chọn icon -> Nhấn thêm lần nữa để hủy
-                      onToggleReaction();
+                    if (post.myReaction != null) {
+                      onToggleReaction(post.myReaction!);
                     } else {
-                      // Chưa chọn icon -> Mở Bottom Sheet danh sách icon
-                      _showReactionPickerSheet(context);
+                      onToggleReaction(ReactionEmoji.love);
                     }
                   },
-                  onLongPress: () => _showReactionPickerSheet(context),
+                  onLongPress: () => _showReactionPicker(context),
                   borderRadius: BorderRadius.circular(99),
                   child: Container(
                     padding: const EdgeInsets.symmetric(
@@ -610,7 +604,7 @@ class FeedPostCard extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: post.hasReacted
                           ? (dark
-                              ? const Color(0xFFEA580C).withValues(alpha: 0.18)
+                              ? AppColors.primary.withValues(alpha: 0.2)
                               : const Color(0xFFFFF7ED))
                           : (dark
                               ? AppColors.darkBackground
@@ -619,7 +613,7 @@ class FeedPostCard extends StatelessWidget {
                       border: Border.all(
                         color: post.hasReacted
                             ? (dark
-                                ? const Color(0xFFEA580C)
+                                ? AppColors.primary
                                 : const Color(0xFFFFEDD5))
                             : border,
                       ),
@@ -627,51 +621,21 @@ class FeedPostCard extends StatelessWidget {
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        if (post.hasReacted) ...[
-                          if (post.myReactionSymbol == '🔥' ||
-                              (post.myReactionSymbol == null &&
-                                  post.myReaction == ReactionEmoji.love))
-                            const LucideIcon(
-                              name: 'flame',
-                              size: 16,
-                              color: Color(0xFFEA580C),
-                              strokeWidth: 2.2,
-                            )
-                          else
-                            Text(
-                              post.myReactionSymbol ??
-                                  post.myReaction?.symbol ??
-                                  '🔥',
-                              style: const TextStyle(fontSize: 16),
-                            ),
-                          const SizedBox(width: 6),
-                          Text(
-                            post.myReactionLabel ??
-                                post.myReaction?.label ??
-                                'Yêu thích',
-                            style: const TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w800,
-                              color: Color(0xFFEA580C),
-                            ),
+                        Text(
+                          post.myReaction?.symbol ?? '🔥',
+                          style: const TextStyle(fontSize: 15),
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          post.myReaction?.label ?? 'Thả tim',
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w800,
+                            color: post.hasReacted
+                                ? const Color(0xFFEA580C)
+                                : foreground,
                           ),
-                        ] else ...[
-                          LucideIcon(
-                            name: 'flame',
-                            size: 16,
-                            color: foreground,
-                            strokeWidth: 2.0,
-                          ),
-                          const SizedBox(width: 6),
-                          Text(
-                            'Thả tim',
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w800,
-                              color: foreground,
-                            ),
-                          ),
-                        ],
+                        ),
                       ],
                     ),
                   ),
@@ -679,6 +643,28 @@ class FeedPostCard extends StatelessWidget {
 
                 const SizedBox(width: 8),
 
+                // Comment Button
+                InkWell(
+                  onTap: onOpenComments,
+                  borderRadius: BorderRadius.circular(99),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8.5),
+                    decoration: BoxDecoration(
+                      color: dark ? AppColors.darkBackground : AppColors.lightBackground,
+                      borderRadius: BorderRadius.circular(99),
+                      border: Border.all(color: border),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.chat_bubble_outline_rounded, size: 15, color: foreground),
+                        const SizedBox(width: 5),
+                        Text('Bình luận', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: foreground)),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
                 // Chat with Author Button
                 InkWell(
                   onTap: onChatWithAuthor,
@@ -696,8 +682,8 @@ class FeedPostCard extends StatelessWidget {
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        LucideIcon(
-                          name: 'message-circle',
+                        Icon(
+                          Icons.chat_bubble_outline_rounded,
                           size: 15,
                           color: foreground,
                         ),
@@ -734,8 +720,8 @@ class FeedPostCard extends StatelessWidget {
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        LucideIcon(
-                          name: 'share-2',
+                        Icon(
+                          Icons.share_outlined,
                           size: 15,
                           color: foreground,
                         ),
@@ -760,210 +746,54 @@ class FeedPostCard extends StatelessWidget {
     );
   }
 
-  ({List<Color> gradient, String icon, String label}) _getVisualTheme() {
-    final catName = (post.category?.name ?? '').toLowerCase();
-    final pName = post.name.toLowerCase();
-    final catIcon = (post.category?.icon ?? '').toLowerCase();
-
-    // 1. Ăn uống
-    if (catIcon.contains('utensils') ||
-        catIcon.contains('food') ||
-        catName.contains('ăn') ||
-        pName.contains('bún') ||
-        pName.contains('phở') ||
-        pName.contains('cơm') ||
-        pName.contains('lẩu')) {
-      return (
-        gradient: const [Color(0xFF9A3412), Color(0xFFEA580C), Color(0xFFF59E0B)],
-        icon: 'utensils',
-        label: 'Ăn uống',
-      );
-    }
-
-    // 2. Cà phê & Đồ uống
-    if (catIcon.contains('coffee') ||
-        catName.contains('cà phê') ||
-        pName.contains('cà phê') ||
-        pName.contains('coffee') ||
-        pName.contains('trà sữa') ||
-        pName.contains('brew')) {
-      return (
-        gradient: const [Color(0xFF78350F), Color(0xFF92400E), Color(0xFFD97706)],
-        icon: 'coffee',
-        label: 'Cà phê & Đồ uống',
-      );
-    }
-
-    // 3. Thu nhập & Tiền lương
-    if (catIcon.contains('banknote') ||
-        catIcon.contains('wallet') ||
-        catName.contains('thu') ||
-        catName.contains('lương') ||
-        pName.contains('lương') ||
-        pName.contains('thưởng') ||
-        pName.contains('tiền')) {
-      return (
-        gradient: const [Color(0xFF065F46), Color(0xFF059669), Color(0xFF10B981)],
-        icon: 'banknote',
-        label: 'Thu nhập & Tiết kiệm',
-      );
-    }
-
-    // 4. Du lịch & Đi lại xa
-    if (catIcon.contains('plane') ||
-        catIcon.contains('flight') ||
-        catName.contains('du lịch') ||
-        pName.contains('du lịch') ||
-        pName.contains('đà lạt') ||
-        pName.contains('vé máy bay') ||
-        pName.contains('tour')) {
-      return (
-        gradient: const [Color(0xFF0369A1), Color(0xFF0284C7), Color(0xFF06B6D4)],
-        icon: 'plane',
-        label: 'Du lịch & Trải nghiệm',
-      );
-    }
-
-    // 5. Mua sắm
-    if (catIcon.contains('shopping') ||
-        catName.contains('mua') ||
-        catName.contains('sắm') ||
-        pName.contains('mua') ||
-        pName.contains('sắm') ||
-        pName.contains('shopee') ||
-        pName.contains('quần áo')) {
-      return (
-        gradient: const [Color(0xFF9D174D), Color(0xFFDB2777), Color(0xFFEC4899)],
-        icon: 'shopping-bag',
-        label: 'Mua sắm',
-      );
-    }
-
-    // 6. Thể thao & Gym
-    if (catIcon.contains('fitness') ||
-        catIcon.contains('dumbbell') ||
-        catName.contains('thể thao') ||
-        catName.contains('gym') ||
-        pName.contains('gym') ||
-        pName.contains('yoga') ||
-        pName.contains('chạy bộ')) {
-      return (
-        gradient: const [Color(0xFF5B21B6), Color(0xFF7C3AED), Color(0xFF8B5CF6)],
-        icon: 'dumbbell',
-        label: 'Thể thao & Sức khỏe',
-      );
-    }
-
-    // 7. Hóa đơn & Tiện ích
-    if (catIcon.contains('zap') ||
-        catName.contains('điện') ||
-        catName.contains('nước') ||
-        catName.contains('hóa đơn') ||
-        pName.contains('điện') ||
-        pName.contains('wifi') ||
-        pName.contains('hóa đơn')) {
-      return (
-        gradient: const [Color(0xFF92400E), Color(0xFFD97706), Color(0xFFF59E0B)],
-        icon: 'zap',
-        label: 'Hóa đơn & Tiện ích',
-      );
-    }
-
-    // 8. Giải trí
-    if (catIcon.contains('gamepad') ||
-        catName.contains('giải trí') ||
-        pName.contains('phim') ||
-        pName.contains('game') ||
-        pName.contains('karaoke')) {
-      return (
-        gradient: const [Color(0xFF4C1D95), Color(0xFF6B21A8), Color(0xFF9333EA)],
-        icon: 'gamepad-2',
-        label: 'Giải trí',
-      );
-    }
-
-    // 9. Di chuyển
-    if (catIcon.contains('car') ||
-        catName.contains('xe') ||
-        catName.contains('xăng') ||
-        pName.contains('xăng') ||
-        pName.contains('grab') ||
-        pName.contains('taxi')) {
-      return (
-        gradient: const [Color(0xFF155E75), Color(0xFF0891B2), Color(0xFF06B6D4)],
-        icon: 'car',
-        label: 'Di chuyển',
-      );
-    }
-
-    // Mặc định: FinTech Blue
-    return (
-      gradient: const [Color(0xFF0F4B92), AppColors.primary, Color(0xFF0284C7)],
-      icon: 'sparkles',
-      label: post.category?.name ?? 'Khoảnh khắc',
+  Widget _buildQuickReactChip(String emojiSymbol, ReactionEmoji emoji) {
+    return InkWell(
+      onTap: () => onToggleReaction(emoji),
+      borderRadius: BorderRadius.circular(20),
+      child: Container(
+        width: 32,
+        height: 32,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: AppColors.primary.withValues(alpha: 0.08),
+        ),
+        alignment: Alignment.center,
+        child: Text(
+          emojiSymbol,
+          style: const TextStyle(fontSize: 15),
+        ),
+      ),
     );
   }
 
   Widget _buildFallbackVisual() {
-    final theme = _getVisualTheme();
-
-    return Stack(
-      fit: StackFit.expand,
-      children: [
-        // Nền Gradient đa sắc theo danh mục
-        Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: theme.gradient,
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-          ),
+    return Container(
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          colors: [Color(0xFF1E293B), Color(0xFF0F172A)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
         ),
-
-        // Vòng tròn trang trí mờ góc trên
-        Positioned(
-          top: -40,
-          right: -40,
-          child: Container(
-            width: 180,
-            height: 180,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: Colors.white.withValues(alpha: 0.12),
-            ),
-          ),
+      ),
+      child: Center(
+        child: Icon(
+          Icons.auto_awesome_rounded,
+          size: 64,
+          color: Colors.white.withValues(alpha: 0.15),
         ),
-
-        // Vòng tròn trang trí mờ góc dưới
-        Positioned(
-          bottom: -50,
-          left: -30,
-          child: Container(
-            width: 160,
-            height: 160,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: Colors.white.withValues(alpha: 0.08),
-            ),
-          ),
-        ),
-
-        // Icon Lucide chìm lớn ở nền phía sau
-        Positioned(
-          right: 15,
-          bottom: 20,
-          child: Transform.rotate(
-            angle: -0.15,
-            child: LucideIcon(
-              name: theme.icon,
-              size: 140,
-              color: Colors.white.withValues(alpha: 0.08),
-              strokeWidth: 1.2,
-            ),
-          ),
-        ),
-      ],
+      ),
     );
+  }
+
+  IconData _getCategoryIcon(String? icon) {
+    return switch (icon?.toLowerCase()) {
+      'utensils' || 'food' => Icons.restaurant_rounded,
+      'wallet' || 'income' => Icons.account_balance_wallet_rounded,
+      'flight' || 'travel' => Icons.flight_takeoff_rounded,
+      'coffee' => Icons.local_cafe_rounded,
+      'fitness' || 'gym' => Icons.fitness_center_rounded,
+      'shopping' => Icons.shopping_bag_rounded,
+      _ => Icons.receipt_long_rounded,
+    };
   }
 }
