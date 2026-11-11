@@ -51,7 +51,7 @@ class FriendsMapper {
       'PENDING' || 'PENDING_RECEIVED' => FriendshipStatus.pending,
       'SENT_REQUEST' || 'SENT' || 'PENDING_SENT' => FriendshipStatus.sentRequest,
       'BLOCKED' => FriendshipStatus.blocked,
-      _ => FriendshipStatus.accepted,
+      _ => FriendshipStatus.none,
     };
   }
 }

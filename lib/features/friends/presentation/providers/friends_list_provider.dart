@@ -108,6 +108,9 @@ class FriendsListNotifier extends AsyncNotifier<FriendsListState> {
   /// Gửi lời mời kết bạn với Optimistic UI
   Future<void> sendRequest(String userId) async {
     final repo = ref.read(friendsRepositoryProvider);
+    final currentState = state.value;
+    if (currentState == null) return;
+
     // Optimistic: đánh dấu ngay trên search results
     state = state.whenData((s) {
       final updated = s.searchResults.map((r) {
@@ -131,23 +134,7 @@ class FriendsListNotifier extends AsyncNotifier<FriendsListState> {
       await repo.sendFriendRequest(userId);
     } catch (_) {
       // Revert nếu API thất bại
-      state = state.whenData((s) {
-        final reverted = s.searchResults.map((r) {
-          if (r.userId == userId) {
-            return UserSearchResult(
-              userId: r.userId,
-              fullName: r.fullName,
-              username: r.username,
-              avatar: r.avatar,
-              email: r.email,
-              friendshipStatus: FriendshipStatus.none,
-              friendshipId: r.friendshipId,
-            );
-          }
-          return r;
-        }).toList();
-        return s.copyWith(searchResults: reverted);
-      });
+      state = AsyncData(currentState);
       rethrow;
     }
   }

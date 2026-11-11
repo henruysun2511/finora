@@ -33,4 +33,4 @@ class Friend {
   }
 }
 
-enum FriendshipStatus { accepted, pending, sentRequest, blocked }
+enum FriendshipStatus { none, accepted, pending, sentRequest, blocked }
