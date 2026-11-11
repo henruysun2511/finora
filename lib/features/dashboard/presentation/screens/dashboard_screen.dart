@@ -497,45 +497,50 @@ class _CashFlowSection extends ConsumerWidget {
                               ),
                             ),
                           ),
-                          const SizedBox(width: 12),
+                          const SizedBox(width: 8),
                           Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                            child: Row(
                               children: [
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(
-                                      'Thu: +${CurrencyFormatter.formatCompact(item.income)}',
-                                      style: GoogleFonts.inter(
-                                        fontSize: 11,
-                                        fontWeight: FontWeight.w600,
-                                        color: AppColors.success,
-                                      ),
+                                Expanded(
+                                  child: Text(
+                                    '+${CurrencyFormatter.formatCompact(item.income)}',
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: GoogleFonts.inter(
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.w600,
+                                      color: AppColors.success,
                                     ),
-                                    Text(
-                                      'Chi: -${CurrencyFormatter.formatCompact(item.expense)}',
-                                      style: GoogleFonts.inter(
-                                        fontSize: 11,
-                                        fontWeight: FontWeight.w600,
-                                        color: AppColors.danger,
-                                      ),
+                                  ),
+                                ),
+                                const SizedBox(width: 4),
+                                Expanded(
+                                  child: Text(
+                                    '-${CurrencyFormatter.formatCompact(item.expense)}',
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: GoogleFonts.inter(
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.w600,
+                                      color: AppColors.danger,
                                     ),
-                                  ],
+                                  ),
                                 ),
                               ],
                             ),
                           ),
-                          const SizedBox(width: 10),
-                          Text(
-                            '${isPositive ? '+' : ''}${CurrencyFormatter.formatCompact(item.net)}',
-                            style: GoogleFonts.outfit(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w800,
-                              color: isPositive
-                                  ? AppColors.success
-                                  : AppColors.danger,
+                          const SizedBox(width: 8),
+                          FittedBox(
+                            fit: BoxFit.scaleDown,
+                            child: Text(
+                              '${isPositive ? '+' : ''}${CurrencyFormatter.formatCompact(item.net)}',
+                              style: GoogleFonts.outfit(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w800,
+                                color: isPositive
+                                    ? AppColors.success
+                                    : AppColors.danger,
+                              ),
                             ),
                           ),
                         ],

@@ -165,24 +165,29 @@ class CashflowReportScreen extends ConsumerWidget {
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Text(
-                                    item.dateLabel,
-                                    style: GoogleFonts.inter(
-                                      fontSize: 12.5,
-                                      fontWeight: FontWeight.w700,
-                                      color: isDark
-                                          ? AppColors.darkForeground
-                                          : AppColors.lightForeground,
+                                  Expanded(
+                                    child: Text(
+                                      item.dateLabel,
+                                      style: GoogleFonts.inter(
+                                        fontSize: 12.5,
+                                        fontWeight: FontWeight.w700,
+                                        color: isDark
+                                            ? AppColors.darkForeground
+                                            : AppColors.lightForeground,
+                                      ),
                                     ),
                                   ),
-                                  Text(
-                                    'Net: ${item.net >= 0 ? '+' : ''}${CurrencyFormatter.format(item.net)}',
-                                    style: GoogleFonts.inter(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w800,
-                                      color: item.net >= 0
-                                          ? AppColors.success
-                                          : AppColors.danger,
+                                  FittedBox(
+                                    fit: BoxFit.scaleDown,
+                                    child: Text(
+                                      'Net: ${item.net >= 0 ? '+' : ''}${CurrencyFormatter.format(item.net)}',
+                                      style: GoogleFonts.inter(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w800,
+                                        color: item.net >= 0
+                                            ? AppColors.success
+                                            : AppColors.danger,
+                                      ),
                                     ),
                                   ),
                                 ],
