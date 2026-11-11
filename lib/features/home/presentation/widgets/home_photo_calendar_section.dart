@@ -9,6 +9,7 @@ import '../../../../app/theme/app_colors.dart';
 import '../../../../core/utils/currency_formatter.dart';
 import '../../../../core/widgets/lucide_icon.dart';
 import '../../../dashboard/domain/models/calendar_dashboard_model.dart';
+import '../../../dashboard/domain/models/dashboard_overview_model.dart';
 import '../../../dashboard/presentation/providers/dashboard_providers.dart';
 import 'section_header.dart';
 
