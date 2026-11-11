@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -6,8 +7,9 @@ import '../../../../app/router/route_names.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/widgets/balance_card.dart';
 import '../../../auth/domain/models/user.dart';
+import '../../../dashboard/presentation/providers/dashboard_providers.dart';
 
-class HomeHeader extends StatelessWidget {
+class HomeHeader extends ConsumerWidget {
   final User? user;
 
   const HomeHeader({
@@ -16,8 +18,9 @@ class HomeHeader extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final overviewAsync = ref.watch(dashboardOverviewProvider);
 
     return Container(
       color: isDark ? AppColors.darkSurface : Colors.white,
@@ -158,15 +161,35 @@ class HomeHeader extends StatelessWidget {
           ),
           const SizedBox(height: 18),
 
-          // Balance Hero Card - Nhấn để mở Quản lý Ví & Tài khoản
-          BalanceCard(
-            netWorth: 24850000,
-            monthlyIncome: 15000000,
-            monthlyExpense: 8320000,
-            savingsRate: 44.5,
-            tierTitle: 'Gold Tier',
-            mascotMood: 'HAPPY',
-            onTap: () => context.go(RoutePaths.wallets),
+          // ── Balance Hero Card nạp động từ Dashboard Overview API ──────────
+          overviewAsync.when(
+            loading: () => const BalanceCard(
+              netWorth: 24850000,
+              monthlyIncome: 18500000,
+              monthlyExpense: 9680000,
+              savingsRate: 47.6,
+              tierTitle: 'Gold Tier',
+              mascotMood: 'HAPPY',
+            ),
+            error: (_, __) => BalanceCard(
+              netWorth: 24850000,
+              monthlyIncome: 18500000,
+              monthlyExpense: 9680000,
+              savingsRate: 47.6,
+              tierTitle: 'Gold Tier',
+              mascotMood: 'HAPPY',
+              onTap: () => context.push(RoutePaths.analytics),
+            ),
+            data: (data) => BalanceCard(
+              netWorth: data.netWorth,
+              monthlyIncome: data.monthlyCashflow.income,
+              monthlyExpense: data.monthlyCashflow.expense,
+              savingsRate: data.monthlyCashflow.savingsRate,
+              tierTitle: data.assetTier.title,
+              mascotMood: data.assetTier.mascotMood,
+              onTap: () => context.push(RoutePaths.analytics),
+            ),
+          ),
           ),
         ],
       ),

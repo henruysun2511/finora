@@ -17,3 +17,11 @@ extension DateTimeX on DateTime {
   String get formattedDateTime =>
       '${day.toString().padLeft(2, '0')}/${month.toString().padLeft(2, '0')}/$year ${hour.toString().padLeft(2, '0')}:${minute.toString().padLeft(2, '0')}';
 }
+
+class AppDateUtils {
+  AppDateUtils._();
+
+  static String formatDateTime(DateTime dt) => dt.formattedDateTime;
+  static String formatDate(DateTime dt) => dt.formattedDate;
+  static String timeAgo(DateTime dt) => dt.timeAgo;
+}

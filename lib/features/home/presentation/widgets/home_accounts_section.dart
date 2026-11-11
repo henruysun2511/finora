@@ -1,71 +1,130 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../app/router/route_names.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/utils/currency_formatter.dart';
+import '../../../dashboard/domain/models/dashboard_overview_model.dart';
+import '../../../dashboard/presentation/providers/dashboard_providers.dart';
 import 'section_header.dart';
 
-class HomeAccountsSection extends StatelessWidget {
+class HomeAccountsSection extends ConsumerWidget {
   const HomeAccountsSection({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final overviewAsync = ref.watch(dashboardOverviewProvider);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         SectionHeader(
-          title: 'Tài khoản',
+          title: 'Tài khoản & Nguồn tiền',
           actionText: 'Xem tất cả',
           onTap: () => context.go(RoutePaths.wallets),
         ),
         const SizedBox(height: 12),
         SizedBox(
           height: 108,
-          child: ListView(
-            scrollDirection: Axis.horizontal,
-            clipBehavior: Clip.none,
-            children: [
-              GestureDetector(
-                onTap: () => context.go(RoutePaths.wallets),
-                child: _AccountCard(
-                  isDark: isDark,
-                  name: 'Tiền mặt',
-                  balance: 2500000,
-                  icon: Icons.account_balance_wallet_rounded,
-                  chipText: 'Ví tiền mặt',
-                  chipColor: AppColors.success,
+          child: overviewAsync.when(
+            loading: () => ListView(
+              scrollDirection: Axis.horizontal,
+              clipBehavior: Clip.none,
+              children: [
+                GestureDetector(
+                  onTap: () => context.push(RoutePaths.wallets),
+                  child: _AccountCard(
+                    isDark: isDark,
+                    name: 'Tiền mặt',
+                    balance: 2500000,
+                    icon: Icons.account_balance_wallet_rounded,
+                    chipText: 'Ví tiền mặt',
+                    chipColor: AppColors.success,
+                  ),
                 ),
-              ),
-              const SizedBox(width: 12),
-              GestureDetector(
-                onTap: () => context.go(RoutePaths.wallets),
-                child: _AccountCard(
-                  isDark: isDark,
-                  name: 'Vietcombank',
-                  balance: 18350000,
-                  icon: Icons.account_balance_rounded,
-                  chipText: 'Tài khoản NH',
-                  chipColor: AppColors.primary,
-                  isHighlighted: true,
+                const SizedBox(width: 12),
+                GestureDetector(
+                  onTap: () => context.push(RoutePaths.wallets),
+                  child: _AccountCard(
+                    isDark: isDark,
+                    name: 'Vietcombank',
+                    balance: 18350000,
+                    icon: Icons.account_balance_rounded,
+                    chipText: 'Tài khoản NH',
+                    chipColor: AppColors.primary,
+                    isHighlighted: true,
+                  ),
                 ),
-              ),
-              const SizedBox(width: 12),
-              GestureDetector(
-                onTap: () => context.go(RoutePaths.wallets),
-                child: _AccountCard(
-                  isDark: isDark,
-                  name: 'MoMo',
-                  balance: 4000000,
-                  icon: Icons.smartphone_rounded,
-                  chipText: 'Ví điện tử',
-                  chipColor: AppColors.secondary,
+              ],
+            ),
+            error: (_, __) => ListView(
+              scrollDirection: Axis.horizontal,
+              clipBehavior: Clip.none,
+              children: [
+                GestureDetector(
+                  onTap: () => context.push(RoutePaths.wallets),
+                  child: _AccountCard(
+                    isDark: isDark,
+                    name: 'Tiền mặt',
+                    balance: 2500000,
+                    icon: Icons.account_balance_wallet_rounded,
+                    chipText: 'Ví tiền mặt',
+                    chipColor: AppColors.success,
+                  ),
                 ),
-              ),
-            ],
+                const SizedBox(width: 12),
+                GestureDetector(
+                  onTap: () => context.push(RoutePaths.wallets),
+                  child: _AccountCard(
+                    isDark: isDark,
+                    name: 'Vietcombank',
+                    balance: 18350000,
+                    icon: Icons.account_balance_rounded,
+                    chipText: 'Tài khoản NH',
+                    chipColor: AppColors.primary,
+                    isHighlighted: true,
+                  ),
+                ),
+              ],
+            ),
+            data: (data) {
+              final accounts = data.accountsSummary;
+              return ListView.separated(
+                scrollDirection: Axis.horizontal,
+                clipBehavior: Clip.none,
+                itemCount: accounts.length,
+                separatorBuilder: (_, __) => const SizedBox(width: 12),
+                itemBuilder: (context, index) {
+                  final acc = accounts[index];
+                  final isBank = acc.type == 'BANK';
+                  final isEWallet = acc.type == 'E_WALLET';
+
+                  return GestureDetector(
+                    onTap: () => context.push(RoutePaths.wallets),
+                    child: _AccountCard(
+                      isDark: isDark,
+                      name: acc.name,
+                      balance: acc.balance,
+                      icon: isBank
+                          ? Icons.account_balance_rounded
+                          : (isEWallet
+                              ? Icons.smartphone_rounded
+                              : Icons.account_balance_wallet_rounded),
+                      chipText: isBank
+                          ? 'Ngân hàng'
+                          : (isEWallet ? 'Ví điện tử' : 'Ví tiền mặt'),
+                      chipColor: isBank
+                          ? AppColors.primary
+                          : (isEWallet ? AppColors.secondary : AppColors.success),
+                      isHighlighted: isBank,
+                    ),
+                  );
+                },
+              );
+            },
           ),
         ),
       ],
