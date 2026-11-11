@@ -10,6 +10,8 @@ import '../../../../core/widgets/confirm_dialog.dart';
 import '../../../../core/widgets/navigation/social_bottom_bar.dart';
 import '../../../../core/widgets/navigation/social_tab.dart';
 import '../../../../core/widgets/page_header.dart';
+import '../../../messages/domain/models/conversation.dart';
+import '../../../messages/presentation/screens/chat_detail_screen.dart';
 import '../../domain/models/friend.dart';
 import '../../domain/models/friend_request.dart';
 import '../../domain/models/user_search_result.dart';
@@ -344,7 +346,22 @@ class _FriendsListScreenState extends ConsumerState<FriendsListScreen>
                     final friend = filtered[i];
                     return FriendCard(
                       friend: friend,
-                      onChat: () => context.push(RoutePaths.socialChat),
+                      onChat: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => ChatDetailScreen(
+                              conversation: Conversation(
+                                id: friend.userId,
+                                title: friend.displayName,
+                                avatar: friend.avatar,
+                                lastMessageContent: '',
+                                lastMessageAt: DateTime.now(),
+                              ),
+                            ),
+                          ),
+                        );
+                      },
                       onUnfriend: () => _confirmUnfriend(context, friend),
                       onBlock: () => _confirmBlock(context, friend),
                     );
