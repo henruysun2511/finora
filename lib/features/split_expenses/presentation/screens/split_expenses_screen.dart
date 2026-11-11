@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import 'package:finora_mb/app/router/route_names.dart';
 import 'package:finora_mb/app/theme/app_colors.dart';
 import 'package:finora_mb/core/widgets/lucide_icon.dart';
 import 'package:finora_mb/core/widgets/navigation/social_bottom_bar.dart';
@@ -16,9 +18,10 @@ class SplitExpensesScreen extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: isDark ? AppColors.darkBackground : AppColors.lightBackground,
-      appBar: const PageHeader.subPage(
+      appBar: PageHeader.subPage(
         title: 'Chia tiền nhóm',
         subtitle: 'Quản lý các đợt chia bill & hóa đơn',
+        onBack: () => context.go(RoutePaths.feed),
       ),
       body: Center(
         child: Padding(

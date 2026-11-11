@@ -25,5 +25,8 @@ abstract class FriendsRepository {
   Future<void> rejectFriendRequest(String friendshipId);
 
   /// Hủy kết bạn / xóa bạn
-  Future<void> removeFriend(String friendshipId);
+  Future<void> removeFriend(String targetUserId);
+
+  /// Chặn người dùng
+  Future<void> blockUser(String targetUserId);
 }

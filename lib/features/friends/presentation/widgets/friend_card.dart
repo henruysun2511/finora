@@ -8,11 +8,13 @@ class FriendCard extends StatelessWidget {
     required this.friend,
     required this.onChat,
     required this.onUnfriend,
+    this.onBlock,
   });
 
   final Friend friend;
   final VoidCallback onChat;
   final VoidCallback onUnfriend;
+  final VoidCallback? onBlock;
 
   LinearGradient _avatarGradient(String seed) {
     final gradients = [
@@ -106,8 +108,8 @@ class FriendCard extends StatelessWidget {
                 icon: Icon(Icons.more_vert_rounded, size: 20, color: muted),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                 color: surface,
-                itemBuilder: (_) => const [
-                  PopupMenuItem(
+                itemBuilder: (_) => [
+                  const PopupMenuItem(
                     value: 'unfriend',
                     child: Row(
                       children: [
@@ -124,9 +126,28 @@ class FriendCard extends StatelessWidget {
                       ],
                     ),
                   ),
+                  if (onBlock != null)
+                    const PopupMenuItem(
+                      value: 'block',
+                      child: Row(
+                        children: [
+                          Icon(Icons.block_rounded, size: 18, color: AppColors.danger),
+                          SizedBox(width: 10),
+                          Text(
+                            'Chặn người này',
+                            style: TextStyle(
+                              color: AppColors.danger,
+                              fontWeight: FontWeight.w600,
+                              fontSize: 14,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                 ],
                 onSelected: (val) {
                   if (val == 'unfriend') onUnfriend();
+                  if (val == 'block') onBlock?.call();
                 },
               ),
             ],

@@ -198,9 +198,18 @@ class FriendsRepositoryImpl implements FriendsRepository {
   }
 
   @override
-  Future<void> removeFriend(String friendshipId) async {
+  Future<void> removeFriend(String targetUserId) async {
     try {
-      await _api.removeFriend(friendshipId);
+      await _api.removeFriend(targetUserId);
+    } catch (_) {
+      // Bỏ qua lỗi mạng
+    }
+  }
+
+  @override
+  Future<void> blockUser(String targetUserId) async {
+    try {
+      await _api.blockUser(targetUserId);
     } catch (_) {
       // Bỏ qua lỗi mạng
     }

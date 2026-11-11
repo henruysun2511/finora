@@ -215,20 +215,46 @@ class FriendsListNotifier extends AsyncNotifier<FriendsListState> {
   }
 
   /// Hủy kết bạn / xóa bạn
-  Future<void> removeFriend(String friendshipId) async {
+  Future<void> removeFriend(String friendshipId, {String? targetUserId}) async {
     final repo = ref.read(friendsRepositoryProvider);
     final currentState = state.value;
     if (currentState == null) return;
 
+    final targetId = targetUserId ?? friendshipId;
+
     // Optimistic: xóa khỏi danh sách bạn bè
     state = state.whenData((s) {
       return s.copyWith(
-        friends: s.friends.where((f) => f.friendshipId != friendshipId).toList(),
+        friends: s.friends
+            .where((f) => f.friendshipId != friendshipId && f.userId != targetId)
+            .toList(),
       );
     });
 
     try {
-      await repo.removeFriend(friendshipId);
+      await repo.removeFriend(targetId);
+    } catch (_) {
+      // Revert
+      state = AsyncData(currentState);
+    }
+  }
+
+  /// Chặn người dùng
+  Future<void> blockUser(String targetUserId) async {
+    final repo = ref.read(friendsRepositoryProvider);
+    final currentState = state.value;
+    if (currentState == null) return;
+
+    // Optimistic: xóa khỏi danh sách bạn bè và lời mời
+    state = state.whenData((s) {
+      return s.copyWith(
+        friends: s.friends.where((f) => f.userId != targetUserId).toList(),
+        pendingRequests: s.pendingRequests.where((r) => r.requesterId != targetUserId).toList(),
+      );
+    });
+
+    try {
+      await repo.blockUser(targetUserId);
     } catch (_) {
       // Revert
       state = AsyncData(currentState);

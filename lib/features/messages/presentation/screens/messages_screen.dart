@@ -44,6 +44,7 @@ class _MessagesScreenState extends ConsumerState<MessagesScreen> {
       appBar: PageHeader.subPage(
         title: 'Hội thoại',
         subtitle: 'Chat bạn bè & nhóm ví chung',
+        onBack: () => context.go(RoutePaths.feed),
         action: IconButton(
           icon: const Icon(Icons.person_add_rounded, color: AppColors.primary),
           tooltip: 'Tìm bạn mới',

@@ -17,12 +17,14 @@ class PageHeader extends StatelessWidget implements PreferredSizeWidget {
   final bool isSubPage;
   final bool showBottomBorder;
   final Color? backgroundColor;
+  final PreferredSizeWidget? bottom;
 
   const PageHeader.page({
     super.key,
     required this.title,
     this.subtitle,
     this.action,
+    this.bottom,
   })  : isSubPage = false,
         onBack = null,
         showBottomBorder = false,
@@ -36,10 +38,12 @@ class PageHeader extends StatelessWidget implements PreferredSizeWidget {
     this.onBack,
     this.showBottomBorder = true,
     this.backgroundColor,
+    this.bottom,
   }) : isSubPage = true;
 
   @override
-  Size get preferredSize => Size.fromHeight(isSubPage ? 56.0 : 64.0);
+  Size get preferredSize =>
+      Size.fromHeight((isSubPage ? 56.0 : 64.0) + (bottom?.preferredSize.height ?? 0.0));
 
   @override
   Widget build(BuildContext context) {
@@ -52,7 +56,7 @@ class PageHeader extends StatelessWidget implements PreferredSizeWidget {
       return Container(
         decoration: BoxDecoration(
           color: bgColor,
-          border: showBottomBorder
+          border: showBottomBorder && bottom == null
               ? Border(
                   bottom: BorderSide(
                     color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
@@ -63,48 +67,54 @@ class PageHeader extends StatelessWidget implements PreferredSizeWidget {
         ),
         child: SafeArea(
           bottom: false,
-          child: Container(
-            height: 64,
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        title,
-                        style: GoogleFonts.inter(
-                          fontSize: 20,
-                          fontWeight: FontWeight.w900,
-                          letterSpacing: -0.5,
-                          color: isDark
-                              ? AppColors.darkForeground
-                              : AppColors.lightForeground,
-                        ),
-                      ),
-                      if (subtitle != null) ...[
-                        const SizedBox(height: 2),
-                        Text(
-                          subtitle!,
-                          style: GoogleFonts.inter(
-                            fontSize: 12,
-                            color: isDark
-                                ? AppColors.darkMuted
-                                : AppColors.lightMuted,
-                            fontWeight: FontWeight.w500,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                height: 64,
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            title,
+                            style: GoogleFonts.inter(
+                              fontSize: 20,
+                              fontWeight: FontWeight.w900,
+                              letterSpacing: -0.5,
+                              color: isDark
+                                  ? AppColors.darkForeground
+                                  : AppColors.lightForeground,
+                            ),
                           ),
-                        ),
-                      ],
-                    ],
-                  ),
+                          if (subtitle != null) ...[
+                            const SizedBox(height: 2),
+                            Text(
+                              subtitle!,
+                              style: GoogleFonts.inter(
+                                fontSize: 12,
+                                color: isDark
+                                    ? AppColors.darkMuted
+                                    : AppColors.lightMuted,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
+                    if (action != null) action!,
+                  ],
                 ),
-                if (action != null) action!,
-              ],
-            ),
+              ),
+              if (bottom != null) bottom!,
+            ],
           ),
         ),
       );
@@ -117,7 +127,7 @@ class PageHeader extends StatelessWidget implements PreferredSizeWidget {
     return Container(
       decoration: BoxDecoration(
         color: bgColor,
-        border: showBottomBorder
+        border: showBottomBorder && bottom == null
             ? Border(
                 bottom: BorderSide(
                   color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
@@ -128,87 +138,93 @@ class PageHeader extends StatelessWidget implements PreferredSizeWidget {
       ),
       child: SafeArea(
         bottom: false,
-        child: Container(
-          height: 56,
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: Row(
-            children: [
-              // Nút Back chuẩn .tx-back bo góc mềm 12px
-              Material(
-                color: Colors.transparent,
-                child: InkWell(
-                  onTap: () {
-                    if (onBack != null) {
-                      onBack!();
-                    } else if (context.canPop()) {
-                      context.pop();
-                    }
-                  },
-                  borderRadius: BorderRadius.circular(12),
-                  child: Container(
-                    width: 38,
-                    height: 38,
-                    decoration: BoxDecoration(
-                      color: isDark
-                          ? AppColors.darkBorder.withValues(alpha: 0.5)
-                          : const Color(0xFFF1F5F9),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              height: 56,
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Row(
+                children: [
+                  // Nút Back chuẩn .tx-back bo góc mềm 12px
+                  Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      onTap: () {
+                        if (onBack != null) {
+                          onBack!();
+                        } else if (context.canPop()) {
+                          context.pop();
+                        }
+                      },
                       borderRadius: BorderRadius.circular(12),
-                    ),
-                    alignment: Alignment.center,
-                    child: Icon(
-                      Icons.chevron_left_rounded,
-                      size: 22,
-                      color: isDark
-                          ? AppColors.darkForeground
-                          : AppColors.lightForeground,
+                      child: Container(
+                        width: 38,
+                        height: 38,
+                        decoration: BoxDecoration(
+                          color: isDark
+                              ? AppColors.darkBorder.withValues(alpha: 0.5)
+                              : const Color(0xFFF1F5F9),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        alignment: Alignment.center,
+                        child: Icon(
+                          Icons.chevron_left_rounded,
+                          size: 22,
+                          color: isDark
+                              ? AppColors.darkForeground
+                              : AppColors.lightForeground,
+                        ),
+                      ),
                     ),
                   ),
-                ),
-              ),
-              const SizedBox(width: 14),
+                  const SizedBox(width: 14),
 
-              // Tiêu đề (.tx-hdr-title)
-              Expanded(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      title,
-                      style: GoogleFonts.inter(
-                        fontSize: 16.5,
-                        fontWeight: FontWeight.w900,
-                        letterSpacing: -0.4,
-                        color: isDark
-                            ? AppColors.darkForeground
-                            : AppColors.lightForeground,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    if (subtitle != null) ...[
-                      const SizedBox(height: 1),
-                      Text(
-                        subtitle!,
-                        style: GoogleFonts.inter(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w500,
-                          color: isDark
-                              ? AppColors.darkMuted
-                              : AppColors.lightMuted,
+                  // Tiêu đề (.tx-hdr-title)
+                  Expanded(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          title,
+                          style: GoogleFonts.inter(
+                            fontSize: 16.5,
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: -0.4,
+                            color: isDark
+                                ? AppColors.darkForeground
+                                : AppColors.lightForeground,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
-                  ],
-                ),
-              ),
+                        if (subtitle != null) ...[
+                          const SizedBox(height: 1),
+                          Text(
+                            subtitle!,
+                            style: GoogleFonts.inter(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w500,
+                              color: isDark
+                                  ? AppColors.darkMuted
+                                  : AppColors.lightMuted,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
 
-              // Action bên phải (nếu có)
-              if (action != null) action!,
-            ],
-          ),
+                  // Action bên phải (nếu có)
+                  if (action != null) action!,
+                ],
+              ),
+            ),
+            if (bottom != null) bottom!,
+          ],
         ),
       ),
     );

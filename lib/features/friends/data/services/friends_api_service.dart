@@ -51,11 +51,11 @@ class FriendsApiService {
         .toList();
   }
 
-  /// GET /friends/search?q=query - Tìm kiếm người dùng theo tên hoặc email
+  /// GET /friends/search?query=query - Tìm kiếm người dùng theo tên hoặc email
   Future<List<UserSearchResultDto>> searchUsers(String query) async {
     final res = await _dio.get(
       ApiConstants.searchFriends,
-      queryParameters: {'q': query},
+      queryParameters: {'query': query, 'q': query},
     );
     final data = res.data['data'];
     final List items = data is List
@@ -93,8 +93,16 @@ class FriendsApiService {
     );
   }
 
-  /// DELETE /friends/:id - Hủy kết bạn (Unfriend)
-  Future<void> removeFriend(String friendshipId) async {
-    await _dio.delete(ApiConstants.removeFriend(friendshipId));
+  /// DELETE /friends/:id - Hủy kết bạn (Unfriend theo friendUserId)
+  Future<void> removeFriend(String targetUserId) async {
+    await _dio.delete(ApiConstants.removeFriend(targetUserId));
+  }
+
+  /// PATCH /friends/:id/status - Chặn người dùng (status = BLOCKED)
+  Future<void> blockUser(String targetUserId) async {
+    await _dio.patch(
+      '/friends/$targetUserId/status',
+      data: {'status': 'BLOCKED'},
+    );
   }
 }

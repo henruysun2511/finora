@@ -8,6 +8,7 @@ import '../../../../core/widgets/app_toast.dart';
 import '../../../../core/widgets/confirm_dialog.dart';
 import '../../../../core/widgets/navigation/social_bottom_bar.dart';
 import '../../../../core/widgets/navigation/social_tab.dart';
+import '../../../../core/widgets/page_header.dart';
 import '../../domain/models/friend.dart';
 import '../../domain/models/friend_request.dart';
 import '../../domain/models/user_search_result.dart';
@@ -57,9 +58,28 @@ class _FriendsListScreenState extends ConsumerState<FriendsListScreen>
       icon: Icons.person_remove_rounded,
     );
     if (confirmed && ctx.mounted) {
-      await ref.read(friendsListProvider.notifier).removeFriend(friend.friendshipId);
+      await ref
+          .read(friendsListProvider.notifier)
+          .removeFriend(friend.friendshipId, targetUserId: friend.userId);
       if (ctx.mounted) {
         AppToast.success(ctx, 'Đã hủy kết bạn với ${friend.displayName}');
+      }
+    }
+  }
+
+  Future<void> _confirmBlock(BuildContext ctx, Friend friend) async {
+    final confirmed = await showConfirmDialog(
+      ctx,
+      title: 'Chặn người dùng',
+      message:
+          'Bạn có chắc muốn chặn ${friend.displayName}?\nSau khi chặn, người này sẽ không thể gửi tin nhắn hoặc kết nối với bạn.',
+      confirmText: 'Chặn',
+      icon: Icons.block_rounded,
+    );
+    if (confirmed && ctx.mounted) {
+      await ref.read(friendsListProvider.notifier).blockUser(friend.userId);
+      if (ctx.mounted) {
+        AppToast.success(ctx, 'Đã chặn ${friend.displayName}');
       }
     }
   }
@@ -111,31 +131,10 @@ class _FriendsListScreenState extends ConsumerState<FriendsListScreen>
       length: 3,
       child: Scaffold(
         backgroundColor: bg,
-        appBar: AppBar(
-          backgroundColor: surface,
-          elevation: 0,
-          scrolledUnderElevation: 1,
-          leading: IconButton(
-            icon: Icon(Icons.arrow_back_rounded, color: foreground),
-            onPressed: () => context.pop(),
-          ),
-          title: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Bạn bè & Kết nối',
-                style: TextStyle(
-                  fontSize: 17,
-                  fontWeight: FontWeight.w800,
-                  color: foreground,
-                ),
-              ),
-              Text(
-                'Quản lý kết nối Finora',
-                style: TextStyle(fontSize: 11.5, color: muted),
-              ),
-            ],
-          ),
+        appBar: PageHeader.subPage(
+          title: 'Bạn bè & Kết nối',
+          subtitle: 'Quản lý kết nối Finora',
+          onBack: () => context.go(RoutePaths.feed),
           bottom: PreferredSize(
             preferredSize: const Size.fromHeight(48),
             child: Container(
@@ -298,6 +297,7 @@ class _FriendsListScreenState extends ConsumerState<FriendsListScreen>
                       friend: friend,
                       onChat: () => context.push(RoutePaths.socialChat),
                       onUnfriend: () => _confirmUnfriend(context, friend),
+                      onBlock: () => _confirmBlock(context, friend),
                     );
                   },
                 ),
