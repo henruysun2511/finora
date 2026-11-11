@@ -70,6 +70,12 @@ class FriendsListNotifier extends AsyncNotifier<FriendsListState> {
     );
   }
 
+  /// Làm mới danh sách bạn bè
+  Future<void> refresh() async {
+    ref.invalidateSelf();
+    await future;
+  }
+
   /// Tìm kiếm người dùng với debounce 400ms
   void search(String query) {
     _debounceTimer?.cancel();

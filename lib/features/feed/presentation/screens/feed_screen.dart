@@ -364,7 +364,7 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
                 return RefreshIndicator(
                   color: AppColors.primary,
                   onRefresh: () async {
-                    await Future.wait([
+                    await Future.wait<void>([
                       ref.read(feedListProvider.notifier).refresh(),
                       ref.read(friendsListProvider.notifier).refresh(),
                     ]);
