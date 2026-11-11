@@ -1826,7 +1826,7 @@ class _CalendarTab extends ConsumerWidget {
                             const SizedBox(width: 8),
                             Expanded(
                               child: Text(
-                                'Ngày ${spike.date}: Chi tiêu đột biến ${CurrencyFormatter.format(spike.amount)} (+${spike.deviationPercentage.toStringAsFixed(0)}% so với trung bình)',
+                                'Ngày ${spike.date}: Chi tiêu đột biến ${CurrencyFormatter.format(spike.totalExpense)} (${spike.transactionCount} giao dịch)',
                                 style: GoogleFonts.inter(
                                   fontSize: 12,
                                   color: isDark

@@ -169,3 +169,4 @@ final reportOverviewProvider =
     AutoDisposeNotifierProvider<ReportOverviewNotifier, ReportOverviewState>(
   ReportOverviewNotifier.new,
 );
+

@@ -64,9 +64,7 @@ class ReportMapper {
       totalIncome = cashFlow.totalIncome;
       totalExpense = cashFlow.totalExpense;
       netSavings = cashFlow.netSavings;
-      savingsRate = cashFlow.savingsRate;
-      momIncomeChange = cashFlow.momIncomeChange;
-      momExpenseChange = cashFlow.momExpenseChange;
+      savingsRate = totalIncome > 0 ? ((netSavings / totalIncome) * 100) : 0.0;
     } else if (overview != null) {
       totalIncome = overview.monthlyCashflow.income;
       totalExpense = overview.monthlyCashflow.expense;
@@ -74,41 +72,25 @@ class ReportMapper {
       savingsRate = overview.monthlyCashflow.savingsRate;
     }
 
-    final summary = ReportFinancialSummary(
+    final statMetrics = ReportStatMetrics(
       totalIncome: totalIncome,
       totalExpense: totalExpense,
       netSavings: netSavings,
       savingsRate: savingsRate,
       momIncomeChange: momIncomeChange,
       momExpenseChange: momExpenseChange,
+      comparePeriodLabel: 'so với kỳ trước',
     );
-
-    // 3. Quy tắc 50/30/20
-    ReportRule503020? rule503020;
-    if (categoryBreakdown?.rule503020Evaluation != null) {
-      final r = categoryBreakdown!.rule503020Evaluation!;
-      rule503020 = ReportRule503020(
-        needsAmount: r.needs.amount,
-        needsPercentage: r.needs.percentage,
-        wantsAmount: r.wants.amount,
-        wantsPercentage: r.wants.percentage,
-        savingsAmount: r.savings.amount,
-        savingsPercentage: r.savings.percentage,
-        isNeedsCompliant: r.needs.percentage <= 50,
-        isWantsCompliant: r.wants.percentage <= 30,
-        isSavingsCompliant: r.savings.percentage >= 20,
-      );
-    }
 
     return ReportOverviewData(
       period: period,
       targetDate: targetDate,
-      summary: summary,
+      statMetrics: statMetrics,
       slices: slices,
       categories: categories,
-      rule503020: rule503020,
       customStart: customStart,
       customEnd: customEnd,
     );
   }
 }
+

@@ -1,6 +1,7 @@
 enum ReportPeriod {
   week,
   month,
+  quarter,
   year,
   custom;
 
@@ -10,6 +11,8 @@ enum ReportPeriod {
         return 'Tuần';
       case ReportPeriod.month:
         return 'Tháng';
+      case ReportPeriod.quarter:
+        return 'Quý';
       case ReportPeriod.year:
         return 'Năm';
       case ReportPeriod.custom:
@@ -23,6 +26,8 @@ enum ReportPeriod {
         return 'WEEK';
       case ReportPeriod.month:
         return 'MONTH';
+      case ReportPeriod.quarter:
+        return 'QUARTER';
       case ReportPeriod.year:
         return 'YEAR';
       case ReportPeriod.custom:

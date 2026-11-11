@@ -61,6 +61,9 @@ class UpcomingBillsSummaryModel {
   final double projectedDisposableCash;
   final List<UpcomingBillItemModel> bills;
 
+  int get totalBillsCount => bills.length;
+  double get totalProjectedAmount => totalUpcoming30Days;
+
   const UpcomingBillsSummaryModel({
     required this.totalUpcoming30Days,
     required this.projectedDisposableCash,
@@ -84,6 +87,9 @@ class CalendarDashboardModel {
   final String month;
   final List<CalendarDayItemModel> days;
   final UpcomingBillsSummaryModel upcomingBillsSummary;
+
+  List<CalendarDayItemModel> get spendingSpikes =>
+      days.where((d) => d.hasSpikeExpense).toList();
 
   const CalendarDashboardModel({
     required this.month,
