@@ -12,7 +12,6 @@ import '../../../../core/widgets/navigation/social_tab.dart';
 import '../../../friends/friends.dart';
 import '../../domain/models/feed_post.dart';
 import '../providers/feed_list_provider.dart';
-import '../widgets/comments_bottom_sheet.dart';
 import '../widgets/feed_category_filter_bar.dart';
 import '../widgets/feed_empty_state.dart';
 import '../widgets/feed_grid_card.dart';
@@ -417,13 +416,6 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
                               onShare: () {
                                 _sharePost(post.name);
                               },
-                              onOpenComments: () {
-                                CommentsBottomSheet.show(
-                                  context,
-                                  transactionId: post.id,
-                                  postTitle: post.name,
-                                );
-                              },
                             );
                           },
                         ),
@@ -514,14 +506,6 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
                         },
                         onShare: () {
                           _sharePost(currentPost.name);
-                        },
-                        onOpenComments: () {
-                          Navigator.pop(ctx);
-                          CommentsBottomSheet.show(
-                            context,
-                            transactionId: currentPost.id,
-                            postTitle: currentPost.name,
-                          );
                         },
                       ),
                     ),

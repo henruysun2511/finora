@@ -18,7 +18,6 @@ class FeedPostCard extends StatelessWidget {
     this.onUpdatePost,
     this.onChatWithAuthor,
     this.onShare,
-    this.onOpenComments,
   });
 
   final FeedPost post;
@@ -28,7 +27,6 @@ class FeedPostCard extends StatelessWidget {
   final void Function({bool? amountHidden, String? note})? onUpdatePost;
   final VoidCallback? onChatWithAuthor;
   final VoidCallback? onShare;
-  final VoidCallback? onOpenComments;
 
   String _formatTimeAgo(DateTime dateTime) {
     final diff = DateTime.now().difference(dateTime);
@@ -716,44 +714,6 @@ class FeedPostCard extends StatelessWidget {
                     ),
                   ),
                 ),
-
-                if (onOpenComments != null) ...[
-                  const SizedBox(width: 8),
-                  InkWell(
-                    onTap: onOpenComments,
-                    borderRadius: BorderRadius.circular(99),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 14, vertical: 8.5),
-                      decoration: BoxDecoration(
-                        color: dark
-                            ? AppColors.darkBackground
-                            : AppColors.lightBackground,
-                        borderRadius: BorderRadius.circular(99),
-                        border: Border.all(color: border),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          LucideIcon(
-                            name: 'message-square',
-                            size: 15,
-                            color: foreground,
-                          ),
-                          const SizedBox(width: 6),
-                          Text(
-                            'Bình luận',
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w800,
-                              color: foreground,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
 
                 const Spacer(),
 
