@@ -203,29 +203,27 @@ class _HomePhotoCalendarSectionState
     // Nếu có giao dịch gần đây từ overview mà chưa có trong calendarDays thì bổ sung
     if (recentTransactions != null) {
       for (final tx in recentTransactions) {
-        final dt = DateTime.tryParse(tx.transactionDate);
-        if (dt != null) {
-          int? txDay;
-          if (dt.year == year && dt.month == month) {
-            txDay = dt.day;
-          } else {
-            final local = dt.toLocal();
-            if (local.year == year && local.month == month) {
-              txDay = local.day;
-            }
+        final dt = tx.transactionDate;
+        int? txDay;
+        if (dt.year == year && dt.month == month) {
+          txDay = dt.day;
+        } else {
+          final local = dt.toLocal();
+          if (local.year == year && local.month == month) {
+            txDay = local.day;
           }
-          if (txDay != null && !dayMap.containsKey(txDay)) {
-            dayMap[txDay] = CalendarDayItemModel(
-              date:
-                  '$year-${month.toString().padLeft(2, '0')}-${txDay.toString().padLeft(2, '0')}',
-              totalIncome: tx.type == 'INCOME' ? tx.amount : 0,
-              totalExpense: tx.type == 'EXPENSE' ? tx.amount : 0,
-              transactionCount: 1,
-              hasSpikeExpense: false,
-              highlightPhotoUrl: tx.photoUrl,
-            );
-            totalMonthTx += 1;
-          }
+        }
+        if (txDay != null && !dayMap.containsKey(txDay)) {
+          dayMap[txDay] = CalendarDayItemModel(
+            date:
+                '$year-${month.toString().padLeft(2, '0')}-${txDay.toString().padLeft(2, '0')}',
+            totalIncome: tx.type == 'INCOME' ? tx.amount : 0,
+            totalExpense: tx.type == 'EXPENSE' ? tx.amount : 0,
+            transactionCount: 1,
+            hasSpikeExpense: false,
+            highlightPhotoUrl: null,
+          );
+          totalMonthTx += 1;
         }
       }
     }
