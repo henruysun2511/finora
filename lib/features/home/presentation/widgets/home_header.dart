@@ -94,30 +94,6 @@ class HomeHeader extends ConsumerWidget {
               const SizedBox(width: 12),
               Row(
                 children: [
-                  // Mascot Mood / AI Assistant Chip
-                  GestureDetector(
-                    onTap: () => context.push(RoutePaths.aiChat),
-                    child: Container(
-                      width: 40,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        color: isDark
-                            ? const Color(0xFF1E293B)
-                            : const Color(0xFFF0FDF4),
-                        borderRadius: BorderRadius.circular(13),
-                        border: Border.all(
-                          color: const Color(0xFF10B981).withValues(alpha: 0.35),
-                        ),
-                      ),
-                      child: const Center(
-                        child: Text(
-                          '✨',
-                          style: TextStyle(fontSize: 17),
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
                   // Notification Bell Chip
                   GestureDetector(
                     onTap: () => context.push(RoutePaths.notifications),
