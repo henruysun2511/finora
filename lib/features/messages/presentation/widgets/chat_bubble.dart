@@ -130,7 +130,6 @@ class ChatBubble extends StatelessWidget {
                     onTap: () {
                       Navigator.pop(ctx);
                       onRecall?.call();
-                      AppToast.success(context, 'Đã thu hồi tin nhắn');
                     },
                   ),
               ],

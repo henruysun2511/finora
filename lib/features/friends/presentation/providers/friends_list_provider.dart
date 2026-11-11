@@ -140,7 +140,7 @@ class FriendsListNotifier extends AsyncNotifier<FriendsListState> {
               username: r.username,
               avatar: r.avatar,
               email: r.email,
-              friendshipStatus: FriendshipStatus.accepted,
+              friendshipStatus: FriendshipStatus.none,
               friendshipId: r.friendshipId,
             );
           }
@@ -148,6 +148,7 @@ class FriendsListNotifier extends AsyncNotifier<FriendsListState> {
         }).toList();
         return s.copyWith(searchResults: reverted);
       });
+      rethrow;
     }
   }
 
@@ -188,6 +189,7 @@ class FriendsListNotifier extends AsyncNotifier<FriendsListState> {
     } catch (_) {
       // Revert
       state = AsyncData(currentState);
+      rethrow;
     }
   }
 
@@ -211,6 +213,7 @@ class FriendsListNotifier extends AsyncNotifier<FriendsListState> {
     } catch (_) {
       // Revert
       state = AsyncData(currentState);
+      rethrow;
     }
   }
 
@@ -236,6 +239,7 @@ class FriendsListNotifier extends AsyncNotifier<FriendsListState> {
     } catch (_) {
       // Revert
       state = AsyncData(currentState);
+      rethrow;
     }
   }
 
@@ -258,6 +262,7 @@ class FriendsListNotifier extends AsyncNotifier<FriendsListState> {
     } catch (_) {
       // Revert
       state = AsyncData(currentState);
+      rethrow;
     }
   }
 }

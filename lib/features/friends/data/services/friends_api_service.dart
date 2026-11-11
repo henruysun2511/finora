@@ -73,7 +73,6 @@ class FriendsApiService {
       ApiConstants.friendRequests,
       data: {
         'addresseeId': userId,
-        'friendId': userId,
       },
     );
   }

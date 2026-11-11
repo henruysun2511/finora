@@ -1,7 +1,9 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../app/theme/app_colors.dart';
+import '../../../../core/widgets/app_toast.dart';
 import '../../../../core/widgets/page_header.dart';
 import '../../domain/models/conversation.dart';
 import '../providers/chat_detail_provider.dart';
@@ -18,6 +20,18 @@ class ChatDetailScreen extends ConsumerStatefulWidget {
 
 class _ChatDetailScreenState extends ConsumerState<ChatDetailScreen> {
   final ScrollController _scrollController = ScrollController();
+
+  String _formatError(dynamic e) {
+    if (e is DioException) {
+      final data = e.response?.data;
+      if (data is Map && data['message'] != null) {
+        final msg = data['message'];
+        if (msg is List && msg.isNotEmpty) return msg.join(', ');
+        return msg.toString();
+      }
+    }
+    return e?.toString() ?? 'Đã có lỗi xảy ra';
+  }
 
   void _scrollToBottom() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -235,11 +249,26 @@ class _ChatDetailScreenState extends ConsumerState<ChatDetailScreen> {
                     return ChatBubble(
                       message: msg,
                       isGroup: conv.isGroup,
-                      onToggleReaction: (emoji) {
-                        ref.read(chatDetailProvider(conv.id).notifier).toggleReaction(msg.id, emoji);
+                      onToggleReaction: (emoji) async {
+                        try {
+                          await ref.read(chatDetailProvider(conv.id).notifier).toggleReaction(msg.id, emoji);
+                        } catch (e) {
+                          if (context.mounted) {
+                            AppToast.error(context, 'Không thể thả cảm xúc: ${_formatError(e)}');
+                          }
+                        }
                       },
-                      onRecall: () {
-                        ref.read(chatDetailProvider(conv.id).notifier).recallMessage(msg.id);
+                      onRecall: () async {
+                        try {
+                          await ref.read(chatDetailProvider(conv.id).notifier).recallMessage(msg.id);
+                          if (context.mounted) {
+                            AppToast.success(context, 'Đã thu hồi tin nhắn');
+                          }
+                        } catch (e) {
+                          if (context.mounted) {
+                            AppToast.error(context, 'Thu hồi thất bại: ${_formatError(e)}');
+                          }
+                        }
                       },
                     );
                   },
@@ -251,9 +280,15 @@ class _ChatDetailScreenState extends ConsumerState<ChatDetailScreen> {
           // ── Input Bar ──
           ChatInputBar(
             isGroup: conv.isGroup,
-            onSendText: (text) {
-              ref.read(chatDetailProvider(conv.id).notifier).sendTextMessage(text);
-              _scrollToBottom();
+            onSendText: (text) async {
+              try {
+                await ref.read(chatDetailProvider(conv.id).notifier).sendTextMessage(text);
+                _scrollToBottom();
+              } catch (e) {
+                if (context.mounted) {
+                  AppToast.error(context, 'Không thể gửi tin nhắn: ${_formatError(e)}');
+                }
+              }
             },
           ),
         ],

@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -46,6 +47,18 @@ class _FriendsListScreenState extends ConsumerState<FriendsListScreen>
     super.dispose();
   }
 
+  String _formatError(dynamic e) {
+    if (e is DioException) {
+      final data = e.response?.data;
+      if (data is Map && data['message'] != null) {
+        final msg = data['message'];
+        if (msg is List && msg.isNotEmpty) return msg.join(', ');
+        return msg.toString();
+      }
+    }
+    return e?.toString() ?? 'Đã có lỗi xảy ra';
+  }
+
   // ── Actions ───────────────────────────────────────────────────────────────────
 
   Future<void> _confirmUnfriend(BuildContext ctx, Friend friend) async {
@@ -58,11 +71,17 @@ class _FriendsListScreenState extends ConsumerState<FriendsListScreen>
       icon: Icons.person_remove_rounded,
     );
     if (confirmed && ctx.mounted) {
-      await ref
-          .read(friendsListProvider.notifier)
-          .removeFriend(friend.friendshipId, targetUserId: friend.userId);
-      if (ctx.mounted) {
-        AppToast.success(ctx, 'Đã hủy kết bạn với ${friend.displayName}');
+      try {
+        await ref
+            .read(friendsListProvider.notifier)
+            .removeFriend(friend.friendshipId, targetUserId: friend.userId);
+        if (ctx.mounted) {
+          AppToast.success(ctx, 'Đã hủy kết bạn với ${friend.displayName}');
+        }
+      } catch (e) {
+        if (ctx.mounted) {
+          AppToast.error(ctx, 'Hủy kết bạn thất bại: ${_formatError(e)}');
+        }
       }
     }
   }
@@ -77,38 +96,68 @@ class _FriendsListScreenState extends ConsumerState<FriendsListScreen>
       icon: Icons.block_rounded,
     );
     if (confirmed && ctx.mounted) {
-      await ref.read(friendsListProvider.notifier).blockUser(friend.userId);
-      if (ctx.mounted) {
-        AppToast.success(ctx, 'Đã chặn ${friend.displayName}');
+      try {
+        await ref.read(friendsListProvider.notifier).blockUser(friend.userId);
+        if (ctx.mounted) {
+          AppToast.success(ctx, 'Đã chặn ${friend.displayName}');
+        }
+      } catch (e) {
+        if (ctx.mounted) {
+          AppToast.error(ctx, 'Chặn người dùng thất bại: ${_formatError(e)}');
+        }
       }
     }
   }
 
   Future<void> _acceptRequest(BuildContext ctx, FriendRequest req) async {
-    await ref.read(friendsListProvider.notifier).acceptRequest(req.friendshipId);
-    if (ctx.mounted) {
-      AppToast.success(ctx, 'Đã kết bạn với ${req.displayName} 🎉');
+    try {
+      await ref.read(friendsListProvider.notifier).acceptRequest(req.friendshipId);
+      if (ctx.mounted) {
+        AppToast.success(ctx, 'Đã kết bạn với ${req.displayName} 🎉');
+      }
+    } catch (e) {
+      if (ctx.mounted) {
+        AppToast.error(ctx, 'Không thể chấp nhận kết bạn: ${_formatError(e)}');
+      }
     }
   }
 
   Future<void> _rejectRequest(BuildContext ctx, FriendRequest req) async {
-    await ref.read(friendsListProvider.notifier).rejectRequest(req.friendshipId);
-    if (ctx.mounted) {
-      AppToast.info(ctx, 'Đã từ chối lời mời từ ${req.displayName}');
+    try {
+      await ref.read(friendsListProvider.notifier).rejectRequest(req.friendshipId);
+      if (ctx.mounted) {
+        AppToast.info(ctx, 'Đã từ chối lời mời từ ${req.displayName}');
+      }
+    } catch (e) {
+      if (ctx.mounted) {
+        AppToast.error(ctx, 'Từ chối lời mời thất bại: ${_formatError(e)}');
+      }
     }
   }
 
   Future<void> _cancelSentRequest(BuildContext ctx, FriendRequest req) async {
-    await ref.read(friendsListProvider.notifier).rejectRequest(req.friendshipId);
-    if (ctx.mounted) {
-      AppToast.info(ctx, 'Đã hủy lời mời gửi tới ${req.displayName}');
+    try {
+      await ref.read(friendsListProvider.notifier).rejectRequest(req.friendshipId);
+      if (ctx.mounted) {
+        AppToast.info(ctx, 'Đã hủy lời mời gửi tới ${req.displayName}');
+      }
+    } catch (e) {
+      if (ctx.mounted) {
+        AppToast.error(ctx, 'Hủy lời mời thất bại: ${_formatError(e)}');
+      }
     }
   }
 
   Future<void> _sendRequest(BuildContext ctx, UserSearchResult user) async {
-    await ref.read(friendsListProvider.notifier).sendRequest(user.userId);
-    if (ctx.mounted) {
-      AppToast.success(ctx, 'Đã gửi lời mời kết bạn tới ${user.displayName} ✉️');
+    try {
+      await ref.read(friendsListProvider.notifier).sendRequest(user.userId);
+      if (ctx.mounted) {
+        AppToast.success(ctx, 'Đã gửi lời mời kết bạn tới ${user.displayName} ✉️');
+      }
+    } catch (e) {
+      if (ctx.mounted) {
+        AppToast.error(ctx, 'Gửi lời mời kết bạn thất bại: ${_formatError(e)}');
+      }
     }
   }
 

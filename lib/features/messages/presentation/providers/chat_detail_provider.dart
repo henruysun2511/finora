@@ -36,9 +36,10 @@ class ChatDetailNotifier extends AutoDisposeFamilyAsyncNotifier<List<DirectMessa
       final saved = await repo.sendMessage(conversationId: arg, content: text);
       final updated = (state.value ?? []).map((m) => m.id == tempMsg.id ? saved : m).toList();
       state = AsyncData(updated);
-    } catch (_) {
+    } catch (e) {
       // Revert if error
       state = AsyncData(currentList);
+      rethrow;
     }
   }
 
@@ -65,8 +66,9 @@ class ChatDetailNotifier extends AutoDisposeFamilyAsyncNotifier<List<DirectMessa
       } else {
         await repo.addReaction(messageId: messageId, emoji: emoji);
       }
-    } catch (_) {
-      // Bỏ qua lỗi mạng
+    } catch (e) {
+      state = AsyncData(currentList);
+      rethrow;
     }
   }
 
@@ -89,8 +91,9 @@ class ChatDetailNotifier extends AutoDisposeFamilyAsyncNotifier<List<DirectMessa
     final repo = ref.read(messagesRepositoryProvider);
     try {
       await repo.recallMessage(messageId);
-    } catch (_) {
-      // Bỏ qua lỗi mạng
+    } catch (e) {
+      state = AsyncData(currentList);
+      rethrow;
     }
   }
 }
