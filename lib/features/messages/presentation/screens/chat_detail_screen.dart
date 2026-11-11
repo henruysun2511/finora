@@ -255,15 +255,6 @@ class _ChatDetailScreenState extends ConsumerState<ChatDetailScreen> {
               ref.read(chatDetailProvider(conv.id).notifier).sendTextMessage(text);
               _scrollToBottom();
             },
-            onSendTransaction: ({required name, required amount, isExpense = true, groupWalletName}) {
-              ref.read(chatDetailProvider(conv.id).notifier).sendTransactionShare(
-                    name: name,
-                    amount: amount,
-                    isExpense: isExpense,
-                    groupWalletName: groupWalletName,
-                  );
-              _scrollToBottom();
-            },
           ),
         ],
       ),

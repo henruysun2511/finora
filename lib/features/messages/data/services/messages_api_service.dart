@@ -13,10 +13,11 @@ class MessagesApiService {
       ApiConstants.conversations,
       queryParameters: search != null && search.isNotEmpty ? {'search': search} : null,
     );
-    final data = res.data['data'];
+    final raw = res.data;
+    final dynamic data = raw is Map ? (raw['data'] ?? raw) : raw;
     final List items = data is List
         ? data
-        : (data is Map ? (data['items'] ?? data['data'] ?? []) : []);
+        : (data is Map ? (data['items'] ?? data['data'] ?? (raw is Map ? raw['items'] : null) ?? []) : []);
     return items
         .map((e) => ConversationResponseDto.fromJson(e as Map<String, dynamic>))
         .toList();
@@ -32,10 +33,11 @@ class MessagesApiService {
       ApiConstants.friendMessages(friendId),
       queryParameters: {'page': page, 'limit': limit},
     );
-    final data = res.data['data'];
+    final raw = res.data;
+    final dynamic data = raw is Map ? (raw['data'] ?? raw) : raw;
     final List items = data is List
         ? data
-        : (data is Map ? (data['items'] ?? data['data'] ?? []) : []);
+        : (data is Map ? (data['items'] ?? data['data'] ?? (raw is Map ? raw['items'] : null) ?? []) : []);
     return items
         .map((e) => MessageResponseDto.fromJson(e as Map<String, dynamic>))
         .toList();
@@ -51,12 +53,14 @@ class MessagesApiService {
       ApiConstants.sendP2PMessage,
       data: {
         'receiverId': friendId,
-        'friendId': friendId,
         'content': content,
         if (relatedTransactionId != null) 'relatedTransactionId': relatedTransactionId,
       },
     );
-    final data = res.data['data'] as Map<String, dynamic>? ?? {};
+    final raw = res.data;
+    final Map<String, dynamic> data = raw is Map
+        ? (raw['data'] is Map ? raw['data'] as Map<String, dynamic> : raw as Map<String, dynamic>)
+        : {};
     return MessageResponseDto.fromJson(data);
   }
 

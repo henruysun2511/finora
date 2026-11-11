@@ -1,6 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../domain/models/direct_message.dart';
-import '../../domain/models/related_transaction.dart';
 import 'messages_providers.dart';
 
 final chatDetailProvider =
@@ -40,48 +39,6 @@ class ChatDetailNotifier extends AutoDisposeFamilyAsyncNotifier<List<DirectMessa
     } catch (_) {
       // Revert if error
       state = AsyncData(currentList);
-    }
-  }
-
-  Future<void> sendTransactionShare({
-    required String name,
-    required double amount,
-    bool isExpense = true,
-    String? groupWalletName,
-  }) async {
-    final currentList = state.value ?? [];
-    final repo = ref.read(messagesRepositoryProvider);
-
-    final tx = RelatedTransaction(
-      id: 'tx-temp-${DateTime.now().millisecondsSinceEpoch}',
-      name: name,
-      amount: amount,
-      transactionDate: DateTime.now(),
-      isExpense: isExpense,
-      groupWalletName: groupWalletName,
-    );
-
-    final tempMsg = DirectMessage(
-      id: 'temp-tx-${DateTime.now().millisecondsSinceEpoch}',
-      senderId: 'me',
-      senderName: 'Tôi',
-      content: 'Chia sẻ hóa đơn: $name (${amount.toStringAsFixed(0)}đ)',
-      type: MessageType.transactionShare,
-      relatedTransaction: tx,
-      isMe: true,
-      createdAt: DateTime.now(),
-    );
-
-    state = AsyncData([...currentList, tempMsg]);
-
-    try {
-      await repo.sendMessage(
-        conversationId: arg,
-        content: tempMsg.content,
-        relatedTransactionId: tx.id,
-      );
-    } catch (_) {
-      // Bỏ qua lỗi
     }
   }
 

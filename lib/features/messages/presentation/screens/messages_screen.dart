@@ -115,26 +115,36 @@ class _MessagesScreenState extends ConsumerState<MessagesScreen> {
                 }).toList();
 
                 if (filtered.isEmpty) {
-                  return Center(
-                    child: Padding(
-                      padding: const EdgeInsets.all(32),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(Icons.chat_bubble_outline_rounded, size: 48, color: muted),
-                          const SizedBox(height: 12),
-                          Text(
-                            filter == 2 ? 'Chưa có nhóm ví chung nào' : 'Chưa có cuộc trò chuyện nào',
-                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: foreground),
+                  return RefreshIndicator(
+                    color: AppColors.primary,
+                    onRefresh: () => ref.read(conversationListProvider.notifier).refresh(),
+                    child: ListView(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      children: [
+                        SizedBox(height: MediaQuery.of(context).size.height * 0.18),
+                        Center(
+                          child: Padding(
+                            padding: const EdgeInsets.all(32),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(Icons.chat_bubble_outline_rounded, size: 48, color: muted),
+                                const SizedBox(height: 12),
+                                Text(
+                                  filter == 2 ? 'Chưa có nhóm ví chung nào' : 'Chưa có cuộc trò chuyện nào',
+                                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: foreground),
+                                ),
+                                const SizedBox(height: 6),
+                                Text(
+                                  'Bắt đầu nhắn tin với bạn bè hoặc kết bạn ngay!',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(fontSize: 13, color: muted),
+                                ),
+                              ],
+                            ),
                           ),
-                          const SizedBox(height: 6),
-                          Text(
-                            'Bắt đầu nhắn tin với bạn bè hoặc tạo nhóm chia bill ngay!',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(fontSize: 13, color: muted),
-                          ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                   );
                 }
