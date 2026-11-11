@@ -180,6 +180,3 @@ class HomeScreen extends ConsumerWidget {
     );
   }
 }
-
-/// Alias để tương thích ngược
-typedef DashboardScreen = HomeScreen;

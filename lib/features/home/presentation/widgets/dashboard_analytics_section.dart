@@ -73,23 +73,29 @@ class DashboardAnalyticsSection extends ConsumerWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
-                        'DIỄN BIẾN THU CHI GẦN ĐÂY',
-                        style: GoogleFonts.inter(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w800,
-                          letterSpacing: 0.6,
-                          color: isDark ? AppColors.darkMuted : AppColors.lightMuted,
+                      Expanded(
+                        child: Text(
+                          'DIỄN BIẾN THU CHI GẦN ĐÂY',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: GoogleFonts.inter(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: 0.6,
+                            color: isDark ? AppColors.darkMuted : AppColors.lightMuted,
+                          ),
                         ),
                       ),
+                      const SizedBox(width: 8),
                       Row(
+                        mainAxisSize: MainAxisSize.min,
                         children: [
                           _Legend(
                             color: AppColors.success,
                             label: 'Thu',
                             isDark: isDark,
                           ),
-                          const SizedBox(width: 10),
+                          const SizedBox(width: 8),
                           _Legend(
                             color: AppColors.danger,
                             label: 'Chi',
@@ -303,12 +309,16 @@ class _StatChip extends StatelessWidget {
         children: [
           Icon(icon, size: 16, color: color),
           const SizedBox(height: 4),
-          Text(
-            value,
-            style: GoogleFonts.outfit(
-              fontSize: 13,
-              fontWeight: FontWeight.w900,
-              color: color,
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            alignment: Alignment.centerLeft,
+            child: Text(
+              value,
+              style: GoogleFonts.outfit(
+                fontSize: 13,
+                fontWeight: FontWeight.w900,
+                color: color,
+              ),
             ),
           ),
           Text(
@@ -347,7 +357,7 @@ class _ReportButton extends StatelessWidget {
       onTap: onTap,
       borderRadius: BorderRadius.circular(14),
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 10),
+        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 4),
         decoration: BoxDecoration(
           color: isDark ? AppColors.darkBackground : const Color(0xFFF8FAFC),
           borderRadius: BorderRadius.circular(14),
@@ -368,14 +378,20 @@ class _ReportButton extends StatelessWidget {
               child: Icon(icon, size: 17, color: color),
             ),
             const SizedBox(height: 6),
-            Text(
-              label,
-              style: GoogleFonts.inter(
-                fontSize: 11,
-                fontWeight: FontWeight.w700,
-                color: isDark
-                    ? AppColors.darkForeground
-                    : AppColors.lightForeground,
+            FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Text(
+                label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.center,
+                style: GoogleFonts.inter(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w700,
+                  color: isDark
+                      ? AppColors.darkForeground
+                      : AppColors.lightForeground,
+                ),
               ),
             ),
           ],
