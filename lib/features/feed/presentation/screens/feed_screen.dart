@@ -19,7 +19,6 @@ import '../widgets/feed_grid_card.dart';
 import '../widgets/feed_post_card.dart';
 import '../widgets/feed_search_bar.dart';
 import '../widgets/feed_stories_bar.dart';
-import '../widgets/share_milestone_sheet.dart';
 
 class FeedScreen extends ConsumerStatefulWidget {
   const FeedScreen({super.key});
@@ -153,11 +152,6 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
                 }
               },
               tooltip: 'Quay lại',
-            ),
-            action: _buildHeaderButton(
-              iconName: 'trophy',
-              onTap: () => ShareMilestoneSheet.show(context),
-              tooltip: 'Chia sẻ cột mốc tài chính',
             ),
             showBackButton: false,
             gradient: const LinearGradient(
