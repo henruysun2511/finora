@@ -11,6 +11,8 @@ import '../../../dashboard/domain/models/dashboard_overview_model.dart';
 import '../../../dashboard/presentation/providers/dashboard_providers.dart';
 import '../../../wallets/presentation/providers/wallets_overview_provider.dart';
 import '../widgets/home_accounts_section.dart';
+import '../widgets/home_budget_health_card.dart';
+import '../widgets/home_category_breakdown_card.dart';
 import '../widgets/home_header.dart';
 import '../widgets/home_mascot_section.dart';
 import '../widgets/home_photo_calendar_section.dart';
@@ -157,6 +159,14 @@ class HomeScreen extends ConsumerWidget {
 
                       // ── Snapshot Xu hướng Thu & Chi 7 ngày qua ──────────
                       const HomeWeeklyTrendSection(),
+                      const SizedBox(height: 22),
+
+                      // ── Cơ cấu Chi tiêu (Donut + Category Breakdown) ───
+                      const HomeCategoryBreakdownCard(),
+                      const SizedBox(height: 22),
+
+                      // ── Tiến độ Ngân sách & Sức khỏe Dòng tiền ──────────
+                      const HomeBudgetHealthCard(),
                       const SizedBox(height: 22),
 
                       // ── Linh vật AI đồng hành ──────────────────────────

@@ -199,3 +199,4 @@ class _IndicatorPill extends StatelessWidget {
     );
   }
 }
+
