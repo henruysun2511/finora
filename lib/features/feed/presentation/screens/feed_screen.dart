@@ -9,7 +9,12 @@ import '../../../../core/widgets/banner_header.dart';
 import '../../../../core/widgets/lucide_icon.dart';
 import '../../../../core/widgets/navigation/social_bottom_bar.dart';
 import '../../../../core/widgets/navigation/social_tab.dart';
+import '../../../auth/presentation/providers/auth_provider.dart';
 import '../../../friends/friends.dart';
+import '../../../messages/domain/models/conversation.dart';
+import '../../../messages/presentation/providers/conversation_list_provider.dart';
+import '../../../messages/presentation/providers/messages_providers.dart';
+import '../../../messages/presentation/screens/chat_detail_screen.dart';
 import '../../domain/models/feed_post.dart';
 import '../providers/feed_list_provider.dart';
 import '../widgets/feed_category_filter_bar.dart';
@@ -410,9 +415,7 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
                                       note: note,
                                     );
                               },
-                              onChatWithAuthor: () {
-                                context.push(RoutePaths.socialChat);
-                              },
+                              onChatWithAuthor: () => _handleChatWithAuthor(post),
                               onShare: () {
                                 _sharePost(post.name);
                               },
@@ -502,7 +505,7 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
                         },
                         onChatWithAuthor: () {
                           Navigator.pop(ctx);
-                          context.push(RoutePaths.socialChat);
+                          _handleChatWithAuthor(currentPost);
                         },
                         onShare: () {
                           _sharePost(currentPost.name);
@@ -516,6 +519,344 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
           },
         );
       },
+    );
+  void _handleChatWithAuthor(FeedPost post) {
+    final currentUserId = ref.read(authNotifierProvider).value?.id;
+    if (currentUserId != null && currentUserId == post.author.id) {
+      AppToast.info(context, 'Không thể gửi tin nhắn cho chính mình');
+      return;
+    }
+
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => _FeedPostReplySheet(post: post),
+    );
+  }
+}
+
+class _FeedPostReplySheet extends ConsumerStatefulWidget {
+  const _FeedPostReplySheet({required this.post});
+  final FeedPost post;
+
+  @override
+  ConsumerState<_FeedPostReplySheet> createState() => _FeedPostReplySheetState();
+}
+
+class _FeedPostReplySheetState extends ConsumerState<_FeedPostReplySheet> {
+  final TextEditingController _replyCtrl = TextEditingController();
+  bool _isSending = false;
+
+  @override
+  void dispose() {
+    _replyCtrl.dispose();
+    super.dispose();
+  }
+
+  String _formatAmount(num? amount) {
+    if (amount == null) return '0';
+    if (amount >= 1000000) {
+      final val = amount / 1000000;
+      return '${val.toStringAsFixed(val.truncateToDouble() == val ? 0 : 1)}tr';
+    }
+    if (amount >= 1000) {
+      return '${(amount / 1000).toStringAsFixed(0)}k';
+    }
+    return amount.toStringAsFixed(0);
+  }
+
+  Future<void> _sendReply() async {
+    final text = _replyCtrl.text.trim();
+    if (text.isEmpty) {
+      AppToast.warning(context, 'Vui lòng nhập nội dung tin nhắn');
+      return;
+    }
+
+    setState(() => _isSending = true);
+
+    try {
+      final repo = ref.read(messagesRepositoryProvider);
+      await repo.sendMessage(
+        conversationId: widget.post.author.id,
+        content: text,
+        relatedTransactionId: widget.post.id,
+      );
+      ref.invalidate(conversationListProvider);
+
+      if (mounted) {
+        Navigator.pop(context);
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => ChatDetailScreen(
+              conversation: Conversation(
+                id: widget.post.author.id,
+                title: widget.post.author.fullName,
+                avatar: widget.post.author.avatar,
+                lastMessageContent: text,
+                lastMessageAt: DateTime.now(),
+              ),
+            ),
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isSending = false);
+        AppToast.error(
+          context,
+          'Gửi tin nhắn thất bại: ${AppToast.extractErrorMessage(e)}',
+        );
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final surface = isDark ? AppColors.darkSurface : Colors.white;
+    final foreground = isDark ? AppColors.darkForeground : AppColors.lightForeground;
+    final muted = isDark ? AppColors.darkMuted : AppColors.lightMuted;
+    final border = isDark ? AppColors.darkBorder : AppColors.lightBorder;
+
+    final post = widget.post;
+    final hasPhoto = post.photoUrl != null && post.photoUrl!.isNotEmpty;
+
+    return Container(
+      decoration: BoxDecoration(
+        color: surface,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      padding: EdgeInsets.only(
+        bottom: MediaQuery.of(context).viewInsets.bottom,
+      ),
+      child: SafeArea(
+        top: false,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Handle Bar
+            Center(
+              child: Container(
+                margin: const EdgeInsets.only(top: 10, bottom: 8),
+                width: 36,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: muted.withValues(alpha: 0.3),
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+            ),
+
+            // Author Header
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 4, 12, 10),
+              child: Row(
+                children: [
+                  CircleAvatar(
+                    radius: 18,
+                    backgroundColor: AppColors.primary.withValues(alpha: 0.12),
+                    backgroundImage: post.author.avatar != null && post.author.avatar!.isNotEmpty
+                        ? NetworkImage(post.author.avatar!)
+                        : null,
+                    child: post.author.avatar == null || post.author.avatar!.isEmpty
+                        ? Text(
+                            post.author.fullName.isNotEmpty
+                                ? post.author.fullName.substring(0, 1).toUpperCase()
+                                : 'U',
+                            style: const TextStyle(
+                              color: AppColors.primary,
+                              fontWeight: FontWeight.w700,
+                              fontSize: 13,
+                            ),
+                          )
+                        : null,
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Nhắn tin cho ${post.author.fullName}',
+                          style: TextStyle(
+                            fontSize: 14.5,
+                            fontWeight: FontWeight.w700,
+                            color: foreground,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        Text(
+                          'Phản hồi bài đăng khoảnh khắc',
+                          style: TextStyle(fontSize: 11.5, color: muted),
+                        ),
+                      ],
+                    ),
+                  ),
+                  IconButton(
+                    icon: Icon(Icons.close_rounded, size: 20, color: muted),
+                    onPressed: () => Navigator.pop(context),
+                  ),
+                ],
+              ),
+            ),
+
+            // Mini Post Preview Card
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: isDark ? AppColors.darkBackground : const Color(0xFFF8FAFC),
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(color: border),
+                ),
+                child: Row(
+                  children: [
+                    if (hasPhoto)
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(10),
+                        child: Image.network(
+                          post.photoUrl!,
+                          width: 48,
+                          height: 48,
+                          fit: BoxFit.cover,
+                          errorBuilder: (_, __, ___) => Container(
+                            width: 48,
+                            height: 48,
+                            color: AppColors.primary.withValues(alpha: 0.1),
+                            child: const Icon(Icons.receipt_long_rounded, color: AppColors.primary),
+                          ),
+                        ),
+                      )
+                    else
+                      Container(
+                        width: 48,
+                        height: 48,
+                        decoration: BoxDecoration(
+                          color: AppColors.primary.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: const Icon(Icons.receipt_long_rounded, color: AppColors.primary),
+                      ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            post.name,
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w700,
+                              color: foreground,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          const SizedBox(height: 3),
+                          Row(
+                            children: [
+                              Text(
+                                post.isAmountHidden
+                                    ? '••••••'
+                                    : '${_formatAmount(post.amount)}đ',
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w800,
+                                  color: AppColors.primary,
+                                ),
+                              ),
+                              if (post.category != null) ...[
+                                const SizedBox(width: 6),
+                                Text(
+                                  '· ${post.category!.name}',
+                                  style: TextStyle(fontSize: 11, color: muted),
+                                ),
+                              ],
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 10),
+
+            // Input Bar
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 4, 16, 12),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: _replyCtrl,
+                      autofocus: true,
+                      minLines: 1,
+                      maxLines: 4,
+                      style: TextStyle(fontSize: 14, color: foreground),
+                      decoration: InputDecoration(
+                        hintText: 'Nhập tin nhắn phản hồi...',
+                        hintStyle: TextStyle(fontSize: 13.5, color: muted),
+                        filled: true,
+                        fillColor: isDark ? AppColors.darkBackground : const Color(0xFFF1F5F9),
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(18),
+                          borderSide: BorderSide(color: border),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(18),
+                          borderSide: BorderSide(color: border),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(18),
+                          borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  GestureDetector(
+                    onTap: _isSending ? null : _sendReply,
+                    child: Container(
+                      width: 44,
+                      height: 44,
+                      decoration: BoxDecoration(
+                        color: AppColors.primary,
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppColors.primary.withValues(alpha: 0.3),
+                            blurRadius: 8,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: _isSending
+                          ? const Center(
+                              child: SizedBox(
+                                width: 18,
+                                height: 18,
+                                child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                              ),
+                            )
+                          : const Icon(Icons.send_rounded, color: Colors.white, size: 20),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

@@ -155,12 +155,15 @@ class ChatBubble extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 6),
         child: Row(
           mainAxisAlignment: isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.end,
           children: [
             if (!isMe && isGroup) const SizedBox(width: 32),
             ChatTransactionCard(
               transaction: message.relatedTransaction!,
               isMe: isMe,
               time: _formatTime(message.createdAt),
+              content: message.content,
+              senderName: message.senderName,
               onViewDetail: onViewTransaction,
             ),
           ],
