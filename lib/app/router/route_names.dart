@@ -59,7 +59,8 @@ class RouteNames {
 
   // 8. Reports & Analytics (Báo cáo & Phân tích)
   static const String reportsOverview = 'reportsOverview';
-  static const String analytics = 'analytics';
+  static const String dashboard = 'dashboard';
+  static const String analytics = 'dashboard';
   static const String cashflowReport = 'cashflowReport';
   static const String categoryReport = 'categoryReport';
   static const String exchangeRates = 'exchangeRates';
@@ -148,7 +149,8 @@ class RoutePaths {
 
   // 8. Reports & Analytics
   static const String reportsOverview = '/reports/overview';
-  static const String analytics = '/analytics';
+  static const String dashboard = '/dashboard';
+  static const String analytics = '/dashboard';
   static const String cashflowReport = '/reports/cashflow';
   static const String categoryReport = '/reports/category';
   static const String exchangeRates = '/exchange-rates';

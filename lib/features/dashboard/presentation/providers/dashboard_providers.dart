@@ -9,6 +9,7 @@ import '../../domain/models/cash_flow_model.dart';
 import '../../domain/models/category_breakdown_model.dart';
 import '../../domain/models/dashboard_overview_model.dart';
 import '../../domain/models/debts_dashboard_model.dart';
+import '../../domain/models/shared_wallet_dashboard_model.dart';
 import '../../domain/repositories/dashboard_repository.dart';
 
 final dashboardApiServiceProvider = Provider<DashboardApiService>((ref) {
@@ -61,4 +62,12 @@ final dashboardCalendarProvider =
     FutureProvider.autoDispose<CalendarDashboardModel>((ref) async {
   final repo = ref.watch(dashboardRepositoryProvider);
   return repo.getCalendar();
+});
+
+/// 7. Provider nạp Thống kê ví chung & Ma trận cấn trừ nợ
+final dashboardSharedWalletProvider =
+    FutureProvider.autoDispose.family<SharedWalletDashboardModel, String>(
+        (ref, walletId) async {
+  final repo = ref.watch(dashboardRepositoryProvider);
+  return repo.getSharedWalletDashboard(walletId);
 });

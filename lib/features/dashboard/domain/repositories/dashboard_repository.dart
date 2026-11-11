@@ -4,6 +4,7 @@ import '../models/cash_flow_model.dart';
 import '../models/category_breakdown_model.dart';
 import '../models/dashboard_overview_model.dart';
 import '../models/debts_dashboard_model.dart';
+import '../models/shared_wallet_dashboard_model.dart';
 
 abstract class DashboardRepository {
   Future<DashboardOverviewModel> getOverview({String? walletId});
@@ -12,4 +13,5 @@ abstract class DashboardRepository {
   Future<CategoryBreakdownModel> getCategoryBreakdown({String? month, String? type});
   Future<DebtsDashboardModel> getDebts({String? walletId});
   Future<CalendarDashboardModel> getCalendar({String? month});
+  Future<SharedWalletDashboardModel> getSharedWalletDashboard(String walletId);
 }

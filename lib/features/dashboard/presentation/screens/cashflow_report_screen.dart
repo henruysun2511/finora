@@ -5,7 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/utils/currency_formatter.dart';
 import '../../../../core/widgets/page_header.dart';
-import '../../../dashboard/presentation/providers/dashboard_providers.dart';
+import '../providers/dashboard_providers.dart';
 
 class CashflowReportScreen extends ConsumerWidget {
   const CashflowReportScreen({super.key});

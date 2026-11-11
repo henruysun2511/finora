@@ -178,7 +178,7 @@ class HomeHeader extends ConsumerWidget {
               savingsRate: 47.6,
               tierTitle: 'Gold Tier',
               mascotMood: 'HAPPY',
-              onTap: () => context.push(RoutePaths.analytics),
+              onTap: () => context.push(RoutePaths.dashboard),
             ),
             data: (data) => BalanceCard(
               netWorth: data.netWorth,
@@ -187,7 +187,7 @@ class HomeHeader extends ConsumerWidget {
               savingsRate: data.monthlyCashflow.savingsRate,
               tierTitle: data.assetTier.title,
               mascotMood: data.assetTier.mascotMood,
-              onTap: () => context.push(RoutePaths.analytics),
+              onTap: () => context.push(RoutePaths.dashboard),
             ),
           ),
         ],

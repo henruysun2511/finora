@@ -4,9 +4,9 @@ import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../features/ai_chat/presentation/screens/ai_chat_screen.dart';
-import '../../features/analytics/presentation/screens/analytics_screen.dart';
-import '../../features/analytics/presentation/screens/cashflow_report_screen.dart';
-import '../../features/analytics/presentation/screens/category_report_screen.dart';
+import '../../features/dashboard/presentation/screens/dashboard_screen.dart';
+import '../../features/dashboard/presentation/screens/cashflow_report_screen.dart';
+import '../../features/dashboard/presentation/screens/category_report_screen.dart';
 import '../../features/reports/presentation/screens/reports_overview_screen.dart';
 import '../../features/exchange_rates/presentation/screens/exchange_rates_screen.dart';
 import '../../features/auth/presentation/providers/auth_provider.dart';
@@ -192,13 +192,13 @@ GoRouter appRouter(AppRouterRef ref) {
             ],
           ),
 
-          // Branch 1: Dashboard Báo cáo & Phân tích (Analytics / Dashboard)
+          // Branch 1: Dashboard Báo cáo & Phân tích (Dashboard)
           StatefulShellBranch(
             routes: [
               GoRoute(
-                path: RoutePaths.analytics,
-                name: RouteNames.analytics,
-                builder: (context, state) => const AnalyticsScreen(),
+                path: RoutePaths.dashboard,
+                name: RouteNames.dashboard,
+                builder: (context, state) => const DashboardScreen(),
               ),
             ],
           ),

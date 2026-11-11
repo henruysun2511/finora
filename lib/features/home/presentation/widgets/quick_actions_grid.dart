@@ -80,7 +80,7 @@ class QuickActionsGrid extends StatelessWidget {
                 icon: Icons.pie_chart_rounded,
                 label: 'Báo cáo',
                 bgColor: const Color(0xFFEC4899),
-                onTap: () => context.push(RoutePaths.analytics),
+                onTap: () => context.push(RoutePaths.dashboard),
               ),
               // 6. Giao dịch định kỳ
               _QuickActionItem(

@@ -7,23 +7,23 @@ import '../../../../app/theme/app_colors.dart';
 import '../../../../core/utils/currency_formatter.dart';
 import '../../../../core/widgets/page_header.dart';
 import 'package:go_router/go_router.dart';
-import '../../../dashboard/presentation/providers/dashboard_providers.dart';
+import '../providers/dashboard_providers.dart';
 
-class AnalyticsScreen extends ConsumerStatefulWidget {
-  const AnalyticsScreen({super.key});
+class DashboardScreen extends ConsumerStatefulWidget {
+  const DashboardScreen({super.key});
 
   @override
-  ConsumerState<AnalyticsScreen> createState() => _AnalyticsScreenState();
+  ConsumerState<DashboardScreen> createState() => _DashboardScreenState();
 }
 
-class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen>
+class _DashboardScreenState extends ConsumerState<DashboardScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 4, vsync: this);
+    _tabController = TabController(length: 5, vsync: this);
   }
 
   @override
@@ -40,7 +40,7 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen>
       backgroundColor:
           isDark ? AppColors.darkBackground : AppColors.lightBackground,
       appBar: PageHeader.page(
-        title: 'Báo cáo & Phân tích',
+        title: 'Dashboard Tài chính',
         subtitle: 'Bức tranh chi tiết toàn cảnh tài chính',
         action: Row(
           mainAxisSize: MainAxisSize.min,
@@ -58,6 +58,7 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen>
                 ref.invalidate(dashboardCashFlowProvider);
                 ref.invalidate(dashboardCategoryBreakdownProvider);
                 ref.invalidate(dashboardBudgetHealthProvider);
+                ref.invalidate(dashboardDebtsProvider);
                 ref.invalidate(dashboardCalendarProvider);
               },
             ),
@@ -95,6 +96,7 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen>
                 Tab(text: 'Dòng tiền'),
                 Tab(text: 'Cơ cấu 50/30/20'),
                 Tab(text: 'Sức khỏe ngân sách'),
+                Tab(text: 'Sổ nợ & Nghĩa vụ'),
                 Tab(text: 'Lịch & Hóa đơn'),
               ],
             ),
@@ -108,6 +110,7 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen>
                 _CashFlowTab(isDark: isDark),
                 _CategoryBreakdownTab(isDark: isDark),
                 _BudgetHealthTab(isDark: isDark),
+                _DebtsTab(isDark: isDark),
                 _CalendarTab(isDark: isDark),
               ],
             ),
@@ -984,7 +987,293 @@ class _BudgetHealthTab extends ConsumerWidget {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// TAB 4: LỊCH TÀI CHÍNH & HÓA ĐƠN ĐỊNH KỲ
+// TAB 4: SỔ NỢ & NGHĨA VỤ TÀI CHÍNH (DEBTS DASHBOARD)
+// ─────────────────────────────────────────────────────────────────────────────
+class _DebtsTab extends ConsumerWidget {
+  final bool isDark;
+  const _DebtsTab({required this.isDark});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final debtsAsync = ref.watch(dashboardDebtsProvider);
+
+    return debtsAsync.when(
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (e, _) => Center(child: Text('Lỗi tải dữ liệu: $e')),
+      data: (debts) {
+        final overdue = debts.overdueStats;
+
+        return SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // 1. Metric Cards
+              Row(
+                children: [
+                  Expanded(
+                    child: _MetricCard(
+                      isDark: isDark,
+                      label: 'Phải thu',
+                      value: CurrencyFormatter.formatCompact(debts.totalReceivables),
+                      color: AppColors.success,
+                      icon: Icons.call_received_rounded,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: _MetricCard(
+                      isDark: isDark,
+                      label: 'Phải trả',
+                      value: CurrencyFormatter.formatCompact(debts.totalPayables),
+                      color: AppColors.danger,
+                      icon: Icons.call_made_rounded,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: _MetricCard(
+                      isDark: isDark,
+                      label: 'Vị thế ròng',
+                      value: CurrencyFormatter.formatCompact(debts.netDebtPosition),
+                      color: debts.netDebtPosition >= 0 ? AppColors.primary : AppColors.danger,
+                      icon: Icons.account_balance_rounded,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 18),
+
+              // 2. Cảnh báo quá hạn
+              if (overdue.overduePayableCount > 0 || overdue.overdueReceivableCount > 0)
+                Container(
+                  margin: const EdgeInsets.only(bottom: 18),
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: AppColors.danger.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(18),
+                    border: Border.all(
+                      color: AppColors.danger.withValues(alpha: 0.3),
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: AppColors.danger.withValues(alpha: 0.15),
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(Icons.warning_amber_rounded, color: AppColors.danger, size: 22),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'CẢNH BÁO QUÁ HẠN NỢ',
+                              style: GoogleFonts.inter(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w800,
+                                color: AppColors.danger,
+                              ),
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              'Bạn có ${overdue.overduePayableCount} khoản nợ phải trả (${CurrencyFormatter.formatCompact(overdue.overduePayableAmount)}) và ${overdue.overdueReceivableCount} khoản phải thu (${CurrencyFormatter.formatCompact(overdue.overdueReceivableAmount)}) đã quá hạn.',
+                              style: GoogleFonts.inter(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500,
+                                color: isDark ? AppColors.darkForeground : AppColors.lightForeground,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+              // 3. Top đối tác nợ
+              _SectionContainer(
+                isDark: isDark,
+                title: 'TOP ĐỐI TÁC NỢ & CHO VAY',
+                child: debts.topDebtors.isEmpty
+                    ? Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        child: Center(
+                          child: Text(
+                            'Không có dữ liệu nợ đối tác',
+                            style: GoogleFonts.inter(
+                              fontSize: 12.5,
+                              color: isDark ? AppColors.darkMuted : AppColors.lightMuted,
+                            ),
+                          ),
+                        ),
+                      )
+                    : Column(
+                        children: debts.topDebtors.map((debtor) {
+                          final isReceivable = debtor.type == 'LENT';
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 8),
+                            child: Row(
+                              children: [
+                                CircleAvatar(
+                                  radius: 18,
+                                  backgroundColor: (isReceivable ? AppColors.success : AppColors.danger).withValues(alpha: 0.12),
+                                  child: Text(
+                                    debtor.counterpartyName.isNotEmpty ? debtor.counterpartyName[0] : '?',
+                                    style: GoogleFonts.inter(
+                                      fontWeight: FontWeight.w800,
+                                      fontSize: 13,
+                                      color: isReceivable ? AppColors.success : AppColors.danger,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        debtor.counterpartyName,
+                                        style: GoogleFonts.inter(
+                                          fontSize: 13.5,
+                                          fontWeight: FontWeight.w700,
+                                          color: isDark ? AppColors.darkForeground : AppColors.lightForeground,
+                                        ),
+                                      ),
+                                      if (debtor.dueDate != null)
+                                        Text(
+                                          'Hạn: ${debtor.dueDate} ${debtor.isOverdue ? "(${debtor.daysOverdue} ngày quá hạn)" : ""}',
+                                          style: GoogleFonts.inter(
+                                            fontSize: 11,
+                                            fontWeight: debtor.isOverdue ? FontWeight.w700 : FontWeight.w500,
+                                            color: debtor.isOverdue ? AppColors.danger : (isDark ? AppColors.darkMuted : AppColors.lightMuted),
+                                          ),
+                                        ),
+                                    ],
+                                  ),
+                                ),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  children: [
+                                    Text(
+                                      '${isReceivable ? "+" : "-"}${CurrencyFormatter.format(debtor.remainingAmount)}',
+                                      style: GoogleFonts.outfit(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w800,
+                                        color: isReceivable ? AppColors.success : AppColors.danger,
+                                      ),
+                                    ),
+                                    Text(
+                                      isReceivable ? 'Cần thu' : 'Cần trả',
+                                      style: GoogleFonts.inter(
+                                        fontSize: 10.5,
+                                        fontWeight: FontWeight.w600,
+                                        color: isReceivable ? AppColors.success : AppColors.danger,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          );
+                        }).toList(),
+                      ),
+              ),
+              const SizedBox(height: 18),
+
+              // 4. Tiến độ trả góp
+              if (debts.installments.isNotEmpty)
+                _SectionContainer(
+                  isDark: isDark,
+                  title: 'TIẾN ĐỘ CÁC KHOẢN TRẢ GÓP',
+                  child: Column(
+                    children: debts.installments.map((inst) {
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  inst.counterpartyName,
+                                  style: GoogleFonts.inter(
+                                    fontSize: 13.5,
+                                    fontWeight: FontWeight.w700,
+                                    color: isDark ? AppColors.darkForeground : AppColors.lightForeground,
+                                  ),
+                                ),
+                                Text(
+                                  '${inst.progressPercentage.toStringAsFixed(0)}%',
+                                  style: GoogleFonts.inter(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w800,
+                                    color: AppColors.primary,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 6),
+                            Container(
+                              height: 8,
+                              decoration: BoxDecoration(
+                                color: isDark ? AppColors.darkBorder : const Color(0xFFF1F5F9),
+                                borderRadius: BorderRadius.circular(99),
+                              ),
+                              child: FractionallySizedBox(
+                                alignment: Alignment.centerLeft,
+                                widthFactor: (inst.progressPercentage / 100.0).clamp(0.0, 1.0),
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    color: AppColors.primary,
+                                    borderRadius: BorderRadius.circular(99),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 6),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  'Đã trả: ${CurrencyFormatter.formatCompact(inst.paidAmount)} / ${CurrencyFormatter.formatCompact(inst.totalPrincipal)}',
+                                  style: GoogleFonts.inter(
+                                    fontSize: 11,
+                                    color: isDark ? AppColors.darkMuted : AppColors.lightMuted,
+                                  ),
+                                ),
+                                if (inst.nextDueDate != null)
+                                  Text(
+                                    'Kỳ tới: ${inst.nextDueDate}',
+                                    style: GoogleFonts.inter(
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.w600,
+                                      color: AppColors.orange,
+                                    ),
+                                  ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// TAB 5: LỊCH TÀI CHÍNH & HÓA ĐƠN ĐỊNH KỲ
 // ─────────────────────────────────────────────────────────────────────────────
 class _CalendarTab extends ConsumerWidget {
   final bool isDark;

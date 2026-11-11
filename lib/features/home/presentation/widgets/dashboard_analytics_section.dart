@@ -222,7 +222,7 @@ class DashboardAnalyticsSection extends ConsumerWidget {
                           icon: Icons.analytics_rounded,
                           label: 'Phân tích',
                           color: const Color(0xFF10B981),
-                          onTap: () => context.push(RoutePaths.analytics),
+                          onTap: () => context.push(RoutePaths.dashboard),
                         ),
                       ),
                     ],

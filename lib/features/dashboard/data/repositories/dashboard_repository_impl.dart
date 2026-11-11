@@ -4,6 +4,7 @@ import '../../domain/models/cash_flow_model.dart';
 import '../../domain/models/category_breakdown_model.dart';
 import '../../domain/models/dashboard_overview_model.dart';
 import '../../domain/models/debts_dashboard_model.dart';
+import '../../domain/models/shared_wallet_dashboard_model.dart';
 import '../../domain/repositories/dashboard_repository.dart';
 import '../services/dashboard_api_service.dart';
 
@@ -40,5 +41,10 @@ class DashboardRepositoryImpl implements DashboardRepository {
   @override
   Future<CalendarDashboardModel> getCalendar({String? month}) {
     return _service.getCalendar(month: month);
+  }
+
+  @override
+  Future<SharedWalletDashboardModel> getSharedWalletDashboard(String walletId) {
+    return _service.getSharedWalletDashboard(walletId);
   }
 }

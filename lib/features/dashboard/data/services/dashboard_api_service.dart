@@ -7,6 +7,7 @@ import '../../domain/models/cash_flow_model.dart';
 import '../../domain/models/category_breakdown_model.dart';
 import '../../domain/models/dashboard_overview_model.dart';
 import '../../domain/models/debts_dashboard_model.dart';
+import '../../domain/models/shared_wallet_dashboard_model.dart';
 
 class DashboardApiService {
   final Dio _dio;
@@ -44,7 +45,7 @@ class DashboardApiService {
   Future<BudgetHealthModel> getBudgetHealth({String? month}) async {
     try {
       final res = await _dio.get<dynamic>(
-        '/dashboard/budget-health',
+        ApiConstants.dashboardBudgetHealth,
         queryParameters: month != null ? {'month': month} : null,
       );
       final data = _extractData(res.data);
@@ -76,7 +77,7 @@ class DashboardApiService {
   Future<CategoryBreakdownModel> getCategoryBreakdown({String? month, String? type}) async {
     try {
       final res = await _dio.get<dynamic>(
-        '/dashboard/category-breakdown',
+        ApiConstants.dashboardCategoryBreakdown,
         queryParameters: {
           if (month != null) 'month': month,
           if (type != null) 'type': type,
@@ -95,7 +96,7 @@ class DashboardApiService {
   Future<DebtsDashboardModel> getDebts({String? walletId}) async {
     try {
       final res = await _dio.get<dynamic>(
-        '/dashboard/debts',
+        ApiConstants.dashboardDebts,
         queryParameters: walletId != null ? {'walletId': walletId} : null,
       );
       final data = _extractData(res.data);
@@ -111,7 +112,7 @@ class DashboardApiService {
   Future<CalendarDashboardModel> getCalendar({String? month}) async {
     try {
       final res = await _dio.get<dynamic>(
-        '/dashboard/calendar',
+        ApiConstants.dashboardCalendar,
         queryParameters: month != null ? {'month': month} : null,
       );
       final data = _extractData(res.data);
@@ -121,6 +122,21 @@ class DashboardApiService {
     } catch (_) {}
 
     return _mockCalendar();
+  }
+
+  // 7. GET /dashboard/shared-wallet/:walletId
+  Future<SharedWalletDashboardModel> getSharedWalletDashboard(String walletId) async {
+    try {
+      final res = await _dio.get<dynamic>(
+        ApiConstants.dashboardSharedWallet(walletId),
+      );
+      final data = _extractData(res.data);
+      if (data.isNotEmpty) {
+        return SharedWalletDashboardModel.fromJson(data);
+      }
+    } catch (_) {}
+
+    return _mockSharedWallet(walletId);
   }
 
   // ── MOCK DATA CHUẨN FINTECH KHI OFFLINE ─────────────────────────────────────
@@ -471,6 +487,42 @@ class DashboardApiService {
             nextRunDate: '01/12/2026',
             frequency: 'MONTHLY',
             daysRemaining: 21,
+          ),
+        ],
+      ),
+    );
+  }
+
+  SharedWalletDashboardModel _mockSharedWallet(String walletId) {
+    return SharedWalletDashboardModel(
+      walletId: walletId,
+      walletName: 'Ví chung Gia Đình',
+      totalSpent: 8500000.0,
+      currency: 'VND',
+      memberContributions: const [
+        MemberContributionModel(
+          userId: 'user-1',
+          fullName: 'Bạn (Chủ ví)',
+          totalPaid: 5200000.0,
+          percentage: 61.2,
+        ),
+        MemberContributionModel(
+          userId: 'user-2',
+          fullName: 'Mai Anh',
+          totalPaid: 3300000.0,
+          percentage: 38.8,
+        ),
+      ],
+      settlementMatrix: const SettlementMatrixModel(
+        isBalanced: false,
+        suggestedSettlements: [
+          SuggestedSettlementModel(
+            fromUserId: 'user-2',
+            fromUserName: 'Mai Anh',
+            toUserId: 'user-1',
+            toUserName: 'Bạn',
+            amount: 950000.0,
+            reason: 'Cân bằng chi phí ví chung theo phần đóng góp 50/50',
           ),
         ],
       ),

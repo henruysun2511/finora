@@ -64,14 +64,14 @@ class HomeScreen extends ConsumerWidget {
                           message:
                               'Tỷ lệ tiết kiệm tháng này đạt ${ov.monthlyCashflow.savingsRate.toStringAsFixed(1)}%, thặng dư ròng +${(ov.monthlyCashflow.netCashflow / 1000000).toStringAsFixed(1)}M ₫!',
                           actionText: 'Xem chi tiết',
-                          onAction: () => context.push(RoutePaths.analytics),
+                          onAction: () => context.push(RoutePaths.dashboard),
                         ),
                         orElse: () => MascotBanner(
                           name: 'Nora AI',
                           message:
                               'Bạn đã tiết kiệm được 47.6% thu nhập tháng này, vượt mục tiêu 10%!',
                           actionText: 'Xem chi tiết',
-                          onAction: () => context.push(RoutePaths.analytics),
+                          onAction: () => context.push(RoutePaths.dashboard),
                         ),
                       ),
                       const SizedBox(height: 14),
