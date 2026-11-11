@@ -75,7 +75,8 @@ class _HomeCategoryBreakdownCardState
               data: (data) => _buildContent(
                 isDark: isDark,
                 month: now.month,
-                totalExpense: data.totalExpense > 0 ? data.totalExpense : 8300000,
+                totalExpense:
+                    data.totalAmount > 0 ? data.totalAmount : 8300000,
                 items: data.categories.isNotEmpty
                     ? data.categories.take(5).toList()
                     : _mockCategories(),
@@ -90,42 +91,42 @@ class _HomeCategoryBreakdownCardState
   List<CategoryBreakdownItemModel> _mockCategories() {
     return const [
       CategoryBreakdownItemModel(
-        categoryId: 'cat-1',
-        categoryName: 'Ăn uống',
+        id: 'cat-1',
+        name: 'Ăn uống',
         icon: 'utensils',
-        colorHex: '#0072D6',
+        color: '#0072D6',
         amount: 3160000,
         percentage: 38.0,
       ),
       CategoryBreakdownItemModel(
-        categoryId: 'cat-2',
-        categoryName: 'Mua sắm',
+        id: 'cat-2',
+        name: 'Mua sắm',
         icon: 'shopping-bag',
-        colorHex: '#F97316',
+        color: '#F97316',
         amount: 2080000,
         percentage: 25.0,
       ),
       CategoryBreakdownItemModel(
-        categoryId: 'cat-3',
-        categoryName: 'Hóa đơn',
+        id: 'cat-3',
+        name: 'Hóa đơn',
         icon: 'receipt',
-        colorHex: '#10B981',
+        color: '#10B981',
         amount: 1250000,
         percentage: 15.0,
       ),
       CategoryBreakdownItemModel(
-        categoryId: 'cat-4',
-        categoryName: 'Di chuyển',
+        id: 'cat-4',
+        name: 'Di chuyển',
         icon: 'car',
-        colorHex: '#8B5CF6',
+        color: '#8B5CF6',
         amount: 998000,
         percentage: 12.0,
       ),
       CategoryBreakdownItemModel(
-        categoryId: 'cat-5',
-        categoryName: 'Khác & Giải trí',
+        id: 'cat-5',
+        name: 'Khác & Giải trí',
         icon: 'gamepad-2',
-        colorHex: '#EC4899',
+        color: '#EC4899',
         amount: 834000,
         percentage: 10.0,
       ),
@@ -289,7 +290,7 @@ class _HomeCategoryBreakdownCardState
                                       MainAxisAlignment.spaceBetween,
                                   children: [
                                     Text(
-                                      cat.categoryName,
+                                      cat.name,
                                       style: GoogleFonts.inter(
                                         fontSize: 11.5,
                                         fontWeight: isSelected
@@ -369,7 +370,7 @@ class _HomeCategoryBreakdownCardState
                     ),
                     children: [
                       TextSpan(
-                        text: activeItem.categoryName,
+                        text: activeItem.name,
                         style: const TextStyle(fontWeight: FontWeight.w800),
                       ),
                       TextSpan(
@@ -451,3 +452,4 @@ class _DonutChartPainter extends CustomPainter {
         oldDelegate.isDark != isDark;
   }
 }
+

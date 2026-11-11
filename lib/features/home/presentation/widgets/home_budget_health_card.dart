@@ -66,8 +66,11 @@ class HomeBudgetHealthCard extends ConsumerWidget {
           ),
           data: (budget) {
             final spent = budget.totalSpent > 0 ? budget.totalSpent : 8320000.0;
-            final totalBudget = budget.totalBudget > 0 ? budget.totalBudget : 13500000.0;
-            final spendPct = ((spent / totalBudget) * 100).clamp(0, 150).round();
+            final totalBudget = budget.totalBudgetLimit > 0
+                ? budget.totalBudgetLimit
+                : 13500000.0;
+            final spendPct =
+                ((spent / totalBudget) * 100).clamp(0, 150).round();
 
             final ov = overviewAsync.valueOrNull;
             final savingsRate = ov?.monthlyCashflow.savingsRate ?? 44.5;
@@ -532,3 +535,4 @@ class HomeBudgetHealthCard extends ConsumerWidget {
     );
   }
 }
+

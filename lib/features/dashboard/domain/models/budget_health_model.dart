@@ -83,6 +83,7 @@ class BudgetHealthModel {
   final List<CategoryBudgetProgressModel> categoryBudgets;
 
   List<CategoryBudgetProgressModel> get budgets => categoryBudgets;
+  double get totalBudget => totalBudgetLimit;
 
   const BudgetHealthModel({
     required this.month,

@@ -30,6 +30,9 @@ class CategoryBreakdownItemModel {
   final double percentage;
   final List<SubCategoryBreakdownItemModel> subCategories;
 
+  String get categoryName => name;
+  String get colorHex => color;
+
   const CategoryBreakdownItemModel({
     required this.id,
     required this.name,
@@ -37,7 +40,7 @@ class CategoryBreakdownItemModel {
     required this.color,
     required this.amount,
     required this.percentage,
-    required this.subCategories,
+    this.subCategories = const [],
   });
 
   factory CategoryBreakdownItemModel.fromJson(Map<String, dynamic> json) {
@@ -141,6 +144,7 @@ class CategoryBreakdownModel {
   final List<TopSpendingItemModel> topSpendingItems;
 
   List<TopSpendingItemModel> get topExpenses => topSpendingItems;
+  double get totalExpense => totalAmount;
 
   const CategoryBreakdownModel({
     required this.month,
