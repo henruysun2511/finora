@@ -403,7 +403,7 @@ class ProfileScreen extends ConsumerWidget {
             onPressed: () async {
               await ref.read(authNotifierProvider.notifier).logout();
               if (context.mounted) {
-                context.go(RoutePaths.login);
+                context.go(RoutePaths.welcome);
               }
             },
           ),

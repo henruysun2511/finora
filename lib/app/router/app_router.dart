@@ -73,7 +73,7 @@ GoRouter appRouter(AppRouterRef ref) {
 
   return GoRouter(
     navigatorKey: _rootNavigatorKey,
-    initialLocation: RoutePaths.home,
+    initialLocation: RoutePaths.welcome,
     debugLogDiagnostics: false,
     refreshListenable: notifier,
     redirect: (context, state) {
@@ -89,9 +89,16 @@ GoRouter appRouter(AppRouterRef ref) {
           location == RoutePaths.forgotPassword ||
           location.startsWith('/onboarding');
 
-      if (!isLoggedIn && !isOnPublicAuthPage) return RoutePaths.login;
-      if (isLoggedIn && (location == RoutePaths.login || location == RoutePaths.register)) {
-        return RoutePaths.home;
+      if (!isLoggedIn && !isOnPublicAuthPage) return RoutePaths.welcome;
+      if (isLoggedIn) {
+        // Đăng ký mới thành công -> Bắt buộc chuyển tiếp vào Onboarding để thiết lập hồ sơ & ví
+        if (location == RoutePaths.register) {
+          return RoutePaths.onboardingWelcome;
+        }
+        // Đăng nhập tài khoản cũ -> Chuyển vào Trang chủ
+        if (location == RoutePaths.login || location == RoutePaths.welcome) {
+          return RoutePaths.home;
+        }
       }
       return null;
     },

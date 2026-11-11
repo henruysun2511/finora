@@ -5,11 +5,13 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../app/theme/app_colors.dart';
-import '../../../../core/widgets/form_card.dart';
-import '../../../../core/widgets/page_header.dart';
 import '../../../../app/theme/app_text_styles.dart';
 import '../../../../core/utils/currency_formatter.dart';
 import '../../../../core/widgets/app_toast.dart';
+import '../../../../core/widgets/form_card.dart';
+import '../../../../core/widgets/lucide_icon.dart';
+import '../../../../core/widgets/page_header.dart';
+import '../../../friends/friends.dart';
 import '../../domain/models/loan.dart';
 import '../../domain/models/loan_input.dart';
 import '../../domain/models/loan_type.dart';
@@ -38,6 +40,7 @@ class _LoanFormScreenState extends ConsumerState<LoanFormScreen> {
   final _interestController = TextEditingController();
   final _notesController = TextEditingController();
 
+  String? _selectedFriendId;
   LoanType _type = LoanType.lent;
   DateTime? _dueDate;
   int? _installmentMonths;
@@ -65,6 +68,7 @@ class _LoanFormScreenState extends ConsumerState<LoanFormScreen> {
     _type = loan.type;
     _nameController.text = loan.counterpartyName;
     _phoneController.text = loan.counterpartyPhone ?? '';
+    _selectedFriendId = loan.counterpartyUserId;
     _friendIdController.text = loan.counterpartyUserId ?? '';
     _amountController.text = loan.principalAmount.toInt().toString();
     _walletIdController.text = loan.sourceWalletId ?? '';
@@ -98,7 +102,7 @@ class _LoanFormScreenState extends ConsumerState<LoanFormScreen> {
     if (!_formKey.currentState!.validate()) return;
     FocusScope.of(context).unfocus();
 
-    final friendId = _friendIdController.text.trim();
+    final friendId = (_selectedFriendId ?? _friendIdController.text).trim();
     final phone = _phoneController.text.trim();
     final walletId = _walletIdController.text.trim();
     final notes = _notesController.text.trim();
@@ -155,6 +159,7 @@ class _LoanFormScreenState extends ConsumerState<LoanFormScreen> {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final formState = ref.watch(loanFormProvider);
+    final friendsAsync = ref.watch(friendsListProvider);
 
     if (widget.isEditing) {
       final loanAsync = ref.watch(loanDetailProvider(widget.loanId!));
@@ -168,16 +173,20 @@ class _LoanFormScreenState extends ConsumerState<LoanFormScreen> {
         ),
         data: (loan) {
           _populateData(loan);
-          return _buildScaffold(context, isDark, formState);
+          return _buildScaffold(context, isDark, formState, friendsAsync);
         },
       );
     }
 
-    return _buildScaffold(context, isDark, formState);
+    return _buildScaffold(context, isDark, formState, friendsAsync);
   }
 
   Widget _buildScaffold(
-      BuildContext context, bool isDark, LoanFormState formState) {
+    BuildContext context,
+    bool isDark,
+    LoanFormState formState,
+    AsyncValue<List<Friend>> friendsAsync,
+  ) {
     return Scaffold(
       backgroundColor:
           isDark ? AppColors.darkBackground : AppColors.lightBackground,
@@ -319,14 +328,7 @@ class _LoanFormScreenState extends ConsumerState<LoanFormScreen> {
                     validator: LoanValidators.validatePhone,
                   ),
                   const SizedBox(height: 12),
-                  TextFormField(
-                    controller: _friendIdController,
-                    decoration: const InputDecoration(
-                      labelText: 'ID tài khoản bạn bè FINORA (nếu có)',
-                      prefixIcon: Icon(Icons.group_outlined),
-                      hintText: 'Nhập ID tài khoản bạn bè để liên kết nợ',
-                    ),
-                  ),
+                  _buildFriendSelectField(friendsAsync),
                 ],
               ),
             ),
@@ -544,6 +546,216 @@ class _LoanFormScreenState extends ConsumerState<LoanFormScreen> {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildFriendSelectField(AsyncValue<List<Friend>> friendsAsync) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return friendsAsync.when(
+      data: (friends) {
+        if (friends.isEmpty) {
+          return Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+            decoration: BoxDecoration(
+              color: isDark ? AppColors.darkBackground : const Color(0xFFF8FAFC),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
+              ),
+            ),
+            child: Row(
+              children: [
+                const LucideIcon(name: 'users', size: 18, color: AppColors.lightMuted),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    'Chưa có bạn bè FINORA để liên kết',
+                    style: GoogleFonts.inter(
+                      fontSize: 12.5,
+                      color: isDark ? AppColors.darkMuted : AppColors.lightMuted,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          );
+        }
+
+        final effectiveValue = friends.any((f) => f.id == _selectedFriendId)
+            ? _selectedFriendId
+            : null;
+
+        return DropdownButtonFormField<String?>(
+          value: effectiveValue,
+          isExpanded: true,
+          decoration: InputDecoration(
+            labelText: 'Liên kết bạn bè FINORA (tùy chọn)',
+            prefixIcon: const Padding(
+              padding: EdgeInsets.all(12),
+              child: LucideIcon(name: 'user-plus', size: 18, color: AppColors.primary),
+            ),
+            suffixIcon: _selectedFriendId != null
+                ? IconButton(
+                    icon: const LucideIcon(name: 'x', size: 16, color: AppColors.lightMuted),
+                    tooltip: 'Bỏ chọn bạn bè',
+                    onPressed: () {
+                      setState(() {
+                        _selectedFriendId = null;
+                        _friendIdController.clear();
+                      });
+                    },
+                  )
+                : null,
+          ),
+          hint: Text(
+            'Chọn bạn bè từ danh bạ...',
+            style: GoogleFonts.inter(fontSize: 13, color: AppColors.lightMuted),
+          ),
+          selectedItemBuilder: (context) {
+            return [
+              Text(
+                'Không liên kết bạn bè',
+                style: GoogleFonts.inter(fontSize: 13.5, color: AppColors.lightMuted),
+              ),
+              ...friends.map((f) {
+                return Row(
+                  children: [
+                    Container(
+                      width: 22,
+                      height: 22,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        gradient: const LinearGradient(
+                          colors: [Color(0xFF0072D6), Color(0xFF0284C7)],
+                        ),
+                        image: f.avatar != null && f.avatar!.isNotEmpty
+                            ? DecorationImage(
+                                image: NetworkImage(f.avatar!),
+                                fit: BoxFit.cover,
+                              )
+                            : null,
+                      ),
+                      alignment: Alignment.center,
+                      child: f.avatar == null || f.avatar!.isEmpty
+                          ? Text(
+                              f.initials,
+                              style: const TextStyle(
+                                fontSize: 9,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            )
+                          : null,
+                    ),
+                    const SizedBox(width: 8),
+                    Flexible(
+                      child: Text(
+                        '${f.displayName} (${f.email})',
+                        style: GoogleFonts.inter(
+                          fontSize: 13.5,
+                          fontWeight: FontWeight.w600,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                );
+              }),
+            ];
+          },
+          items: [
+            DropdownMenuItem<String?>(
+              value: null,
+              child: Text(
+                'Không liên kết bạn bè',
+                style: GoogleFonts.inter(fontSize: 13.5, color: AppColors.lightMuted),
+              ),
+            ),
+            ...friends.map((f) {
+              return DropdownMenuItem<String?>(
+                value: f.id,
+                child: Row(
+                  children: [
+                    Container(
+                      width: 30,
+                      height: 30,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        gradient: const LinearGradient(
+                          colors: [Color(0xFF0072D6), Color(0xFF0284C7)],
+                        ),
+                        image: f.avatar != null && f.avatar!.isNotEmpty
+                            ? DecorationImage(
+                                image: NetworkImage(f.avatar!),
+                                fit: BoxFit.cover,
+                              )
+                            : null,
+                      ),
+                      alignment: Alignment.center,
+                      child: f.avatar == null || f.avatar!.isEmpty
+                          ? Text(
+                              f.initials,
+                              style: const TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            )
+                          : null,
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            f.displayName,
+                            style: GoogleFonts.inter(
+                              fontSize: 13.5,
+                              fontWeight: FontWeight.w600,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          if (f.email.isNotEmpty && f.email != f.displayName)
+                            Text(
+                              f.email,
+                              style: GoogleFonts.inter(
+                                fontSize: 11,
+                                color: AppColors.lightMuted,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }),
+          ],
+          onChanged: (val) {
+            setState(() {
+              _selectedFriendId = val;
+              _friendIdController.text = val ?? '';
+              if (val != null) {
+                final friend = friends.firstWhere((x) => x.id == val);
+                if (_nameController.text.trim().isEmpty) {
+                  _nameController.text = friend.displayName;
+                }
+              }
+            });
+          },
+        );
+      },
+      loading: () => const Padding(
+        padding: EdgeInsets.symmetric(vertical: 8),
+        child: LinearProgressIndicator(),
+      ),
+      error: (_, __) => const SizedBox.shrink(),
     );
   }
 }

@@ -1,6 +1,31 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
+/// Các hằng số định danh tên Icon Lucide
+class LucideIcons {
+  LucideIcons._();
+
+  static const String arrowLeft = 'arrow-left';
+  static const String arrowRight = 'arrow-right';
+  static const String arrowUpRight = 'arrow-up-right';
+  static const String user = 'user';
+  static const String userPlus = 'user-plus';
+  static const String users = 'users';
+  static const String wallet = 'wallet';
+  static const String check = 'check';
+  static const String checkCheck = 'check-check';
+  static const String checkCircle2 = 'check-circle-2';
+  static const String sparkles = 'sparkles';
+  static const String eye = 'eye';
+  static const String search = 'search';
+  static const String plus = 'plus';
+  static const String settings = 'sliders-horizontal';
+  static const String bell = 'bell';
+  static const String x = 'x';
+  static const String home = 'home';
+  static const String banknote = 'banknote';
+}
+
 /// Bộ Icon vector Lucide chính xác theo chuẩn Lucide React / static-ui/ui-sample-3
 class LucideIcon extends StatelessWidget {
   final String name;
@@ -180,6 +205,8 @@ const Map<String, String> kLucideSvgPaths = {
       '<path d="M12 17V7" /><path d="M16 8h-6a2 2 0 0 0 0 4h4a2 2 0 0 1 0 4H8" /><path d="M4 3a1 1 0 0 1 1-1 1.3 1.3 0 0 1 .7.2l.933.6a1.3 1.3 0 0 0 1.4 0l.934-.6a1.3 1.3 0 0 1 1.4 0l.933.6a1.3 1.3 0 0 0 1.4 0l.933-.6a1.3 1.3 0 0 1 1.4 0l.934.6a1.3 1.3 0 0 0 1.4 0l.933-.6A1.3 1.3 0 0 1 19 2a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1 1.3 1.3 0 0 1-.7-.2l-.933-.6a1.3 1.3 0 0 0-1.4 0l-.934.6a1.3 1.3 0 0 1-1.4 0l-.933-.6a1.3 1.3 0 0 0-1.4 0l-.933.6a1.3 1.3 0 0 1-1.4 0l-.934-.6a1.3 1.3 0 0 0-1.4 0l-.933.6a1.3 1.3 0 0 1-.7.2 1 1 0 0 1-1-1z" />',
   'sparkles':
       '<path d="M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z" /><path d="M20 2v4" /><path d="M22 4h-4" /><circle cx="4" cy="20" r="2" />',
+  'eye':
+      '<path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" /><circle cx="12" cy="12" r="3" />',
   'music':
       '<path d="M9 18V5l12-2v13" /><circle cx="6" cy="18" r="3" /><circle cx="18" cy="16" r="3" />',
   'shield-check':
@@ -200,6 +227,10 @@ const Map<String, String> kLucideSvgPaths = {
       '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><line x1="19" x2="19" y1="8" y2="14" /><line x1="22" x2="16" y1="11" y2="11" />',
   'arrow-left':
       '<path d="m12 19-7-7 7-7" /><path d="M19 12H5" />',
+  'arrow-right':
+      '<path d="M5 12h14" /><path d="m12 5 7 7-7 7" />',
+  'arrow-up-right':
+      '<line x1="7" y1="17" x2="17" y2="7" /><polyline points="7 7 17 7 17 17" />',
   'x':
       '<path d="M18 6 6 18" /><path d="m6 6 12 12" />',
   'refresh-cw':
