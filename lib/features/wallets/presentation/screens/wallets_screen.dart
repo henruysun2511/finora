@@ -1,72 +1,14 @@
-﻿import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter/material.dart';
 
-import 'package:finora_mb/app/theme/app_colors.dart';
+import 'wallets_overview_screen.dart';
 
+/// Màn hình quản lý Không gian Ví & Tài khoản (FINORA WALLET HUB)
+/// Tương thích ngược với định danh WalletsScreen
 class WalletsScreen extends StatelessWidget {
   const WalletsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
-    return Scaffold(
-      backgroundColor: isDark ? AppColors.darkBackground : AppColors.lightBackground,
-      appBar: AppBar(
-        title: Text(
-          'Quản lý Ví tiền',
-          style: GoogleFonts.inter(
-            fontWeight: FontWeight.w700,
-            fontSize: 18,
-            color: isDark ? AppColors.darkForeground : AppColors.lightForeground,
-          ),
-        ),
-        centerTitle: true,
-        backgroundColor: isDark ? AppColors.darkSurface : Colors.white,
-        elevation: 0,
-      ),
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(24.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                width: 64,
-                height: 64,
-                decoration: BoxDecoration(
-                  color: AppColors.primary.withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: const Icon(
-                  Icons.account_balance_wallet_rounded,
-                  color: AppColors.primary,
-                  size: 32,
-                ),
-              ),
-              const SizedBox(height: 16),
-              Text(
-                'Quản lý Ví tiền',
-                style: GoogleFonts.inter(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w700,
-                  color: isDark ? AppColors.darkForeground : AppColors.lightForeground,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'Danh sách các ví tiền mặt, ví điện tử (MoMo, ZaloPay) và phân bổ số dư (/wallets)',
-                style: GoogleFonts.inter(
-                  fontSize: 14,
-                  color: isDark ? AppColors.darkMuted : AppColors.lightMuted,
-                ),
-                textAlign: TextAlign.center,
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
+    return const WalletsOverviewScreen();
   }
 }

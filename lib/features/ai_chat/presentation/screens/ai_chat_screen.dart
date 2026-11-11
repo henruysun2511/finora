@@ -149,187 +149,88 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen> {
                       ],
                     ),
                   )
-                : state.messages.isEmpty
-                    ? SingleChildScrollView(
-                        padding: const EdgeInsets.all(20),
-                        child: Column(
-                          children: [
-                            const SizedBox(height: 30),
-                            // Date pill
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 14, vertical: 4),
-                              decoration: BoxDecoration(
-                                color: isDark
-                                    ? const Color(0xFF1E293B)
-                                    : const Color(0xFFE2E8F0),
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: Text(
-                                'HÔM NAY · BẮT ĐẦU HỘI THOẠI',
-                                style: GoogleFonts.inter(
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.w800,
-                                  letterSpacing: 0.5,
-                                  color: isDark
-                                      ? const Color(0xFF94A3B8)
-                                      : const Color(0xFF64748B),
-                                ),
-                              ),
-                            ),
-                            const SizedBox(height: 24),
-
-                            // Mascot Welcome Card
-                            Container(
-                              width: double.infinity,
-                              padding: const EdgeInsets.all(20),
-                              decoration: BoxDecoration(
-                                color: isDark
-                                    ? const Color(0xFF1E293B)
-                                    : Colors.white,
-                                borderRadius: BorderRadius.circular(20),
-                                border: Border.all(
-                                  color: isDark
-                                      ? AppColors.darkBorder
-                                      : const Color(0xFFE2E8F0),
-                                  width: 1.5,
-                                ),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black
-                                        .withValues(alpha: isDark ? 0.2 : 0.04),
-                                    blurRadius: 16,
-                                    offset: const Offset(0, 4),
-                                  ),
-                                ],
-                              ),
-                              child: Column(
-                                children: [
-                                  Container(
-                                    width: 68,
-                                    height: 68,
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      color: mascot.blobColor
-                                          .withValues(alpha: 0.18),
-                                      border: Border.all(
-                                        color: mascot.color.withValues(alpha: 0.3),
-                                        width: 2,
-                                      ),
-                                    ),
-                                    alignment: Alignment.center,
-                                    child: ClipOval(
-                                      child: MascotWidget(
-                                        mascotId: mascot.id,
-                                        size: 52,
-                                        float: true,
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(height: 14),
-                                  Text(
-                                    'Chào bạn! Mình là ${mascot.name}',
-                                    style: GoogleFonts.inter(
-                                      fontSize: 17,
-                                      fontWeight: FontWeight.w800,
-                                      color: isDark
-                                          ? AppColors.darkForeground
-                                          : AppColors.lightForeground,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 6),
-                                  Text(
-                                    mascot.personality,
-                                    textAlign: TextAlign.center,
-                                    style: GoogleFonts.inter(
-                                      fontSize: 13,
-                                      color: isDark
-                                          ? AppColors.darkMuted
-                                          : AppColors.lightMuted,
-                                      height: 1.4,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 14),
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 14, vertical: 8),
-                                    decoration: BoxDecoration(
-                                      color: const Color(0xFF0072D5)
-                                          .withValues(alpha: 0.08),
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
-                                    child: Text(
-                                      '👉 Gõ chi tiêu tự nhiên (vd: "cà phê 45k", "ăn trưa 65k"). Mình sẽ tự nhận diện và đề xuất tạo giao dịch!',
-                                      textAlign: TextAlign.center,
-                                      style: GoogleFonts.inter(
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w600,
-                                        color: const Color(0xFF0072D5),
-                                        height: 1.35,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      )
-                    : Column(
-                        children: [
-                          if (state.isLoadingMore)
-                            Container(
-                              padding: const EdgeInsets.symmetric(vertical: 8),
-                              alignment: Alignment.center,
-                              child: const SizedBox(
-                                width: 18,
-                                height: 18,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  color: Color(0xFF0072D5),
-                                ),
-                              ),
-                            ),
-                          Expanded(
-                            child: ListView.builder(
-                              controller: _scrollController,
-                              padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
-                              itemCount: state.messages.length,
-                              itemBuilder: (context, index) {
-                                final msg = state.messages[index];
-                                return ChatBubble(
-                                  message: msg,
-                                  mascot: mascot,
-                                  onConfirmPendingAction: (actionId) =>
-                                      notifier.confirmPendingAction(actionId),
-                                  onSaveDraft: (actionId, draft) =>
-                                      notifier.updatePendingActionDraft(
-                                    actionId,
-                                    draft,
-                                  ),
-                                  onRejectPendingAction: (actionId) =>
-                                      notifier.rejectPendingAction(actionId),
-                                  onSelectClarifyAction: (intent) =>
-                                      notifier.sendMessage(
-                                    'Tôi chọn: $intent',
-                                    intentOverride: intent,
-                                  ),
-                                  onRetry: (msgToRetry) =>
-                                      notifier.retryMediaMessage(msgToRetry),
-                                  onManualInput: () =>
-                                      context.push(RoutePaths.createTransaction),
-                                );
-                              },
+                : Column(
+                    children: [
+                      if (state.isLoadingMore)
+                        Container(
+                          padding: const EdgeInsets.symmetric(vertical: 8),
+                          alignment: Alignment.center,
+                          child: const SizedBox(
+                            width: 18,
+                            height: 18,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: Color(0xFF0072D5),
                             ),
                           ),
-                        ],
+                        ),
+                      Expanded(
+                        child: ListView.builder(
+                          controller: _scrollController,
+                          padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
+                          itemCount: state.messages.length + 1,
+                          itemBuilder: (context, index) {
+                            if (index == 0) {
+                              return Center(
+                                child: Container(
+                                  margin: const EdgeInsets.only(top: 4, bottom: 14),
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 14, vertical: 4),
+                                  decoration: BoxDecoration(
+                                    color: isDark
+                                        ? const Color(0xFF1E293B)
+                                        : const Color(0xFFE2E8F0),
+                                    borderRadius: BorderRadius.circular(99),
+                                  ),
+                                  child: Text(
+                                    'HÔM NAY · 12:30',
+                                    style: GoogleFonts.inter(
+                                      fontSize: 10.5,
+                                      fontWeight: FontWeight.w800,
+                                      letterSpacing: 0.5,
+                                      color: isDark
+                                          ? const Color(0xFF94A3B8)
+                                          : const Color(0xFF64748B),
+                                    ),
+                                  ),
+                                ),
+                              );
+                            }
+
+                            final msg = state.messages[index - 1];
+                            return ChatBubble(
+                              message: msg,
+                              mascot: mascot,
+                              onConfirmPendingAction: (actionId) =>
+                                  notifier.confirmPendingAction(actionId),
+                              onSaveDraft: (actionId, draft) =>
+                                  notifier.updatePendingActionDraft(
+                                actionId,
+                                draft,
+                              ),
+                              onRejectPendingAction: (actionId) =>
+                                  notifier.rejectPendingAction(actionId),
+                              onSelectClarifyAction: (intent) =>
+                                  notifier.sendMessage(
+                                'Tôi chọn: $intent',
+                                intentOverride: intent,
+                              ),
+                              onRetry: (msgToRetry) =>
+                                  notifier.retryMediaMessage(msgToRetry),
+                              onManualInput: () =>
+                                  context.push(RoutePaths.createTransaction),
+                            );
+                          },
+                        ),
                       ),
+                    ],
+                  ),
           ),
 
           // Quick Prompt Chips
           QuickPromptChips(
             onSelectPrompt: (prompt) {
-              _inputKey.currentState?.setText(prompt);
+              notifier.sendMessage(prompt);
             },
           ),
           const SizedBox(height: 6),

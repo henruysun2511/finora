@@ -30,6 +30,14 @@ class TransactionFormNotifier extends StateNotifier<TransactionFormState> {
     state = state.copyWith(amount: amount, amountString: amountString);
   }
 
+  void setAmount(double amount) {
+    state = state.copyWith(amount: amount, amountString: amount.toInt().toString());
+  }
+
+  void setDate(DateTime date) {
+    setTransactionDate(date);
+  }
+
   void onKeyPress(String key) {
     var cur = state.amountString;
 

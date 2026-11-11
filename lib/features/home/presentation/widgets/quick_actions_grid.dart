@@ -4,8 +4,9 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../app/router/route_names.dart';
 import '../../../../app/theme/app_colors.dart';
-import 'section_header.dart';
 
+/// Lưới 12 nút tác vụ nhanh (3 dòng x 4 cột cân đối)
+/// Chuẩn thiết kế FinTech SOLARN Style - Tinh giản các mục trùng lặp
 class QuickActionsGrid extends StatelessWidget {
   const QuickActionsGrid({super.key});
 
@@ -16,12 +17,7 @@ class QuickActionsGrid extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        SectionHeader(
-          title: 'Thao tác nhanh',
-          actionText: '16 tiện ích',
-          onTap: () {},
-        ),
-        const SizedBox(height: 12),
+        // ── Card bọc lưới 12 tiện ích thiết yếu ──────────────────────────────
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 16),
           decoration: BoxDecoration(
@@ -62,15 +58,7 @@ class QuickActionsGrid extends StatelessWidget {
                 bgColor: const Color(0xFFF97316),
                 onTap: () => context.push(RoutePaths.scanReceipt),
               ),
-              // 3. Chuyển tiền nội bộ
-              _QuickActionItem(
-                isDark: isDark,
-                icon: Icons.swap_horiz_rounded,
-                label: 'Chuyển ví',
-                bgColor: const Color(0xFF0D9488),
-                onTap: () => context.push(RoutePaths.transfer),
-              ),
-              // 4. Lịch sử giao dịch
+              // 3. Lịch sử giao dịch
               _QuickActionItem(
                 isDark: isDark,
                 icon: Icons.receipt_long_rounded,
@@ -78,7 +66,7 @@ class QuickActionsGrid extends StatelessWidget {
                 bgColor: const Color(0xFF3B82F6),
                 onTap: () => context.push(RoutePaths.transactions),
               ),
-              // 5. Ngân sách chi tiêu
+              // 4. Ngân sách chi tiêu
               _QuickActionItem(
                 isDark: isDark,
                 icon: Icons.calendar_month_rounded,
@@ -86,15 +74,15 @@ class QuickActionsGrid extends StatelessWidget {
                 bgColor: const Color(0xFF8B5CF6),
                 onTap: () => context.go(RoutePaths.budgets),
               ),
-              // 6. Báo cáo & Phân tích
+              // 5. Báo cáo & Phân tích
               _QuickActionItem(
                 isDark: isDark,
                 icon: Icons.pie_chart_rounded,
                 label: 'Báo cáo',
                 bgColor: const Color(0xFFEC4899),
-                onTap: () => context.push(RoutePaths.analytics),
+                onTap: () => context.push(RoutePaths.dashboard),
               ),
-              // 7. Giao dịch định kỳ
+              // 6. Giao dịch định kỳ
               _QuickActionItem(
                 isDark: isDark,
                 icon: Icons.event_repeat_rounded,
@@ -102,7 +90,7 @@ class QuickActionsGrid extends StatelessWidget {
                 bgColor: const Color(0xFF10B981),
                 onTap: () => context.push(RoutePaths.recurringTransactions),
               ),
-              // 8. Sổ ghi nợ
+              // 7. Sổ ghi nợ
               _QuickActionItem(
                 isDark: isDark,
                 icon: Icons.handshake_rounded,
@@ -110,7 +98,7 @@ class QuickActionsGrid extends StatelessWidget {
                 bgColor: const Color(0xFFF59E0B),
                 onTap: () => context.push(RoutePaths.loans),
               ),
-              // 9. Chia tiền nhóm
+              // 8. Chia tiền nhóm
               _QuickActionItem(
                 isDark: isDark,
                 icon: Icons.call_split_rounded,
@@ -118,15 +106,7 @@ class QuickActionsGrid extends StatelessWidget {
                 bgColor: const Color(0xFF6366F1),
                 onTap: () => context.push(RoutePaths.splitExpenses),
               ),
-              // 10. Quỹ chung nhóm
-              _QuickActionItem(
-                isDark: isDark,
-                icon: Icons.groups_rounded,
-                label: 'Quỹ chung',
-                bgColor: const Color(0xFF06B6D4),
-                onTap: () => context.push(RoutePaths.sharedWallets),
-              ),
-              // 11. Danh mục thu chi
+              // 9. Danh mục thu chi
               _QuickActionItem(
                 isDark: isDark,
                 icon: Icons.category_rounded,
@@ -134,15 +114,15 @@ class QuickActionsGrid extends StatelessWidget {
                 bgColor: const Color(0xFF14B8A6),
                 onTap: () => context.push(RoutePaths.categorySettings),
               ),
-              // 12. Danh sách ví
+              // 10. Danh sách ví tiền
               _QuickActionItem(
                 isDark: isDark,
                 icon: Icons.account_balance_wallet_rounded,
-                label: 'Ví của tôi',
+                label: 'Ví tiền',
                 bgColor: const Color(0xFF2563EB),
-                onTap: () => context.push(RoutePaths.wallets),
+                onTap: () => context.go(RoutePaths.wallets),
               ),
-              // 13. Tỷ giá ngoại tệ
+              // 11. Tỷ giá ngoại tệ
               _QuickActionItem(
                 isDark: isDark,
                 icon: Icons.currency_exchange_rounded,
@@ -150,29 +130,13 @@ class QuickActionsGrid extends StatelessWidget {
                 bgColor: const Color(0xFFD97706),
                 onTap: () => context.push(RoutePaths.exchangeRates),
               ),
-              // 14. Bảng tin tài chính
+              // 12. Bảng tin tài chính
               _QuickActionItem(
                 isDark: isDark,
                 icon: Icons.dynamic_feed_rounded,
                 label: 'Bảng tin',
                 bgColor: const Color(0xFF84CC16),
                 onTap: () => context.push(RoutePaths.socialFeed),
-              ),
-              // 15. Bạn bè & Kết nối
-              _QuickActionItem(
-                isDark: isDark,
-                icon: Icons.person_add_alt_1_rounded,
-                label: 'Bạn bè',
-                bgColor: const Color(0xFF0EA5E9),
-                onTap: () => context.push(RoutePaths.friends),
-              ),
-              // 16. Nora AI Chat
-              _QuickActionItem(
-                isDark: isDark,
-                icon: Icons.smart_toy_rounded,
-                label: 'Nora Chat',
-                bgColor: const Color(0xFFA855F7),
-                onTap: () => context.push(RoutePaths.aiChat),
               ),
             ],
           ),
@@ -199,41 +163,60 @@ class _QuickActionItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(16),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            width: 48,
-            height: 48,
-            decoration: BoxDecoration(
-              color: bgColor,
-              borderRadius: BorderRadius.circular(16),
-              boxShadow: [
-                BoxShadow(
-                  color: bgColor.withValues(alpha: 0.28),
-                  blurRadius: 8,
-                  offset: const Offset(0, 3),
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(16),
+        splashColor: bgColor.withValues(alpha: 0.12),
+        highlightColor: bgColor.withValues(alpha: 0.06),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 2),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(
+                  color: isDark
+                      ? bgColor.withValues(alpha: 0.22)
+                      : bgColor.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(
+                    color: bgColor.withValues(alpha: isDark ? 0.35 : 0.22),
+                    width: 1,
+                  ),
                 ),
-              ],
-            ),
-            child: Icon(icon, color: Colors.white, size: 22),
+                child: Center(
+                  child: Icon(
+                    icon,
+                    size: 22,
+                    color: isDark
+                        ? Color.lerp(bgColor, Colors.white, 0.45)
+                        : bgColor,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 5),
+              Text(
+                label,
+                style: GoogleFonts.inter(
+                  fontSize: 10.5,
+                  fontWeight: FontWeight.w600,
+                  color: isDark
+                      ? AppColors.darkForeground
+                      : const Color(0xFF1E293B),
+                  letterSpacing: -0.1,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.center,
+              ),
+            ],
           ),
-          const SizedBox(height: 6),
-          Text(
-            label,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            textAlign: TextAlign.center,
-            style: GoogleFonts.inter(
-              fontSize: 11,
-              fontWeight: FontWeight.w700,
-              color: isDark ? AppColors.darkMuted : const Color(0xFF64748B),
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }

@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../app/theme/app_colors.dart';
+import '../../../../core/widgets/app_toast.dart';
 import '../../domain/models/chat_message_model.dart';
 import '../../domain/models/send_message_input.dart';
 import 'edit_transaction_draft_bottom_sheet.dart';
@@ -52,7 +53,12 @@ class ConfirmationPromptCard extends StatelessWidget {
             ? Map<String, dynamic>.from(payload['toolInput'] as Map)
             : payload);
 
-    if (preview['amount'] == null && payload['amount'] == null && preview['amountFormatted'] == null) {
+    final itemsList = (preview['items'] ?? payload['items']) as List<dynamic>?;
+
+    if (itemsList == null &&
+        preview['amount'] == null &&
+        payload['amount'] == null &&
+        preview['amountFormatted'] == null) {
       return const SizedBox.shrink();
     }
 
@@ -206,100 +212,119 @@ class ConfirmationPromptCard extends StatelessWidget {
               ),
               const SizedBox(height: 12),
 
-              // Row 1: Khoản chi & Số tiền
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Flexible(
-                    child: Text(
-                      txName.toString(),
-                      style: GoogleFonts.inter(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w700,
-                        color: isDark
-                            ? AppColors.darkForeground
-                            : AppColors.lightForeground,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
+              // Row 1..3: Multi-item or Single item
+              if (itemsList != null && itemsList.isNotEmpty) ...[
+                for (var i = 0; i < itemsList.length; i++) ...[
+                  if (i > 0) ...[
+                    const SizedBox(height: 8),
+                    Divider(
+                      color: isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9),
+                      height: 16,
                     ),
-                  ),
-                  Text(
-                    '${isIncome ? '+' : '-'}${formattedAmount ?? _formatCurrency(amountVal)}',
-                    style: GoogleFonts.outfit(
-                      fontSize: 17,
-                      fontWeight: FontWeight.w800,
-                      color: isIncome
-                          ? const Color(0xFF10B981)
-                          : const Color(0xFFEF4444),
-                    ),
+                    const SizedBox(height: 4),
+                  ],
+                  _buildMultiItemRow(
+                    context,
+                    item: itemsList[i] is Map ? itemsList[i] as Map : {},
+                    isDark: isDark,
                   ),
                 ],
-              ),
-              const SizedBox(height: 8),
+              ] else ...[
+                // Row 1: Khoản chi & Số tiền
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Flexible(
+                      child: Text(
+                        txName.toString(),
+                        style: GoogleFonts.inter(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w700,
+                          color: isDark
+                              ? AppColors.darkForeground
+                              : AppColors.lightForeground,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    Text(
+                      '${isIncome ? '+' : '-'}${formattedAmount ?? _formatCurrency(amountVal)}',
+                      style: GoogleFonts.outfit(
+                        fontSize: 17,
+                        fontWeight: FontWeight.w800,
+                        color: isIncome
+                            ? const Color(0xFF10B981)
+                            : const Color(0xFFEF4444),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
 
-              // Row 2: Danh mục
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'Danh mục',
-                    style: GoogleFonts.inter(
-                      fontSize: 13,
-                      color: isDark
-                          ? const Color(0xFF94A3B8)
-                          : const Color(0xFF64748B),
-                    ),
-                  ),
-                  Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                    decoration: BoxDecoration(
-                      color: isDark
-                          ? const Color(0xFF334155)
-                          : const Color(0xFFF1F5F9),
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                    child: Text(
-                      categoryName.toString(),
+                // Row 2: Danh mục
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Danh mục',
                       style: GoogleFonts.inter(
-                        fontSize: 12.5,
+                        fontSize: 13,
+                        color: isDark
+                            ? const Color(0xFF94A3B8)
+                            : const Color(0xFF64748B),
+                      ),
+                    ),
+                    Container(
+                      padding:
+                          const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: isDark
+                            ? const Color(0xFF334155)
+                            : const Color(0xFFF1F5F9),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: Text(
+                        categoryName.toString(),
+                        style: GoogleFonts.inter(
+                          fontSize: 12.5,
+                          fontWeight: FontWeight.w600,
+                          color: isDark
+                              ? AppColors.darkForeground
+                              : AppColors.lightForeground,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 6),
+
+                // Row 3: Nguồn tiền
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Tài khoản',
+                      style: GoogleFonts.inter(
+                        fontSize: 13,
+                        color: isDark
+                            ? const Color(0xFF94A3B8)
+                            : const Color(0xFF64748B),
+                      ),
+                    ),
+                    Text(
+                      accountName.toString(),
+                      style: GoogleFonts.inter(
+                        fontSize: 13,
                         fontWeight: FontWeight.w600,
                         color: isDark
                             ? AppColors.darkForeground
                             : AppColors.lightForeground,
                       ),
                     ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 6),
-
-              // Row 3: Nguồn tiền
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'Tài khoản',
-                    style: GoogleFonts.inter(
-                      fontSize: 13,
-                      color: isDark
-                          ? const Color(0xFF94A3B8)
-                          : const Color(0xFF64748B),
-                    ),
-                  ),
-                  Text(
-                    accountName.toString(),
-                    style: GoogleFonts.inter(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
-                      color: isDark
-                          ? AppColors.darkForeground
-                          : AppColors.lightForeground,
-                    ),
-                  ),
-                ],
-              ),
+                  ],
+                ),
+              ],
 
               // Row 4: Ngày ghi sổ nếu có
               if (dateStr != null && dateStr.isNotEmpty) ...[
@@ -444,12 +469,7 @@ class ConfirmationPromptCard extends StatelessWidget {
                                 if (draft != null) {
                                   onSaveDraft?.call(actionId, draft);
                                   if (context.mounted) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                        content: Text('Đã cập nhật bản nháp. Bấm "Xác nhận ghi sổ" để hoàn tất.'),
-                                        duration: Duration(seconds: 2),
-                                      ),
-                                    );
+                                    AppToast.success(context, 'Đã cập nhật bản nháp. Bấm "Xác nhận ghi sổ" để hoàn tất.');
                                   }
                                 }
                               }
@@ -554,6 +574,107 @@ class ConfirmationPromptCard extends StatelessWidget {
               ],
             ),
           ),
+      ],
+    );
+  }
+
+  Widget _buildMultiItemRow(
+    BuildContext context, {
+    required Map item,
+    required bool isDark,
+  }) {
+    final itName = item['name'] ?? item['title'] ?? item['note'] ?? 'Khoản chi';
+    final itAmount = item['amount'] as num? ?? 0;
+    final itAmountFmt =
+        item['amountFormatted']?.toString() ?? _formatCurrency(itAmount);
+    final itCat = item['category'] ?? item['categoryName'] ?? 'Ăn uống';
+    final itAcc = item['account'] ?? item['accountName'];
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Flexible(
+              child: Text(
+                itName.toString(),
+                style: GoogleFonts.inter(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w700,
+                  color: isDark
+                      ? AppColors.darkForeground
+                      : AppColors.lightForeground,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            Text(
+              '-$itAmountFmt',
+              style: GoogleFonts.outfit(
+                fontSize: 16,
+                fontWeight: FontWeight.w800,
+                color: const Color(0xFFEF4444),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 6),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              'Danh mục',
+              style: GoogleFonts.inter(
+                fontSize: 13,
+                color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+              ),
+            ),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+              decoration: BoxDecoration(
+                color: isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9),
+                borderRadius: BorderRadius.circular(6),
+              ),
+              child: Text(
+                itCat.toString(),
+                style: GoogleFonts.inter(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: isDark
+                      ? AppColors.darkForeground
+                      : AppColors.lightForeground,
+                ),
+              ),
+            ),
+          ],
+        ),
+        if (itAcc != null) ...[
+          const SizedBox(height: 6),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Tài khoản',
+                style: GoogleFonts.inter(
+                  fontSize: 13,
+                  color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                ),
+              ),
+              Text(
+                itAcc.toString(),
+                style: GoogleFonts.inter(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                  color: isDark
+                      ? AppColors.darkForeground
+                      : AppColors.lightForeground,
+                ),
+              ),
+            ],
+          ),
+        ],
       ],
     );
   }

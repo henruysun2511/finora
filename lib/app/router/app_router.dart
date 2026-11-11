@@ -4,9 +4,9 @@ import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../features/ai_chat/presentation/screens/ai_chat_screen.dart';
-import '../../features/analytics/presentation/screens/analytics_screen.dart';
-import '../../features/analytics/presentation/screens/cashflow_report_screen.dart';
-import '../../features/analytics/presentation/screens/category_report_screen.dart';
+import '../../features/dashboard/presentation/screens/dashboard_screen.dart';
+import '../../features/dashboard/presentation/screens/cashflow_report_screen.dart';
+import '../../features/dashboard/presentation/screens/category_report_screen.dart';
 import '../../features/exchange_rates/presentation/screens/exchange_rates_screen.dart';
 import '../../features/auth/presentation/providers/auth_provider.dart';
 import '../../features/auth/presentation/screens/forgot_password_screen.dart';
@@ -73,7 +73,7 @@ GoRouter appRouter(AppRouterRef ref) {
 
   return GoRouter(
     navigatorKey: _rootNavigatorKey,
-    initialLocation: RoutePaths.home,
+    initialLocation: RoutePaths.welcome,
     debugLogDiagnostics: false,
     refreshListenable: notifier,
     redirect: (context, state) {
@@ -89,9 +89,16 @@ GoRouter appRouter(AppRouterRef ref) {
           location == RoutePaths.forgotPassword ||
           location.startsWith('/onboarding');
 
-      if (!isLoggedIn && !isOnPublicAuthPage) return RoutePaths.login;
-      if (isLoggedIn && (location == RoutePaths.login || location == RoutePaths.register)) {
-        return RoutePaths.home;
+      if (!isLoggedIn && !isOnPublicAuthPage) return RoutePaths.welcome;
+      if (isLoggedIn) {
+        // Đăng ký mới thành công -> Bắt buộc chuyển tiếp vào Onboarding để thiết lập hồ sơ & ví
+        if (location == RoutePaths.register) {
+          return RoutePaths.onboardingWelcome;
+        }
+        // Đăng nhập tài khoản cũ -> Chuyển vào Trang chủ
+        if (location == RoutePaths.login || location == RoutePaths.welcome) {
+          return RoutePaths.home;
+        }
       }
       return null;
     },
@@ -163,16 +170,34 @@ GoRouter appRouter(AppRouterRef ref) {
                 name: RouteNames.home,
                 builder: (context, state) => const HomeScreen(),
               ),
+              GoRoute(
+                path: RoutePaths.wallets,
+                name: RouteNames.wallets,
+                builder: (context, state) => const WalletsScreen(),
+              ),
+              GoRoute(
+                path: RoutePaths.sharedWallets,
+                name: RouteNames.sharedWallets,
+                builder: (context, state) => const SharedWalletsScreen(),
+              ),
+              GoRoute(
+                path: RoutePaths.walletDetail,
+                name: RouteNames.walletDetail,
+                builder: (context, state) {
+                  final id = state.pathParameters['id'] ?? '';
+                  return WalletDetailScreen(walletId: id);
+                },
+              ),
             ],
           ),
 
-          // Branch 1: Ngân sách & Sổ GD (Budgets)
+          // Branch 1: Dashboard Báo cáo & Phân tích (Dashboard)
           StatefulShellBranch(
             routes: [
               GoRoute(
-                path: RoutePaths.budgets,
-                name: RouteNames.budgets,
-                builder: (context, state) => const BudgetsScreen(),
+                path: RoutePaths.dashboard,
+                name: RouteNames.dashboard,
+                builder: (context, state) => const DashboardScreen(),
               ),
             ],
           ),
@@ -275,13 +300,8 @@ GoRouter appRouter(AppRouterRef ref) {
 
       // ==========================================
       // 4. PHÂN HỆ VÍ & TÀI KHOẢN (Wallets & Accounts)
+      // Lưu ý: wallets, sharedWallets, walletDetail nằm trong Shell (Branch 0) để giữ Bottom Navigation Bar
       // ==========================================
-      GoRoute(
-        parentNavigatorKey: _rootNavigatorKey,
-        path: RoutePaths.wallets,
-        name: RouteNames.wallets,
-        builder: (context, state) => const WalletsScreen(),
-      ),
       GoRoute(
         parentNavigatorKey: _rootNavigatorKey,
         path: RoutePaths.createWallet,
@@ -290,24 +310,9 @@ GoRouter appRouter(AppRouterRef ref) {
       ),
       GoRoute(
         parentNavigatorKey: _rootNavigatorKey,
-        path: RoutePaths.sharedWallets,
-        name: RouteNames.sharedWallets,
-        builder: (context, state) => const SharedWalletsScreen(),
-      ),
-      GoRoute(
-        parentNavigatorKey: _rootNavigatorKey,
         path: RoutePaths.createSharedWallet,
         name: RouteNames.createSharedWallet,
         builder: (context, state) => const CreateSharedWalletScreen(),
-      ),
-      GoRoute(
-        parentNavigatorKey: _rootNavigatorKey,
-        path: RoutePaths.walletDetail,
-        name: RouteNames.walletDetail,
-        builder: (context, state) {
-          final id = state.pathParameters['id'] ?? '';
-          return WalletDetailScreen(walletId: id);
-        },
       ),
       GoRoute(
         parentNavigatorKey: _rootNavigatorKey,
@@ -334,6 +339,12 @@ GoRouter appRouter(AppRouterRef ref) {
       // ==========================================
       // 5. PHÂN HỆ NGÂN SÁCH (Budgets Sub-routes)
       // ==========================================
+      GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
+        path: RoutePaths.budgets,
+        name: RouteNames.budgets,
+        builder: (context, state) => const BudgetsScreen(),
+      ),
       GoRoute(
         parentNavigatorKey: _rootNavigatorKey,
         path: RoutePaths.createBudget,
@@ -421,9 +432,9 @@ GoRouter appRouter(AppRouterRef ref) {
       // ==========================================
       GoRoute(
         parentNavigatorKey: _rootNavigatorKey,
-        path: RoutePaths.analytics,
-        name: RouteNames.analytics,
-        builder: (context, state) => const AnalyticsScreen(),
+        path: RoutePaths.reportsOverview,
+        name: RouteNames.reportsOverview,
+        builder: (context, state) => const DashboardScreen(),
       ),
       GoRoute(
         parentNavigatorKey: _rootNavigatorKey,

@@ -10,6 +10,8 @@ class User {
   final DateTime? createdAt;
   final DateTime? updatedAt;
 
+  String? get avatar => avatarUrl;
+
   const User({
     required this.id,
     required this.email,

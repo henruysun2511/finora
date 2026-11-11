@@ -13,36 +13,36 @@ class QuickPromptChips extends StatelessWidget {
 
   static const List<Map<String, String>> _prompts = [
     {
-      'label': '📊 Đánh giá quy tắc 50/30/20',
-      'query': 'Đánh giá chi tiêu của tôi theo quy tắc 50 30 20 tháng này',
+      'label': '🍜 Ăn tối 250k',
+      'query': 'Ăn tối buffet 250k',
+    },
+    {
+      'label': '📊 Tiêu nhiều nhất ở đâu?',
+      'query': 'Tháng này tôi tiêu nhiều nhất vào đâu?',
+    },
+    {
+      'label': '💡 Mẹo tiết kiệm tuần này',
+      'query': 'Gợi ý cho tôi mẹo tiết kiệm tuần này',
+    },
+    {
+      'label': '☕ Cà phê 45k',
+      'query': 'Cà phê Highland 45k thanh toán bằng tiền mặt',
     },
     {
       'label': '🎯 Tiến độ ngân sách',
       'query': 'Tình hình tiến độ ngân sách tháng này của tôi thế nào?',
     },
     {
-      'label': '📅 Thói quen chi tiêu',
-      'query': 'Thói quen chi tiêu theo thứ và ngày của tôi thế nào?',
+      'label': '💵 Số dư tài khoản',
+      'query': 'Tra cứu số dư các tài khoản ví của tôi',
     },
     {
-      'label': '💵 Số dư các tài khoản',
-      'query': 'Tra cứu số dư các tài khoản ví của tôi',
+      'label': '📊 Quy tắc 50/30/20',
+      'query': 'Đánh giá chi tiêu của tôi theo quy tắc 50 30 20 tháng này',
     },
     {
       'label': '📈 Dòng tiền & tích lũy',
       'query': 'Dòng tiền thu chi và tỷ lệ tiết kiệm tháng này của tôi',
-    },
-    {
-      'label': '🤝 Sổ nợ & cho vay',
-      'query': 'Sổ nợ và các khoản cho vay của tôi hiện tại',
-    },
-    {
-      'label': '🍜 Ăn tối buffet 250k',
-      'query': 'Ăn tối buffet nướng 250k thanh toán qua Vietcombank',
-    },
-    {
-      'label': '💡 Lời khuyên tài chính',
-      'query': 'Cho tôi vài lời khuyên tài chính phù hợp với số dư hiện tại',
     },
   ];
 
