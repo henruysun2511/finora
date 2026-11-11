@@ -8,6 +8,8 @@ import '../../../../app/theme/app_colors.dart';
 import '../../../../core/utils/currency_formatter.dart';
 import '../../../../core/widgets/app_toast.dart';
 import '../../../../core/widgets/banner_header.dart';
+import '../../../../core/widgets/category_icon.dart';
+import '../../../../core/widgets/lucide_icon.dart';
 import '../../domain/models/dashboard_overview_model.dart';
 import '../../domain/models/export_format.dart';
 import '../providers/dashboard_providers.dart';
@@ -69,9 +71,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
                   end: Alignment.bottomRight,
                 ),
                 action: BannerHeader.glassButton(
-                  icon: const Icon(
-                    Icons.refresh_rounded,
-                    size: 20,
+                  icon: const LucideIcon(
+                    name: 'refresh-cw',
+                    size: 18,
                     color: Colors.white,
                   ),
                   onTap: () {
@@ -211,8 +213,8 @@ class _DashboardHeroBanner extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    const Icon(
-                      Icons.account_balance_wallet_rounded,
+                    const LucideIcon(
+                      name: 'wallet',
                       color: Colors.white70,
                       size: 14,
                     ),
@@ -440,7 +442,11 @@ class _OverviewTab extends ConsumerWidget {
             children: [
               TextButton.icon(
                 onPressed: () => _showExportOptions(context, ref),
-                icon: const Icon(Icons.file_download_outlined, size: 16),
+                icon: const LucideIcon(
+                  name: 'download',
+                  size: 16,
+                  color: AppColors.primary,
+                ),
                 label: Text(
                   'Xuất báo cáo (PDF/Excel)',
                   style: GoogleFonts.inter(
@@ -528,7 +534,7 @@ class _CashFlowTab extends ConsumerWidget {
                       label: 'Tổng thu',
                       value: CurrencyFormatter.formatCompact(cf.totalIncome),
                       color: AppColors.success,
-                      icon: Icons.arrow_upward_rounded,
+                      icon: 'arrow-up',
                     ),
                   ),
                   const SizedBox(width: 8),
@@ -538,7 +544,7 @@ class _CashFlowTab extends ConsumerWidget {
                       label: 'Tổng chi',
                       value: CurrencyFormatter.formatCompact(cf.totalExpense),
                       color: AppColors.danger,
-                      icon: Icons.arrow_downward_rounded,
+                      icon: 'arrow-down',
                     ),
                   ),
                   const SizedBox(width: 8),
@@ -548,7 +554,7 @@ class _CashFlowTab extends ConsumerWidget {
                       label: 'Thặng dư ròng',
                       value: CurrencyFormatter.formatCompact(cf.netSavings),
                       color: AppColors.primary,
-                      icon: Icons.savings_rounded,
+                      icon: 'piggy-bank',
                     ),
                   ),
                 ],
@@ -844,16 +850,10 @@ class _CategoryBreakdownTab extends ConsumerWidget {
                     return ExpansionTile(
                       shape: const Border(),
                       tilePadding: EdgeInsets.zero,
-                      leading: Container(
-                        width: 36,
-                        height: 36,
-                        decoration: BoxDecoration(
-                          color: AppColors.primary.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        alignment: Alignment.center,
-                        child: Text(c.icon,
-                            style: const TextStyle(fontSize: 18)),
+                      leading: CategoryIcon(
+                        icon: c.icon,
+                        colorHex: c.color,
+                        size: 36,
                       ),
                       title: Text(
                         c.name,
@@ -876,7 +876,12 @@ class _CategoryBreakdownTab extends ConsumerWidget {
                               color: AppColors.primary,
                             ),
                           ),
-                          const Icon(Icons.expand_more_rounded, size: 20),
+                          const SizedBox(width: 4),
+                          const LucideIcon(
+                            name: 'chevron-down',
+                            size: 16,
+                            color: AppColors.primary,
+                          ),
                         ],
                       ),
                       children: c.subCategories.map((sub) {
@@ -1216,8 +1221,10 @@ class _BudgetHealthTab extends ConsumerWidget {
                         children: [
                           Row(
                             children: [
-                              Text(item.icon,
-                                  style: const TextStyle(fontSize: 18)),
+                              CategoryIcon(
+                                icon: item.icon,
+                                size: 28,
+                              ),
                               const SizedBox(width: 8),
                               Expanded(
                                 child: Text(
@@ -1334,7 +1341,7 @@ class _DebtsTab extends ConsumerWidget {
                       value: CurrencyFormatter.formatCompact(
                           debts.totalReceivables),
                       color: AppColors.success,
-                      icon: Icons.call_received_rounded,
+                      icon: 'arrow-down-left',
                     ),
                   ),
                   const SizedBox(width: 8),
@@ -1345,7 +1352,7 @@ class _DebtsTab extends ConsumerWidget {
                       value: CurrencyFormatter.formatCompact(
                           debts.totalPayables),
                       color: AppColors.danger,
-                      icon: Icons.call_made_rounded,
+                      icon: 'arrow-up-right',
                     ),
                   ),
                   const SizedBox(width: 8),
@@ -1358,7 +1365,7 @@ class _DebtsTab extends ConsumerWidget {
                       color: debts.netDebtPosition >= 0
                           ? AppColors.primary
                           : AppColors.danger,
-                      icon: Icons.account_balance_rounded,
+                      icon: 'hand-coins',
                     ),
                   ),
                 ],
@@ -1386,8 +1393,11 @@ class _DebtsTab extends ConsumerWidget {
                           color: AppColors.danger.withValues(alpha: 0.15),
                           shape: BoxShape.circle,
                         ),
-                        child: const Icon(Icons.warning_amber_rounded,
-                            color: AppColors.danger, size: 22),
+                        child: const LucideIcon(
+                          name: 'alert-triangle',
+                          color: AppColors.danger,
+                          size: 20,
+                        ),
                       ),
                       const SizedBox(width: 12),
                       Expanded(
@@ -1752,8 +1762,8 @@ class _CalendarTab extends ConsumerWidget {
                                     borderRadius: BorderRadius.circular(10),
                                   ),
                                   alignment: Alignment.center,
-                                  child: const Icon(
-                                    Icons.receipt_long_rounded,
+                                  child: const LucideIcon(
+                                    name: 'receipt',
                                     size: 18,
                                     color: Color(0xFF6366F1),
                                   ),
@@ -1818,8 +1828,8 @@ class _CalendarTab extends ConsumerWidget {
                         padding: const EdgeInsets.symmetric(vertical: 6),
                         child: Row(
                           children: [
-                            const Icon(
-                              Icons.warning_amber_rounded,
+                            const LucideIcon(
+                              name: 'alert-triangle',
                               size: 18,
                               color: AppColors.orange,
                             ),
@@ -1857,7 +1867,7 @@ class _MetricCard extends StatelessWidget {
   final String label;
   final String value;
   final Color color;
-  final IconData icon;
+  final String icon;
 
   const _MetricCard({
     required this.isDark,
@@ -1881,7 +1891,7 @@ class _MetricCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, size: 16, color: color),
+          LucideIcon(name: icon, size: 16, color: color),
           const SizedBox(height: 6),
           FittedBox(
             fit: BoxFit.scaleDown,

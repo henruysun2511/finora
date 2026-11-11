@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../app/theme/app_colors.dart';
+import '../../../../core/widgets/lucide_icon.dart';
 import '../../domain/models/export_format.dart';
 import '../../domain/models/report_overview_data.dart';
 
@@ -72,8 +73,8 @@ class ReportExportSheet extends StatelessWidget {
                   color: AppColors.primary.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: const Icon(
-                  Icons.file_download_outlined,
+                child: const LucideIcon(
+                  name: 'download',
                   color: AppColors.primary,
                   size: 22,
                 ),
@@ -120,7 +121,20 @@ class ReportExportSheet extends StatelessWidget {
                     ),
                     child: Row(
                       children: [
-                        Text(format.icon, style: const TextStyle(fontSize: 26)),
+                        Container(
+                          width: 40,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            color: AppColors.primary.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          alignment: Alignment.center,
+                          child: LucideIcon(
+                            name: format.lucideIcon,
+                            size: 20,
+                            color: AppColors.primary,
+                          ),
+                        ),
                         const SizedBox(width: 14),
                         Expanded(
                           child: Column(
@@ -149,9 +163,9 @@ class ReportExportSheet extends StatelessWidget {
                             ],
                           ),
                         ),
-                        const Icon(
-                          Icons.arrow_forward_ios_rounded,
-                          size: 14,
+                        const LucideIcon(
+                          name: 'chevron-right',
+                          size: 16,
                           color: AppColors.primary,
                         ),
                       ],

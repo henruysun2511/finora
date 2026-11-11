@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/utils/currency_formatter.dart';
+import '../../../../core/widgets/lucide_icon.dart';
 import '../../../../core/widgets/page_header.dart';
 import '../providers/dashboard_providers.dart';
 
@@ -22,7 +23,11 @@ class CashflowReportScreen extends ConsumerWidget {
         title: 'Báo cáo Dòng tiền',
         subtitle: 'Xu hướng dòng tiền ròng vào/ra theo tuần và tháng',
         action: IconButton(
-          icon: const Icon(Icons.refresh_rounded),
+          icon: LucideIcon(
+            name: 'refresh-cw',
+            size: 20,
+            color: isDark ? AppColors.darkForeground : AppColors.lightForeground,
+          ),
           onPressed: () => ref.invalidate(dashboardCashFlowProvider),
         ),
       ),
@@ -80,8 +85,11 @@ class CashflowReportScreen extends ConsumerWidget {
                           Expanded(
                             child: Row(
                               children: [
-                                const Icon(Icons.arrow_upward_rounded,
-                                    size: 16, color: Color(0xFF86EFAC)),
+                                const LucideIcon(
+                                  name: 'arrow-up',
+                                  size: 16,
+                                  color: Color(0xFF86EFAC),
+                                ),
                                 const SizedBox(width: 4),
                                 Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -104,8 +112,11 @@ class CashflowReportScreen extends ConsumerWidget {
                           Expanded(
                             child: Row(
                               children: [
-                                const Icon(Icons.arrow_downward_rounded,
-                                    size: 16, color: Color(0xFFFCA5A5)),
+                                const LucideIcon(
+                                  name: 'arrow-down',
+                                  size: 16,
+                                  color: Color(0xFFFCA5A5),
+                                ),
                                 const SizedBox(width: 4),
                                 Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,

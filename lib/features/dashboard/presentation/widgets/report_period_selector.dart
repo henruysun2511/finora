@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../app/theme/app_colors.dart';
+import '../../../../core/widgets/lucide_icon.dart';
 import '../../domain/models/report_period.dart';
 
 class ReportPeriodSelector extends StatelessWidget {
@@ -86,8 +87,11 @@ class ReportPeriodSelector extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 IconButton(
-                  icon: const Icon(Icons.chevron_left_rounded, size: 24),
-                  color: isDark ? AppColors.darkForeground : AppColors.lightForeground,
+                  icon: LucideIcon(
+                    name: 'chevron-left',
+                    size: 20,
+                    color: isDark ? AppColors.darkForeground : AppColors.lightForeground,
+                  ),
                   onPressed: onPrevious,
                   tooltip: 'Kỳ trước',
                   padding: EdgeInsets.zero,
@@ -110,8 +114,8 @@ class ReportPeriodSelector extends StatelessWidget {
                       ),
                       if (selectedPeriod == ReportPeriod.custom) ...[
                         const SizedBox(width: 6),
-                        const Icon(
-                          Icons.calendar_month_outlined,
+                        const LucideIcon(
+                          name: 'calendar',
                           size: 16,
                           color: AppColors.primary,
                         ),
@@ -120,8 +124,11 @@ class ReportPeriodSelector extends StatelessWidget {
                   ),
                 ),
                 IconButton(
-                  icon: const Icon(Icons.chevron_right_rounded, size: 24),
-                  color: isDark ? AppColors.darkForeground : AppColors.lightForeground,
+                  icon: LucideIcon(
+                    name: 'chevron-right',
+                    size: 20,
+                    color: isDark ? AppColors.darkForeground : AppColors.lightForeground,
+                  ),
                   onPressed: onNext,
                   tooltip: 'Kỳ sau',
                   padding: EdgeInsets.zero,

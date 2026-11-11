@@ -4,6 +4,8 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/utils/currency_formatter.dart';
+import '../../../../core/widgets/category_icon.dart';
+import '../../../../core/widgets/lucide_icon.dart';
 import '../../../../core/widgets/page_header.dart';
 import '../providers/dashboard_providers.dart';
 
@@ -22,7 +24,11 @@ class CategoryReportScreen extends ConsumerWidget {
         title: 'Cơ cấu Chi tiêu',
         subtitle: 'Phân tích tỷ trọng chi phí và quy tắc 50/30/20',
         action: IconButton(
-          icon: const Icon(Icons.refresh_rounded),
+          icon: LucideIcon(
+            name: 'refresh-cw',
+            size: 20,
+            color: isDark ? AppColors.darkForeground : AppColors.lightForeground,
+          ),
           onPressed: () => ref.invalidate(dashboardCategoryBreakdownProvider),
         ),
       ),
@@ -172,7 +178,11 @@ class CategoryReportScreen extends ConsumerWidget {
                           padding: const EdgeInsets.symmetric(vertical: 8),
                           child: Row(
                             children: [
-                              Text(c.icon, style: const TextStyle(fontSize: 20)),
+                              CategoryIcon(
+                                icon: c.icon,
+                                colorHex: c.color,
+                                size: 36,
+                              ),
                               const SizedBox(width: 10),
                               Expanded(
                                 child: Column(

@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/utils/currency_formatter.dart';
+import '../../../../core/widgets/lucide_icon.dart';
 import '../../domain/models/report_overview_data.dart';
 
 class ReportDonutChart extends StatefulWidget {
@@ -131,7 +132,11 @@ class _ReportDonutChartState extends State<ReportDonutChart> {
                 : Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Text(selectedSlice.icon, style: const TextStyle(fontSize: 16)),
+                      LucideIcon(
+                        name: selectedSlice.icon,
+                        size: 16,
+                        color: _parseColor(selectedSlice.colorHex),
+                      ),
                       const SizedBox(width: 8),
                       Text(
                         selectedSlice.name,

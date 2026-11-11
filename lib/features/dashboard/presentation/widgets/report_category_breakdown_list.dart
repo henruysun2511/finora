@@ -5,6 +5,8 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../../app/router/route_names.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/utils/currency_formatter.dart';
+import '../../../../core/widgets/category_icon.dart';
+import '../../../../core/widgets/lucide_icon.dart';
 import '../../domain/models/report_overview_data.dart';
 
 class ReportCategoryBreakdownList extends StatefulWidget {
@@ -160,18 +162,10 @@ class _ReportCategoryBreakdownListState extends State<ReportCategoryBreakdownLis
                       // Hàng trên: Icon + Tên + % + Số tiền
                       Row(
                         children: [
-                          Container(
-                            width: 38,
-                            height: 38,
-                            decoration: BoxDecoration(
-                              color: catColor.withValues(alpha: 0.15),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            alignment: Alignment.center,
-                            child: Text(
-                              cat.icon,
-                              style: const TextStyle(fontSize: 18),
-                            ),
+                          CategoryIcon(
+                            icon: cat.icon,
+                            colorHex: cat.colorHex,
+                            size: 38,
                           ),
                           const SizedBox(width: 12),
                           Expanded(
@@ -304,8 +298,8 @@ class _ReportCategoryBreakdownListState extends State<ReportCategoryBreakdownLis
                                   ),
                                 ),
                                 const SizedBox(width: 4),
-                                const Icon(
-                                  Icons.arrow_forward_rounded,
+                                const LucideIcon(
+                                  name: 'arrow-right',
                                   size: 14,
                                   color: AppColors.primary,
                                 ),

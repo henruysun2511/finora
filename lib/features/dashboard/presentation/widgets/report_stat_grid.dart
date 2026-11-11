@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/utils/currency_formatter.dart';
+import '../../../../core/widgets/lucide_icon.dart';
 import '../../domain/models/report_overview_data.dart';
 
 class ReportStatGrid extends StatelessWidget {
@@ -46,7 +47,7 @@ class ReportStatGrid extends StatelessWidget {
                   badgeText: incomeChangeText,
                   badgeColor: metrics.momIncomeChange >= 0 ? AppColors.success : AppColors.danger,
                   isDark: isDark,
-                  icon: Icons.arrow_upward_rounded,
+                  icon: 'arrow-up',
                   iconColor: AppColors.success,
                 ),
               ),
@@ -58,7 +59,7 @@ class ReportStatGrid extends StatelessWidget {
                   badgeText: expenseChangeText,
                   badgeColor: metrics.momExpenseChange <= 0 ? AppColors.success : AppColors.danger,
                   isDark: isDark,
-                  icon: Icons.arrow_downward_rounded,
+                  icon: 'arrow-down',
                   iconColor: AppColors.danger,
                 ),
               ),
@@ -74,7 +75,7 @@ class ReportStatGrid extends StatelessWidget {
                   badgeText: surplusBadgeText,
                   badgeColor: metrics.netSavings >= 0 ? const Color(0xFFF59E0B) : AppColors.danger,
                   isDark: isDark,
-                  icon: Icons.savings_outlined,
+                  icon: 'piggy-bank',
                   iconColor: AppColors.primary,
                 ),
               ),
@@ -86,7 +87,7 @@ class ReportStatGrid extends StatelessWidget {
                   badgeText: savingsRateTargetText,
                   badgeColor: isDark ? AppColors.darkMuted : AppColors.lightMuted,
                   isDark: isDark,
-                  icon: Icons.pie_chart_outline_rounded,
+                  icon: 'pie-chart',
                   iconColor: const Color(0xFF8B5CF6),
                 ),
               ),
@@ -104,7 +105,7 @@ class _StatCard extends StatelessWidget {
   final String badgeText;
   final Color badgeColor;
   final bool isDark;
-  final IconData icon;
+  final String icon;
   final Color iconColor;
 
   const _StatCard({
@@ -156,12 +157,12 @@ class _StatCard extends StatelessWidget {
                 ),
               ),
               Container(
-                padding: const EdgeInsets.all(4),
+                padding: const EdgeInsets.all(5),
                 decoration: BoxDecoration(
                   color: iconColor.withValues(alpha: 0.12),
                   shape: BoxShape.circle,
                 ),
-                child: Icon(icon, size: 14, color: iconColor),
+                child: LucideIcon(name: icon, size: 13, color: iconColor),
               ),
             ],
           ),

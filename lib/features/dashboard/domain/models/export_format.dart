@@ -36,6 +36,17 @@ enum ExportFormat {
     }
   }
 
+  String get lucideIcon {
+    switch (this) {
+      case ExportFormat.pdf:
+        return 'file-text';
+      case ExportFormat.excel:
+        return 'file-spreadsheet';
+      case ExportFormat.csv:
+        return 'file-text';
+    }
+  }
+
   String get icon {
     switch (this) {
       case ExportFormat.pdf:
