@@ -254,25 +254,26 @@ class _HomePhotoCalendarSectionState
 
         // ── 3. Lưới ô lịch ảnh chi tiêu (lc-cells) ───────────────────────────
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12),
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              final cellWidth = (constraints.maxWidth - (6 * 5)) / 7;
+          padding: const EdgeInsets.symmetric(horizontal: 14),
+          child: Builder(
+            builder: (context) {
               final totalCells = leadingEmpty + daysInMonth;
               final rowCount = (totalCells / 7).ceil();
 
               return Column(
                 children: List.generate(rowCount, (r) {
                   return Padding(
-                    padding: const EdgeInsets.only(bottom: 5),
+                    padding: const EdgeInsets.only(bottom: 6),
                     child: Row(
                       children: List.generate(7, (c) {
                         final index = r * 7 + c;
                         if (index < leadingEmpty ||
                             index >= leadingEmpty + daysInMonth) {
-                          return SizedBox(
-                            width: cellWidth,
-                            height: cellWidth,
+                          return const Expanded(
+                            child: AspectRatio(
+                              aspectRatio: 1.0,
+                              child: SizedBox.shrink(),
+                            ),
                           );
                         }
 
@@ -285,23 +286,29 @@ class _HomePhotoCalendarSectionState
                             item != null && item.totalExpense > 0;
                         final txCount = item?.transactionCount ?? 0;
 
-                        return SizedBox(
-                          width: cellWidth,
-                          height: cellWidth,
-                          child: _PhotoCalendarCell(
-                            dayNum: dayNum,
-                            isDark: isDark,
-                            isSelected: isSelected,
-                            hasExpense: hasExpense,
-                            txCount: txCount,
-                            paletteIndex: dayNum % _gradientPalettes.length,
-                            iconName: _categoryIcons[
-                                dayNum % _categoryIcons.length],
-                            onTap: () {
-                              setState(() {
-                                _selectedDate = DateTime(year, month, dayNum);
-                              });
-                            },
+                        return Expanded(
+                          child: AspectRatio(
+                            aspectRatio: 1.0,
+                            child: Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 2.5),
+                              child: _PhotoCalendarCell(
+                                dayNum: dayNum,
+                                isDark: isDark,
+                                isSelected: isSelected,
+                                hasExpense: hasExpense,
+                                txCount: txCount,
+                                paletteIndex: dayNum % _gradientPalettes.length,
+                                iconName: _categoryIcons[
+                                    dayNum % _categoryIcons.length],
+                                onTap: () {
+                                  setState(() {
+                                    _selectedDate =
+                                        DateTime(year, month, dayNum);
+                                  });
+                                },
+                              ),
+                            ),
                           ),
                         );
                       }),
@@ -485,9 +492,8 @@ class _PhotoCalendarCell extends StatelessWidget {
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 160),
         curve: Curves.easeOutCubic,
-        margin: const EdgeInsets.all(2),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(11),
           gradient: hasExpense
               ? LinearGradient(
                   colors: gradientColors,
