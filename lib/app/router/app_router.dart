@@ -51,14 +51,13 @@ import '../../features/transactions/presentation/screens/scan_receipt_screen.dar
 import '../../features/transactions/presentation/screens/receipt_capture_screen.dart';
 import '../../features/transactions/presentation/screens/transaction_detail_screen.dart';
 import '../../features/transactions/presentation/screens/transactions_screen.dart';
-import '../../features/wallets/presentation/screens/account_detail_screen.dart';
+import '../../features/accounts/presentation/screens/account_detail_screen.dart';
 import '../../features/wallets/presentation/screens/create_account_screen.dart';
-import '../../features/wallets/presentation/screens/create_shared_wallet_screen.dart';
 import '../../features/wallets/presentation/screens/create_wallet_screen.dart';
 import '../../features/wallets/presentation/screens/shared_wallets_screen.dart';
 import '../../features/wallets/presentation/screens/transfer_screen.dart';
 import '../../features/wallets/presentation/screens/wallet_detail_screen.dart';
-import '../../features/wallets/presentation/screens/wallets_screen.dart';
+import '../../features/wallets/presentation/screens/wallets_overview_screen.dart';
 import 'route_names.dart';
 import 'scaffold_with_nav_bar.dart';
 
@@ -173,7 +172,7 @@ GoRouter appRouter(AppRouterRef ref) {
               GoRoute(
                 path: RoutePaths.wallets,
                 name: RouteNames.wallets,
-                builder: (context, state) => const WalletsScreen(),
+                builder: (context, state) => const WalletsOverviewScreen(),
               ),
               GoRoute(
                 path: RoutePaths.sharedWallets,
@@ -312,7 +311,7 @@ GoRouter appRouter(AppRouterRef ref) {
         parentNavigatorKey: _rootNavigatorKey,
         path: RoutePaths.createSharedWallet,
         name: RouteNames.createSharedWallet,
-        builder: (context, state) => const CreateSharedWalletScreen(),
+        builder: (context, state) => const CreateWalletScreen(),
       ),
       GoRoute(
         parentNavigatorKey: _rootNavigatorKey,

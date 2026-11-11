@@ -113,6 +113,32 @@ class WalletDetailActions {
     await repo.deleteWallet(_walletId);
     _ref.invalidate(walletsOverviewProvider);
   }
+
+  Future<void> transferOwnership(String newOwnerId) async {
+    final repo = _ref.read(walletRepositoryProvider);
+    await repo.transferOwnership(_walletId, newOwnerId);
+    _ref.invalidate(walletDetailProvider(_walletId));
+    _ref.invalidate(walletsOverviewProvider);
+  }
+
+  Future<void> leaveWallet() async {
+    final repo = _ref.read(walletRepositoryProvider);
+    await repo.leaveWallet(_walletId);
+    _ref.invalidate(walletsOverviewProvider);
+  }
+
+  Future<void> acceptInvite() async {
+    final repo = _ref.read(walletRepositoryProvider);
+    await repo.acceptInvite(_walletId);
+    _ref.invalidate(walletDetailProvider(_walletId));
+    _ref.invalidate(walletsOverviewProvider);
+  }
+
+  Future<void> rejectInvite() async {
+    final repo = _ref.read(walletRepositoryProvider);
+    await repo.rejectInvite(_walletId);
+    _ref.invalidate(walletsOverviewProvider);
+  }
 }
 
 final walletDetailActionsProvider =

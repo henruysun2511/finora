@@ -7,6 +7,7 @@ import '../../../../app/router/route_names.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/utils/currency_formatter.dart';
 import '../../../../core/widgets/app_toast.dart';
+import '../../../../core/widgets/page_header.dart';
 import '../providers/wallet_detail_provider.dart';
 
 /// Màn hình Chi tiết ví & Tài khoản chuẩn 1:1 theo `device-preview/screens/wallets/detail.html`
@@ -34,15 +35,30 @@ class _WalletDetailScreenState extends ConsumerState<WalletDetailScreen> {
 
     return Scaffold(
       backgroundColor: isDark ? AppColors.darkBackground : const Color(0xFFF8FAFC),
+      appBar: PageHeader.subPage(
+        title: walletName,
+        subtitle: isMain ? 'Ví cá nhân' : 'Ví dùng chung',
+        onBack: () {
+          if (context.canPop()) {
+            context.pop();
+          } else {
+            context.go(RoutePaths.wallets);
+          }
+        },
+        action: IconButton(
+          icon: Icon(
+            Icons.tune_rounded,
+            color: isDark ? AppColors.darkForeground : AppColors.lightForeground,
+          ),
+          onPressed: () => context.push(RoutePaths.accountDetailWithId(widget.walletId)),
+        ),
+      ),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // ──────────────── 1. STATUS BAR & HEADER ────────────────
-              _buildHeader(context, isDark, walletName),
-
-              // ──────────────── 2. BANK CARD HERO ─────────────────────
+              // ──────────────── 1. BANK CARD HERO ─────────────────────
               _buildBankCardHero(
                 walletName: walletName,
                 balance: balance,
@@ -64,75 +80,6 @@ class _WalletDetailScreenState extends ConsumerState<WalletDetailScreen> {
             ],
           ),
         ),
-      ),
-    );
-  }
-
-  /// Header chuẩn với nút Back, Tiêu đề và Nút Cài đặt / Đồng bộ
-  Widget _buildHeader(BuildContext context, bool isDark, String title) {
-    return Container(
-      color: isDark ? AppColors.darkSurface : Colors.white,
-      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
-      child: Row(
-        children: [
-          // Nút Quay lại
-          GestureDetector(
-            onTap: () {
-              if (context.canPop()) {
-                context.pop();
-              } else {
-                context.go(RoutePaths.wallets);
-              }
-            },
-            child: Container(
-              width: 38,
-              height: 38,
-              decoration: BoxDecoration(
-                color: isDark ? AppColors.darkBackground : const Color(0xFFF1F5F9),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Icon(
-                Icons.chevron_left_rounded,
-                color: isDark ? AppColors.darkForeground : AppColors.lightForeground,
-                size: 20,
-              ),
-            ),
-          ),
-          const SizedBox(width: 12),
-
-          // Tiêu đề
-          Expanded(
-            child: Text(
-              title,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: GoogleFonts.inter(
-                fontSize: 16,
-                fontWeight: FontWeight.w900,
-                letterSpacing: -0.4,
-                color: isDark ? AppColors.darkForeground : AppColors.lightForeground,
-              ),
-            ),
-          ),
-
-          // Nút Cài đặt kết nối Open Banking / Sliders
-          GestureDetector(
-            onTap: () => context.push(RoutePaths.accountDetailWithId(widget.walletId)),
-            child: Container(
-              width: 38,
-              height: 38,
-              decoration: BoxDecoration(
-                color: isDark ? AppColors.darkBackground : const Color(0xFFF1F5F9),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Icon(
-                Icons.tune_rounded,
-                color: isDark ? AppColors.darkForeground : AppColors.lightForeground,
-                size: 18,
-              ),
-            ),
-          ),
-        ],
       ),
     );
   }

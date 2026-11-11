@@ -6,6 +6,7 @@ import '../../domain/models/wallet_model.dart';
 import '../../domain/repositories/wallet_repository.dart';
 import '../dto/create_wallet_request.dart';
 import '../dto/invite_member_request.dart';
+import '../dto/transfer_ownership_request.dart';
 import '../dto/update_member_role_request.dart';
 import '../dto/update_wallet_request.dart';
 import '../mappers/wallet_mapper.dart';
@@ -60,6 +61,22 @@ class WalletRepositoryImpl implements WalletRepository {
   Future<void> deleteWallet(String id) => _apiService.deleteWallet(id);
 
   @override
+  Future<WalletModel> transferOwnership(
+    String walletId,
+    String newOwnerId,
+  ) async {
+    final data = await _apiService.transferOwnership(
+      walletId,
+      TransferOwnershipRequest(newOwnerId: newOwnerId),
+    );
+    return WalletMapper.fromJson(data);
+  }
+
+  @override
+  Future<void> leaveWallet(String walletId) =>
+      _apiService.leaveWallet(walletId);
+
+  @override
   Future<List<WalletMemberModel>> getMembers(String walletId) async {
     final list = await _apiService.getMembers(walletId);
     return list.map(WalletMemberMapper.fromJson).toList();
@@ -72,6 +89,16 @@ class WalletRepositoryImpl implements WalletRepository {
   ) async {
     await _apiService.inviteMember(walletId, request);
   }
+
+  @override
+  Future<WalletModel> acceptInvite(String walletId) async {
+    final data = await _apiService.acceptInvite(walletId);
+    return WalletMapper.fromJson(data);
+  }
+
+  @override
+  Future<void> rejectInvite(String walletId) =>
+      _apiService.rejectInvite(walletId);
 
   @override
   Future<void> updateMemberRole(

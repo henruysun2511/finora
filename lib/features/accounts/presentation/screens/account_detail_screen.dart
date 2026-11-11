@@ -6,6 +6,8 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../../app/router/route_names.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/widgets/app_toast.dart';
+import '../../../../core/widgets/form_card.dart';
+import '../../../../core/widgets/page_header.dart';
 import '../widgets/adjust_balance_dialog.dart';
 
 /// Màn hình Chi tiết tài khoản & Đồng bộ Open Banking chuẩn 1:1 theo `device-preview/screens/accounts/detail.html`
@@ -72,15 +74,23 @@ class _AccountDetailScreenState extends ConsumerState<AccountDetailScreen> {
 
     return Scaffold(
       backgroundColor: isDark ? AppColors.darkBackground : const Color(0xFFF8FAFC),
+      appBar: PageHeader.subPage(
+        title: 'Đồng bộ Open Banking',
+        subtitle: 'Vietcombank API Sync',
+        onBack: () {
+          if (context.canPop()) {
+            context.pop();
+          } else {
+            context.go(RoutePaths.wallets);
+          }
+        },
+      ),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // ──────────────── 1. HEADER ────────────────
-              _buildHeader(context, isDark),
-
-              // ──────────────── 2. BODY CONTENT ──────────
+              // ──────────────── BODY CONTENT ──────────
               Padding(
                 padding: const EdgeInsets.all(16),
                 child: Column(
@@ -178,49 +188,6 @@ class _AccountDetailScreenState extends ConsumerState<AccountDetailScreen> {
     );
   }
 
-  Widget _buildHeader(BuildContext context, bool isDark) {
-    return Container(
-      color: isDark ? AppColors.darkSurface : Colors.white,
-      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
-      child: Row(
-        children: [
-          GestureDetector(
-            onTap: () {
-              if (context.canPop()) {
-                context.pop();
-              } else {
-                context.go(RoutePaths.wallets);
-              }
-            },
-            child: Container(
-              width: 38,
-              height: 38,
-              decoration: BoxDecoration(
-                color: isDark ? AppColors.darkBackground : const Color(0xFFF1F5F9),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Icon(
-                Icons.chevron_left_rounded,
-                color: isDark ? AppColors.darkForeground : AppColors.lightForeground,
-                size: 20,
-              ),
-            ),
-          ),
-          const SizedBox(width: 12),
-          Text(
-            'Đồng bộ Open Banking',
-            style: GoogleFonts.inter(
-              fontSize: 16,
-              fontWeight: FontWeight.w900,
-              letterSpacing: -0.4,
-              color: isDark ? AppColors.darkForeground : AppColors.lightForeground,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   Widget _buildSyncStatusCard(bool isDark) {
     return Container(
       padding: const EdgeInsets.all(20),
@@ -298,58 +265,41 @@ class _AccountDetailScreenState extends ConsumerState<AccountDetailScreen> {
   }
 
   Widget _buildSettingsCard(bool isDark) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-      decoration: BoxDecoration(
-        color: isDark ? AppColors.darkSurface : Colors.white,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
-      ),
+    return FormCard(
+      title: 'Cài đặt đồng bộ',
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Column(
         children: [
-          // Row 1
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Tự động đọc biến động số dư',
-                style: GoogleFonts.inter(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w700,
-                  color: isDark ? AppColors.darkForeground : const Color(0xFF334155),
-                ),
+          SwitchListTile(
+            contentPadding: EdgeInsets.zero,
+            title: Text(
+              'Tự động đọc biến động số dư',
+              style: GoogleFonts.inter(
+                fontSize: 13,
+                fontWeight: FontWeight.w700,
+                color: isDark ? AppColors.darkForeground : const Color(0xFF334155),
               ),
-              Switch(
-                value: _autoReadTx,
-                activeColor: AppColors.primary,
-                onChanged: (val) => setState(() => _autoReadTx = val),
-              ),
-            ],
+            ),
+            value: _autoReadTx,
+            activeColor: AppColors.primary,
+            onChanged: (val) => setState(() => _autoReadTx = val),
           ),
-          const Divider(height: 1, color: Color(0xFFE2E8F0)),
-
-          // Row 2
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'AI Nora tự gán danh mục',
-                style: GoogleFonts.inter(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w700,
-                  color: isDark ? AppColors.darkForeground : const Color(0xFF334155),
-                ),
+          const Divider(height: 1),
+          SwitchListTile(
+            contentPadding: EdgeInsets.zero,
+            title: Text(
+              'AI Nora tự gán danh mục',
+              style: GoogleFonts.inter(
+                fontSize: 13,
+                fontWeight: FontWeight.w700,
+                color: isDark ? AppColors.darkForeground : const Color(0xFF334155),
               ),
-              Switch(
-                value: _aiNoraCategorize,
-                activeColor: AppColors.primary,
-                onChanged: (val) => setState(() => _aiNoraCategorize = val),
-              ),
-            ],
+            ),
+            value: _aiNoraCategorize,
+            activeColor: AppColors.primary,
+            onChanged: (val) => setState(() => _aiNoraCategorize = val),
           ),
-          const Divider(height: 1, color: Color(0xFFE2E8F0)),
-
-          // Row 3
+          const Divider(height: 1),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 14),
             child: Row(

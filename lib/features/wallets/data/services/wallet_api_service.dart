@@ -3,6 +3,7 @@ import 'package:dio/dio.dart';
 import '../../../../core/errors/app_exception.dart';
 import '../dto/create_wallet_request.dart';
 import '../dto/invite_member_request.dart';
+import '../dto/transfer_ownership_request.dart';
 import '../dto/update_member_role_request.dart';
 import '../dto/update_wallet_request.dart';
 
@@ -17,11 +18,18 @@ abstract class WalletApiService {
     UpdateWalletRequest request,
   );
   Future<void> deleteWallet(String id);
+  Future<Map<String, dynamic>> transferOwnership(
+    String walletId,
+    TransferOwnershipRequest request,
+  );
+  Future<void> leaveWallet(String walletId);
   Future<List<Map<String, dynamic>>> getMembers(String walletId);
   Future<Map<String, dynamic>> inviteMember(
     String walletId,
     InviteMemberRequest request,
   );
+  Future<Map<String, dynamic>> acceptInvite(String walletId);
+  Future<void> rejectInvite(String walletId);
   Future<Map<String, dynamic>> updateMemberRole(
     String walletId,
     String userId,
@@ -128,6 +136,24 @@ class DioWalletApiService implements WalletApiService {
   });
 
   @override
+  Future<Map<String, dynamic>> transferOwnership(
+    String walletId,
+    TransferOwnershipRequest request,
+  ) => _guard(() async {
+    final res = await _dio.post(
+      '/wallets/$walletId/transfer-ownership',
+      data: request.toJson(),
+    );
+    final data = _extractData(res.data);
+    return data as Map<String, dynamic>;
+  });
+
+  @override
+  Future<void> leaveWallet(String walletId) => _guard(() async {
+    await _dio.post('/wallets/$walletId/leave');
+  });
+
+  @override
   Future<List<Map<String, dynamic>>> getMembers(String walletId) =>
       _guard(() async {
         final res = await _dio.get('/wallets/$walletId/members');
@@ -149,6 +175,19 @@ class DioWalletApiService implements WalletApiService {
     );
     final data = _extractData(res.data);
     return data as Map<String, dynamic>;
+  });
+
+  @override
+  Future<Map<String, dynamic>> acceptInvite(String walletId) =>
+      _guard(() async {
+        final res = await _dio.post('/wallets/$walletId/members/accept');
+        final data = _extractData(res.data);
+        return data as Map<String, dynamic>;
+      });
+
+  @override
+  Future<void> rejectInvite(String walletId) => _guard(() async {
+    await _dio.post('/wallets/$walletId/members/reject');
   });
 
   @override
