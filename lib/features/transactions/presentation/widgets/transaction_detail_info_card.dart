@@ -44,8 +44,8 @@ class TransactionDetailInfoCard extends StatelessWidget {
         return 'Đã ghi sổ thành công';
       case TransactionStatus.pending:
         return 'Chờ xác nhận';
-      case TransactionStatus.rejected:
-        return 'Đã từ chối';
+      case TransactionStatus.cancelled:
+        return 'Đã hủy bỏ';
     }
   }
 

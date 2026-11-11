@@ -159,7 +159,8 @@ class _LoanFormScreenState extends ConsumerState<LoanFormScreen> {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final formState = ref.watch(loanFormProvider);
-    final friendsAsync = ref.watch(friendsListProvider);
+    final friendsAsync =
+        ref.watch(friendsListProvider).whenData((state) => state.friends);
 
     if (widget.isEditing) {
       final loanAsync = ref.watch(loanDetailProvider(widget.loanId!));
@@ -719,9 +720,11 @@ class _LoanFormScreenState extends ConsumerState<LoanFormScreen> {
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                           ),
-                          if (f.email.isNotEmpty && f.email != f.displayName)
+                          if (f.email != null &&
+                              f.email!.isNotEmpty &&
+                              f.email != f.displayName)
                             Text(
-                              f.email,
+                              f.email!,
                               style: GoogleFonts.inter(
                                 fontSize: 11,
                                 color: AppColors.lightMuted,

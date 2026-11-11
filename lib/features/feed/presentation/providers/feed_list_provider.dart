@@ -5,6 +5,10 @@ import '../../domain/models/post_reaction.dart';
 import '../../domain/models/reaction_emoji.dart';
 import 'feed_providers.dart';
 
+enum FeedViewMode { list, grid }
+
+final feedViewModeProvider = StateProvider.autoDispose<FeedViewMode>((ref) => FeedViewMode.list);
+
 // Filter state: 0 = Tất cả, 1 = Bạn bè, 2 = Của tôi
 final feedTabFilterProvider = StateProvider.autoDispose<int>((ref) => 0);
 

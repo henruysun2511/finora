@@ -21,6 +21,8 @@ class Friend {
   final FriendshipStatus status;
   final DateTime? connectedAt;
 
+  String get id => userId;
+
   String get displayName => fullName.isNotEmpty ? fullName : username;
 
   String get initials {
