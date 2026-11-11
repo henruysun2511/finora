@@ -222,7 +222,7 @@ class ChatTransactionCard extends StatelessWidget {
                                 fontWeight: FontWeight.w700,
                                 height: 1.3,
                                 shadows: [
-                                  Shadow(color: Colors.black80, blurRadius: 4, offset: Offset(0, 1)),
+                                  Shadow(color: Colors.black87, blurRadius: 4, offset: Offset(0, 1)),
                                 ],
                               ),
                             ),

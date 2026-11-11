@@ -520,6 +520,8 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
         );
       },
     );
+  }
+
   void _handleChatWithAuthor(FeedPost post) {
     final currentUserId = ref.read(authNotifierProvider).value?.id;
     if (currentUserId != null && currentUserId == post.author.id) {
