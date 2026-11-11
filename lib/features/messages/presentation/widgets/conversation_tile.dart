@@ -67,7 +67,7 @@ class ConversationTile extends StatelessWidget {
                     ),
                   ),
                 ),
-                if (conversation.isOnline && !conversation.isGroup)
+                if (conversation.isOnline)
                   Positioned(
                     bottom: 1,
                     right: 1,
@@ -82,23 +82,6 @@ class ConversationTile extends StatelessWidget {
                           width: 2,
                         ),
                       ),
-                    ),
-                  ),
-                if (conversation.isGroup)
-                  Positioned(
-                    bottom: 0,
-                    right: 0,
-                    child: Container(
-                      padding: const EdgeInsets.all(3),
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: AppColors.primary,
-                        border: Border.all(
-                          color: isDark ? AppColors.darkBackground : Colors.white,
-                          width: 1.5,
-                        ),
-                      ),
-                      child: const Icon(Icons.groups_rounded, size: 10, color: Colors.white),
                     ),
                   ),
               ],
@@ -138,20 +121,6 @@ class ConversationTile extends StatelessWidget {
                   const SizedBox(height: 3),
                   Row(
                     children: [
-                      if (conversation.groupWalletName != null) ...[
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
-                          margin: const EdgeInsets.only(right: 6),
-                          decoration: BoxDecoration(
-                            color: AppColors.primary.withValues(alpha: 0.1),
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                          child: Text(
-                            conversation.groupWalletName!,
-                            style: const TextStyle(fontSize: 10, color: AppColors.primary, fontWeight: FontWeight.w700),
-                          ),
-                        ),
-                      ],
                       Expanded(
                         child: Text(
                           conversation.lastMessageContent,

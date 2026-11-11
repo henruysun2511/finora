@@ -36,14 +36,13 @@ class _MessagesScreenState extends ConsumerState<MessagesScreen> {
     final muted = isDark ? AppColors.darkMuted : AppColors.lightMuted;
     final border = isDark ? AppColors.darkBorder : AppColors.lightBorder;
 
-    final filter = ref.watch(conversationTabFilterProvider);
     final convsAsync = ref.watch(conversationListProvider);
 
     return Scaffold(
       backgroundColor: bg,
       appBar: PageHeader.subPage(
         title: 'Hội thoại',
-        subtitle: 'Chat bạn bè & nhóm ví chung',
+        subtitle: 'Nhắn tin cùng bạn bè',
         onBack: () => context.go(RoutePaths.feed),
         action: IconButton(
           icon: const Icon(Icons.person_add_rounded, color: AppColors.primary),
@@ -55,7 +54,7 @@ class _MessagesScreenState extends ConsumerState<MessagesScreen> {
         children: [
           // ── Search Bar ──
           Padding(
-            padding: const EdgeInsets.fromLTRB(16, 10, 16, 6),
+            padding: const EdgeInsets.fromLTRB(16, 10, 16, 8),
             child: TextField(
               controller: _searchCtrl,
               onChanged: (v) {
@@ -63,7 +62,7 @@ class _MessagesScreenState extends ConsumerState<MessagesScreen> {
                 setState(() {});
               },
               decoration: InputDecoration(
-                hintText: 'Tìm kiếm cuộc trò chuyện, nhóm ví...',
+                hintText: 'Tìm kiếm cuộc trò chuyện...',
                 hintStyle: TextStyle(fontSize: 13.5, color: muted),
                 prefixIcon: Icon(Icons.search_rounded, size: 20, color: muted),
                 suffixIcon: _searchCtrl.text.isNotEmpty
@@ -86,20 +85,6 @@ class _MessagesScreenState extends ConsumerState<MessagesScreen> {
             ),
           ),
 
-          // ── Filter Chips: Tất cả | Bạn bè 1-1 | Nhóm ví chung ──
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-            child: Row(
-              children: [
-                _buildFilterChip('Tất cả', 0, filter, isDark),
-                const SizedBox(width: 8),
-                _buildFilterChip('Bạn bè (1-1)', 1, filter, isDark),
-                const SizedBox(width: 8),
-                _buildFilterChip('Nhóm ví chung 👥', 2, filter, isDark),
-              ],
-            ),
-          ),
-
           // ── Conversation List ──
           Expanded(
             child: convsAsync.when(
@@ -108,13 +93,7 @@ class _MessagesScreenState extends ConsumerState<MessagesScreen> {
                 child: Text('Không thể tải tin nhắn: $err', style: TextStyle(color: muted)),
               ),
               data: (list) {
-                final filtered = list.where((c) {
-                  if (filter == 1) return !c.isGroup;
-                  if (filter == 2) return c.isGroup;
-                  return true;
-                }).toList();
-
-                if (filtered.isEmpty) {
+                if (list.isEmpty) {
                   return RefreshIndicator(
                     color: AppColors.primary,
                     onRefresh: () => ref.read(conversationListProvider.notifier).refresh(),
@@ -131,7 +110,7 @@ class _MessagesScreenState extends ConsumerState<MessagesScreen> {
                                 Icon(Icons.chat_bubble_outline_rounded, size: 48, color: muted),
                                 const SizedBox(height: 12),
                                 Text(
-                                  filter == 2 ? 'Chưa có nhóm ví chung nào' : 'Chưa có cuộc trò chuyện nào',
+                                  'Chưa có cuộc trò chuyện nào',
                                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: foreground),
                                 ),
                                 const SizedBox(height: 6),
@@ -154,7 +133,7 @@ class _MessagesScreenState extends ConsumerState<MessagesScreen> {
                   onRefresh: () => ref.read(conversationListProvider.notifier).refresh(),
                   child: ListView.separated(
                     padding: const EdgeInsets.only(bottom: 24, top: 4),
-                    itemCount: filtered.length,
+                    itemCount: list.length,
                     separatorBuilder: (_, __) => Divider(
                       indent: 76,
                       height: 1,
@@ -162,7 +141,7 @@ class _MessagesScreenState extends ConsumerState<MessagesScreen> {
                       color: border.withValues(alpha: 0.5),
                     ),
                     itemBuilder: (ctx, i) {
-                      final conv = filtered[i];
+                      final conv = list[i];
                       return ConversationTile(
                         conversation: conv,
                         onTap: () {
@@ -183,35 +162,6 @@ class _MessagesScreenState extends ConsumerState<MessagesScreen> {
         ],
       ),
       bottomNavigationBar: const SocialBottomBar(currentTab: SocialTab.messages),
-    );
-  }
-
-  Widget _buildFilterChip(String label, int index, int currentFilter, bool isDark) {
-    final isSelected = currentFilter == index;
-    return ChoiceChip(
-      label: Text(label),
-      selected: isSelected,
-      showCheckmark: false,
-      onSelected: (_) {
-        ref.read(conversationTabFilterProvider.notifier).state = index;
-      },
-      labelStyle: TextStyle(
-        fontSize: 12,
-        fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
-        color: isSelected
-            ? Colors.white
-            : (isDark ? AppColors.darkForeground : AppColors.lightForeground),
-      ),
-      backgroundColor: isDark ? AppColors.darkSurface : Colors.white,
-      selectedColor: AppColors.primary,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(99),
-        side: BorderSide(
-          color: isSelected
-              ? AppColors.primary
-              : (isDark ? AppColors.darkBorder : AppColors.lightBorder),
-        ),
-      ),
     );
   }
 }

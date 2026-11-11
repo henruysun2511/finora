@@ -109,55 +109,10 @@ class _ChatDetailScreenState extends ConsumerState<ChatDetailScreen> {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  conv.isGroup
-                      ? (conv.groupWalletName ?? 'Nhóm thảo luận hóa đơn chia tiền')
-                      : 'Bạn bè kết nối tài chính Finora',
+                  'Bạn bè kết nối tài chính Finora',
                   style: TextStyle(fontSize: 13, color: muted),
                 ),
-                const SizedBox(height: 20),
-                Divider(color: border, height: 1),
-                const SizedBox(height: 12),
-                ListTile(
-                  contentPadding: EdgeInsets.zero,
-                  leading: Container(
-                    width: 36,
-                    height: 36,
-                    decoration: BoxDecoration(
-                      color: AppColors.primary.withValues(alpha: 0.1),
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(Icons.receipt_long_rounded, color: AppColors.primary, size: 20),
-                  ),
-                  title: Text(
-                    'Chia sẻ hóa đơn',
-                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: foreground),
-                  ),
-                  subtitle: Text(
-                    'Hỗ trợ đính kèm chi tiêu và chia bill vào cuộc trò chuyện',
-                    style: TextStyle(fontSize: 12, color: muted),
-                  ),
-                ),
-                if (conv.isGroup)
-                  ListTile(
-                    contentPadding: EdgeInsets.zero,
-                    leading: Container(
-                      width: 36,
-                      height: 36,
-                      decoration: BoxDecoration(
-                        color: AppColors.success.withValues(alpha: 0.1),
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(Icons.account_balance_wallet_rounded, color: AppColors.success, size: 20),
-                    ),
-                    title: Text(
-                      'Ví chung kết nối',
-                      style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: foreground),
-                    ),
-                    subtitle: Text(
-                      conv.groupWalletName ?? 'Ví quỹ nhóm',
-                      style: TextStyle(fontSize: 12, color: muted),
-                    ),
-                  ),
+                const SizedBox(height: 16),
               ],
             ),
           ),
@@ -182,11 +137,7 @@ class _ChatDetailScreenState extends ConsumerState<ChatDetailScreen> {
     final conv = widget.conversation;
     final messagesAsync = ref.watch(chatDetailProvider(conv.id));
 
-    final subtitle = conv.isGroup
-        ? (conv.groupWalletName != null
-            ? '${conv.groupWalletName!} · ${conv.membersCount ?? 5} thành viên'
-            : 'Nhóm thảo luận hóa đơn')
-        : (conv.isOnline ? 'Đang hoạt động' : 'Trò chuyện 1-1');
+    final subtitle = conv.isOnline ? 'Đang hoạt động' : 'Trò chuyện 1-1';
 
     return Scaffold(
       backgroundColor: bg,
@@ -202,25 +153,6 @@ class _ChatDetailScreenState extends ConsumerState<ChatDetailScreen> {
       ),
       body: Column(
         children: [
-          // ── Banner Ví chung nếu là Group Chat ──
-          if (conv.isGroup)
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              color: AppColors.primary.withValues(alpha: 0.08),
-              child: Row(
-                children: [
-                  const Icon(Icons.account_balance_wallet_rounded, size: 16, color: AppColors.primary),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      'Mọi người trong nhóm có thể gửi và xem hóa đơn chia tiền tại đây.',
-                      style: TextStyle(fontSize: 12, color: foreground, fontWeight: FontWeight.w600),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
           // ── Messages List ──
           Expanded(
             child: messagesAsync.when(

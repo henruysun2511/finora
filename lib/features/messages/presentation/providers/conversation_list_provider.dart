@@ -5,9 +5,6 @@ import 'messages_providers.dart';
 
 final messageSearchQueryProvider = StateProvider.autoDispose<String>((ref) => '');
 
-// Tab lọc: 0 = Tất cả, 1 = Bạn bè (1-1), 2 = Nhóm ví chung
-final conversationTabFilterProvider = StateProvider.autoDispose<int>((ref) => 0);
-
 final conversationListProvider =
     AsyncNotifierProvider.autoDispose<ConversationListNotifier, List<Conversation>>(() {
   return ConversationListNotifier();
