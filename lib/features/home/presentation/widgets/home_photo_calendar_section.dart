@@ -37,40 +37,40 @@ class _HomePhotoCalendarSectionState
     [Color(0xFFFEF08A), Color(0xFFFACC15)], // 5: Vàng chanh tươi sáng (Thu nhập / Thưởng)
   ];
 
-  static (List<Color> front, List<Color> back, String icon) _getCellVisuals(int dayNum) {
+  static _CellVisuals _getCellVisuals(int dayNum) {
     if (dayNum == 1) {
-      return (_gradientPalettes[0], _gradientPalettes[1], 'coffee');
+      return _CellVisuals(_gradientPalettes[0], _gradientPalettes[1], 'coffee');
     }
     if (dayNum == 4) {
-      return (_gradientPalettes[0], _gradientPalettes[1], 'coffee');
+      return _CellVisuals(_gradientPalettes[0], _gradientPalettes[1], 'coffee');
     }
     if (dayNum == 5) {
-      return (_gradientPalettes[1], _gradientPalettes[0], 'car');
+      return _CellVisuals(_gradientPalettes[1], _gradientPalettes[0], 'car');
     }
     if (dayNum == 8) {
-      return (_gradientPalettes[4], _gradientPalettes[1], 'utensils');
+      return _CellVisuals(_gradientPalettes[4], _gradientPalettes[1], 'utensils');
     }
     if (dayNum == 10) {
-      return (_gradientPalettes[3], _gradientPalettes[5], 'shopping-bag');
+      return _CellVisuals(_gradientPalettes[3], _gradientPalettes[5], 'shopping-bag');
     }
     if (dayNum == 13) {
-      return (_gradientPalettes[2], _gradientPalettes[0], 'piggy-bank');
+      return _CellVisuals(_gradientPalettes[2], _gradientPalettes[0], 'piggy-bank');
     }
 
     switch (dayNum % 6) {
       case 0:
-        return (_gradientPalettes[4], _gradientPalettes[2], 'receipt');
+        return _CellVisuals(_gradientPalettes[4], _gradientPalettes[2], 'receipt');
       case 1:
-        return (_gradientPalettes[0], _gradientPalettes[1], 'coffee');
+        return _CellVisuals(_gradientPalettes[0], _gradientPalettes[1], 'coffee');
       case 2:
-        return (_gradientPalettes[3], _gradientPalettes[5], 'shopping-bag');
+        return _CellVisuals(_gradientPalettes[3], _gradientPalettes[5], 'shopping-bag');
       case 3:
-        return (_gradientPalettes[2], _gradientPalettes[4], 'piggy-bank');
+        return _CellVisuals(_gradientPalettes[2], _gradientPalettes[4], 'piggy-bank');
       case 4:
-        return (_gradientPalettes[0], _gradientPalettes[1], 'utensils');
+        return _CellVisuals(_gradientPalettes[0], _gradientPalettes[1], 'utensils');
       case 5:
       default:
-        return (_gradientPalettes[1], _gradientPalettes[0], 'car');
+        return _CellVisuals(_gradientPalettes[1], _gradientPalettes[0], 'car');
     }
   }
 
@@ -393,9 +393,9 @@ class _HomePhotoCalendarSectionState
                                 hasExpense: hasExpense,
                                 txCount: txCount,
                                 isFan: isFan,
-                                frontPalette: visuals.$1,
-                                backPalette: visuals.$2,
-                                iconName: visuals.$3,
+                                frontPalette: visuals.front,
+                                backPalette: visuals.back,
+                                iconName: visuals.icon,
                                 highlightPhotoUrl: item?.highlightPhotoUrl,
                                 onTap: () {
                                   setState(() {
@@ -897,5 +897,13 @@ class _NavButton extends StatelessWidget {
       ),
     );
   }
+}
+
+class _CellVisuals {
+  final List<Color> front;
+  final List<Color> back;
+  final String icon;
+
+  const _CellVisuals(this.front, this.back, this.icon);
 }
 
