@@ -62,7 +62,6 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
             SliverToBoxAdapter(
               child: BannerHeader(
                 title: 'Dashboard Tài chính',
-                subtitle: 'Trung tâm Báo cáo & Phân tích chuyên sâu',
                 showBackButton: false,
                 gradient: const LinearGradient(
                   colors: [
