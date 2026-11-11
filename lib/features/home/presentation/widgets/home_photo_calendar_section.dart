@@ -402,6 +402,28 @@ class _HomePhotoCalendarSectionState
                                     _selectedDate =
                                         DateTime(year, month, dayNum);
                                   });
+                                  if (hasExpense) {
+                                    final weekdayNames = [
+                                      'Thứ hai',
+                                      'Thứ ba',
+                                      'Thứ tư',
+                                      'Thứ năm',
+                                      'Thứ sáu',
+                                      'Thứ bảy',
+                                      'Chủ nhật'
+                                    ];
+                                    final dt = DateTime(year, month, dayNum);
+                                    final weekdayStr =
+                                        weekdayNames[dt.weekday - 1];
+                                    _openTransactionDetailModal(
+                                      context: context,
+                                      dateStr:
+                                          '$weekdayStr, $dayNum/$month/$year',
+                                      dayItem: item,
+                                      dayNum: dayNum,
+                                      isDark: isDark,
+                                    );
+                                  }
                                 },
                               ),
                             ),
@@ -512,21 +534,27 @@ class _HomePhotoCalendarSectionState
                   borderRadius: BorderRadius.circular(8),
                   child: Container(
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 8, vertical: 3.5),
+                        horizontal: 10, vertical: 4.5),
                     decoration: BoxDecoration(
-                      color: AppColors.primary.withValues(alpha: 0.1),
+                      color: AppColors.primary.withValues(alpha: 0.12),
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(
-                        color: AppColors.primary.withValues(alpha: 0.25),
+                        color: AppColors.primary.withValues(alpha: 0.3),
                       ),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
+                        const Icon(
+                          Icons.receipt_long_rounded,
+                          size: 13,
+                          color: AppColors.primary,
+                        ),
+                        const SizedBox(width: 4),
                         Text(
                           'Xem chi tiết',
                           style: GoogleFonts.inter(
-                            fontSize: 10.5,
+                            fontSize: 11,
                             fontWeight: FontWeight.w700,
                             color: AppColors.primary,
                           ),
