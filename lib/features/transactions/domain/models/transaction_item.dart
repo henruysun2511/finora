@@ -21,6 +21,14 @@ class TransactionItem {
     this.toAccountId,
     this.toAccountName,
     this.status = TransactionStatus.confirmed,
+    this.locationName,
+    this.source = 'MANUAL',
+    this.visibility = 'PRIVATE',
+    this.excludeFromReport = false,
+    this.receiptId,
+    this.latitude,
+    this.longitude,
+    this.isRecurring = false,
   });
 
   final String id;
@@ -40,6 +48,14 @@ class TransactionItem {
   final String? toAccountId;
   final String? toAccountName;
   final TransactionStatus status;
+  final String? locationName;
+  final String source;
+  final String visibility;
+  final bool excludeFromReport;
+  final String? receiptId;
+  final double? latitude;
+  final double? longitude;
+  final bool isRecurring;
   final DateTime transactionDate;
   final DateTime createdAt;
 

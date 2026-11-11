@@ -17,6 +17,7 @@ import '../widgets/transaction_detail_balance_card.dart';
 import '../widgets/transaction_detail_hero_card.dart';
 import '../widgets/transaction_detail_info_card.dart';
 import '../widgets/transaction_detail_receipt_card.dart';
+import '../widgets/transaction_detail_split_card.dart';
 
 final transactionDetailFutureProvider = FutureProvider.autoDispose
     .family<TransactionItem, String>((ref, id) async {
@@ -130,11 +131,16 @@ class TransactionDetailScreen extends ConsumerWidget {
         subtitle: transactionId.length >= 8
             ? 'Mã: #${transactionId.substring(0, 8)}'
             : null,
-        action: IconButton(
-          icon: const Icon(Icons.delete_outline_rounded,
-              color: AppColors.danger),
-          tooltip: 'Xóa giao dịch',
-          onPressed: () => _handleDelete(context, ref),
+        action: TextButton(
+          onPressed: () => context.push(RoutePaths.createTransaction),
+          child: Text(
+            'Sửa',
+            style: GoogleFonts.inter(
+              fontSize: 13.5,
+              fontWeight: FontWeight.w800,
+              color: AppColors.primary,
+            ),
+          ),
         ),
       ),
       body: detailAsync.when(
@@ -155,14 +161,20 @@ class TransactionDetailScreen extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // ── KHỐI HERO: ICON + TÊN + SỐ TIỀN ──
+                // ── 1. KHỐI HERO: ICON + TÊN + SỐ TIỀN ──
                 TransactionDetailHeroCard(item: item),
                 const SizedBox(height: 16),
 
-                // ── KHỐI THÔNG TIN CHI TIẾT ──
+                // ── 2. KHỐI THÔNG TIN CHI TIẾT ĐẦY ĐỦ ──
                 TransactionDetailInfoCard(item: item, dateStr: dateStr),
 
-                // ── KHỐI HÓA ĐƠN ĐÍNH KÈM (NẾU CÓ) ──
+                // ── 3. KHỐI CHIA TIỀN BẠN BÈ (SPLIT BILL) ──
+                if (item.type == TransactionType.expense && item.amount > 0) ...[
+                  const SizedBox(height: 16),
+                  TransactionDetailSplitCard(amount: item.amount),
+                ],
+
+                // ── 4. KHỐI HÓA ĐƠN ĐÍNH KÈM (NẾU CÓ) ──
                 if (item.photoUrl != null && item.photoUrl!.isNotEmpty) ...[
                   const SizedBox(height: 16),
                   TransactionDetailReceiptCard(
@@ -171,36 +183,58 @@ class TransactionDetailScreen extends ConsumerWidget {
                   ),
                 ],
 
-                // ── KHỐI TÁC ĐỘNG TÀI CHÍNH ──
-                if (item.balanceAfter != null) ...[
-                  const SizedBox(height: 16),
-                  TransactionDetailBalanceCard(
-                    balanceAfter: item.balanceAfter!,
-                  ),
-                ],
-
                 const SizedBox(height: 24),
 
-                // ── NÚT XÓA GIAO DỊCH ──
-                OutlinedButton.icon(
-                  onPressed: () => _handleDelete(context, ref),
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: AppColors.danger,
-                    side: const BorderSide(color: AppColors.danger),
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14),
+                // ── 5. HÀNG NÚT THAO TÁC: XOÁ & CHỈNH SỬA ──
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        onPressed: () => _handleDelete(context, ref),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: AppColors.danger,
+                          side: const BorderSide(color: AppColors.danger),
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                        ),
+                        icon:
+                            const Icon(Icons.delete_outline_rounded, size: 18),
+                        label: Text(
+                          'Xóa giao dịch',
+                          style: GoogleFonts.inter(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ),
                     ),
-                  ),
-                  icon: const Icon(Icons.delete_outline_rounded, size: 20),
-                  label: Text(
-                    'XÓA GIAO DỊCH & HOÀN TÁC SỐ DƯ',
-                    style: GoogleFonts.inter(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: 0.5,
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: ElevatedButton.icon(
+                        onPressed: () =>
+                            context.push(RoutePaths.createTransaction),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primary,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                          elevation: 0,
+                        ),
+                        icon: const Icon(Icons.edit_rounded, size: 18),
+                        label: Text(
+                          'Chỉnh sửa',
+                          style: GoogleFonts.inter(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ),
                     ),
-                  ),
+                  ],
                 ),
 
                 const SizedBox(height: 32),
