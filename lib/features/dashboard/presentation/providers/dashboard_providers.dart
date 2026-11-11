@@ -78,6 +78,13 @@ final dashboardCalendarProvider =
   return repo.getCalendar();
 });
 
+/// 6b. Provider nạp Lịch chi tiêu có lọc theo tháng (yyyy-MM)
+final dashboardCalendarByMonthProvider =
+    FutureProvider.autoDispose.family<CalendarDashboardModel, String?>((ref, month) async {
+  final repo = ref.watch(dashboardRepositoryProvider);
+  return repo.getCalendar(month: month);
+});
+
 /// 7. Provider nạp Thống kê ví chung & Ma trận cấn trừ nợ
 final dashboardSharedWalletProvider =
     FutureProvider.autoDispose.family<SharedWalletDashboardModel, String>(

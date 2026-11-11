@@ -29,24 +29,50 @@ class _HomePhotoCalendarSectionState
 
   // 6 bộ phối màu gradient phong cách Solarn FinTech cho các ô có chi tiêu
   static const List<List<Color>> _gradientPalettes = [
-    [Color(0xFFFFE4C6), Color(0xFFFFA94D)], // Vàng hổ phách - Ăn uống / Cà phê
-    [Color(0xFFB9D4FF), Color(0xFF5F8BFF)], // Xanh biển nhạt - Di chuyển / Xe cộ
-    [Color(0xFFC9F0DA), Color(0xFF5FCF8B)], // Xanh ngọc mint - Tiết kiệm / Thu nhập
-    [Color(0xFFFFD8E0), Color(0xFFFF7FA5)], // Hồng phấn - Mua sắm / Mua quà
-    [Color(0xFFDBCCFF), Color(0xFF8F74FF)], // Tím lavender - Hóa đơn / Dịch vụ
-    [Color(0xFFFFD5AB), Color(0xFFFF9C47)], // Cam san hô - Tiệc tùng / Giải trí
+    [Color(0xFFFFD5AB), Color(0xFFFF9C47)], // 0: Cam san hô / Vàng hổ phách (Ăn uống, cà phê)
+    [Color(0xFFC7D2FE), Color(0xFF818CF8)], // 1: Xanh tím / Lavender (Di chuyển / Xe cộ)
+    [Color(0xFFC9F0DA), Color(0xFF4ADE80)], // 2: Xanh mint tươi (Tiết kiệm, heo đất)
+    [Color(0xFFFFD2E0), Color(0xFFFF7FA5)], // 3: Hồng phấn (Mua sắm)
+    [Color(0xFFB9D4FF), Color(0xFF5F8BFF)], // 4: Xanh biển (Hóa đơn / Đăng ký)
+    [Color(0xFFFEF08A), Color(0xFFFACC15)], // 5: Vàng chanh tươi sáng (Thu nhập / Thưởng)
   ];
 
-  static const List<String> _categoryIcons = [
-    'utensils',
-    'car',
-    'piggy-bank',
-    'shopping-bag',
-    'receipt',
-    'coffee',
-    'banknote',
-    'plane',
-  ];
+  static (List<Color> front, List<Color> back, String icon) _getCellVisuals(int dayNum) {
+    if (dayNum == 1) {
+      return (_gradientPalettes[0], _gradientPalettes[1], 'coffee');
+    }
+    if (dayNum == 4) {
+      return (_gradientPalettes[0], _gradientPalettes[1], 'coffee');
+    }
+    if (dayNum == 5) {
+      return (_gradientPalettes[1], _gradientPalettes[0], 'car');
+    }
+    if (dayNum == 8) {
+      return (_gradientPalettes[4], _gradientPalettes[1], 'utensils');
+    }
+    if (dayNum == 10) {
+      return (_gradientPalettes[3], _gradientPalettes[5], 'shopping-bag');
+    }
+    if (dayNum == 13) {
+      return (_gradientPalettes[2], _gradientPalettes[0], 'piggy-bank');
+    }
+
+    switch (dayNum % 6) {
+      case 0:
+        return (_gradientPalettes[4], _gradientPalettes[2], 'receipt');
+      case 1:
+        return (_gradientPalettes[0], _gradientPalettes[1], 'coffee');
+      case 2:
+        return (_gradientPalettes[3], _gradientPalettes[5], 'shopping-bag');
+      case 3:
+        return (_gradientPalettes[2], _gradientPalettes[4], 'piggy-bank');
+      case 4:
+        return (_gradientPalettes[0], _gradientPalettes[1], 'utensils');
+      case 5:
+      default:
+        return (_gradientPalettes[1], _gradientPalettes[0], 'car');
+    }
+  }
 
   @override
   void initState() {
@@ -67,7 +93,10 @@ class _HomePhotoCalendarSectionState
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final calendarAsync = ref.watch(dashboardCalendarProvider);
+    final monthKey =
+        '${_currentMonth.year}-${_currentMonth.month.toString().padLeft(2, '0')}';
+    final calendarAsync = ref.watch(dashboardCalendarByMonthProvider(monthKey));
+    final overviewAsync = ref.watch(dashboardOverviewProvider);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -104,11 +133,13 @@ class _HomePhotoCalendarSectionState
               isDark: isDark,
               calendarDays: const [],
               totalBills: 0,
+              recentTransactions: overviewAsync.value?.recentTransactions,
             ),
             data: (data) => _buildCalendarContent(
               isDark: isDark,
               calendarDays: data.days,
               totalBills: data.upcomingBillsSummary.totalBillsCount,
+              recentTransactions: overviewAsync.value?.recentTransactions,
             ),
           ),
         ),
@@ -120,15 +151,8 @@ class _HomePhotoCalendarSectionState
     required bool isDark,
     required List<CalendarDayItemModel> calendarDays,
     required int totalBills,
+    List<DashboardRecentTransactionModel>? recentTransactions,
   }) {
-    // Map date string "yyyy-MM-dd" -> CalendarDayItemModel
-    final dayMap = <String, CalendarDayItemModel>{};
-    int totalMonthTx = 0;
-    for (final d in calendarDays) {
-      dayMap[d.date] = d;
-      totalMonthTx += d.transactionCount;
-    }
-
     final year = _currentMonth.year;
     final month = _currentMonth.month;
     final daysInMonth = DateTime(year, month + 1, 0).day;
@@ -136,11 +160,78 @@ class _HomePhotoCalendarSectionState
     final firstWeekday = DateTime(year, month, 1).weekday;
     final leadingEmpty = firstWeekday - 1;
 
+    // Map theo số ngày trong tháng (1..31) để đối chiếu chính xác tuyệt đối không bị lệch múi giờ hay định dạng
+    final dayMap = <int, CalendarDayItemModel>{};
+    int totalMonthTx = 0;
+
+    for (final d in calendarDays) {
+      totalMonthTx += d.transactionCount;
+      int? matchedDay;
+
+      // 1. Phân tích qua DateTime
+      final dt = DateTime.tryParse(d.date);
+      if (dt != null) {
+        if (dt.year == year && dt.month == month) {
+          matchedDay = dt.day;
+        } else {
+          final local = dt.toLocal();
+          if (local.year == year && local.month == month) {
+            matchedDay = local.day;
+          }
+        }
+      }
+
+      // 2. Phân tích qua chuỗi YYYY-MM-DD
+      if (matchedDay == null && d.date.length >= 10) {
+        final parts = d.date.substring(0, 10).split('-');
+        if (parts.length == 3) {
+          final y = int.tryParse(parts[0]);
+          final m = int.tryParse(parts[1]);
+          final day = int.tryParse(parts[2]);
+          if (y == year && m == month && day != null) {
+            matchedDay = day;
+          }
+        }
+      }
+
+      if (matchedDay != null) {
+        dayMap[matchedDay] = d;
+      }
+    }
+
+    // Nếu có giao dịch gần đây từ overview mà chưa có trong calendarDays thì bổ sung
+    if (recentTransactions != null) {
+      for (final tx in recentTransactions) {
+        final dt = DateTime.tryParse(tx.transactionDate);
+        if (dt != null) {
+          int? txDay;
+          if (dt.year == year && dt.month == month) {
+            txDay = dt.day;
+          } else {
+            final local = dt.toLocal();
+            if (local.year == year && local.month == month) {
+              txDay = local.day;
+            }
+          }
+          if (txDay != null && !dayMap.containsKey(txDay)) {
+            dayMap[txDay] = CalendarDayItemModel(
+              date:
+                  '$year-${month.toString().padLeft(2, '0')}-${txDay.toString().padLeft(2, '0')}',
+              totalIncome: tx.type == 'INCOME' ? tx.amount : 0,
+              totalExpense: tx.type == 'EXPENSE' ? tx.amount : 0,
+              transactionCount: 1,
+              hasSpikeExpense: false,
+              highlightPhotoUrl: tx.photoUrl,
+            );
+            totalMonthTx += 1;
+          }
+        }
+      }
+    }
+
     // Ngày đang được chọn hiện tại
     final selectedDayNum = _selectedDate?.day ?? 1;
-    final selectedDateStr =
-        '$year-${month.toString().padLeft(2, '0')}-${selectedDayNum.toString().padLeft(2, '0')}';
-    final selectedDayModel = dayMap[selectedDateStr];
+    final selectedDayModel = dayMap[selectedDayNum];
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -278,13 +369,16 @@ class _HomePhotoCalendarSectionState
                         }
 
                         final dayNum = index - leadingEmpty + 1;
-                        final dayDateStr =
-                            '$year-${month.toString().padLeft(2, '0')}-${dayNum.toString().padLeft(2, '0')}';
-                        final item = dayMap[dayDateStr];
+                        final item = dayMap[dayNum];
                         final isSelected = dayNum == selectedDayNum;
-                        final hasExpense =
-                            item != null && item.totalExpense > 0;
-                        final txCount = item?.transactionCount ?? 0;
+                        final hasExpense = item != null &&
+                            (item.totalExpense > 0 ||
+                                item.transactionCount > 0);
+                        final txCount =
+                            item?.transactionCount ?? (hasExpense ? 1 : 0);
+                        final visuals = _getCellVisuals(dayNum);
+                        final isFan =
+                            hasExpense && txCount >= 2 && (dayNum % 2 == 0);
 
                         return Expanded(
                           child: AspectRatio(
@@ -298,9 +392,11 @@ class _HomePhotoCalendarSectionState
                                 isSelected: isSelected,
                                 hasExpense: hasExpense,
                                 txCount: txCount,
-                                paletteIndex: dayNum % _gradientPalettes.length,
-                                iconName: _categoryIcons[
-                                    dayNum % _categoryIcons.length],
+                                isFan: isFan,
+                                frontPalette: visuals.$1,
+                                backPalette: visuals.$2,
+                                iconName: visuals.$3,
+                                highlightPhotoUrl: item?.highlightPhotoUrl,
                                 onTap: () {
                                   setState(() {
                                     _selectedDate =
@@ -467,8 +563,11 @@ class _PhotoCalendarCell extends StatelessWidget {
   final bool isSelected;
   final bool hasExpense;
   final int txCount;
-  final int paletteIndex;
+  final bool isFan;
+  final List<Color> frontPalette;
+  final List<Color> backPalette;
   final String iconName;
+  final String? highlightPhotoUrl;
   final VoidCallback onTap;
 
   const _PhotoCalendarCell({
@@ -477,15 +576,20 @@ class _PhotoCalendarCell extends StatelessWidget {
     required this.isSelected,
     required this.hasExpense,
     required this.txCount,
-    required this.paletteIndex,
+    required this.isFan,
+    required this.frontPalette,
+    required this.backPalette,
     required this.iconName,
+    this.highlightPhotoUrl,
     required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    final gradientColors =
-        _HomePhotoCalendarSectionState._gradientPalettes[paletteIndex];
+    final emptyBg =
+        isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9);
+    final hasRealPhoto =
+        highlightPhotoUrl != null && highlightPhotoUrl!.trim().isNotEmpty;
 
     return GestureDetector(
       onTap: onTap,
@@ -493,127 +597,194 @@ class _PhotoCalendarCell extends StatelessWidget {
         duration: const Duration(milliseconds: 160),
         curve: Curves.easeOutCubic,
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(11),
-          gradient: hasExpense
+          borderRadius: BorderRadius.circular(13),
+          color: (!hasExpense || isFan) ? emptyBg : null,
+          gradient: (hasExpense && !isFan && !hasRealPhoto)
               ? LinearGradient(
-                  colors: gradientColors,
+                  colors: frontPalette,
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 )
               : null,
-          color: hasExpense
-              ? null
-              : (isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9)),
           border: isSelected
-              ? Border.all(color: AppColors.primary, width: 2)
+              ? Border.all(color: AppColors.primary, width: 2.5)
               : null,
           boxShadow: isSelected
               ? [
                   BoxShadow(
-                    color: AppColors.primary.withValues(alpha: 0.35),
-                    blurRadius: 8,
+                    color: AppColors.primary.withValues(alpha: 0.38),
+                    blurRadius: 10,
                     offset: const Offset(0, 3),
                   ),
                 ]
               : null,
         ),
-        child: Stack(
-          alignment: Alignment.center,
-          children: [
-            // Nếu có nhiều hơn 1 GD -> Hiển thị fan stack mini layer
-            if (hasExpense && txCount > 1)
-              Positioned(
-                right: 3,
-                top: 3,
-                child: Transform.rotate(
-                  angle: 0.12,
-                  child: Container(
-                    width: 14,
-                    height: 14,
-                    decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.35),
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                  ),
-                ),
-              ),
-
-            // Ngày thường không có chi tiêu
-            if (!hasExpense)
-              Text(
-                '$dayNum',
-                style: GoogleFonts.inter(
-                  fontSize: 11.5,
-                  fontWeight: FontWeight.w700,
-                  color: isDark ? AppColors.darkMuted : const Color(0xFF64748B),
-                ),
-              ),
-
-            // Ngày có chi tiêu (Photo Calendar Card)
-            if (hasExpense) ...[
-              // Tag số ngày góc trên bên trái (pnum)
-              Positioned(
-                top: 3,
-                left: 3,
-                child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 3.5, vertical: 1),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.92),
-                    borderRadius: BorderRadius.circular(4),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.08),
-                        blurRadius: 2,
-                      ),
-                    ],
-                  ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(isSelected ? 10.5 : 13),
+          child: Stack(
+            fit: StackFit.expand,
+            alignment: Alignment.center,
+            children: [
+              // 1. Ngày trống (không có chi tiêu)
+              if (!hasExpense)
+                Center(
                   child: Text(
                     '$dayNum',
                     style: GoogleFonts.inter(
-                      fontSize: 8.5,
-                      fontWeight: FontWeight.w900,
-                      color: const Color(0xFF0F172A),
+                      fontSize: 11,
+                      fontWeight: FontWeight.w700,
+                      color: isDark
+                          ? AppColors.darkMuted
+                          : const Color(0xFF94A3B8),
                     ),
                   ),
                 ),
-              ),
 
-              // Huy hiệu số giao dịch góc trên bên phải (m-count)
-              if (txCount > 1)
+              // 2. Có chi tiêu & Fan Stack (nhiều giao dịch xếp xòe quạt theo Solarn UI chuẩn preview)
+              if (hasExpense && isFan)
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 5),
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      // Thẻ sau: lệch trái & nghiêng -12 độ
+                      Transform.translate(
+                        offset: const Offset(-4, 2),
+                        child: Transform.rotate(
+                          angle: -0.21,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: backPalette,
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                              ),
+                              borderRadius: BorderRadius.circular(9),
+                              border: Border.all(color: Colors.white, width: 1.5),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: const Color(0xFF0F172A).withValues(alpha: 0.22),
+                                  blurRadius: 4,
+                                  offset: const Offset(0, 1.5),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                      // Thẻ trước: lệch phải & nghiêng +10 độ
+                      Transform.translate(
+                        offset: const Offset(3.5, -0.5),
+                        child: Transform.rotate(
+                          angle: 0.17,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: frontPalette,
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                              ),
+                              borderRadius: BorderRadius.circular(9),
+                              border: Border.all(color: Colors.white, width: 1.5),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: const Color(0xFF0F172A).withValues(alpha: 0.28),
+                                  blurRadius: 5,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+              // 3. Ảnh thật nếu người dùng có chụp hóa đơn
+              if (hasExpense && !isFan && hasRealPhoto)
+                Image.network(
+                  highlightPhotoUrl!,
+                  fit: BoxFit.cover,
+                  errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+                ),
+
+              // 4. Các huy hiệu (Badges)
+              if (hasExpense) ...[
+                // Số ngày (pnum) - góc trên bên trái
                 Positioned(
-                  top: 3,
-                  right: 3,
+                  top: 3.5,
+                  left: 3.5,
                   child: Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 4, vertical: 1),
+                    padding: const EdgeInsets.symmetric(horizontal: 3.5, vertical: 1),
                     decoration: BoxDecoration(
-                      color: AppColors.primary,
-                      borderRadius: BorderRadius.circular(99),
+                      color: Colors.white.withValues(alpha: 0.94),
+                      borderRadius: BorderRadius.circular(5),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.12),
+                          blurRadius: 2,
+                        ),
+                      ],
                     ),
                     child: Text(
-                      '$txCount',
+                      '$dayNum',
                       style: GoogleFonts.inter(
-                        fontSize: 8,
+                        fontSize: 8.5,
                         fontWeight: FontWeight.w900,
-                        color: Colors.white,
+                        color: const Color(0xFF0F172A),
+                        height: 1.1,
                       ),
                     ),
                   ),
                 ),
 
-              // Icon danh mục chi tiêu góc dưới bên phải (phic)
-              Positioned(
-                bottom: 3,
-                right: 3,
-                child: LucideIcon(
-                  name: iconName,
-                  size: 13,
-                  color: Colors.white.withValues(alpha: 0.95),
-                ),
-              ),
+                // Huy hiệu đếm số giao dịch (m-count) - góc trên bên phải
+                if (txCount > 1)
+                  Positioned(
+                    top: 3.5,
+                    right: 3.5,
+                    child: Container(
+                      constraints: const BoxConstraints(minWidth: 15, minHeight: 14),
+                      padding: const EdgeInsets.symmetric(horizontal: 3.5, vertical: 0.5),
+                      decoration: BoxDecoration(
+                        color: isSelected ? Colors.white : AppColors.primary,
+                        borderRadius: BorderRadius.circular(99),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.18),
+                            blurRadius: 2,
+                          ),
+                        ],
+                      ),
+                      child: Center(
+                        child: Text(
+                          '$txCount',
+                          style: GoogleFonts.inter(
+                            fontSize: 8,
+                            fontWeight: FontWeight.w900,
+                            color: isSelected ? AppColors.primary : Colors.white,
+                            height: 1.0,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+
+                // Icon danh mục (phic) - góc dưới bên phải (chỉ hiện khi ô đơn không phải fan-stack)
+                if (!isFan)
+                  Positioned(
+                    right: 3.5,
+                    bottom: 3.5,
+                    child: LucideIcon(
+                      name: iconName,
+                      size: 13,
+                      color: Colors.white.withValues(alpha: 0.95),
+                    ),
+                  ),
+              ],
             ],
-          ],
+          ),
         ),
       ),
     );
