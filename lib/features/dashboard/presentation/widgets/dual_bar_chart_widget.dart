@@ -397,3 +397,4 @@ class _LegendChip extends StatelessWidget {
     );
   }
 }
+

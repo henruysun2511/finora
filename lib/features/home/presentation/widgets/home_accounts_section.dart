@@ -30,68 +30,128 @@ class HomeAccountsSection extends ConsumerWidget {
         SizedBox(
           height: 108,
           child: overviewAsync.when(
-            loading: () => ListView(
+            loading: () => ListView.separated(
               scrollDirection: Axis.horizontal,
               clipBehavior: Clip.none,
-              children: [
-                GestureDetector(
-                  onTap: () => context.push(RoutePaths.wallets),
-                  child: _AccountCard(
-                    isDark: isDark,
-                    name: 'Tiền mặt',
-                    balance: 2500000,
-                    icon: Icons.account_balance_wallet_rounded,
-                    chipText: 'Ví tiền mặt',
-                    chipColor: AppColors.success,
-                  ),
-                ),
-                const SizedBox(width: 12),
-                GestureDetector(
-                  onTap: () => context.push(RoutePaths.wallets),
-                  child: _AccountCard(
-                    isDark: isDark,
-                    name: 'Vietcombank',
-                    balance: 18350000,
-                    icon: Icons.account_balance_rounded,
-                    chipText: 'Tài khoản NH',
-                    chipColor: AppColors.primary,
-                    isHighlighted: true,
-                  ),
-                ),
-              ],
+              itemCount: 2,
+              separatorBuilder: (_, __) => const SizedBox(width: 12),
+              itemBuilder: (_, __) => _AccountCardSkeleton(isDark: isDark),
             ),
-            error: (_, __) => ListView(
-              scrollDirection: Axis.horizontal,
-              clipBehavior: Clip.none,
-              children: [
-                GestureDetector(
-                  onTap: () => context.push(RoutePaths.wallets),
-                  child: _AccountCard(
-                    isDark: isDark,
-                    name: 'Tiền mặt',
-                    balance: 2500000,
-                    icon: Icons.account_balance_wallet_rounded,
-                    chipText: 'Ví tiền mặt',
-                    chipColor: AppColors.success,
-                  ),
+            error: (err, _) => Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              decoration: BoxDecoration(
+                color: isDark ? AppColors.darkSurface : Colors.white,
+                borderRadius: BorderRadius.circular(18),
+                border: Border.all(
+                  color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
                 ),
-                const SizedBox(width: 12),
-                GestureDetector(
-                  onTap: () => context.push(RoutePaths.wallets),
-                  child: _AccountCard(
-                    isDark: isDark,
-                    name: 'Vietcombank',
-                    balance: 18350000,
-                    icon: Icons.account_balance_rounded,
-                    chipText: 'Tài khoản NH',
-                    chipColor: AppColors.primary,
-                    isHighlighted: true,
+              ),
+              child: Row(
+                children: [
+                  const Icon(
+                    Icons.info_outline_rounded,
+                    color: AppColors.primary,
+                    size: 22,
                   ),
-                ),
-              ],
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      'Không thể tải tài khoản',
+                      style: GoogleFonts.inter(
+                        fontSize: 12,
+                        color:
+                            isDark ? AppColors.darkMuted : AppColors.lightMuted,
+                      ),
+                    ),
+                  ),
+                  TextButton(
+                    onPressed: () => ref.invalidate(dashboardOverviewProvider),
+                    child: Text(
+                      'Thử lại',
+                      style: GoogleFonts.inter(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.primary,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
             data: (data) {
               final accounts = data.accountsSummary;
+
+              if (accounts.isEmpty) {
+                return GestureDetector(
+                  onTap: () => context.push(RoutePaths.wallets),
+                  child: Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 14,
+                    ),
+                    decoration: BoxDecoration(
+                      color: isDark ? AppColors.darkSurface : Colors.white,
+                      borderRadius: BorderRadius.circular(18),
+                      border: Border.all(
+                        color: isDark
+                            ? AppColors.darkBorder
+                            : AppColors.lightBorder,
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 40,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            color: AppColors.primary.withValues(alpha: 0.12),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: const Icon(
+                            Icons.add_card_rounded,
+                            color: AppColors.primary,
+                            size: 20,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                'Chưa có tài khoản',
+                                style: GoogleFonts.inter(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w700,
+                                  color: isDark
+                                      ? AppColors.darkForeground
+                                      : AppColors.lightForeground,
+                                ),
+                              ),
+                              Text(
+                                'Bấm để thêm tài khoản hoặc ví',
+                                style: GoogleFonts.inter(
+                                  fontSize: 11,
+                                  color: isDark
+                                      ? AppColors.darkMuted
+                                      : AppColors.lightMuted,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const Icon(
+                          Icons.chevron_right_rounded,
+                          color: AppColors.primary,
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              }
+
               return ListView.separated(
                 scrollDirection: Axis.horizontal,
                 clipBehavior: Clip.none,
@@ -118,7 +178,9 @@ class HomeAccountsSection extends ConsumerWidget {
                           : (isEWallet ? 'Ví điện tử' : 'Ví tiền mặt'),
                       chipColor: isBank
                           ? AppColors.primary
-                          : (isEWallet ? AppColors.secondary : AppColors.success),
+                          : (isEWallet
+                              ? const Color(0xFF2563EB)
+                              : const Color(0xFF0284C7)),
                       isHighlighted: isBank,
                     ),
                   );
@@ -252,6 +314,85 @@ class _AccountCard extends StatelessWidget {
                     ),
                   ),
                 ],
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _AccountCardSkeleton extends StatelessWidget {
+  final bool isDark;
+
+  const _AccountCardSkeleton({required this.isDark});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 154,
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: isDark ? AppColors.darkSurface : Colors.white,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(
+          color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 28,
+                height: 28,
+                decoration: BoxDecoration(
+                  color: isDark
+                      ? Colors.white.withValues(alpha: 0.05)
+                      : Colors.black.withValues(alpha: 0.05),
+                  borderRadius: BorderRadius.circular(9),
+                ),
+              ),
+              const SizedBox(width: 7),
+              Expanded(
+                child: Container(
+                  height: 12,
+                  decoration: BoxDecoration(
+                    color: isDark
+                        ? Colors.white.withValues(alpha: 0.05)
+                        : Colors.black.withValues(alpha: 0.05),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                height: 16,
+                width: 80,
+                decoration: BoxDecoration(
+                  color: isDark
+                      ? Colors.white.withValues(alpha: 0.08)
+                      : Colors.black.withValues(alpha: 0.08),
+                  borderRadius: BorderRadius.circular(4),
+                ),
+              ),
+              const SizedBox(height: 6),
+              Container(
+                height: 10,
+                width: 50,
+                decoration: BoxDecoration(
+                  color: isDark
+                      ? Colors.white.withValues(alpha: 0.04)
+                      : Colors.black.withValues(alpha: 0.04),
+                  borderRadius: BorderRadius.circular(3),
+                ),
               ),
             ],
           ),

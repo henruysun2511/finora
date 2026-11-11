@@ -9,9 +9,12 @@ import '../../../../core/widgets/mascot_banner.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
 import '../../../dashboard/domain/models/dashboard_overview_model.dart';
 import '../../../dashboard/presentation/providers/dashboard_providers.dart';
+import '../../../wallets/presentation/providers/wallets_overview_provider.dart';
 import '../widgets/home_accounts_section.dart';
 import '../widgets/home_header.dart';
 import '../widgets/home_mascot_section.dart';
+import '../widgets/home_photo_calendar_section.dart';
+import '../widgets/home_weekly_trend_section.dart';
 import '../widgets/quick_actions_grid.dart';
 import '../widgets/recent_transactions_section.dart';
 
@@ -37,6 +40,7 @@ class HomeScreen extends ConsumerWidget {
             ref.invalidate(dashboardCategoryBreakdownProvider);
             ref.invalidate(dashboardDebtsProvider);
             ref.invalidate(dashboardCalendarProvider);
+            ref.invalidate(walletsOverviewProvider);
             await Future.delayed(const Duration(milliseconds: 600));
           },
           child: SingleChildScrollView(
@@ -145,6 +149,14 @@ class HomeScreen extends ConsumerWidget {
 
                       // ── Giao dịch gần đây (GET /dashboard/overview) ────
                       const RecentTransactionsSection(),
+                      const SizedBox(height: 22),
+
+                      // ── Lịch ảnh chi tiêu (Photo Expense Calendar) ───────
+                      const HomePhotoCalendarSection(),
+                      const SizedBox(height: 22),
+
+                      // ── Snapshot Xu hướng Thu & Chi 7 ngày qua ──────────
+                      const HomeWeeklyTrendSection(),
                       const SizedBox(height: 22),
 
                       // ── Linh vật AI đồng hành ──────────────────────────

@@ -271,3 +271,4 @@ class DebtBalanceBarChartWidget extends StatelessWidget {
     );
   }
 }
+

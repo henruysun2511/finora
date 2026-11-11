@@ -320,3 +320,4 @@ class _CategoryPillarCard extends StatelessWidget {
     );
   }
 }
+

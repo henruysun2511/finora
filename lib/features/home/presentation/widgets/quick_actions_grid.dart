@@ -177,29 +177,28 @@ class _QuickActionItem extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Container(
-                width: 44,
-                height: 44,
+                width: 48,
+                height: 48,
                 decoration: BoxDecoration(
-                  color: isDark
-                      ? bgColor.withValues(alpha: 0.22)
-                      : bgColor.withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(14),
-                  border: Border.all(
-                    color: bgColor.withValues(alpha: isDark ? 0.35 : 0.22),
-                    width: 1,
-                  ),
+                  color: bgColor,
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: bgColor.withValues(alpha: 0.28),
+                      blurRadius: 8,
+                      offset: const Offset(0, 3),
+                    ),
+                  ],
                 ),
                 child: Center(
                   child: Icon(
                     icon,
                     size: 22,
-                    color: isDark
-                        ? Color.lerp(bgColor, Colors.white, 0.45)
-                        : bgColor,
+                    color: Colors.white,
                   ),
                 ),
               ),
-              const SizedBox(height: 5),
+              const SizedBox(height: 6),
               Text(
                 label,
                 style: GoogleFonts.inter(
