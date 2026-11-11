@@ -204,7 +204,7 @@ class RecurringTransactionsScreen extends ConsumerWidget {
       }
     } catch (e) {
       if (context.mounted) {
-        AppToast.error(context, 'Lỗi cập nhật trạng thái: $e');
+        AppToast.error(context, e);
       }
     }
   }
@@ -234,7 +234,7 @@ class RecurringTransactionsScreen extends ConsumerWidget {
       }
     } catch (e) {
       if (context.mounted) {
-        AppToast.error(context, 'Lỗi kích hoạt: $e');
+        AppToast.error(context, e);
       }
     }
   }
@@ -264,7 +264,7 @@ class RecurringTransactionsScreen extends ConsumerWidget {
       }
     } catch (e) {
       if (context.mounted) {
-        AppToast.error(context, 'Lỗi xóa quy tắc: $e');
+        AppToast.error(context, e);
       }
     }
   }

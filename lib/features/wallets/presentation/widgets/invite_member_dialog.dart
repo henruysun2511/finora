@@ -47,7 +47,7 @@ class _InviteMemberDialogState extends ConsumerState<InviteMemberDialog> {
       }
     } catch (e) {
       if (mounted) {
-        AppToast.error(context, e.toString());
+        AppToast.error(context, e);
       }
     } finally {
       if (mounted) setState(() => _isLoading = false);

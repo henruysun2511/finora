@@ -101,7 +101,7 @@ class _CreateAccountSheetState extends ConsumerState<CreateAccountSheet> {
       }
     } catch (e) {
       if (mounted) {
-        AppToast.error(context, e.toString());
+        AppToast.error(context, e);
       }
     } finally {
       if (mounted) setState(() => _isLoading = false);

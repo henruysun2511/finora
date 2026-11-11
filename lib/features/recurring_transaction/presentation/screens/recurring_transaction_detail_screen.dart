@@ -473,7 +473,7 @@ class RecurringTransactionDetailScreen extends ConsumerWidget {
       }
     } catch (e) {
       if (context.mounted) {
-        AppToast.error(context, 'Lỗi thực thi: $e');
+        AppToast.error(context, e);
       }
     }
   }
@@ -498,7 +498,7 @@ class RecurringTransactionDetailScreen extends ConsumerWidget {
         }
       } catch (e) {
         if (context.mounted) {
-          AppToast.error(context, 'Lỗi khi xóa: $e');
+          AppToast.error(context, e);
         }
       }
     }

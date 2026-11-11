@@ -125,7 +125,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       }
       next.whenOrNull(
         error: (error, _) {
-          AppToast.error(context, error.toString());
+          AppToast.error(context, error);
         },
       );
     });

@@ -32,7 +32,12 @@ AppException mapDioExceptionToAppException(DioException error) {
         } else if (errors is String && errors.isNotEmpty) {
           msg = errors;
         } else if (data['message'] != null) {
-          msg = data['message'].toString();
+          final m = data['message'];
+          if (m is List && m.isNotEmpty) {
+            msg = m.join(', ');
+          } else {
+            msg = m.toString();
+          }
         }
       } else if (data is String && data.isNotEmpty) {
         msg = data;

@@ -42,7 +42,7 @@ class _ScanReceiptScreenState extends ConsumerState<ScanReceiptScreen> {
       }
     } catch (e) {
       if (mounted) {
-        AppToast.error(context, 'Lỗi khi chọn ảnh: $e');
+        AppToast.error(context, e);
       }
     }
   }
@@ -66,7 +66,7 @@ class _ScanReceiptScreenState extends ConsumerState<ScanReceiptScreen> {
     } catch (e) {
       if (mounted) {
         setState(() => _isUploading = false);
-        AppToast.error(context, 'Lỗi khi bóc tách hóa đơn: $e');
+        AppToast.error(context, e);
       }
     }
   }

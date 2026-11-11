@@ -67,7 +67,7 @@ class _UserProfileDetailScreenState
       }
     } catch (e) {
       if (mounted) {
-        AppToast.error(context, 'Không thể cập nhật hồ sơ: $e');
+        AppToast.error(context, e);
       }
     } finally {
       if (mounted) {
