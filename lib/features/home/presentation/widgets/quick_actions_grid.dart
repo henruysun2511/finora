@@ -62,21 +62,21 @@ class QuickActionsGrid extends StatelessWidget {
                 bgColor: const Color(0xFFF97316),
                 onTap: () => context.push(RoutePaths.scanReceipt),
               ),
-              // 3. Chuyển tiền nội bộ
+              // 3. Ví tiền & Nguồn tiền
+              _QuickActionItem(
+                isDark: isDark,
+                icon: Icons.account_balance_wallet_rounded,
+                label: 'Ví tiền',
+                bgColor: const Color(0xFF2563EB),
+                onTap: () => context.go(RoutePaths.wallets),
+              ),
+              // 4. Chuyển tiền nội bộ
               _QuickActionItem(
                 isDark: isDark,
                 icon: Icons.swap_horiz_rounded,
                 label: 'Chuyển ví',
                 bgColor: const Color(0xFF0D9488),
                 onTap: () => context.push(RoutePaths.transfer),
-              ),
-              // 4. Lịch sử giao dịch
-              _QuickActionItem(
-                isDark: isDark,
-                icon: Icons.receipt_long_rounded,
-                label: 'Sổ GD',
-                bgColor: const Color(0xFF3B82F6),
-                onTap: () => context.push(RoutePaths.transactions),
               ),
               // 5. Ngân sách chi tiêu
               _QuickActionItem(
@@ -124,23 +124,23 @@ class QuickActionsGrid extends StatelessWidget {
                 icon: Icons.groups_rounded,
                 label: 'Quỹ chung',
                 bgColor: const Color(0xFF06B6D4),
-                onTap: () => context.push(RoutePaths.sharedWallets),
+                onTap: () => context.go(RoutePaths.sharedWallets),
               ),
-              // 11. Giao dịch định kỳ
+              // 11. Thêm tài khoản / thẻ
               _QuickActionItem(
                 isDark: isDark,
-                icon: Icons.event_repeat_rounded,
-                label: 'Định kỳ',
+                icon: Icons.add_card_rounded,
+                label: 'Thêm thẻ/TK',
                 bgColor: const Color(0xFF14B8A6),
-                onTap: () => context.push(RoutePaths.recurringTransactions),
+                onTap: () => context.push(RoutePaths.createAccount),
               ),
-              // 12. Danh sách ví
+              // 12. Lịch sử giao dịch
               _QuickActionItem(
                 isDark: isDark,
-                icon: Icons.account_balance_wallet_rounded,
-                label: 'Ví của tôi',
-                bgColor: const Color(0xFF2563EB),
-                onTap: () => context.push(RoutePaths.wallets),
+                icon: Icons.receipt_long_rounded,
+                label: 'Sổ GD',
+                bgColor: const Color(0xFF3B82F6),
+                onTap: () => context.push(RoutePaths.transactions),
               ),
               // 13. Tỷ giá ngoại tệ
               _QuickActionItem(

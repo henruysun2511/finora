@@ -158,14 +158,15 @@ class HomeHeader extends StatelessWidget {
           ),
           const SizedBox(height: 18),
 
-          // Balance Hero Card
-          const BalanceCard(
+          // Balance Hero Card - Nhấn để mở Quản lý Ví & Tài khoản
+          BalanceCard(
             netWorth: 24850000,
             monthlyIncome: 15000000,
             monthlyExpense: 8320000,
             savingsRate: 44.5,
             tierTitle: 'Gold Tier',
             mascotMood: 'HAPPY',
+            onTap: () => context.go(RoutePaths.wallets),
           ),
         ],
       ),

@@ -9,12 +9,13 @@ class AppButton extends StatelessWidget {
 
   const AppButton({
     super.key,
-    required this.label,
+    String? label,
+    String? text,
     required this.onPressed,
     this.isLoading = false,
     this.isOutlined = false,
     this.icon,
-  });
+  }) : label = label ?? text ?? '';
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +25,10 @@ class AppButton extends StatelessWidget {
         ? const SizedBox(
             height: 20,
             width: 20,
-            child: CircularProgressIndicator(strokeWidth: 2.2, color: Colors.white),
+            child: CircularProgressIndicator(
+              strokeWidth: 2.2,
+              color: Colors.white,
+            ),
           )
         : Row(
             mainAxisSize: MainAxisSize.min,

@@ -20,7 +20,7 @@ class HomeAccountsSection extends StatelessWidget {
         SectionHeader(
           title: 'Tài khoản',
           actionText: 'Xem tất cả',
-          onTap: () => context.push(RoutePaths.wallets),
+          onTap: () => context.go(RoutePaths.wallets),
         ),
         const SizedBox(height: 12),
         SizedBox(
@@ -30,7 +30,7 @@ class HomeAccountsSection extends StatelessWidget {
             clipBehavior: Clip.none,
             children: [
               GestureDetector(
-                onTap: () => context.push(RoutePaths.wallets),
+                onTap: () => context.go(RoutePaths.wallets),
                 child: _AccountCard(
                   isDark: isDark,
                   name: 'Tiền mặt',
@@ -42,7 +42,7 @@ class HomeAccountsSection extends StatelessWidget {
               ),
               const SizedBox(width: 12),
               GestureDetector(
-                onTap: () => context.push(RoutePaths.wallets),
+                onTap: () => context.go(RoutePaths.wallets),
                 child: _AccountCard(
                   isDark: isDark,
                   name: 'Vietcombank',
@@ -55,7 +55,7 @@ class HomeAccountsSection extends StatelessWidget {
               ),
               const SizedBox(width: 12),
               GestureDetector(
-                onTap: () => context.push(RoutePaths.wallets),
+                onTap: () => context.go(RoutePaths.wallets),
                 child: _AccountCard(
                   isDark: isDark,
                   name: 'MoMo',

@@ -161,6 +161,24 @@ GoRouter appRouter(AppRouterRef ref) {
                 name: RouteNames.home,
                 builder: (context, state) => const HomeScreen(),
               ),
+              GoRoute(
+                path: RoutePaths.wallets,
+                name: RouteNames.wallets,
+                builder: (context, state) => const WalletsScreen(),
+              ),
+              GoRoute(
+                path: RoutePaths.sharedWallets,
+                name: RouteNames.sharedWallets,
+                builder: (context, state) => const SharedWalletsScreen(),
+              ),
+              GoRoute(
+                path: RoutePaths.walletDetail,
+                name: RouteNames.walletDetail,
+                builder: (context, state) {
+                  final id = state.pathParameters['id'] ?? '';
+                  return WalletDetailScreen(walletId: id);
+                },
+              ),
             ],
           ),
 
@@ -253,13 +271,8 @@ GoRouter appRouter(AppRouterRef ref) {
 
       // ==========================================
       // 4. PHÂN HỆ VÍ & TÀI KHOẢN (Wallets & Accounts)
+      // Lưu ý: wallets, sharedWallets, walletDetail nằm trong Shell (Branch 0) để giữ Bottom Navigation Bar
       // ==========================================
-      GoRoute(
-        parentNavigatorKey: _rootNavigatorKey,
-        path: RoutePaths.wallets,
-        name: RouteNames.wallets,
-        builder: (context, state) => const WalletsScreen(),
-      ),
       GoRoute(
         parentNavigatorKey: _rootNavigatorKey,
         path: RoutePaths.createWallet,
@@ -268,24 +281,9 @@ GoRouter appRouter(AppRouterRef ref) {
       ),
       GoRoute(
         parentNavigatorKey: _rootNavigatorKey,
-        path: RoutePaths.sharedWallets,
-        name: RouteNames.sharedWallets,
-        builder: (context, state) => const SharedWalletsScreen(),
-      ),
-      GoRoute(
-        parentNavigatorKey: _rootNavigatorKey,
         path: RoutePaths.createSharedWallet,
         name: RouteNames.createSharedWallet,
         builder: (context, state) => const CreateSharedWalletScreen(),
-      ),
-      GoRoute(
-        parentNavigatorKey: _rootNavigatorKey,
-        path: RoutePaths.walletDetail,
-        name: RouteNames.walletDetail,
-        builder: (context, state) {
-          final id = state.pathParameters['id'] ?? '';
-          return WalletDetailScreen(walletId: id);
-        },
       ),
       GoRoute(
         parentNavigatorKey: _rootNavigatorKey,

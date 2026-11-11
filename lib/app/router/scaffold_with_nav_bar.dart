@@ -72,7 +72,7 @@ class ScaffoldWithNavBar extends StatelessWidget {
                 // 2. Tab Ngân sách (Budgets)
                 _NavItem(
                   icon: Icons.calendar_month_rounded,
-                  label: 'Lịch & Ví',
+                  label: 'Ngân sách',
                   isSelected: currentIndex == 1,
                   onTap: () => _onItemTapped(context, 1),
                 ),

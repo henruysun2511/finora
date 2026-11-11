@@ -117,10 +117,12 @@ class RoutePaths {
   // 4. Wallets & Accounts
   static const String wallets = '/wallets';
   static const String walletDetail = '/wallets/:id';
+  static String walletDetailWithId(String id) => '/wallets/$id';
   static const String createWallet = '/wallets/create';
   static const String sharedWallets = '/wallets/shared';
   static const String createSharedWallet = '/wallets/shared/create';
   static const String accountDetail = '/accounts/:id';
+  static String accountDetailWithId(String id) => '/accounts/$id';
   static const String createAccount = '/accounts/create';
   static const String transfer = '/transfer';
 

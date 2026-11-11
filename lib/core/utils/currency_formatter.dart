@@ -7,7 +7,16 @@ class CurrencyFormatter {
 
   /// Format số tiền chuẩn:
   /// `format(24850000)` -> `24.850.000 ₫`
-  static String format(num amount, {String symbol = '₫'}) {
+  static String format(num amount, {String symbol = '₫', String? currency}) {
+    if (currency != null && currency.isNotEmpty) {
+      if (currency.toUpperCase() == 'USD') {
+        symbol = r'$';
+      } else if (currency.toUpperCase() == 'VND') {
+        symbol = '₫';
+      } else {
+        symbol = currency;
+      }
+    }
     final formatted = _formatter.format(amount);
     return '$formatted $symbol';
   }

@@ -1,12 +1,18 @@
 import 'package:flutter/material.dart';
 
 class AppShimmer extends StatefulWidget {
-  final Widget child;
+  final Widget? child;
+  final double? width;
+  final double? height;
+  final double borderRadius;
   final Duration duration;
 
   const AppShimmer({
     super.key,
-    required this.child,
+    this.child,
+    this.width,
+    this.height,
+    this.borderRadius = 8,
     this.duration = const Duration(milliseconds: 1500),
   });
 
@@ -37,6 +43,13 @@ class _AppShimmerState extends State<AppShimmer>
     final baseColor = isDark ? Colors.grey[800]! : Colors.grey[300]!;
     final highlightColor = isDark ? Colors.grey[700]! : Colors.grey[100]!;
 
+    final effectiveChild = widget.child ??
+        AppShimmerBox(
+          width: widget.width,
+          height: widget.height ?? 16,
+          borderRadius: widget.borderRadius,
+        );
+
     return AnimatedBuilder(
       animation: _controller,
       builder: (context, child) {
@@ -57,7 +70,7 @@ class _AppShimmerState extends State<AppShimmer>
           child: child,
         );
       },
-      child: widget.child,
+      child: effectiveChild,
     );
   }
 }

@@ -220,6 +220,36 @@ class QuickAddModal extends StatelessWidget {
                 children: [
                   Expanded(
                     child: _QuickActionTile(
+                      icon: Icons.account_balance_wallet_rounded,
+                      title: 'Tạo Ví mới',
+                      subtitle: 'Không gian cá nhân / quỹ chung',
+                      gradient: const [Color(0xFF2563EB), Color(0xFF60A5FA)],
+                      onTap: () {
+                        Navigator.pop(context);
+                        context.push(RoutePaths.createWallet);
+                      },
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: _QuickActionTile(
+                      icon: Icons.credit_card_rounded,
+                      title: 'Thêm Tài khoản',
+                      subtitle: 'Ngân hàng, ví điện tử, tiền mặt',
+                      gradient: const [Color(0xFF0D9488), Color(0xFF2DD4BF)],
+                      onTap: () {
+                        Navigator.pop(context);
+                        context.push(RoutePaths.createAccount);
+                      },
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  Expanded(
+                    child: _QuickActionTile(
                       icon: Icons.category_rounded,
                       title: 'Quản lý Danh mục',
                       subtitle: 'Cấu hình và phân loại thu chi',
