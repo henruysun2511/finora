@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/network/dio_client.dart';
 import '../../data/services/settings_api_service.dart';
+import '../../domain/models/ai_settings.dart';
 import '../../domain/models/general_settings.dart';
 import '../../domain/models/notification_preferences.dart';
 
@@ -147,6 +148,71 @@ class NotificationPreferencesNotifier extends AsyncNotifier<NotificationPreferen
       await service.updateNotificationPreferences(payload);
     } catch (e) {
       // Revert if error
+      state = AsyncData(current);
+      rethrow;
+    }
+  }
+}
+
+final aiSettingsProvider =
+    AsyncNotifierProvider<AiSettingsNotifier, AiSettings>(() {
+  return AiSettingsNotifier();
+});
+
+class AiSettingsNotifier extends AsyncNotifier<AiSettings> {
+  @override
+  Future<AiSettings> build() async {
+    final service = ref.watch(settingsApiServiceProvider);
+    try {
+      final data = await service.getSettings();
+      return AiSettings.fromMap(data);
+    } catch (_) {
+      return const AiSettings();
+    }
+  }
+
+  Future<void> updateAiSettings({
+    String? provider,
+    String? model,
+    String? apiKey,
+  }) async {
+    final current = state.value ?? const AiSettings();
+    final updated = current.copyWith(
+      provider: provider,
+      model: model,
+      hasCustomApiKey: (apiKey != null && apiKey.trim().isNotEmpty) ? true : current.hasCustomApiKey,
+    );
+
+    state = AsyncData(updated);
+
+    try {
+      final service = ref.read(settingsApiServiceProvider);
+      final res = await service.updateAiSettings(
+        provider: provider,
+        model: model,
+        apiKey: apiKey,
+      );
+      state = AsyncData(AiSettings.fromMap(res));
+    } catch (e) {
+      state = AsyncData(current);
+      rethrow;
+    }
+  }
+
+  Future<void> deleteApiKey() async {
+    final current = state.value ?? const AiSettings();
+    final updated = current.copyWith(
+      hasCustomApiKey: false,
+      maskedApiKey: null,
+    );
+
+    state = AsyncData(updated);
+
+    try {
+      final service = ref.read(settingsApiServiceProvider);
+      final res = await service.deleteCustomApiKey();
+      state = AsyncData(AiSettings.fromMap(res));
+    } catch (e) {
       state = AsyncData(current);
       rethrow;
     }

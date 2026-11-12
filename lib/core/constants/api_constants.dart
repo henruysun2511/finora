@@ -222,6 +222,7 @@ class ApiConstants {
   static const String updateMascotSettings = '/settings/mascot';
   static const String updateGeneralSettings = '/settings/general';
   static const String updateAiSettings = '/settings/ai';
+  static const String deleteAiApiKey = '/settings/ai/api-key';
   static const String updateNotificationSettings = '/settings/notifications';
   static const String setupPin = '/settings/pin/setup';
   static const String verifyPin = '/settings/pin/verify';

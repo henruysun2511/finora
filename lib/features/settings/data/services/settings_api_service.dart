@@ -12,6 +12,12 @@ abstract class SettingsApiService {
     bool? defaultAmountHidden,
   });
   Future<Map<String, dynamic>> updateNotificationPreferences(Map<String, dynamic> preferences);
+  Future<Map<String, dynamic>> updateAiSettings({
+    String? provider,
+    String? model,
+    String? apiKey,
+  });
+  Future<Map<String, dynamic>> deleteCustomApiKey();
 }
 
 class DioSettingsApiService implements SettingsApiService {
@@ -75,6 +81,32 @@ class DioSettingsApiService implements SettingsApiService {
         final res = await _dio.patch<Map<String, dynamic>>(
           ApiConstants.updateNotificationSettings,
           data: preferences,
+        );
+        return _extractData(res.data);
+      });
+
+  @override
+  Future<Map<String, dynamic>> updateAiSettings({
+    String? provider,
+    String? model,
+    String? apiKey,
+  }) =>
+      _guard(() async {
+        final res = await _dio.patch<Map<String, dynamic>>(
+          ApiConstants.updateAiSettings,
+          data: {
+            if (provider != null) 'provider': provider,
+            if (model != null) 'model': model,
+            if (apiKey != null) 'apiKey': apiKey,
+          },
+        );
+        return _extractData(res.data);
+      });
+
+  @override
+  Future<Map<String, dynamic>> deleteCustomApiKey() => _guard(() async {
+        final res = await _dio.delete<Map<String, dynamic>>(
+          ApiConstants.deleteAiApiKey,
         );
         return _extractData(res.data);
       });

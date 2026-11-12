@@ -320,6 +320,13 @@ class ProfileScreen extends ConsumerWidget {
                 ),
                 Divider(height: 20, color: isDark ? AppColors.darkBorder : AppColors.lightBorder),
                 ProfileSettingsTile(
+                  icon: Icons.tune_rounded,
+                  title: 'Cài đặt chung',
+                  subtitle: 'Tiền tệ, ngôn ngữ, AI & quyền riêng tư',
+                  onTap: () => context.push(RoutePaths.settings),
+                ),
+                Divider(height: 20, color: isDark ? AppColors.darkBorder : AppColors.lightBorder),
+                ProfileSettingsTile(
                   icon: Icons.security_rounded,
                   title: 'Bảo mật & Mã PIN',
                   subtitle: 'Sinh trắc học Face ID, Touch ID',
@@ -345,13 +352,6 @@ class ProfileScreen extends ConsumerWidget {
                   title: 'Cài đặt Thông báo',
                   subtitle: 'Cảnh báo ngân sách & lịch nhắc',
                   onTap: () => context.push(RoutePaths.notificationSettings),
-                ),
-                Divider(height: 20, color: isDark ? AppColors.darkBorder : AppColors.lightBorder),
-                ProfileSettingsTile(
-                  icon: Icons.tune_rounded,
-                  title: 'Cài đặt chung',
-                  subtitle: 'Tiền tệ, ngôn ngữ & quyền riêng tư',
-                  onTap: () => context.push(RoutePaths.settings),
                 ),
                 Divider(height: 20, color: isDark ? AppColors.darkBorder : AppColors.lightBorder),
                 ProfileSettingsTile(

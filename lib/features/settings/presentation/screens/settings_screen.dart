@@ -9,7 +9,7 @@ import '../../../../core/widgets/page_header.dart';
 import '../providers/user_settings_provider.dart';
 
 /// Màn hình Cài đặt chung chuẩn FinTech Design System
-/// Tuân thủ chặt chẽ PageHeader.subPage, FormCard, và SwitchListTile của Finora
+/// Quản lý Tiền tệ, Ngôn ngữ, Quyền riêng tư, Cấu hình Mô hình AI & API Key (BYOK)
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
 
@@ -447,6 +447,412 @@ class SettingsScreen extends ConsumerWidget {
     );
   }
 
+  void _showModelPicker(
+    BuildContext context,
+    WidgetRef ref,
+    String provider,
+    String? currentModel,
+  ) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final surface = isDark ? AppColors.darkSurface : Colors.white;
+    final foreground = isDark ? AppColors.darkForeground : AppColors.lightForeground;
+    final muted = isDark ? AppColors.darkMuted : AppColors.lightMuted;
+    final border = isDark ? AppColors.darkBorder : AppColors.lightBorder;
+
+    final isGemini = provider == 'GEMINI';
+
+    final models = isGemini
+        ? [
+            {
+              'id': 'gemini-1.5-flash',
+              'name': 'Gemini 1.5 Flash (Mặc định)',
+              'desc': 'Tối ưu tốc độ cao, nhận diện hóa đơn cực nhanh & tiết kiệm quota',
+            },
+            {
+              'id': 'gemini-1.5-pro',
+              'name': 'Gemini 1.5 Pro (Chuyên sâu)',
+              'desc': 'Khả năng tư duy logic và phân tích xu hướng tài chính phức tạp',
+            },
+            {
+              'id': 'gemini-2.0-flash',
+              'name': 'Gemini 2.0 Flash (Thử nghiệm)',
+              'desc': 'Mô hình thế hệ mới nhất của Google với tốc độ xử lý siêu tốc',
+            },
+          ]
+        : [
+            {
+              'id': 'gpt-4o-mini',
+              'name': 'GPT-4o Mini (Mặc định)',
+              'desc': 'Mô hình thông minh, tốc độ cao và chi phí API tối ưu của OpenAI',
+            },
+            {
+              'id': 'gpt-4o',
+              'name': 'GPT-4o (Toàn năng)',
+              'desc': 'Mô hình hàng đầu của OpenAI cho năng lực phân tích tài chính cao nhất',
+            },
+          ];
+
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) {
+        return Container(
+          decoration: BoxDecoration(
+            color: surface,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+          ),
+          child: SafeArea(
+            top: false,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Center(
+                  child: Container(
+                    margin: const EdgeInsets.symmetric(vertical: 10),
+                    width: 36,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: muted.withValues(alpha: 0.3),
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 4, 20, 10),
+                  child: Row(
+                    children: [
+                      Text(
+                        'Chọn Model AI (${isGemini ? 'Google' : 'OpenAI'})',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w700,
+                          color: foreground,
+                        ),
+                      ),
+                      const Spacer(),
+                      IconButton(
+                        icon: Icon(Icons.close_rounded, size: 20, color: muted),
+                        onPressed: () => Navigator.pop(ctx),
+                      ),
+                    ],
+                  ),
+                ),
+                ListView.separated(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  padding: const EdgeInsets.fromLTRB(16, 4, 16, 20),
+                  itemCount: models.length,
+                  separatorBuilder: (_, __) => Divider(height: 1, color: border),
+                  itemBuilder: (c, i) {
+                    final item = models[i];
+                    final modelId = item['id']!;
+                    final modelName = item['name']!;
+                    final modelDesc = item['desc']!;
+                    final isSelected = (currentModel == null && i == 0) || currentModel == modelId;
+
+                    return ListTile(
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      tileColor: isSelected
+                          ? AppColors.primary.withValues(alpha: isDark ? 0.15 : 0.08)
+                          : Colors.transparent,
+                      title: Text(
+                        modelName,
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
+                          color: isSelected ? AppColors.primary : foreground,
+                        ),
+                      ),
+                      subtitle: Text(
+                        modelDesc,
+                        style: TextStyle(fontSize: 12, color: muted),
+                      ),
+                      trailing: isSelected
+                          ? const Icon(Icons.check_circle_rounded, color: AppColors.primary, size: 22)
+                          : null,
+                      onTap: () async {
+                        Navigator.pop(ctx);
+                        if (!isSelected) {
+                          try {
+                            await ref
+                                .read(aiSettingsProvider.notifier)
+                                .updateAiSettings(model: modelId);
+                            if (context.mounted) {
+                              AppToast.success(context, 'Đã chọn mô hình: $modelId');
+                            }
+                          } catch (e) {
+                            if (context.mounted) {
+                              AppToast.error(context, e);
+                            }
+                          }
+                        }
+                      },
+                    );
+                  },
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void _showApiKeySheet(
+    BuildContext context,
+    WidgetRef ref,
+    String provider,
+    String? currentKey,
+  ) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final surface = isDark ? AppColors.darkSurface : Colors.white;
+    final foreground = isDark ? AppColors.darkForeground : AppColors.lightForeground;
+    final muted = isDark ? AppColors.darkMuted : AppColors.lightMuted;
+    final border = isDark ? AppColors.darkBorder : AppColors.lightBorder;
+
+    final isGemini = provider == 'GEMINI';
+    final keyCtrl = TextEditingController();
+    bool obscure = true;
+    bool isSaving = false;
+
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) {
+        return StatefulBuilder(
+          builder: (modalCtx, setModalState) {
+            final viewInsets = MediaQuery.of(modalCtx).viewInsets;
+
+            return Padding(
+              padding: EdgeInsets.only(bottom: viewInsets.bottom),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: surface,
+                  borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+                ),
+                child: SafeArea(
+                  top: false,
+                  child: SingleChildScrollView(
+                    physics: const ClampingScrollPhysics(),
+                    padding: const EdgeInsets.fromLTRB(20, 10, 20, 24),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Center(
+                          child: Container(
+                            margin: const EdgeInsets.only(bottom: 12),
+                            width: 36,
+                            height: 4,
+                            decoration: BoxDecoration(
+                              color: muted.withValues(alpha: 0.3),
+                              borderRadius: BorderRadius.circular(2),
+                            ),
+                          ),
+                        ),
+                        Row(
+                          children: [
+                            Container(
+                              width: 36,
+                              height: 36,
+                              decoration: BoxDecoration(
+                                color: (isGemini ? const Color(0xFF0284C7) : const Color(0xFF10B981))
+                                    .withValues(alpha: 0.15),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: Icon(
+                                isGemini ? Icons.auto_awesome_rounded : Icons.psychology_rounded,
+                                color: isGemini ? const Color(0xFF0284C7) : const Color(0xFF10B981),
+                                size: 20,
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Thiết lập API Key cá nhân',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w700,
+                                      color: foreground,
+                                    ),
+                                  ),
+                                  Text(
+                                    'Dành cho nhà cung cấp: ${isGemini ? 'Google Gemini' : 'OpenAI'}',
+                                    style: TextStyle(fontSize: 12, color: muted),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            IconButton(
+                              icon: Icon(Icons.close_rounded, size: 20, color: muted),
+                              onPressed: () => Navigator.pop(ctx),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 16),
+                        Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: isDark ? AppColors.darkBackground : const Color(0xFFF8FAFC),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: border),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  const Icon(Icons.lightbulb_outline_rounded,
+                                      size: 16, color: AppColors.primary),
+                                  const SizedBox(width: 6),
+                                  Text(
+                                    'Cách lấy API Key hoàn toàn miễn phí:',
+                                    style: TextStyle(
+                                      fontSize: 12.5,
+                                      fontWeight: FontWeight.w700,
+                                      color: foreground,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 6),
+                              Text(
+                                isGemini
+                                    ? '1. Truy cập https://aistudio.google.com/app/apikey\n'
+                                      '2. Đăng nhập Google và bấm "Create API key"\n'
+                                      '3. Sao chép và dán khóa (bắt đầu bằng AIzaSy...)'
+                                    : '1. Truy cập https://platform.openai.com/api-keys\n'
+                                      '2. Đăng nhập và bấm "Create new secret key"\n'
+                                      '3. Sao chép và dán khóa (bắt đầu bằng sk-...)',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: muted,
+                                  height: 1.4,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          'Nhập Secret API Key:',
+                          style: TextStyle(
+                            fontSize: 13.5,
+                            fontWeight: FontWeight.w700,
+                            color: foreground,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        TextField(
+                          controller: keyCtrl,
+                          obscureText: obscure,
+                          autofocus: true,
+                          style: TextStyle(fontSize: 13.5, color: foreground, fontFamily: 'monospace'),
+                          decoration: InputDecoration(
+                            hintText: isGemini ? 'AIzaSy...' : 'sk-...',
+                            hintStyle: TextStyle(fontSize: 13, color: muted),
+                            filled: true,
+                            fillColor: isDark ? AppColors.darkBackground : const Color(0xFFF1F5F9),
+                            contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(14),
+                              borderSide: BorderSide(color: border),
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(14),
+                              borderSide: BorderSide(color: border),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(14),
+                              borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
+                            ),
+                            suffixIcon: IconButton(
+                              icon: Icon(
+                                obscure ? Icons.visibility_off_rounded : Icons.visibility_rounded,
+                                size: 18,
+                                color: muted,
+                              ),
+                              onPressed: () => setModalState(() => obscure = !obscure),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        Row(
+                          children: [
+                            const Icon(Icons.shield_outlined, size: 14, color: AppColors.success),
+                            const SizedBox(width: 6),
+                            Expanded(
+                              child: Text(
+                                'Khóa được bảo mật và chỉ dùng để gọi AI cho tài khoản của bạn.',
+                                style: TextStyle(fontSize: 11.5, color: muted),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 20),
+                        SizedBox(
+                          width: double.infinity,
+                          height: 46,
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppColors.primary,
+                              foregroundColor: Colors.white,
+                              elevation: 0,
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                            ),
+                            onPressed: isSaving
+                                ? null
+                                : () async {
+                                    final val = keyCtrl.text.trim();
+                                    if (val.isEmpty) {
+                                      AppToast.warning(context, 'Vui lòng nhập API Key');
+                                      return;
+                                    }
+                                    setModalState(() => isSaving = true);
+                                    try {
+                                      await ref
+                                          .read(aiSettingsProvider.notifier)
+                                          .updateAiSettings(apiKey: val);
+                                      if (context.mounted) {
+                                        Navigator.pop(ctx);
+                                        AppToast.success(context, 'Đã lưu API Key cá nhân thành công!');
+                                      }
+                                    } catch (e) {
+                                      setModalState(() => isSaving = false);
+                                      if (context.mounted) {
+                                        AppToast.error(context, e);
+                                      }
+                                    }
+                                  },
+                            child: isSaving
+                                ? const SizedBox(
+                                    width: 20,
+                                    height: 20,
+                                    child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                                  )
+                                : const Text(
+                                    'Lưu API Key',
+                                    style: TextStyle(fontSize: 14.5, fontWeight: FontWeight.w700),
+                                  ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
   void _showTextDialog(BuildContext context, String title, String content) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final surface = isDark ? AppColors.darkSurface : Colors.white;
@@ -484,12 +890,13 @@ class SettingsScreen extends ConsumerWidget {
     final border = isDark ? AppColors.darkBorder : AppColors.lightBorder;
 
     final settingsAsync = ref.watch(generalSettingsProvider);
+    final aiSettingsAsync = ref.watch(aiSettingsProvider);
 
     return Scaffold(
       backgroundColor: bg,
       appBar: PageHeader.subPage(
         title: 'Cài đặt chung',
-        subtitle: 'Tiền tệ, ngôn ngữ & hiển thị giao dịch',
+        subtitle: 'Tiền tệ, ngôn ngữ, AI & hiển thị giao dịch',
         onBack: () => Navigator.of(context).pop(),
       ),
       body: settingsAsync.when(
@@ -543,6 +950,9 @@ class SettingsScreen extends ConsumerWidget {
           final visLabel = settings.defaultTransactionVisibility == 'FRIENDS'
               ? 'Bạn bè (Friends)'
               : 'Chỉ mình tôi (Riêng tư)';
+
+          final aiSettings = aiSettingsAsync.valueOrNull ?? const AiSettings();
+          final isGemini = aiSettings.provider == 'GEMINI';
 
           return ListView(
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 32),
@@ -683,7 +1093,319 @@ class SettingsScreen extends ConsumerWidget {
                 ),
               ),
 
-              // ── 2. QUYỀN RIÊNG TƯ & HIỂN THỊ ──
+              // ── 2. CẤU HÌNH MÔ HÌNH AI & API KEY (BYOK) ──
+              FormCard(
+                title: 'Mô hình AI & API Key (BYOK)',
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Provider Segmented Toggle
+                    Text(
+                      'Nhà cung cấp AI:',
+                      style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: foreground),
+                    ),
+                    const SizedBox(height: 8),
+                    Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: BoxDecoration(
+                        color: isDark ? AppColors.darkBackground : const Color(0xFFF1F5F9),
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(color: border),
+                      ),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: GestureDetector(
+                              onTap: () async {
+                                if (!isGemini) {
+                                  try {
+                                    await ref
+                                        .read(aiSettingsProvider.notifier)
+                                        .updateAiSettings(provider: 'GEMINI', model: 'gemini-1.5-flash');
+                                  } catch (e) {
+                                    if (context.mounted) AppToast.error(context, e);
+                                  }
+                                }
+                              },
+                              child: AnimatedContainer(
+                                duration: const Duration(milliseconds: 180),
+                                padding: const EdgeInsets.symmetric(vertical: 8),
+                                decoration: BoxDecoration(
+                                  color: isGemini ? AppColors.primary : Colors.transparent,
+                                  borderRadius: BorderRadius.circular(10),
+                                  boxShadow: isGemini
+                                      ? [
+                                          BoxShadow(
+                                            color: AppColors.primary.withValues(alpha: 0.25),
+                                            blurRadius: 6,
+                                            offset: const Offset(0, 2),
+                                          ),
+                                        ]
+                                      : null,
+                                ),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(
+                                      Icons.auto_awesome_rounded,
+                                      size: 15,
+                                      color: isGemini ? Colors.white : (isDark ? AppColors.darkMuted : AppColors.lightMuted),
+                                    ),
+                                    const SizedBox(width: 6),
+                                    Text(
+                                      'Google Gemini',
+                                      style: TextStyle(
+                                        fontSize: 13,
+                                        fontWeight: isGemini ? FontWeight.w700 : FontWeight.w500,
+                                        color: isGemini ? Colors.white : foreground,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 4),
+                          Expanded(
+                            child: GestureDetector(
+                              onTap: () async {
+                                if (isGemini) {
+                                  try {
+                                    await ref
+                                        .read(aiSettingsProvider.notifier)
+                                        .updateAiSettings(provider: 'OPENAI', model: 'gpt-4o-mini');
+                                  } catch (e) {
+                                    if (context.mounted) AppToast.error(context, e);
+                                  }
+                                }
+                              },
+                              child: AnimatedContainer(
+                                duration: const Duration(milliseconds: 180),
+                                padding: const EdgeInsets.symmetric(vertical: 8),
+                                decoration: BoxDecoration(
+                                  color: !isGemini ? AppColors.primary : Colors.transparent,
+                                  borderRadius: BorderRadius.circular(10),
+                                  boxShadow: !isGemini
+                                      ? [
+                                          BoxShadow(
+                                            color: AppColors.primary.withValues(alpha: 0.25),
+                                            blurRadius: 6,
+                                            offset: const Offset(0, 2),
+                                          ),
+                                        ]
+                                      : null,
+                                ),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(
+                                      Icons.psychology_rounded,
+                                      size: 15,
+                                      color: !isGemini ? Colors.white : (isDark ? AppColors.darkMuted : AppColors.lightMuted),
+                                    ),
+                                    const SizedBox(width: 6),
+                                    Text(
+                                      'OpenAI (ChatGPT)',
+                                      style: TextStyle(
+                                        fontSize: 13,
+                                        fontWeight: !isGemini ? FontWeight.w700 : FontWeight.w500,
+                                        color: !isGemini ? Colors.white : foreground,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const Divider(height: 20),
+
+                    // Model Selector
+                    InkWell(
+                      onTap: () => _showModelPicker(
+                        context,
+                        ref,
+                        aiSettings.provider,
+                        aiSettings.model,
+                      ),
+                      borderRadius: BorderRadius.circular(10),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 4),
+                        child: Row(
+                          children: [
+                            _buildIconBadge(
+                              icon: Icons.memory_rounded,
+                              color: const Color(0xFF6366F1),
+                              isDark: isDark,
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Mô hình AI (Model)',
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w600,
+                                      color: foreground,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    aiSettings.model ?? (isGemini ? 'gemini-1.5-flash (Mặc định)' : 'gpt-4o-mini (Mặc định)'),
+                                    style: const TextStyle(fontSize: 12, color: AppColors.primary, fontWeight: FontWeight.w600),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Icon(Icons.arrow_drop_down_rounded, size: 20, color: muted),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const Divider(height: 20),
+
+                    // API Key Status & Actions (BYOK)
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: aiSettings.hasCustomApiKey
+                            ? const Color(0xFF10B981).withValues(alpha: isDark ? 0.12 : 0.08)
+                            : (isDark ? AppColors.darkBackground : const Color(0xFFF8FAFC)),
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(
+                          color: aiSettings.hasCustomApiKey
+                              ? const Color(0xFF10B981).withValues(alpha: 0.35)
+                              : border,
+                        ),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Icon(
+                                aiSettings.hasCustomApiKey ? Icons.verified_rounded : Icons.cloud_done_rounded,
+                                size: 18,
+                                color: aiSettings.hasCustomApiKey ? const Color(0xFF10B981) : muted,
+                              ),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  aiSettings.hasCustomApiKey
+                                      ? 'Đang dùng API Key riêng của bạn'
+                                      : 'Đang dùng API Key mặc định của Finora',
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w700,
+                                    color: aiSettings.hasCustomApiKey ? const Color(0xFF10B981) : foreground,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          if (aiSettings.hasCustomApiKey && aiSettings.maskedApiKey != null) ...[
+                            const SizedBox(height: 6),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                              decoration: BoxDecoration(
+                                color: isDark ? AppColors.darkSurface : Colors.white,
+                                borderRadius: BorderRadius.circular(6),
+                                border: Border.all(color: border),
+                              ),
+                              child: Text(
+                                'Key: ${aiSettings.maskedApiKey}',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontFamily: 'monospace',
+                                  fontWeight: FontWeight.w600,
+                                  color: foreground,
+                                ),
+                              ),
+                            ),
+                          ] else ...[
+                            const SizedBox(height: 4),
+                            Text(
+                              'Nhập API Key cá nhân để thoải mái hỏi đáp AI và phân tích hoá đơn không giới hạn số lượt mỗi ngày.',
+                              style: TextStyle(fontSize: 11.5, color: muted, height: 1.35),
+                            ),
+                          ],
+                          const SizedBox(height: 10),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: OutlinedButton.icon(
+                                  onPressed: () => _showApiKeySheet(
+                                    context,
+                                    ref,
+                                    aiSettings.provider,
+                                    aiSettings.maskedApiKey,
+                                  ),
+                                  icon: Icon(
+                                    aiSettings.hasCustomApiKey ? Icons.edit_rounded : Icons.add_rounded,
+                                    size: 15,
+                                    color: AppColors.primary,
+                                  ),
+                                  label: Text(
+                                    aiSettings.hasCustomApiKey ? 'Đổi API Key' : 'Thêm API Key riêng',
+                                    style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w700, color: AppColors.primary),
+                                  ),
+                                  style: OutlinedButton.styleFrom(
+                                    padding: const EdgeInsets.symmetric(vertical: 8),
+                                    side: const BorderSide(color: AppColors.primary),
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                  ),
+                                ),
+                              ),
+                              if (aiSettings.hasCustomApiKey) ...[
+                                const SizedBox(width: 8),
+                                TextButton.icon(
+                                  onPressed: () async {
+                                    final confirmed = await showConfirmDialog(
+                                      context,
+                                      title: 'Xóa API Key riêng?',
+                                      message:
+                                          'Hệ thống sẽ chuyển về sử dụng API Key mặc định của Finora.',
+                                      confirmText: 'Xóa Key',
+                                    );
+                                    if (confirmed == true && context.mounted) {
+                                      try {
+                                        await ref
+                                            .read(aiSettingsProvider.notifier)
+                                            .deleteApiKey();
+                                        if (context.mounted) {
+                                          AppToast.success(context, 'Đã chuyển về dùng API Key mặc định');
+                                        }
+                                      } catch (e) {
+                                        if (context.mounted) AppToast.error(context, e);
+                                      }
+                                    }
+                                  },
+                                  icon: const Icon(Icons.delete_outline_rounded, size: 15, color: AppColors.danger),
+                                  label: const Text(
+                                    'Xóa Key',
+                                    style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600, color: AppColors.danger),
+                                  ),
+                                  style: TextButton.styleFrom(
+                                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                                  ),
+                                ),
+                              ],
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              // ── 3. QUYỀN RIÊNG TƯ & HIỂN THỊ ──
               FormCard(
                 title: 'Quyền riêng tư & Hiển thị',
                 child: Column(
@@ -784,7 +1506,7 @@ class SettingsScreen extends ConsumerWidget {
                 ),
               ),
 
-              // ── 3. DỮ LIỆU & BỘ NHỚ ĐỆM ──
+              // ── 4. DỮ LIỆU & BỘ NHỚ ĐỆM ──
               FormCard(
                 title: 'Dữ liệu & Bộ nhớ',
                 child: InkWell(
@@ -840,7 +1562,7 @@ class SettingsScreen extends ConsumerWidget {
                 ),
               ),
 
-              // ── 4. THÔNG TIN ỨNG DỤNG & PHÁP LÝ ──
+              // ── 5. THÔNG TIN ỨNG DỤNG & PHÁP LÝ ──
               FormCard(
                 title: 'Thông tin ứng dụng',
                 child: Column(
