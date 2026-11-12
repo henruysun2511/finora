@@ -57,10 +57,10 @@ class DioSettingsApiService implements SettingsApiService {
         await _dio.patch<dynamic>(
           ApiConstants.updateGeneralSettings,
           data: {
-            if (defaultCurrency != null) 'defaultCurrency': defaultCurrency,
-            if (language != null) 'language': language,
+            if (defaultCurrency != null) 'defaultCurrency': defaultCurrency.toUpperCase(),
+            if (language != null) 'language': language.toLowerCase(),
             if (defaultTransactionVisibility != null)
-              'defaultTransactionVisibility': defaultTransactionVisibility,
+              'defaultTransactionVisibility': defaultTransactionVisibility.toUpperCase(),
             if (defaultAmountHidden != null)
               'defaultAmountHidden': defaultAmountHidden,
           },

@@ -6,7 +6,7 @@ class GeneralSettings {
 
   const GeneralSettings({
     this.defaultCurrency = 'VND',
-    this.language = 'VI',
+    this.language = 'vi',
     this.defaultTransactionVisibility = 'PRIVATE',
     this.defaultAmountHidden = true,
   });
@@ -15,7 +15,7 @@ class GeneralSettings {
     if (map == null) return const GeneralSettings();
     return GeneralSettings(
       defaultCurrency: (map['defaultCurrency'] as String?)?.toUpperCase() ?? 'VND',
-      language: (map['language'] as String?)?.toUpperCase() ?? 'VI',
+      language: (map['language'] as String?)?.toLowerCase() ?? 'vi',
       defaultTransactionVisibility:
           (map['defaultTransactionVisibility'] as String?)?.toUpperCase() ?? 'PRIVATE',
       defaultAmountHidden: map['defaultAmountHidden'] as bool? ?? true,
@@ -46,3 +46,4 @@ class GeneralSettings {
     );
   }
 }
+

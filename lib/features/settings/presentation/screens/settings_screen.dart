@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../app/theme/app_colors.dart';
@@ -190,8 +190,8 @@ class SettingsScreen extends ConsumerWidget {
     final border = isDark ? AppColors.darkBorder : AppColors.lightBorder;
 
     final languages = [
-      {'code': 'VI', 'name': 'Tiếng Việt', 'flag': '🇻🇳'},
-      {'code': 'EN', 'name': 'English (US)', 'flag': '🇺🇸'},
+      {'code': 'vi', 'name': 'Tiếng Việt', 'flag': '🇻🇳'},
+      {'code': 'en', 'name': 'English (US)', 'flag': '🇺🇸'},
     ];
 
     showModalBottomSheet<void>(
@@ -250,7 +250,7 @@ class SettingsScreen extends ConsumerWidget {
                     final code = item['code']!;
                     final name = item['name']!;
                     final flag = item['flag']!;
-                    final isSelected = code == currentLang.toUpperCase();
+                    final isSelected = code == currentLang.toLowerCase();
 
                     return ListTile(
                       contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
@@ -318,15 +318,9 @@ class SettingsScreen extends ConsumerWidget {
       },
       {
         'key': 'FRIENDS',
-        'title': 'Bạn bè (Friends)',
-        'subtitle': 'Chia sẻ với bạn bè trong danh sách và nhận phản hồi tin nhắn Locket',
+        'title': 'Bạn bè (Friends & Locket)',
+        'subtitle': 'Chia sẻ với bạn bè trong danh sách và nhận phản hồi tin nhắn',
         'icon': Icons.people_outline_rounded,
-      },
-      {
-        'key': 'PUBLIC',
-        'title': 'Công khai (Public)',
-        'subtitle': 'Hiển thị trên bảng tin cộng đồng người dùng Finora',
-        'icon': Icons.public_rounded,
       },
     ];
 
@@ -543,14 +537,12 @@ class SettingsScreen extends ConsumerWidget {
             orElse: () => {'code': settings.defaultCurrency, 'name': 'Tiền tệ', 'symbol': settings.defaultCurrency},
           );
 
-          final langLabel = settings.language == 'EN' ? 'English (US)' : 'Tiếng Việt';
-          final langFlag = settings.language == 'EN' ? '🇺🇸' : '🇻🇳';
+          final langLabel = settings.language.toLowerCase() == 'en' ? 'English (US)' : 'Tiếng Việt';
+          final langFlag = settings.language.toLowerCase() == 'en' ? '🇺🇸' : '🇻🇳';
 
           final visLabel = settings.defaultTransactionVisibility == 'FRIENDS'
               ? 'Bạn bè (Friends)'
-              : (settings.defaultTransactionVisibility == 'PUBLIC'
-                  ? 'Công khai'
-                  : 'Chỉ mình tôi (Riêng tư)');
+              : 'Chỉ mình tôi (Riêng tư)';
 
           return ListView(
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 32),
