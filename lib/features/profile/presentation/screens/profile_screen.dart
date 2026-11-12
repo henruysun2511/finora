@@ -329,13 +329,6 @@ class ProfileScreen extends ConsumerWidget {
                 ),
                 Divider(height: 20, color: isDark ? AppColors.darkBorder : AppColors.lightBorder),
                 ProfileSettingsTile(
-                  icon: Icons.security_rounded,
-                  title: l10n?.settingsPrivacy ?? 'Bảo mật & Mã PIN',
-                  subtitle: 'Sinh trắc học Face ID, Touch ID',
-                  onTap: () => context.push(RoutePaths.securitySettings),
-                ),
-                Divider(height: 20, color: isDark ? AppColors.darkBorder : AppColors.lightBorder),
-                ProfileSettingsTile(
                   icon: Icons.category_rounded,
                   title: 'Quản lý Danh mục',
                   subtitle: 'Cấu hình danh mục thu chi',
