@@ -102,6 +102,7 @@
   "aiChatScanHint": "Send receipt photo for automatic OCR scanning",
 
   "settingsTitle": "General Settings",
+  "settingsSubtitle": "Currency, language, AI & transaction display",
   "settingsLocalization": "Localization & Currency",
   "settingsCurrency": "Primary Currency",
   "settingsLanguage": "Display Language",

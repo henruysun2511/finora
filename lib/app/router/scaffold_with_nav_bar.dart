@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../l10n/app_localizations.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_text_styles.dart';
 import 'quick_add_modal.dart';
@@ -32,6 +33,7 @@ class ScaffoldWithNavBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final currentIndex = navigationShell.currentIndex;
 
@@ -64,7 +66,7 @@ class ScaffoldWithNavBar extends StatelessWidget {
                 // 1. Tab Trang chủ (Home)
                 _NavItem(
                   icon: Icons.home_rounded,
-                  label: 'Trang chủ',
+                  label: l10n?.navHome ?? 'Trang chủ',
                   isSelected: currentIndex == 0,
                   onTap: () => _onItemTapped(context, 0),
                 ),
@@ -72,7 +74,7 @@ class ScaffoldWithNavBar extends StatelessWidget {
                 // 2. Tab Dashboard (Ngân sách & Sổ GD)
                 _NavItem(
                   icon: Icons.dashboard_rounded,
-                  label: 'Dashboard',
+                  label: l10n?.navTransactions ?? 'Dashboard',
                   isSelected: currentIndex == 1,
                   onTap: () => _onItemTapped(context, 1),
                 ),
@@ -120,7 +122,7 @@ class ScaffoldWithNavBar extends StatelessWidget {
                 // 4. Tab Báo cáo / Nora AI
                 _NavItem(
                   icon: Icons.smart_toy_rounded,
-                  label: 'Nora AI',
+                  label: l10n?.aiChatTitle ?? 'Nora AI',
                   isSelected: currentIndex == 2,
                   onTap: () => _onItemTapped(context, 2),
                 ),
@@ -128,7 +130,7 @@ class ScaffoldWithNavBar extends StatelessWidget {
                 // 5. Tab Cá nhân (Profile)
                 _NavItem(
                   icon: Icons.person_rounded,
-                  label: 'Cá nhân',
+                  label: l10n?.navProfile ?? 'Cá nhân',
                   isSelected: currentIndex == 3,
                   onTap: () => _onItemTapped(context, 3),
                 ),
@@ -156,6 +158,7 @@ class _NavItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final isDark = Theme.of(context).brightness == Brightness.dark;
     const activeColor = AppColors.primary;
     final inactiveColor = isDark ? AppColors.darkMuted : AppColors.lightFaint;

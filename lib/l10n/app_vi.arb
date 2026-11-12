@@ -105,6 +105,7 @@
   "aiChatScanHint": "Gửi ảnh hóa đơn để quét tự động",
 
   "settingsTitle": "Cài đặt chung",
+  "settingsSubtitle": "Tiền tệ, ngôn ngữ, AI & hiển thị giao dịch",
   "settingsLocalization": "Bản địa hóa & Tiền tệ",
   "settingsCurrency": "Đơn vị tiền tệ chính",
   "settingsLanguage": "Ngôn ngữ hiển thị",

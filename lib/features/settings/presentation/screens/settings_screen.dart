@@ -6,6 +6,7 @@ import '../../../../core/widgets/app_toast.dart';
 import '../../../../core/widgets/confirm_dialog.dart';
 import '../../../../core/widgets/form_card.dart';
 import '../../../../core/widgets/page_header.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../domain/models/ai_settings.dart';
 import '../../domain/models/general_settings.dart';
 import '../providers/user_settings_provider.dart';
@@ -865,6 +866,7 @@ class SettingsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final bg = isDark ? AppColors.darkBackground : AppColors.lightBackground;
     final foreground = isDark ? AppColors.darkForeground : AppColors.lightForeground;
@@ -877,8 +879,8 @@ class SettingsScreen extends ConsumerWidget {
     return Scaffold(
       backgroundColor: bg,
       appBar: PageHeader.subPage(
-        title: 'Cài đặt chung',
-        subtitle: 'Tiền tệ, ngôn ngữ, AI & hiển thị giao dịch',
+        title: l10n?.settingsTitle ?? 'Cài đặt chung',
+        subtitle: l10n?.settingsSubtitle ?? 'Tiền tệ, ngôn ngữ, AI & hiển thị giao dịch',
         onBack: () => Navigator.of(context).pop(),
       ),
       body: settingsAsync.when(
@@ -940,7 +942,7 @@ class SettingsScreen extends ConsumerWidget {
             children: [
               // ── 1. BẢN ĐỊA HÓA & TIỀN TỆ ──
               FormCard(
-                title: 'Bản địa hóa & Tiền tệ',
+                title: l10n?.settingsLocalization ?? 'Bản địa hóa & Tiền tệ',
                 child: Column(
                   children: [
                     InkWell(
@@ -961,7 +963,7 @@ class SettingsScreen extends ConsumerWidget {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    'Đơn vị tiền tệ chính',
+                                    l10n?.settingsCurrency ?? 'Đơn vị tiền tệ chính',
                                     style: TextStyle(
                                       fontSize: 14,
                                       fontWeight: FontWeight.w600,
@@ -970,7 +972,9 @@ class SettingsScreen extends ConsumerWidget {
                                   ),
                                   const SizedBox(height: 2),
                                   Text(
-                                    'Đơn vị gốc hiển thị trên ví, ngân sách & báo cáo',
+                                    settings.language.toLowerCase() == 'en'
+                                        ? 'Base currency displayed on wallets, budgets & reports'
+                                        : 'Đơn vị gốc hiển thị trên ví, ngân sách & báo cáo',
                                     style: TextStyle(fontSize: 12, color: muted),
                                   ),
                                 ],
@@ -1025,7 +1029,7 @@ class SettingsScreen extends ConsumerWidget {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    'Ngôn ngữ hiển thị',
+                                    l10n?.settingsLanguage ?? 'Ngôn ngữ hiển thị',
                                     style: TextStyle(
                                       fontSize: 14,
                                       fontWeight: FontWeight.w600,
@@ -1034,7 +1038,9 @@ class SettingsScreen extends ConsumerWidget {
                                   ),
                                   const SizedBox(height: 2),
                                   Text(
-                                    'Ngôn ngữ toàn bộ giao diện Finora',
+                                    settings.language.toLowerCase() == 'en'
+                                        ? 'Language for all Finora interface screens'
+                                        : 'Ngôn ngữ toàn bộ giao diện Finora',
                                     style: TextStyle(fontSize: 12, color: muted),
                                   ),
                                 ],
@@ -1076,7 +1082,7 @@ class SettingsScreen extends ConsumerWidget {
 
               // ── 2. CẤU HÌNH MÔ HÌNH AI & API KEY (GOOGLE GEMINI) ──
               FormCard(
-                title: 'Mô hình AI & API Key (Google Gemini)',
+                title: l10n?.settingsAiConfig ?? 'Mô hình AI & API Key (Google Gemini)',
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -1327,7 +1333,7 @@ class SettingsScreen extends ConsumerWidget {
 
               // ── 3. QUYỀN RIÊNG TƯ & HIỂN THỊ ──
               FormCard(
-                title: 'Quyền riêng tư & Hiển thị',
+                title: l10n?.settingsPrivacy ?? 'Quyền riêng tư & Hiển thị',
                 child: Column(
                   children: [
                     SwitchListTile(
@@ -1338,7 +1344,7 @@ class SettingsScreen extends ConsumerWidget {
                         isDark: isDark,
                       ),
                       title: Text(
-                        'Mặc định ẩn số tiền',
+                        l10n?.settingsDefaultAmountHidden ?? 'Mặc định ẩn số tiền',
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
@@ -1346,7 +1352,9 @@ class SettingsScreen extends ConsumerWidget {
                         ),
                       ),
                       subtitle: Text(
-                        'Tự động che số dư bằng •••••• khi mở ứng dụng ở nơi công cộng',
+                        settings.language.toLowerCase() == 'en'
+                            ? 'Automatically mask balances with •••••• in public places'
+                            : 'Tự động che số dư bằng •••••• khi mở ứng dụng ở nơi công cộng',
                         style: TextStyle(fontSize: 12, color: muted),
                       ),
                       value: settings.defaultAmountHidden,
@@ -1379,7 +1387,7 @@ class SettingsScreen extends ConsumerWidget {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    'Quyền riêng tư bài đăng mặc định',
+                                    l10n?.settingsDefaultVisibility ?? 'Quyền riêng tư bài đăng mặc định',
                                     style: TextStyle(
                                       fontSize: 14,
                                       fontWeight: FontWeight.w600,
@@ -1428,20 +1436,21 @@ class SettingsScreen extends ConsumerWidget {
 
               // ── 4. DỮ LIỆU & BỘ NHỚ ĐỆM ──
               FormCard(
-                title: 'Dữ liệu & Bộ nhớ',
+                title: settings.language.toLowerCase() == 'en' ? 'Data & Cache' : 'Dữ liệu & Bộ nhớ',
                 child: InkWell(
                   onTap: () async {
                     final confirmed = await showConfirmDialog(
                       context,
-                      title: 'Xóa bộ nhớ đệm?',
-                      message:
-                          'Hành động này sẽ giải phóng dung lượng ảnh hóa đơn, ảnh đại diện đã tải tạm thời. Dữ liệu tài chính của bạn hoàn toàn an toàn.',
-                      confirmText: 'Xóa ngay',
+                      title: settings.language.toLowerCase() == 'en' ? 'Clear Image Cache?' : 'Xóa bộ nhớ đệm?',
+                      message: settings.language.toLowerCase() == 'en'
+                          ? 'This will free up local storage for receipt and avatar images. Your financial data is completely safe.'
+                          : 'Hành động này sẽ giải phóng dung lượng ảnh hóa đơn, ảnh đại diện đã tải tạm thời. Dữ liệu tài chính của bạn hoàn toàn an toàn.',
+                      confirmText: settings.language.toLowerCase() == 'en' ? 'Clear Now' : 'Xóa ngay',
                     );
                     if (confirmed == true && context.mounted) {
                       PaintingBinding.instance.imageCache.clear();
                       PaintingBinding.instance.imageCache.clearLiveImages();
-                      AppToast.success(context, 'Đã giải phóng bộ nhớ đệm thành công!');
+                      AppToast.success(context, settings.language.toLowerCase() == 'en' ? 'Image cache cleared!' : 'Đã giải phóng bộ nhớ đệm thành công!');
                     }
                   },
                   borderRadius: BorderRadius.circular(10),
@@ -1460,7 +1469,7 @@ class SettingsScreen extends ConsumerWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'Xóa bộ nhớ đệm (Clear Cache)',
+                                l10n?.settingsClearCache ?? 'Xóa bộ nhớ đệm (Clear Cache)',
                                 style: TextStyle(
                                   fontSize: 14,
                                   fontWeight: FontWeight.w600,
@@ -1469,7 +1478,9 @@ class SettingsScreen extends ConsumerWidget {
                               ),
                               const SizedBox(height: 2),
                               Text(
-                                'Dọn dẹp ảnh tạm thời để ứng dụng hoạt động nhẹ nhàng hơn',
+                                settings.language.toLowerCase() == 'en'
+                                    ? 'Clean up temporary images to make app run lighter'
+                                    : 'Dọn dẹp ảnh tạm thời để ứng dụng hoạt động nhẹ nhàng hơn',
                                 style: TextStyle(fontSize: 12, color: muted),
                               ),
                             ],
@@ -1484,7 +1495,7 @@ class SettingsScreen extends ConsumerWidget {
 
               // ── 5. THÔNG TIN ỨNG DỤNG & PHÁP LÝ ──
               FormCard(
-                title: 'Thông tin ứng dụng',
+                title: l10n?.settingsAppInfo ?? 'Thông tin ứng dụng',
                 child: Column(
                   children: [
                     Padding(
@@ -1559,7 +1570,7 @@ class SettingsScreen extends ConsumerWidget {
                             const SizedBox(width: 12),
                             Expanded(
                               child: Text(
-                                'Chính sách bảo mật dữ liệu',
+                                l10n?.settingsPrivacyPolicy ?? 'Chính sách bảo mật dữ liệu',
                                 style: TextStyle(
                                   fontSize: 14,
                                   fontWeight: FontWeight.w600,
@@ -1576,7 +1587,7 @@ class SettingsScreen extends ConsumerWidget {
                     InkWell(
                       onTap: () => _showTextDialog(
                         context,
-                        'Điều khoản dịch vụ',
+                        l10n?.settingsTerms ?? 'Điều khoản dịch vụ',
                         'Chào mừng bạn đến với Finora - Trợ lý quản lý tài chính thông minh.\n\n'
                         '1. Điều kiện sử dụng: Người dùng chịu trách nhiệm về tính chính xác của các giao dịch đã nhập.\n'
                         '2. Dịch vụ AI & Mascot: Linh vật đưa ra các gợi ý tham khảo dựa trên quy tắc quản lý chi tiêu và không chịu trách nhiệm cho các quyết định đầu tư thực tế.\n'
@@ -1595,7 +1606,7 @@ class SettingsScreen extends ConsumerWidget {
                             const SizedBox(width: 12),
                             Expanded(
                               child: Text(
-                                'Điều khoản dịch vụ',
+                                l10n?.settingsTerms ?? 'Điều khoản dịch vụ',
                                 style: TextStyle(
                                   fontSize: 14,
                                   fontWeight: FontWeight.w600,
