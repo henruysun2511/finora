@@ -52,6 +52,7 @@ class SettingsScreen extends ConsumerWidget {
     final foreground = isDark ? AppColors.darkForeground : AppColors.lightForeground;
     final muted = isDark ? AppColors.darkMuted : AppColors.lightMuted;
     final border = isDark ? AppColors.darkBorder : AppColors.lightBorder;
+    final border = isDark ? AppColors.darkBorder : AppColors.lightBorder;
 
     showModalBottomSheet<void>(
       context: context,
@@ -190,6 +191,7 @@ class SettingsScreen extends ConsumerWidget {
     final foreground = isDark ? AppColors.darkForeground : AppColors.lightForeground;
     final muted = isDark ? AppColors.darkMuted : AppColors.lightMuted;
     final border = isDark ? AppColors.darkBorder : AppColors.lightBorder;
+    final border = isDark ? AppColors.darkBorder : AppColors.lightBorder;
 
     final languages = [
       {'code': 'vi', 'name': 'Tiếng Việt', 'flag': '🇻🇳'},
@@ -309,6 +311,7 @@ class SettingsScreen extends ConsumerWidget {
     final surface = isDark ? AppColors.darkSurface : Colors.white;
     final foreground = isDark ? AppColors.darkForeground : AppColors.lightForeground;
     final muted = isDark ? AppColors.darkMuted : AppColors.lightMuted;
+    final border = isDark ? AppColors.darkBorder : AppColors.lightBorder;
     final border = isDark ? AppColors.darkBorder : AppColors.lightBorder;
 
     final visOptions = [
@@ -458,6 +461,7 @@ class SettingsScreen extends ConsumerWidget {
     final surface = isDark ? AppColors.darkSurface : Colors.white;
     final foreground = isDark ? AppColors.darkForeground : AppColors.lightForeground;
     final muted = isDark ? AppColors.darkMuted : AppColors.lightMuted;
+    final border = isDark ? AppColors.darkBorder : AppColors.lightBorder;
 
     const models = [
       {
@@ -595,6 +599,7 @@ class SettingsScreen extends ConsumerWidget {
     final surface = isDark ? AppColors.darkSurface : Colors.white;
     final foreground = isDark ? AppColors.darkForeground : AppColors.lightForeground;
     final muted = isDark ? AppColors.darkMuted : AppColors.lightMuted;
+    final border = isDark ? AppColors.darkBorder : AppColors.lightBorder;
     final border = isDark ? AppColors.darkBorder : AppColors.lightBorder;
 
     final keyCtrl = TextEditingController();
@@ -832,23 +837,13 @@ class SettingsScreen extends ConsumerWidget {
       },
     );
   }
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            );
-          },
-        );
-      },
-    );
-  }
 
   void _showTextDialog(BuildContext context, String title, String content) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final surface = isDark ? AppColors.darkSurface : Colors.white;
     final foreground = isDark ? AppColors.darkForeground : AppColors.lightForeground;
     final muted = isDark ? AppColors.darkMuted : AppColors.lightMuted;
+    final border = isDark ? AppColors.darkBorder : AppColors.lightBorder;
 
     showDialog<void>(
       context: context,
@@ -878,6 +873,7 @@ class SettingsScreen extends ConsumerWidget {
     final bg = isDark ? AppColors.darkBackground : AppColors.lightBackground;
     final foreground = isDark ? AppColors.darkForeground : AppColors.lightForeground;
     final muted = isDark ? AppColors.darkMuted : AppColors.lightMuted;
+    final border = isDark ? AppColors.darkBorder : AppColors.lightBorder;
     final border = isDark ? AppColors.darkBorder : AppColors.lightBorder;
 
     final settingsAsync = ref.watch(generalSettingsProvider);

@@ -237,14 +237,9 @@ final appLocaleProvider = Provider<Locale>((ref) {
   return Locale(lang == 'en' ? 'en' : 'vi');
 });
 
-/// Provider cung cấp mã tiền tệ mặc định toàn cục ('VND', 'USD', 'EUR', ...)
-final defaultCurrencyProvider = Provider<String>((ref) {
-  return ref.watch(generalSettingsProvider).valueOrNull?.defaultCurrency ?? 'VND';
-});
-
 /// Provider cung cấp ký hiệu tiền tệ mặc định toàn cục ('₫', '$', '€', ...)
 final defaultCurrencySymbolProvider = Provider<String>((ref) {
-  final code = ref.watch(defaultCurrencyProvider);
+  final code = ref.watch(defaultCurrencyProvider).valueOrNull ?? 'VND';
   return CurrencyFormatter.symbolFor(code);
 });
 
