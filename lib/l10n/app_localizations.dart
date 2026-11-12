@@ -626,6 +626,12 @@ abstract class AppLocalizations {
   /// **'Cài đặt chung'**
   String get settingsTitle;
 
+  /// No description provided for @settingsSubtitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Tiền tệ, ngôn ngữ, AI & hiển thị giao dịch'**
+  String get settingsSubtitle;
+
   /// No description provided for @settingsLocalization.
   ///
   /// In vi, this message translates to:

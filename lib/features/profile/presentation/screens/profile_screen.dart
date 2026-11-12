@@ -7,7 +7,7 @@ import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_text_styles.dart';
 import '../../../../app/theme/theme_mode_provider.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
-import '../../../l10n/app_localizations.dart';
+import 'package:finora_mb/l10n/app_localizations.dart';
 import '../widgets/profile_settings_tile.dart';
 
 class ProfileScreen extends ConsumerWidget {

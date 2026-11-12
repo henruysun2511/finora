@@ -274,6 +274,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsTitle => 'General Settings';
 
   @override
+  String get settingsSubtitle => 'Currency, language, AI & transaction display';
+
+  @override
   String get settingsLocalization => 'Localization & Currency';
 
   @override

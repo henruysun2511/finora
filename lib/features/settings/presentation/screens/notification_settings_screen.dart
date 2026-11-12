@@ -5,7 +5,7 @@ import '../../../../app/theme/app_colors.dart';
 import '../../../../core/widgets/app_toast.dart';
 import '../../../../core/widgets/form_card.dart';
 import '../../../../core/widgets/page_header.dart';
-import '../../../l10n/app_localizations.dart';
+import 'package:finora_mb/l10n/app_localizations.dart';
 import '../providers/user_settings_provider.dart';
 
 /// Màn hình Cài đặt Thông báo chuẩn FinTech Design System

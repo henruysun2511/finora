@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../features/settings/presentation/providers/user_settings_provider.dart';
-import '../l10n/app_localizations.dart';
+import 'package:finora_mb/l10n/app_localizations.dart';
 import 'router/app_router.dart';
 import 'theme/app_theme.dart';
 import 'theme/theme_mode_provider.dart';

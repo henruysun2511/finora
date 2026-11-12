@@ -273,6 +273,9 @@ class AppLocalizationsVi extends AppLocalizations {
   String get settingsTitle => 'Cài đặt chung';
 
   @override
+  String get settingsSubtitle => 'Tiền tệ, ngôn ngữ, AI & hiển thị giao dịch';
+
+  @override
   String get settingsLocalization => 'Bản địa hóa & Tiền tệ';
 
   @override
