@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../settings/presentation/providers/user_settings_provider.dart';
 import '../../domain/models/create_transaction_input.dart';
 import '../../domain/models/transaction_enums.dart';
 import 'transaction_form_state.dart';
@@ -14,13 +15,23 @@ final transactionFormProvider =
 
 class TransactionFormNotifier extends StateNotifier<TransactionFormState> {
   TransactionFormNotifier(this._ref)
-      : super(TransactionFormState(
-          transactionDate: DateTime.now(),
-          accountId: 'acc-cash',
-          accountName: 'Tiền mặt (Ví da)',
-        ));
+      : super(_buildInitialState(_ref));
 
   final Ref _ref;
+
+  static TransactionFormState _buildInitialState(Ref ref) {
+    final generalSettings = ref.read(generalSettingsProvider).valueOrNull;
+    final defaultHidden = generalSettings?.defaultAmountHidden ?? false;
+    final defaultVisibility = generalSettings?.defaultTransactionVisibility ?? 'PRIVATE';
+
+    return TransactionFormState(
+      transactionDate: DateTime.now(),
+      accountId: 'acc-cash',
+      accountName: 'Tiền mặt (Ví da)',
+      amountHidden: defaultHidden,
+      visibility: defaultVisibility,
+    );
+  }
 
   void setType(TransactionType type) {
     state = state.copyWith(type: type);

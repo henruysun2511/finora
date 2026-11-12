@@ -6,6 +6,8 @@ import '../../../../core/widgets/app_toast.dart';
 import '../../../../core/widgets/confirm_dialog.dart';
 import '../../../../core/widgets/form_card.dart';
 import '../../../../core/widgets/page_header.dart';
+import '../../domain/models/ai_settings.dart';
+import '../../domain/models/general_settings.dart';
 import '../providers/user_settings_provider.dart';
 
 /// Màn hình Cài đặt chung chuẩn FinTech Design System
@@ -450,47 +452,30 @@ class SettingsScreen extends ConsumerWidget {
   void _showModelPicker(
     BuildContext context,
     WidgetRef ref,
-    String provider,
     String? currentModel,
   ) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final surface = isDark ? AppColors.darkSurface : Colors.white;
     final foreground = isDark ? AppColors.darkForeground : AppColors.lightForeground;
     final muted = isDark ? AppColors.darkMuted : AppColors.lightMuted;
-    final border = isDark ? AppColors.darkBorder : AppColors.lightBorder;
 
-    final isGemini = provider == 'GEMINI';
-
-    final models = isGemini
-        ? [
-            {
-              'id': 'gemini-1.5-flash',
-              'name': 'Gemini 1.5 Flash (Mặc định)',
-              'desc': 'Tối ưu tốc độ cao, nhận diện hóa đơn cực nhanh & tiết kiệm quota',
-            },
-            {
-              'id': 'gemini-1.5-pro',
-              'name': 'Gemini 1.5 Pro (Chuyên sâu)',
-              'desc': 'Khả năng tư duy logic và phân tích xu hướng tài chính phức tạp',
-            },
-            {
-              'id': 'gemini-2.0-flash',
-              'name': 'Gemini 2.0 Flash (Thử nghiệm)',
-              'desc': 'Mô hình thế hệ mới nhất của Google với tốc độ xử lý siêu tốc',
-            },
-          ]
-        : [
-            {
-              'id': 'gpt-4o-mini',
-              'name': 'GPT-4o Mini (Mặc định)',
-              'desc': 'Mô hình thông minh, tốc độ cao và chi phí API tối ưu của OpenAI',
-            },
-            {
-              'id': 'gpt-4o',
-              'name': 'GPT-4o (Toàn năng)',
-              'desc': 'Mô hình hàng đầu của OpenAI cho năng lực phân tích tài chính cao nhất',
-            },
-          ];
+    const models = [
+      {
+        'id': 'gemini-1.5-flash',
+        'name': 'Gemini 1.5 Flash (Mặc định)',
+        'desc': 'Tối ưu tốc độ cao, nhận diện hóa đơn cực nhanh & miễn phí hạn mức',
+      },
+      {
+        'id': 'gemini-2.0-flash',
+        'name': 'Gemini 2.0 Flash (Thế hệ mới)',
+        'desc': 'Mô hình thế hệ mới nhất của Google với tốc độ xử lý siêu tốc',
+      },
+      {
+        'id': 'gemini-1.5-pro',
+        'name': 'Gemini 1.5 Pro (Chuyên sâu)',
+        'desc': 'Khả năng tư duy logic và phân tích xu hướng tài chính chuyên sâu',
+      },
+    ];
 
     showModalBottomSheet<void>(
       context: context,
@@ -521,8 +506,10 @@ class SettingsScreen extends ConsumerWidget {
                   padding: const EdgeInsets.fromLTRB(20, 4, 20, 10),
                   child: Row(
                     children: [
+                      const Icon(Icons.auto_awesome_rounded, color: AppColors.primary, size: 20),
+                      const SizedBox(width: 8),
                       Text(
-                        'Chọn Model AI (${isGemini ? 'Google' : 'OpenAI'})',
+                        'Chọn mô hình Google Gemini',
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w700,
@@ -602,7 +589,6 @@ class SettingsScreen extends ConsumerWidget {
   void _showApiKeySheet(
     BuildContext context,
     WidgetRef ref,
-    String provider,
     String? currentKey,
   ) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -611,7 +597,6 @@ class SettingsScreen extends ConsumerWidget {
     final muted = isDark ? AppColors.darkMuted : AppColors.lightMuted;
     final border = isDark ? AppColors.darkBorder : AppColors.lightBorder;
 
-    final isGemini = provider == 'GEMINI';
     final keyCtrl = TextEditingController();
     bool obscure = true;
     bool isSaving = false;
@@ -658,13 +643,12 @@ class SettingsScreen extends ConsumerWidget {
                               width: 36,
                               height: 36,
                               decoration: BoxDecoration(
-                                color: (isGemini ? const Color(0xFF0284C7) : const Color(0xFF10B981))
-                                    .withValues(alpha: 0.15),
+                                color: const Color(0xFF0284C7).withValues(alpha: 0.15),
                                 borderRadius: BorderRadius.circular(10),
                               ),
-                              child: Icon(
-                                isGemini ? Icons.auto_awesome_rounded : Icons.psychology_rounded,
-                                color: isGemini ? const Color(0xFF0284C7) : const Color(0xFF10B981),
+                              child: const Icon(
+                                Icons.auto_awesome_rounded,
+                                color: Color(0xFF0284C7),
                                 size: 20,
                               ),
                             ),
@@ -674,7 +658,7 @@ class SettingsScreen extends ConsumerWidget {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    'Thiết lập API Key cá nhân',
+                                    'Thiết lập Gemini API Key cá nhân',
                                     style: TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.w700,
@@ -682,7 +666,7 @@ class SettingsScreen extends ConsumerWidget {
                                     ),
                                   ),
                                   Text(
-                                    'Dành cho nhà cung cấp: ${isGemini ? 'Google Gemini' : 'OpenAI'}',
+                                    'Dành cho: Google Gemini API (Miễn phí 100%)',
                                     style: TextStyle(fontSize: 12, color: muted),
                                   ),
                                 ],
@@ -711,7 +695,7 @@ class SettingsScreen extends ConsumerWidget {
                                       size: 16, color: AppColors.primary),
                                   const SizedBox(width: 6),
                                   Text(
-                                    'Cách lấy API Key hoàn toàn miễn phí:',
+                                    'Cách lấy Google Gemini API Key miễn phí:',
                                     style: TextStyle(
                                       fontSize: 12.5,
                                       fontWeight: FontWeight.w700,
@@ -722,17 +706,13 @@ class SettingsScreen extends ConsumerWidget {
                               ),
                               const SizedBox(height: 6),
                               Text(
-                                isGemini
-                                    ? '1. Truy cập https://aistudio.google.com/app/apikey\n'
-                                      '2. Đăng nhập Google và bấm "Create API key"\n'
-                                      '3. Sao chép và dán khóa (bắt đầu bằng AIzaSy...)'
-                                    : '1. Truy cập https://platform.openai.com/api-keys\n'
-                                      '2. Đăng nhập và bấm "Create new secret key"\n'
-                                      '3. Sao chép và dán khóa (bắt đầu bằng sk-...)',
+                                '1. Truy cập https://aistudio.google.com/app/apikey\n'
+                                '2. Đăng nhập tài khoản Google và chọn "Create API key"\n'
+                                '3. Sao chép và dán khóa (bắt đầu bằng AIzaSy...)',
                                 style: TextStyle(
                                   fontSize: 12,
                                   color: muted,
-                                  height: 1.4,
+                                  height: 1.45,
                                 ),
                               ),
                             ],
@@ -740,7 +720,7 @@ class SettingsScreen extends ConsumerWidget {
                         ),
                         const SizedBox(height: 16),
                         Text(
-                          'Nhập Secret API Key:',
+                          'Nhập Google Gemini API Key:',
                           style: TextStyle(
                             fontSize: 13.5,
                             fontWeight: FontWeight.w700,
@@ -754,7 +734,7 @@ class SettingsScreen extends ConsumerWidget {
                           autofocus: true,
                           style: TextStyle(fontSize: 13.5, color: foreground, fontFamily: 'monospace'),
                           decoration: InputDecoration(
-                            hintText: isGemini ? 'AIzaSy...' : 'sk-...',
+                            hintText: 'AIzaSy...',
                             hintStyle: TextStyle(fontSize: 13, color: muted),
                             filled: true,
                             fillColor: isDark ? AppColors.darkBackground : const Color(0xFFF1F5F9),
@@ -788,7 +768,7 @@ class SettingsScreen extends ConsumerWidget {
                             const SizedBox(width: 6),
                             Expanded(
                               child: Text(
-                                'Khóa được bảo mật và chỉ dùng để gọi AI cho tài khoản của bạn.',
+                                'Khóa được mã hóa bảo mật và chỉ dùng riêng cho tài khoản của bạn.',
                                 style: TextStyle(fontSize: 11.5, color: muted),
                               ),
                             ),
@@ -817,10 +797,10 @@ class SettingsScreen extends ConsumerWidget {
                                     try {
                                       await ref
                                           .read(aiSettingsProvider.notifier)
-                                          .updateAiSettings(apiKey: val);
+                                          .updateAiSettings(provider: 'GEMINI', apiKey: val);
                                       if (context.mounted) {
                                         Navigator.pop(ctx);
-                                        AppToast.success(context, 'Đã lưu API Key cá nhân thành công!');
+                                        AppToast.success(context, 'Đã lưu Google Gemini API Key thành công!');
                                       }
                                     } catch (e) {
                                       setModalState(() => isSaving = false);
@@ -836,11 +816,22 @@ class SettingsScreen extends ConsumerWidget {
                                     child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
                                   )
                                 : const Text(
-                                    'Lưu API Key',
+                                    'Lưu Gemini API Key',
                                     style: TextStyle(fontSize: 14.5, fontWeight: FontWeight.w700),
                                   ),
                           ),
                         ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
                       ],
                     ),
                   ),
@@ -952,7 +943,6 @@ class SettingsScreen extends ConsumerWidget {
               : 'Chỉ mình tôi (Riêng tư)';
 
           final aiSettings = aiSettingsAsync.valueOrNull ?? const AiSettings();
-          final isGemini = aiSettings.provider == 'GEMINI';
 
           return ListView(
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 32),
@@ -1093,129 +1083,70 @@ class SettingsScreen extends ConsumerWidget {
                 ),
               ),
 
-              // ── 2. CẤU HÌNH MÔ HÌNH AI & API KEY (BYOK) ──
+              // ── 2. CẤU HÌNH MÔ HÌNH AI & API KEY (GOOGLE GEMINI) ──
               FormCard(
-                title: 'Mô hình AI & API Key (BYOK)',
+                title: 'Mô hình AI & API Key (Google Gemini)',
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Provider Segmented Toggle
-                    Text(
-                      'Nhà cung cấp AI:',
-                      style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: foreground),
-                    ),
-                    const SizedBox(height: 8),
+                    // Provider Badge (Google Gemini Only)
                     Container(
-                      padding: const EdgeInsets.all(4),
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                       decoration: BoxDecoration(
-                        color: isDark ? AppColors.darkBackground : const Color(0xFFF1F5F9),
-                        borderRadius: BorderRadius.circular(14),
-                        border: Border.all(color: border),
+                        color: AppColors.primary.withValues(alpha: isDark ? 0.18 : 0.08),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: AppColors.primary.withValues(alpha: 0.25)),
                       ),
                       child: Row(
                         children: [
-                          Expanded(
-                            child: GestureDetector(
-                              onTap: () async {
-                                if (!isGemini) {
-                                  try {
-                                    await ref
-                                        .read(aiSettingsProvider.notifier)
-                                        .updateAiSettings(provider: 'GEMINI', model: 'gemini-1.5-flash');
-                                  } catch (e) {
-                                    if (context.mounted) AppToast.error(context, e);
-                                  }
-                                }
-                              },
-                              child: AnimatedContainer(
-                                duration: const Duration(milliseconds: 180),
-                                padding: const EdgeInsets.symmetric(vertical: 8),
-                                decoration: BoxDecoration(
-                                  color: isGemini ? AppColors.primary : Colors.transparent,
-                                  borderRadius: BorderRadius.circular(10),
-                                  boxShadow: isGemini
-                                      ? [
-                                          BoxShadow(
-                                            color: AppColors.primary.withValues(alpha: 0.25),
-                                            blurRadius: 6,
-                                            offset: const Offset(0, 2),
-                                          ),
-                                        ]
-                                      : null,
-                                ),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Icon(
-                                      Icons.auto_awesome_rounded,
-                                      size: 15,
-                                      color: isGemini ? Colors.white : (isDark ? AppColors.darkMuted : AppColors.lightMuted),
-                                    ),
-                                    const SizedBox(width: 6),
-                                    Text(
-                                      'Google Gemini',
-                                      style: TextStyle(
-                                        fontSize: 13,
-                                        fontWeight: isGemini ? FontWeight.w700 : FontWeight.w500,
-                                        color: isGemini ? Colors.white : foreground,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
+                          Container(
+                            width: 32,
+                            height: 32,
+                            decoration: BoxDecoration(
+                              color: AppColors.primary,
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: const Icon(
+                              Icons.auto_awesome_rounded,
+                              size: 16,
+                              color: Colors.white,
                             ),
                           ),
-                          const SizedBox(width: 4),
+                          const SizedBox(width: 10),
                           Expanded(
-                            child: GestureDetector(
-                              onTap: () async {
-                                if (isGemini) {
-                                  try {
-                                    await ref
-                                        .read(aiSettingsProvider.notifier)
-                                        .updateAiSettings(provider: 'OPENAI', model: 'gpt-4o-mini');
-                                  } catch (e) {
-                                    if (context.mounted) AppToast.error(context, e);
-                                  }
-                                }
-                              },
-                              child: AnimatedContainer(
-                                duration: const Duration(milliseconds: 180),
-                                padding: const EdgeInsets.symmetric(vertical: 8),
-                                decoration: BoxDecoration(
-                                  color: !isGemini ? AppColors.primary : Colors.transparent,
-                                  borderRadius: BorderRadius.circular(10),
-                                  boxShadow: !isGemini
-                                      ? [
-                                          BoxShadow(
-                                            color: AppColors.primary.withValues(alpha: 0.25),
-                                            blurRadius: 6,
-                                            offset: const Offset(0, 2),
-                                          ),
-                                        ]
-                                      : null,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text(
+                                  'Google Gemini AI',
+                                  style: TextStyle(
+                                    fontSize: 13.5,
+                                    fontWeight: FontWeight.w700,
+                                    color: AppColors.primary,
+                                  ),
                                 ),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Icon(
-                                      Icons.psychology_rounded,
-                                      size: 15,
-                                      color: !isGemini ? Colors.white : (isDark ? AppColors.darkMuted : AppColors.lightMuted),
-                                    ),
-                                    const SizedBox(width: 6),
-                                    Text(
-                                      'OpenAI (ChatGPT)',
-                                      style: TextStyle(
-                                        fontSize: 13,
-                                        fontWeight: !isGemini ? FontWeight.w700 : FontWeight.w500,
-                                        color: !isGemini ? Colors.white : foreground,
-                                      ),
-                                    ),
-                                  ],
+                                Text(
+                                  'Trợ lý tài chính thông minh của Finora',
+                                  style: TextStyle(
+                                    fontSize: 11.5,
+                                    color: muted,
+                                  ),
                                 ),
+                              ],
+                            ),
+                          ),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3.5),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF10B981).withValues(alpha: 0.15),
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: const Text(
+                              'Miễn phí',
+                              style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w700,
+                                color: Color(0xFF10B981),
                               ),
                             ),
                           ),
@@ -1229,7 +1160,6 @@ class SettingsScreen extends ConsumerWidget {
                       onTap: () => _showModelPicker(
                         context,
                         ref,
-                        aiSettings.provider,
                         aiSettings.model,
                       ),
                       borderRadius: BorderRadius.circular(10),
@@ -1248,7 +1178,7 @@ class SettingsScreen extends ConsumerWidget {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    'Mô hình AI (Model)',
+                                    'Mô hình Gemini (Model)',
                                     style: TextStyle(
                                       fontSize: 14,
                                       fontWeight: FontWeight.w600,
@@ -1257,7 +1187,7 @@ class SettingsScreen extends ConsumerWidget {
                                   ),
                                   const SizedBox(height: 2),
                                   Text(
-                                    aiSettings.model ?? (isGemini ? 'gemini-1.5-flash (Mặc định)' : 'gpt-4o-mini (Mặc định)'),
+                                    aiSettings.model ?? 'gemini-1.5-flash (Mặc định)',
                                     style: const TextStyle(fontSize: 12, color: AppColors.primary, fontWeight: FontWeight.w600),
                                   ),
                                 ],
@@ -1343,7 +1273,6 @@ class SettingsScreen extends ConsumerWidget {
                                   onPressed: () => _showApiKeySheet(
                                     context,
                                     ref,
-                                    aiSettings.provider,
                                     aiSettings.maskedApiKey,
                                   ),
                                   icon: Icon(

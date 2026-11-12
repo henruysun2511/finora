@@ -1,9 +1,15 @@
+import 'dart:ui';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/network/dio_client.dart';
+import '../../../../core/utils/currency_formatter.dart';
 import '../../data/services/settings_api_service.dart';
 import '../../domain/models/ai_settings.dart';
 import '../../domain/models/general_settings.dart';
 import '../../domain/models/notification_preferences.dart';
+
+export '../../domain/models/ai_settings.dart';
+export '../../domain/models/general_settings.dart';
+export '../../domain/models/notification_preferences.dart';
 
 final settingsApiServiceProvider = Provider<SettingsApiService>((ref) {
   return DioSettingsApiService(ref.watch(dioProvider));
@@ -20,7 +26,9 @@ class GeneralSettingsNotifier extends AsyncNotifier<GeneralSettings> {
     final service = ref.watch(settingsApiServiceProvider);
     try {
       final data = await service.getSettings();
-      return GeneralSettings.fromMap(data);
+      final settings = GeneralSettings.fromMap(data);
+      CurrencyFormatter.defaultCurrency = settings.defaultCurrency;
+      return settings;
     } catch (_) {
       return const GeneralSettings();
     }
@@ -39,6 +47,10 @@ class GeneralSettingsNotifier extends AsyncNotifier<GeneralSettings> {
       defaultTransactionVisibility: defaultTransactionVisibility,
       defaultAmountHidden: defaultAmountHidden,
     );
+
+    if (defaultCurrency != null && defaultCurrency.trim().isNotEmpty) {
+      CurrencyFormatter.defaultCurrency = defaultCurrency.trim().toUpperCase();
+    }
 
     // Optimistic update
     state = AsyncData(updated);
@@ -218,4 +230,21 @@ class AiSettingsNotifier extends AsyncNotifier<AiSettings> {
     }
   }
 }
+
+/// Provider cung cấp Locale hiện tại theo thiết lập của người dùng ('vi' hoặc 'en')
+final appLocaleProvider = Provider<Locale>((ref) {
+  final lang = ref.watch(generalSettingsProvider).valueOrNull?.language.toLowerCase();
+  return Locale(lang == 'en' ? 'en' : 'vi');
+});
+
+/// Provider cung cấp mã tiền tệ mặc định toàn cục ('VND', 'USD', 'EUR', ...)
+final defaultCurrencyProvider = Provider<String>((ref) {
+  return ref.watch(generalSettingsProvider).valueOrNull?.defaultCurrency ?? 'VND';
+});
+
+/// Provider cung cấp ký hiệu tiền tệ mặc định toàn cục ('₫', '$', '€', ...)
+final defaultCurrencySymbolProvider = Provider<String>((ref) {
+  final code = ref.watch(defaultCurrencyProvider);
+  return CurrencyFormatter.symbolFor(code);
+});
 
