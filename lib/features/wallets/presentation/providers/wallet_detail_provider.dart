@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/network/dio_client.dart';
 import '../../../accounts/domain/models/account_model.dart';
 import '../../data/dto/invite_member_request.dart';
 import '../../data/dto/update_member_role_request.dart';
@@ -118,4 +119,66 @@ class WalletDetailActions {
 final walletDetailActionsProvider =
     Provider.family<WalletDetailActions, String>((ref, walletId) {
   return WalletDetailActions(ref, walletId);
+});
+
+class WalletTransactionItem {
+  final String id;
+  final String title;
+  final double amount;
+  final String type; // INCOME / EXPENSE
+  final DateTime transactionDate;
+
+  const WalletTransactionItem({
+    required this.id,
+    required this.title,
+    required this.amount,
+    required this.type,
+    required this.transactionDate,
+  });
+}
+
+final walletTransactionsProvider =
+    FutureProvider.family<List<WalletTransactionItem>, String>((ref, walletId) async {
+  final dio = ref.watch(dioProvider);
+  try {
+    final res = await dio.get(
+      '/transactions',
+      queryParameters: {'walletId': walletId, 'limit': 10},
+    );
+    final data = res.data;
+    dynamic items;
+    if (data is Map<String, dynamic>) {
+      final inner = data['data'];
+      if (inner is Map<String, dynamic> && inner['items'] is List) {
+        items = inner['items'];
+      } else if (inner is List) {
+        items = inner;
+      } else if (data['items'] is List) {
+        items = data['items'];
+      }
+    } else if (data is List) {
+      items = data;
+    }
+    if (items is List) {
+      return items.map((raw) {
+        final m = raw as Map<String, dynamic>;
+        final typeStr = (m['type'] as String?)?.toUpperCase() ?? 'EXPENSE';
+        return WalletTransactionItem(
+          id: m['id'] as String? ?? '',
+          title: m['note'] as String? ??
+              m['category']?['name'] as String? ??
+              'Giao dịch',
+          amount: (m['amount'] as num?)?.toDouble() ?? 0.0,
+          type: typeStr,
+          transactionDate: m['transactionDate'] != null
+              ? DateTime.tryParse(m['transactionDate'].toString()) ??
+                  DateTime.now()
+              : DateTime.now(),
+        );
+      }).toList();
+    }
+    return [];
+  } catch (_) {
+    return [];
+  }
 });

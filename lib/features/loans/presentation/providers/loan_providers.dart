@@ -7,7 +7,7 @@ import '../../data/services/mock_loan_api_service.dart';
 import '../../domain/repositories/loan_repository.dart';
 
 const bool kUseMockLoanApi =
-    bool.fromEnvironment('USE_MOCK_API', defaultValue: true);
+    bool.fromEnvironment('USE_MOCK_API', defaultValue: false);
 
 /// Dependency Injection cho feature Loans.
 /// Mặc định dùng Mock để chạy demo, set USE_MOCK_API=false để dùng backend thật.

@@ -6,6 +6,11 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../../app/router/route_names.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/widgets/app_toast.dart';
+import '../../../accounts/data/dto/create_account_request.dart';
+import '../../../accounts/domain/enums/account_type.dart';
+import '../../../accounts/presentation/providers/account_providers.dart';
+import '../../data/dto/create_wallet_request.dart';
+import '../providers/wallet_providers.dart';
 import '../providers/wallets_overview_provider.dart';
 
 /// Màn hình Thêm ví & Nguồn tiền chuẩn 1:1 theo `device-preview/screens/wallets/add.html`
@@ -18,8 +23,8 @@ class CreateWalletScreen extends ConsumerStatefulWidget {
 
 class _CreateWalletScreenState extends ConsumerState<CreateWalletScreen> {
   int _selectedTypeIndex = 0; // 0: Ngân hàng, 1: Ví điện tử, 2: Tiền mặt, 3: Tiết kiệm
-  final _nameController = TextEditingController(text: 'Techcombank Priority');
-  final _balanceController = TextEditingController(text: '5,000,000');
+  final _nameController = TextEditingController();
+  final _balanceController = TextEditingController(text: '0');
   String _selectedCurrency = 'VND (₫) · Việt Nam Đồng';
   bool _isLoading = false;
 
@@ -50,21 +55,82 @@ class _CreateWalletScreenState extends ConsumerState<CreateWalletScreen> {
   }
 
   Future<void> _submit() async {
-    if (_nameController.text.trim().isEmpty) {
+    final name = _nameController.text.trim();
+    if (name.isEmpty) {
       AppToast.error(context, 'Vui lòng nhập tên ví / tài khoản');
       return;
     }
 
     setState(() => _isLoading = true);
-    await Future.delayed(const Duration(milliseconds: 600)); // Simulating API call
 
-    if (mounted) {
-      ref.invalidate(walletsOverviewProvider);
-      AppToast.success(context, 'Đã thêm nguồn tiền thành công vào danh mục của bạn!');
-      if (context.canPop()) {
-        context.pop();
-      } else {
-        context.go(RoutePaths.wallets);
+    try {
+      final currencyCode = _selectedCurrency.startsWith('USD')
+          ? 'USD'
+          : (_selectedCurrency.startsWith('EUR') ? 'EUR' : 'VND');
+
+      final cleanBalanceText = _balanceController.text
+          .replaceAll(',', '')
+          .replaceAll('.', '')
+          .replaceAll(' ', '')
+          .trim();
+      final initialBalance = double.tryParse(cleanBalanceText) ?? 0.0;
+
+      AccountType accountType;
+      switch (_selectedTypeIndex) {
+        case 0:
+          accountType = AccountType.bank;
+          break;
+        case 1:
+          accountType = AccountType.ewallet;
+          break;
+        case 2:
+          accountType = AccountType.cash;
+          break;
+        case 3:
+          accountType = AccountType.bank; // Tiết kiệm -> bank
+          break;
+        default:
+          accountType = AccountType.bank;
+      }
+
+      // Tạo ví mới trên server
+      final wallet = await ref.read(walletRepositoryProvider).createWallet(
+            CreateWalletRequest(
+              name: name,
+              defaultCurrency: currencyCode,
+            ),
+          );
+
+      // Tạo tài khoản nguồn tiền ban đầu thuộc ví vừa tạo
+      await ref.read(accountRepositoryProvider).createAccount(
+            CreateAccountRequest(
+              walletId: wallet.id,
+              name: name,
+              type: accountType,
+              currency: currencyCode,
+              initialBalance: initialBalance,
+            ),
+          );
+
+      if (mounted) {
+        ref.invalidate(walletsOverviewProvider);
+        AppToast.success(
+          context,
+          'Đã thêm nguồn tiền thành công vào danh mục của bạn!',
+        );
+        if (context.canPop()) {
+          context.pop();
+        } else {
+          context.go(RoutePaths.wallets);
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        AppToast.error(context, e.toString());
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
       }
     }
   }

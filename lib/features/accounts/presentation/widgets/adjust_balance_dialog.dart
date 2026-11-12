@@ -14,22 +14,12 @@ import '../../domain/models/account_model.dart';
 import '../providers/account_detail_provider.dart';
 
 class AdjustBalanceDialog extends ConsumerStatefulWidget {
-  final AccountModel? account;
+  final AccountModel account;
 
-  const AdjustBalanceDialog({super.key, this.account});
+  const AdjustBalanceDialog({super.key, required this.account});
 
-  static final _defaultAccount = AccountModel(
-    id: 'vcb',
-    walletId: 'personal',
-    name: 'Vietcombank VCB Digibank',
-    type: AccountType.bank,
-    currency: 'VND',
-    balance: 14350000.0,
-    isArchived: false,
-    accountNumberLast4: '8899',
-    createdAt: DateTime.now(),
-    updatedAt: DateTime.now(),
-  );
+  // Giữ field để tương thích hot reload trong phiên debug
+  static final AccountModel? _defaultAccount = null;
 
   @override
   ConsumerState<AdjustBalanceDialog> createState() =>
@@ -44,7 +34,7 @@ class _AdjustBalanceDialogState extends ConsumerState<AdjustBalanceDialog> {
   BalanceDirection _direction = BalanceDirection.increase;
   bool _isLoading = false;
 
-  AccountModel get _account => widget.account ?? AdjustBalanceDialog._defaultAccount;
+  AccountModel get _account => widget.account;
 
   @override
   void dispose() {

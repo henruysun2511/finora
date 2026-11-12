@@ -6,13 +6,19 @@ enum AccountType {
   ewallet,
   credit;
 
+  static const AccountType eWallet = AccountType.ewallet;
+  static const AccountType savings = AccountType.bank;
+
   static AccountType fromString(String? type) {
     switch (type?.toLowerCase()) {
       case 'bank':
+      case 'bank_account':
         return AccountType.bank;
       case 'ewallet':
+      case 'e_wallet':
         return AccountType.ewallet;
       case 'credit':
+      case 'credit_card':
         return AccountType.credit;
       case 'cash':
       default:
@@ -45,6 +51,8 @@ enum AccountType {
         return 'Thẻ tín dụng';
     }
   }
+
+  String get label => displayName;
 
   String get shortName {
     switch (this) {
@@ -85,6 +93,8 @@ enum AccountType {
     }
   }
 
+  bool get isCash => this == AccountType.cash;
+  bool get isBank => this == AccountType.bank;
+  bool get isEWallet => this == AccountType.ewallet;
   bool get isCredit => this == AccountType.credit;
 }
-

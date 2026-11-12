@@ -26,5 +26,6 @@ class WalletMemberModel {
   bool get isOwner => role == WalletMemberRole.owner;
   bool get isEditor => role == WalletMemberRole.editor;
   bool get isViewer => role == WalletMemberRole.viewer;
+  String get userName => fullName;
 }
 

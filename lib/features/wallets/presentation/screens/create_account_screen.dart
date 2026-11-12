@@ -6,6 +6,12 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../../app/router/route_names.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/widgets/app_toast.dart';
+import '../../../accounts/data/dto/create_account_request.dart';
+import '../../../accounts/domain/enums/account_type.dart';
+import '../../../accounts/presentation/providers/account_providers.dart';
+import '../../data/dto/create_wallet_request.dart';
+import '../providers/wallet_detail_provider.dart';
+import '../providers/wallet_providers.dart';
 import '../providers/wallets_overview_provider.dart';
 
 /// Màn hình Thêm tài khoản ngân hàng chuẩn 1:1 theo `device-preview/screens/accounts/add.html`
@@ -58,7 +64,31 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
     },
   ];
 
-  void _selectBank(String bankName) {
+  Future<String> _resolveWalletId() async {
+    if (widget.walletId != null && widget.walletId!.isNotEmpty) {
+      return widget.walletId!;
+    }
+    final overview = ref.read(walletsOverviewProvider).valueOrNull;
+    if (overview != null && overview.wallets.isNotEmpty) {
+      return overview.wallets.first.id;
+    }
+    try {
+      final wallets = await ref.read(walletRepositoryProvider).getWallets();
+      if (wallets.isNotEmpty) {
+        return wallets.first.id;
+      }
+    } catch (_) {}
+
+    final newWallet = await ref.read(walletRepositoryProvider).createWallet(
+          const CreateWalletRequest(
+            name: 'Ví Cá nhân',
+            defaultCurrency: 'VND',
+          ),
+        );
+    return newWallet.id;
+  }
+
+  Future<void> _selectBank(String bankName) async {
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -87,20 +117,42 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
       ),
     );
 
-    Future.delayed(const Duration(milliseconds: 1200), () {
+    try {
+      final walletId = await _resolveWalletId();
+      final isEWallet = bankName.toLowerCase().contains('momo') ||
+          bankName.toLowerCase().contains('zalopay');
+      final type = isEWallet ? AccountType.ewallet : AccountType.bank;
+
+      final account = await ref.read(accountRepositoryProvider).createAccount(
+            CreateAccountRequest(
+              walletId: walletId,
+              name: bankName,
+              type: type,
+              currency: 'VND',
+              initialBalance: 0.0,
+              accountNumberLast4: '8899',
+            ),
+          );
+
       if (mounted) {
-        Navigator.pop(context); // Đóng dialog
+        Navigator.pop(context); // Đóng dialog đang kết nối
         ref.invalidate(walletsOverviewProvider);
+        ref.invalidate(walletDetailProvider(walletId));
         AppToast.success(context, 'Đã liên kết thành công tài khoản $bankName!');
-        context.push(RoutePaths.accountDetailWithId('vcb'));
+        context.push(RoutePaths.accountDetailWithId(account.id));
       }
-    });
+    } catch (e) {
+      if (mounted) {
+        Navigator.pop(context);
+        AppToast.error(context, e.toString());
+      }
+    }
   }
 
   void _openManualDialog() {
     final nameCtrl = TextEditingController();
     final numCtrl = TextEditingController();
-    final balCtrl = TextEditingController(text: '1,000,000');
+    final balCtrl = TextEditingController(text: '0');
 
     showModalBottomSheet(
       context: context,
@@ -158,14 +210,47 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
             ),
             const SizedBox(height: 20),
             ElevatedButton(
-              onPressed: () {
-                Navigator.pop(ctx);
-                ref.invalidate(walletsOverviewProvider);
-                AppToast.success(context, 'Đã thêm nguồn tiền thành công!');
-                if (context.canPop()) {
-                  context.pop();
-                } else {
-                  context.go(RoutePaths.wallets);
+              onPressed: () async {
+                final name = nameCtrl.text.trim();
+                if (name.isEmpty) {
+                  AppToast.error(context, 'Vui lòng nhập tên tài khoản');
+                  return;
+                }
+                final cleanBal = balCtrl.text
+                    .replaceAll(',', '')
+                    .replaceAll('.', '')
+                    .replaceAll(' ', '')
+                    .trim();
+                final bal = double.tryParse(cleanBal) ?? 0.0;
+                final last4 =
+                    numCtrl.text.trim().isNotEmpty ? numCtrl.text.trim() : null;
+
+                try {
+                  final walletId = await _resolveWalletId();
+                  final account = await ref
+                      .read(accountRepositoryProvider)
+                      .createAccount(
+                        CreateAccountRequest(
+                          walletId: walletId,
+                          name: name,
+                          type: AccountType.bank,
+                          currency: 'VND',
+                          initialBalance: bal,
+                          accountNumberLast4: last4,
+                        ),
+                      );
+
+                  if (mounted) {
+                    Navigator.pop(ctx);
+                    ref.invalidate(walletsOverviewProvider);
+                    ref.invalidate(walletDetailProvider(walletId));
+                    AppToast.success(context, 'Đã thêm nguồn tiền thành công!');
+                    context.push(RoutePaths.accountDetailWithId(account.id));
+                  }
+                } catch (e) {
+                  if (mounted) {
+                    AppToast.error(context, e.toString());
+                  }
                 }
               },
               style: ElevatedButton.styleFrom(

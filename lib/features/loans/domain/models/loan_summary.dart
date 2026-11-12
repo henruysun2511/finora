@@ -21,6 +21,9 @@ class LoanSummary {
   /// Dương = thặng dư (cho vay > đi vay); Âm = áp lực nợ
   double get netPosition => totalLent - (totalBorrowed + totalInstallment);
 
+  /// Alias tương thích cho netPosition
+  double get netBalance => netPosition;
+
   /// Số khoản đang quá hạn
   final int overdueCount;
 

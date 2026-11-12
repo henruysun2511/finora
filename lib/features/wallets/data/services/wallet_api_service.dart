@@ -75,6 +75,8 @@ class DioWalletApiService implements WalletApiService {
     final data = _extractData(res.data);
     if (data is List) {
       return data.cast<Map<String, dynamic>>();
+    } else if (data is Map<String, dynamic> && data['items'] is List) {
+      return (data['items'] as List).cast<Map<String, dynamic>>();
     }
     return [];
   });
@@ -100,6 +102,8 @@ class DioWalletApiService implements WalletApiService {
         final data = _extractData(res.data);
         if (data is List) {
           return data.cast<Map<String, dynamic>>();
+        } else if (data is Map<String, dynamic> && data['items'] is List) {
+          return (data['items'] as List).cast<Map<String, dynamic>>();
         }
         return [];
       });
@@ -134,6 +138,8 @@ class DioWalletApiService implements WalletApiService {
         final data = _extractData(res.data);
         if (data is List) {
           return data.cast<Map<String, dynamic>>();
+        } else if (data is Map<String, dynamic> && data['items'] is List) {
+          return (data['items'] as List).cast<Map<String, dynamic>>();
         }
         return [];
       });

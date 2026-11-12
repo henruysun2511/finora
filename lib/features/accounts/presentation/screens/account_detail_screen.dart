@@ -5,7 +5,11 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../app/router/route_names.dart';
 import '../../../../app/theme/app_colors.dart';
+import '../../../../core/utils/currency_formatter.dart';
 import '../../../../core/widgets/app_toast.dart';
+import '../../../wallets/presentation/providers/wallets_overview_provider.dart';
+import '../../domain/models/account_model.dart';
+import '../providers/account_detail_provider.dart';
 import '../widgets/adjust_balance_dialog.dart';
 
 /// Màn hình Chi tiết tài khoản & Đồng bộ Open Banking chuẩn 1:1 theo `device-preview/screens/accounts/detail.html`
@@ -23,30 +27,48 @@ class _AccountDetailScreenState extends ConsumerState<AccountDetailScreen> {
   bool _aiNoraCategorize = true;
   bool _isSyncing = false;
 
-  void _openAdjustBalance() {
+  void _openAdjustBalance(AccountModel? account) {
+    if (account == null) {
+      AppToast.error(context, 'Chưa tải xong dữ liệu tài khoản để đối soát');
+      return;
+    }
     showDialog(
       context: context,
-      builder: (ctx) => const AdjustBalanceDialog(),
+      builder: (ctx) => AdjustBalanceDialog(account: account),
     );
   }
 
-  Future<void> _syncNow() async {
+  Future<void> _syncNow(AccountModel? account) async {
     setState(() => _isSyncing = true);
-    await Future.delayed(const Duration(milliseconds: 800));
-    if (mounted) {
-      setState(() => _isSyncing = false);
-      AppToast.success(context, 'Đã ép làm mới và tải các giao dịch mới nhất từ Vietcombank!');
+    try {
+      await ref.refresh(accountDetailProvider(widget.accountId).future);
+      ref.invalidate(walletsOverviewProvider);
+      if (mounted) {
+        AppToast.success(
+          context,
+          'Đã ép làm mới và tải các giao dịch mới nhất từ ${account?.name ?? 'Ngân hàng'}!',
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        AppToast.error(context, e.toString());
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isSyncing = false);
+      }
     }
   }
 
-  void _confirmUnlink() {
+  void _confirmUnlink(AccountModel? account) {
+    final accountName = account?.name ?? 'tài khoản';
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: const Text('Hủy liên kết tài khoản?'),
-        content: const Text(
-          'Dữ liệu giao dịch đã đồng bộ sẽ được giữ lại, nhưng hệ thống sẽ dừng tự động đọc biến động số dư.',
+        content: Text(
+          'Dữ liệu giao dịch đã đồng bộ của "$accountName" sẽ được giữ lại, nhưng hệ thống sẽ dừng tự động đọc biến động số dư.',
         ),
         actions: [
           TextButton(
@@ -54,10 +76,34 @@ class _AccountDetailScreenState extends ConsumerState<AccountDetailScreen> {
             child: const Text('HỦY'),
           ),
           TextButton(
-            onPressed: () {
+            onPressed: () async {
               Navigator.pop(ctx);
-              AppToast.success(context, 'Đã hủy liên kết Open Banking thành công.');
-              context.pop();
+              if (account != null) {
+                try {
+                  await ref
+                      .read(accountDetailActionsProvider(account.id))
+                      .deleteAccount(account.walletId);
+                  if (mounted) {
+                    AppToast.success(context, 'Đã hủy liên kết Open Banking thành công.');
+                    if (context.canPop()) {
+                      context.pop();
+                    } else {
+                      context.go(RoutePaths.wallets);
+                    }
+                  }
+                } catch (e) {
+                  if (mounted) {
+                    AppToast.error(context, e.toString());
+                  }
+                }
+              } else {
+                AppToast.success(context, 'Đã hủy liên kết Open Banking thành công.');
+                if (context.canPop()) {
+                  context.pop();
+                } else {
+                  context.go(RoutePaths.wallets);
+                }
+              }
             },
             child: const Text('HỦY LIÊN KẾT', style: TextStyle(color: AppColors.danger)),
           ),
@@ -69,116 +115,184 @@ class _AccountDetailScreenState extends ConsumerState<AccountDetailScreen> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final detailAsync = ref.watch(accountDetailProvider(widget.accountId));
+
+    final account = detailAsync.valueOrNull?.account;
+    final recentTxs = detailAsync.valueOrNull?.recentTransactions ?? [];
 
     return Scaffold(
       backgroundColor: isDark ? AppColors.darkBackground : const Color(0xFFF8FAFC),
       body: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              // ──────────────── 1. HEADER ────────────────
-              _buildHeader(context, isDark),
+        child: RefreshIndicator(
+          onRefresh: () async {
+            await ref.refresh(accountDetailProvider(widget.accountId).future);
+          },
+          child: SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                // ──────────────── 1. HEADER ────────────────
+                _buildHeader(context, isDark, account?.name),
 
-              // ──────────────── 2. BODY CONTENT ──────────
-              Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    // Top Card: Trạng thái kết nối Open Banking
-                    _buildSyncStatusCard(isDark),
+                // ──────────────── 2. BODY CONTENT ──────────
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      // Top Card: Trạng thái kết nối Open Banking
+                      _buildSyncStatusCard(isDark, account),
 
-                    const SizedBox(height: 16),
+                      const SizedBox(height: 16),
 
-                    // Card Tùy chọn cấu hình đồng bộ
-                    _buildSettingsCard(isDark),
+                      // Card Tùy chọn cấu hình đồng bộ
+                      _buildSettingsCard(isDark),
 
-                    const SizedBox(height: 24),
+                      const SizedBox(height: 24),
 
-                    // Nút: Đồng bộ ngay bây giờ
-                    ElevatedButton.icon(
-                      onPressed: _isSyncing ? null : _syncNow,
-                      icon: _isSyncing
-                          ? const SizedBox(
-                              width: 18,
-                              height: 18,
-                              child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
-                            )
-                          : const Icon(Icons.sync_rounded, color: Colors.white),
-                      label: Text(
-                        _isSyncing ? 'Đang đồng bộ...' : 'Đồng bộ ngay bây giờ',
-                        style: GoogleFonts.inter(
-                          fontSize: 14.5,
-                          fontWeight: FontWeight.w800,
-                          color: Colors.white,
+                      // Nút: Đồng bộ ngay bây giờ
+                      ElevatedButton.icon(
+                        onPressed: _isSyncing ? null : () => _syncNow(account),
+                        icon: _isSyncing
+                            ? const SizedBox(
+                                width: 18,
+                                height: 18,
+                                child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                              )
+                            : const Icon(Icons.sync_rounded, color: Colors.white),
+                        label: Text(
+                          _isSyncing ? 'Đang đồng bộ...' : 'Đồng bộ ngay bây giờ',
+                          style: GoogleFonts.inter(
+                            fontSize: 14.5,
+                            fontWeight: FontWeight.w800,
+                            color: Colors.white,
+                          ),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primary,
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          elevation: 0,
                         ),
                       ),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.primary,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        elevation: 0,
-                      ),
-                    ),
 
-                    const SizedBox(height: 12),
+                      const SizedBox(height: 12),
 
-                    // Nút phụ: Điều chỉnh số dư đối soát thực tế
-                    OutlinedButton.icon(
-                      onPressed: _openAdjustBalance,
-                      icon: const Icon(Icons.edit_note_rounded, color: AppColors.primary),
-                      label: Text(
-                        'Điều chỉnh số dư thực tế',
-                        style: GoogleFonts.inter(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w800,
-                          color: AppColors.primary,
+                      // Nút phụ: Điều chỉnh số dư đối soát thực tế
+                      OutlinedButton.icon(
+                        onPressed: () => _openAdjustBalance(account),
+                        icon: const Icon(Icons.edit_note_rounded, color: AppColors.primary),
+                        label: Text(
+                          'Điều chỉnh số dư thực tế',
+                          style: GoogleFonts.inter(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w800,
+                            color: AppColors.primary,
+                          ),
+                        ),
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          side: const BorderSide(color: AppColors.primary),
                         ),
                       ),
-                      style: OutlinedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        side: const BorderSide(color: AppColors.primary),
-                      ),
-                    ),
 
-                    const SizedBox(height: 12),
+                      const SizedBox(height: 12),
 
-                    // Nút: Hủy liên kết tài khoản
-                    TextButton(
-                      onPressed: _confirmUnlink,
-                      style: TextButton.styleFrom(
-                        backgroundColor: const Color(0xFFFEE2E2),
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
+                      // Nút: Hủy liên kết tài khoản
+                      TextButton(
+                        onPressed: () => _confirmUnlink(account),
+                        style: TextButton.styleFrom(
+                          backgroundColor: const Color(0xFFFEE2E2),
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                        ),
+                        child: Text(
+                          'Hủy liên kết tài khoản',
+                          style: GoogleFonts.inter(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w800,
+                            color: AppColors.danger,
+                          ),
                         ),
                       ),
-                      child: Text(
-                        'Hủy liên kết tài khoản',
-                        style: GoogleFonts.inter(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w800,
-                          color: AppColors.danger,
+
+                      if (recentTxs.isNotEmpty) ...[
+                        const SizedBox(height: 24),
+                        Text(
+                          'GIAO DỊCH GẦN ĐÂY',
+                          style: GoogleFonts.inter(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w800,
+                            color: const Color(0xFF64748B),
+                            letterSpacing: 1.0,
+                          ),
                         ),
-                      ),
-                    ),
-                  ],
+                        const SizedBox(height: 10),
+                        Container(
+                          decoration: BoxDecoration(
+                            color: isDark ? AppColors.darkSurface : Colors.white,
+                            borderRadius: BorderRadius.circular(18),
+                            border: Border.all(color: const Color(0xFFE2E8F0)),
+                          ),
+                          child: Column(
+                            children: recentTxs.map((tx) {
+                              final isIncome = tx.type == 'INCOME';
+                              return ListTile(
+                                leading: Container(
+                                  width: 36,
+                                  height: 36,
+                                  decoration: BoxDecoration(
+                                    color: (isIncome ? AppColors.success : AppColors.danger)
+                                        .withValues(alpha: 0.12),
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  child: Icon(
+                                    isIncome ? Icons.arrow_downward_rounded : Icons.arrow_upward_rounded,
+                                    color: isIncome ? AppColors.success : AppColors.danger,
+                                    size: 18,
+                                  ),
+                                ),
+                                title: Text(
+                                  tx.title,
+                                  style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w700),
+                                ),
+                                subtitle: Text(
+                                  '${tx.transactionDate.day}/${tx.transactionDate.month}/${tx.transactionDate.year}',
+                                  style: const TextStyle(fontSize: 11, color: Color(0xFF64748B)),
+                                ),
+                                trailing: Text(
+                                  '${isIncome ? '+' : '-'}${CurrencyFormatter.format(tx.amount)}',
+                                  style: GoogleFonts.outfit(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w800,
+                                    color: isIncome ? AppColors.success : AppColors.danger,
+                                  ),
+                                ),
+                              );
+                            }).toList(),
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
     );
   }
 
-  Widget _buildHeader(BuildContext context, bool isDark) {
+  Widget _buildHeader(BuildContext context, bool isDark, String? name) {
     return Container(
       color: isDark ? AppColors.darkSurface : Colors.white,
       padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
@@ -208,7 +322,7 @@ class _AccountDetailScreenState extends ConsumerState<AccountDetailScreen> {
           ),
           const SizedBox(width: 12),
           Text(
-            'Đồng bộ Open Banking',
+            name != null ? '$name · Open Banking' : 'Đồng bộ Open Banking',
             style: GoogleFonts.inter(
               fontSize: 16,
               fontWeight: FontWeight.w900,
@@ -221,7 +335,15 @@ class _AccountDetailScreenState extends ConsumerState<AccountDetailScreen> {
     );
   }
 
-  Widget _buildSyncStatusCard(bool isDark) {
+  Widget _buildSyncStatusCard(bool isDark, AccountModel? account) {
+    final title = account?.name ?? 'Chi tiết tài khoản';
+    final balanceText = account != null
+        ? CurrencyFormatter.format(account.balance, currency: account.currency)
+        : CurrencyFormatter.format(0, currency: 'VND');
+    final cardLast4 = account?.accountNumberLast4 != null
+        ? '•••• ${account!.accountNumberLast4}'
+        : account?.type.displayName ?? 'Tài khoản Finora';
+
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -253,11 +375,20 @@ class _AccountDetailScreenState extends ConsumerState<AccountDetailScreen> {
           ),
           const SizedBox(height: 12),
           Text(
-            'Vietcombank API Sync',
+            title,
             style: GoogleFonts.inter(
               fontSize: 17,
               fontWeight: FontWeight.w900,
               color: isDark ? AppColors.darkForeground : AppColors.lightForeground,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            '$cardLast4 · Số dư: $balanceText',
+            style: GoogleFonts.inter(
+              fontSize: 13,
+              fontWeight: FontWeight.w700,
+              color: AppColors.primary,
             ),
           ),
           const SizedBox(height: 4),

@@ -311,7 +311,10 @@ GoRouter appRouter(AppRouterRef ref) {
         parentNavigatorKey: _rootNavigatorKey,
         path: RoutePaths.createAccount,
         name: RouteNames.createAccount,
-        builder: (context, state) => const CreateAccountScreen(),
+        builder: (context, state) {
+          final walletId = state.uri.queryParameters['walletId'];
+          return CreateAccountScreen(walletId: walletId);
+        },
       ),
       GoRoute(
         parentNavigatorKey: _rootNavigatorKey,
