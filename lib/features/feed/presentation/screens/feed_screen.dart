@@ -624,21 +624,26 @@ class _FeedPostReplySheetState extends ConsumerState<_FeedPostReplySheet> {
 
     final post = widget.post;
     final hasPhoto = post.photoUrl != null && post.photoUrl!.isNotEmpty;
+    final viewInsets = MediaQuery.of(context).viewInsets;
 
-    return Container(
-      decoration: BoxDecoration(
-        color: surface,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-      ),
-      padding: EdgeInsets.only(
-        bottom: MediaQuery.of(context).viewInsets.bottom,
-      ),
-      child: SafeArea(
-        top: false,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
+    return Padding(
+      padding: EdgeInsets.only(bottom: viewInsets.bottom),
+      child: Container(
+        constraints: BoxConstraints(
+          maxHeight: MediaQuery.sizeOf(context).height * 0.85,
+        ),
+        decoration: BoxDecoration(
+          color: surface,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+        child: SafeArea(
+          top: false,
+          child: SingleChildScrollView(
+            physics: const ClampingScrollPhysics(),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
             // Handle Bar
             Center(
               child: Container(
@@ -859,7 +864,9 @@ class _FeedPostReplySheetState extends ConsumerState<_FeedPostReplySheet> {
           ],
         ),
       ),
-    );
+    ),
+  ),
+);
   }
 }
 

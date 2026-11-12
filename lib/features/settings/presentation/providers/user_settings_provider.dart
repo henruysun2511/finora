@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/network/dio_client.dart';
 import '../../data/services/settings_api_service.dart';
+import '../../domain/models/notification_preferences.dart';
 
 final settingsApiServiceProvider = Provider<SettingsApiService>((ref) {
   return DioSettingsApiService(ref.watch(dioProvider));
@@ -36,6 +37,64 @@ class DefaultCurrencyNotifier extends AsyncNotifier<String> {
     } catch (e) {
       // Revert if error
       state = AsyncData(prev);
+      rethrow;
+    }
+  }
+}
+
+final notificationPreferencesProvider =
+    AsyncNotifierProvider<NotificationPreferencesNotifier, NotificationPreferences>(() {
+  return NotificationPreferencesNotifier();
+});
+
+class NotificationPreferencesNotifier extends AsyncNotifier<NotificationPreferences> {
+  @override
+  Future<NotificationPreferences> build() async {
+    final service = ref.watch(settingsApiServiceProvider);
+    try {
+      final data = await service.getSettings();
+      final prefsMap = data['notificationPreferences'] as Map<String, dynamic>?;
+      return NotificationPreferences.fromMap(prefsMap);
+    } catch (_) {
+      return const NotificationPreferences();
+    }
+  }
+
+  Future<void> updatePreference({
+    bool? pushNotifications,
+    bool? emailNotifications,
+    bool? budgetAlerts,
+    bool? loanReminders,
+    bool? mascotEvolutionAlerts,
+    bool? friendActivityAlerts,
+  }) async {
+    final current = state.value ?? const NotificationPreferences();
+    final updated = current.copyWith(
+      pushNotifications: pushNotifications,
+      emailNotifications: emailNotifications,
+      budgetAlerts: budgetAlerts,
+      loanReminders: loanReminders,
+      mascotEvolutionAlerts: mascotEvolutionAlerts,
+      friendActivityAlerts: friendActivityAlerts,
+    );
+
+    // Optimistic update
+    state = AsyncData(updated);
+
+    try {
+      final service = ref.read(settingsApiServiceProvider);
+      final payload = <String, dynamic>{};
+      if (pushNotifications != null) payload['pushNotifications'] = pushNotifications;
+      if (emailNotifications != null) payload['emailNotifications'] = emailNotifications;
+      if (budgetAlerts != null) payload['budgetAlerts'] = budgetAlerts;
+      if (loanReminders != null) payload['loanReminders'] = loanReminders;
+      if (mascotEvolutionAlerts != null) payload['mascotEvolutionAlerts'] = mascotEvolutionAlerts;
+      if (friendActivityAlerts != null) payload['friendActivityAlerts'] = friendActivityAlerts;
+
+      await service.updateNotificationPreferences(payload);
+    } catch (e) {
+      // Revert if error
+      state = AsyncData(current);
       rethrow;
     }
   }

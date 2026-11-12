@@ -130,12 +130,18 @@ class ProfileScreen extends ConsumerWidget {
                   children: [
                     Expanded(
                       child: ChoiceChip(
-                        label: const Row(
+                        label: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(Icons.wb_sunny_rounded, size: 16),
-                            SizedBox(width: 6),
-                            Text('Sáng'),
+                            Icon(
+                              Icons.wb_sunny_rounded,
+                              size: 16,
+                              color: themeMode == ThemeMode.light
+                                  ? Colors.white
+                                  : (isDark ? AppColors.darkMuted : AppColors.lightMuted),
+                            ),
+                            const SizedBox(width: 6),
+                            const Text('Sáng'),
                           ],
                         ),
                         selected: themeMode == ThemeMode.light,
@@ -147,12 +153,12 @@ class ProfileScreen extends ConsumerWidget {
                           color: themeMode == ThemeMode.light
                               ? Colors.white
                               : (isDark ? AppColors.darkForeground : AppColors.lightForeground),
-                          fontWeight: FontWeight.w600,
+                          fontWeight: themeMode == ThemeMode.light ? FontWeight.w700 : FontWeight.w500,
                         ),
-                        backgroundColor: isDark ? AppColors.darkBackground : Colors.grey.shade100,
+                        backgroundColor: isDark ? AppColors.darkSurface : Colors.white,
                         showCheckmark: false,
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
+                          borderRadius: BorderRadius.circular(12),
                           side: BorderSide(
                             color: themeMode == ThemeMode.light
                                 ? AppColors.primary
@@ -161,15 +167,21 @@ class ProfileScreen extends ConsumerWidget {
                         ),
                       ),
                     ),
-                    const SizedBox(width: 8),
+                    const SizedBox(width: 10),
                     Expanded(
                       child: ChoiceChip(
-                        label: const Row(
+                        label: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(Icons.nightlight_round, size: 16),
-                            SizedBox(width: 6),
-                            Text('Tối'),
+                            Icon(
+                              Icons.nightlight_round,
+                              size: 16,
+                              color: themeMode == ThemeMode.dark
+                                  ? Colors.white
+                                  : (isDark ? AppColors.darkMuted : AppColors.lightMuted),
+                            ),
+                            const SizedBox(width: 6),
+                            const Text('Tối'),
                           ],
                         ),
                         selected: themeMode == ThemeMode.dark,
@@ -181,48 +193,14 @@ class ProfileScreen extends ConsumerWidget {
                           color: themeMode == ThemeMode.dark
                               ? Colors.white
                               : (isDark ? AppColors.darkForeground : AppColors.lightForeground),
-                          fontWeight: FontWeight.w600,
+                          fontWeight: themeMode == ThemeMode.dark ? FontWeight.w700 : FontWeight.w500,
                         ),
-                        backgroundColor: isDark ? AppColors.darkBackground : Colors.grey.shade100,
+                        backgroundColor: isDark ? AppColors.darkSurface : Colors.white,
                         showCheckmark: false,
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
+                          borderRadius: BorderRadius.circular(12),
                           side: BorderSide(
                             color: themeMode == ThemeMode.dark
-                                ? AppColors.primary
-                                : (isDark ? AppColors.darkBorder : AppColors.lightBorder),
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: ChoiceChip(
-                        label: const Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.brightness_auto, size: 16),
-                            SizedBox(width: 6),
-                            Text('Hệ thống'),
-                          ],
-                        ),
-                        selected: themeMode == ThemeMode.system,
-                        onSelected: (_) => ref
-                            .read(themeModeNotifierProvider.notifier)
-                            .setThemeMode(ThemeMode.system),
-                        selectedColor: AppColors.primary,
-                        labelStyle: TextStyle(
-                          color: themeMode == ThemeMode.system
-                              ? Colors.white
-                              : (isDark ? AppColors.darkForeground : AppColors.lightForeground),
-                          fontWeight: FontWeight.w600,
-                        ),
-                        backgroundColor: isDark ? AppColors.darkBackground : Colors.grey.shade100,
-                        showCheckmark: false,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                          side: BorderSide(
-                            color: themeMode == ThemeMode.system
                                 ? AppColors.primary
                                 : (isDark ? AppColors.darkBorder : AppColors.lightBorder),
                           ),

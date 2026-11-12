@@ -6,6 +6,7 @@ import '../../../../core/network/api_exception.dart';
 abstract class SettingsApiService {
   Future<Map<String, dynamic>> getSettings();
   Future<void> updateGeneralSettings({String? defaultCurrency});
+  Future<Map<String, dynamic>> updateNotificationPreferences(Map<String, dynamic> preferences);
 }
 
 class DioSettingsApiService implements SettingsApiService {
@@ -49,6 +50,18 @@ class DioSettingsApiService implements SettingsApiService {
             if (defaultCurrency != null) 'defaultCurrency': defaultCurrency,
           },
         );
+      });
+
+  @override
+  Future<Map<String, dynamic>> updateNotificationPreferences(
+    Map<String, dynamic> preferences,
+  ) =>
+      _guard(() async {
+        final res = await _dio.patch<Map<String, dynamic>>(
+          ApiConstants.updateNotificationSettings,
+          data: preferences,
+        );
+        return _extractData(res.data);
       });
 }
 
