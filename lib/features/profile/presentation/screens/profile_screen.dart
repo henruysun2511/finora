@@ -126,88 +126,130 @@ class ProfileScreen extends ConsumerWidget {
                   ),
                 ),
                 const SizedBox(height: 12),
-                Row(
-                  children: [
-                    Expanded(
-                      child: ChoiceChip(
-                        label: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              Icons.wb_sunny_rounded,
-                              size: 16,
+                Container(
+                  padding: const EdgeInsets.all(4),
+                  decoration: BoxDecoration(
+                    color: isDark ? AppColors.darkBackground : const Color(0xFFF1F5F9),
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(
+                      color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: () => ref
+                              .read(themeModeNotifierProvider.notifier)
+                              .setThemeMode(ThemeMode.light),
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 180),
+                            curve: Curves.easeInOut,
+                            padding: const EdgeInsets.symmetric(vertical: 9),
+                            decoration: BoxDecoration(
                               color: themeMode == ThemeMode.light
-                                  ? Colors.white
-                                  : (isDark ? AppColors.darkMuted : AppColors.lightMuted),
+                                  ? AppColors.primary
+                                  : Colors.transparent,
+                              borderRadius: BorderRadius.circular(10),
+                              boxShadow: themeMode == ThemeMode.light
+                                  ? [
+                                      BoxShadow(
+                                        color: AppColors.primary.withValues(alpha: 0.25),
+                                        blurRadius: 6,
+                                        offset: const Offset(0, 2),
+                                      ),
+                                    ]
+                                  : null,
                             ),
-                            const SizedBox(width: 6),
-                            const Text('Sáng'),
-                          ],
-                        ),
-                        selected: themeMode == ThemeMode.light,
-                        onSelected: (_) => ref
-                            .read(themeModeNotifierProvider.notifier)
-                            .setThemeMode(ThemeMode.light),
-                        selectedColor: AppColors.primary,
-                        labelStyle: TextStyle(
-                          color: themeMode == ThemeMode.light
-                              ? Colors.white
-                              : (isDark ? AppColors.darkForeground : AppColors.lightForeground),
-                          fontWeight: themeMode == ThemeMode.light ? FontWeight.w700 : FontWeight.w500,
-                        ),
-                        backgroundColor: isDark ? AppColors.darkSurface : Colors.white,
-                        showCheckmark: false,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          side: BorderSide(
-                            color: themeMode == ThemeMode.light
-                                ? AppColors.primary
-                                : (isDark ? AppColors.darkBorder : AppColors.lightBorder),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  Icons.wb_sunny_rounded,
+                                  size: 16,
+                                  color: themeMode == ThemeMode.light
+                                      ? Colors.white
+                                      : (isDark ? AppColors.darkMuted : AppColors.lightMuted),
+                                ),
+                                const SizedBox(width: 6),
+                                Text(
+                                  'Sáng',
+                                  style: TextStyle(
+                                    fontSize: 13.5,
+                                    fontWeight: themeMode == ThemeMode.light
+                                        ? FontWeight.w700
+                                        : FontWeight.w500,
+                                    color: themeMode == ThemeMode.light
+                                        ? Colors.white
+                                        : (isDark
+                                            ? AppColors.darkForeground
+                                            : AppColors.lightForeground),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: ChoiceChip(
-                        label: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              Icons.nightlight_round,
-                              size: 16,
+                      const SizedBox(width: 4),
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: () => ref
+                              .read(themeModeNotifierProvider.notifier)
+                              .setThemeMode(ThemeMode.dark),
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 180),
+                            curve: Curves.easeInOut,
+                            padding: const EdgeInsets.symmetric(vertical: 9),
+                            decoration: BoxDecoration(
                               color: themeMode == ThemeMode.dark
-                                  ? Colors.white
-                                  : (isDark ? AppColors.darkMuted : AppColors.lightMuted),
+                                  ? AppColors.primary
+                                  : Colors.transparent,
+                              borderRadius: BorderRadius.circular(10),
+                              boxShadow: themeMode == ThemeMode.dark
+                                  ? [
+                                      BoxShadow(
+                                        color: AppColors.primary.withValues(alpha: 0.25),
+                                        blurRadius: 6,
+                                        offset: const Offset(0, 2),
+                                      ),
+                                    ]
+                                  : null,
                             ),
-                            const SizedBox(width: 6),
-                            const Text('Tối'),
-                          ],
-                        ),
-                        selected: themeMode == ThemeMode.dark,
-                        onSelected: (_) => ref
-                            .read(themeModeNotifierProvider.notifier)
-                            .setThemeMode(ThemeMode.dark),
-                        selectedColor: AppColors.primary,
-                        labelStyle: TextStyle(
-                          color: themeMode == ThemeMode.dark
-                              ? Colors.white
-                              : (isDark ? AppColors.darkForeground : AppColors.lightForeground),
-                          fontWeight: themeMode == ThemeMode.dark ? FontWeight.w700 : FontWeight.w500,
-                        ),
-                        backgroundColor: isDark ? AppColors.darkSurface : Colors.white,
-                        showCheckmark: false,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          side: BorderSide(
-                            color: themeMode == ThemeMode.dark
-                                ? AppColors.primary
-                                : (isDark ? AppColors.darkBorder : AppColors.lightBorder),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  Icons.nightlight_round,
+                                  size: 16,
+                                  color: themeMode == ThemeMode.dark
+                                      ? Colors.white
+                                      : (isDark ? AppColors.darkMuted : AppColors.lightMuted),
+                                ),
+                                const SizedBox(width: 6),
+                                Text(
+                                  'Tối',
+                                  style: TextStyle(
+                                    fontSize: 13.5,
+                                    fontWeight: themeMode == ThemeMode.dark
+                                        ? FontWeight.w700
+                                        : FontWeight.w500,
+                                    color: themeMode == ThemeMode.dark
+                                        ? Colors.white
+                                        : (isDark
+                                            ? AppColors.darkForeground
+                                            : AppColors.lightForeground),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ],
             ),
