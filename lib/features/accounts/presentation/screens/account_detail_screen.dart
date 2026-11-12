@@ -145,10 +145,7 @@ class _AccountDetailScreenState extends ConsumerState<AccountDetailScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // ──────────────── 1. HEADER ────────────────
-                _buildHeader(context, isDark, account?.name),
-
-                // ──────────────── 2. BODY CONTENT ──────────
+                // ──────────────── 1. BODY CONTENT ──────────
                 Padding(
                   padding: const EdgeInsets.all(16),
                   child: Column(
@@ -305,48 +302,6 @@ class _AccountDetailScreenState extends ConsumerState<AccountDetailScreen> {
     );
   }
 
-  Widget _buildHeader(BuildContext context, bool isDark, String? name) {
-    return Container(
-      color: isDark ? AppColors.darkSurface : Colors.white,
-      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
-      child: Row(
-        children: [
-          GestureDetector(
-            onTap: () {
-              if (context.canPop()) {
-                context.pop();
-              } else {
-                context.go(RoutePaths.wallets);
-              }
-            },
-              width: 38,
-              height: 38,
-              decoration: BoxDecoration(
-                color: isDark ? AppColors.darkBackground : const Color(0xFFF1F5F9),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Icon(
-                Icons.chevron_left_rounded,
-                color: isDark ? AppColors.darkForeground : AppColors.lightForeground,
-                size: 20,
-              ),
-            ),
-          ),
-          const SizedBox(width: 12),
-          Text(
-            name != null ? '$name · Open Banking' : 'Đồng bộ Open Banking',
-            style: GoogleFonts.inter(
-              fontSize: 16,
-              fontWeight: FontWeight.w900,
-              letterSpacing: -0.4,
-              color: isDark ? AppColors.darkForeground : AppColors.lightForeground,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   Widget _buildSyncStatusCard(bool isDark, AccountModel? account) {
     final title = account?.name ?? 'Chi tiết tài khoản';
     final balanceText = account != null
@@ -368,6 +323,9 @@ class _AccountDetailScreenState extends ConsumerState<AccountDetailScreen> {
             blurRadius: 14,
             offset: const Offset(0, 4),
           ),
+        ],
+      ),
+      child: Column(
         children: [
           Container(
             width: 64,

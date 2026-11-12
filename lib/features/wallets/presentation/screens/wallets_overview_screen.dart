@@ -122,18 +122,17 @@ class WalletsOverviewScreen extends ConsumerWidget {
     double totalAvailable, {
     required String currency,
   }) {
-    return Container(
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            Color(0xFF0055A9),
-            Color(0xFF0072D5),
-            Color(0xFFF5B53F),
-          ],
-          stops: [0.0, 0.55, 1.0],
-        ),
+    return BannerHeader(
+      title: 'Tài khoản & Nguồn tiền',
+      gradient: const LinearGradient(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: [
+          Color(0xFF0055A9),
+          Color(0xFF0072D5),
+          Color(0xFFF5B53F),
+        ],
+        stops: [0.0, 0.55, 1.0],
       ),
       borderRadius: BorderRadius.zero,
       padding: const EdgeInsets.fromLTRB(18, 12, 18, 28),
@@ -157,7 +156,7 @@ class WalletsOverviewScreen extends ConsumerWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'TỔNG TÀI SẢN',
+                'TỔNG TÀI SẢN RÒNG (NET WORTH)',
                 style: GoogleFonts.inter(
                   fontSize: 11,
                   fontWeight: FontWeight.w800,
@@ -195,7 +194,7 @@ class WalletsOverviewScreen extends ConsumerWidget {
 
           // Số tiền Tổng tài sản ròng
           Text(
-            isHidden ? '••••••••' : CurrencyFormatter.format(totalNetWorth),
+            isHidden ? '••••••••' : CurrencyFormatter.format(totalNetWorth, currency: currency),
             style: GoogleFonts.outfit(
               fontSize: 34,
               fontWeight: FontWeight.w900,
@@ -232,7 +231,7 @@ class WalletsOverviewScreen extends ConsumerWidget {
                       ),
                       const SizedBox(height: 3),
                       Text(
-                        isHidden ? '••••••' : CurrencyFormatter.format(totalSavings),
+                        isHidden ? '••••••' : CurrencyFormatter.format(totalSavings, currency: currency),
                         style: GoogleFonts.outfit(
                           fontSize: 15,
                           fontWeight: FontWeight.w900,
@@ -268,180 +267,16 @@ class WalletsOverviewScreen extends ConsumerWidget {
                       ),
                       const SizedBox(height: 3),
                       Text(
-                        isHidden ? '••••••' : CurrencyFormatter.format(totalAvailable),
+                        isHidden ? '••••••' : CurrencyFormatter.format(totalAvailable, currency: currency),
                         style: GoogleFonts.outfit(
                           fontSize: 15,
                           fontWeight: FontWeight.w900,
                           color: Colors.white,
                         ),
                       ),
-                      GestureDetector(
-                        onTap: () => context.push(RoutePaths.createWallet),
-                        child: Container(
-                          width: 36,
-                          height: 36,
-                          decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.18),
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(
-                              color: Colors.white.withValues(alpha: 0.25),
-                            ),
-                          ),
-                          child: const Icon(
-                            Icons.add_rounded,
-                            color: Colors.white,
-                            size: 20,
-                          ),
-                        ),
-                      ),
                     ],
                   ),
-                  const SizedBox(height: 22),
-
-                  // Nhãn Tổng tài sản ròng
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'TỔNG TÀI SẢN RÒNG (NET WORTH)',
-                        style: GoogleFonts.inter(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w800,
-                          color: Colors.white.withValues(alpha: 0.8),
-                          letterSpacing: 1.0,
-                        ),
-                      ),
-                      GestureDetector(
-                        onTap: () {
-                          ref.read(isBalanceHiddenProvider.notifier).state =
-                              !isHidden;
-                        },
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              isHidden
-                                  ? Icons.visibility_rounded
-                                  : Icons.visibility_off_rounded,
-                              size: 14,
-                              color: Colors.white.withValues(alpha: 0.85),
-                            ),
-                            const SizedBox(width: 5),
-                            Text(
-                              isHidden ? 'Hiện' : 'Ẩn',
-                              style: GoogleFonts.inter(
-                                fontSize: 11.5,
-                                fontWeight: FontWeight.w700,
-                                color: Colors.white.withValues(alpha: 0.85),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 6),
-
-                  // Số tiền Tổng tài sản ròng
-                  Text(
-                    isHidden
-                        ? '••••••••'
-                        : CurrencyFormatter.format(totalNetWorth,
-                            currency: currency),
-                    style: GoogleFonts.outfit(
-                      fontSize: 34,
-                      fontWeight: FontWeight.w900,
-                      letterSpacing: -1.0,
-                      color: Colors.white,
-                    ),
-                  ),
-                  const SizedBox(height: 14),
-
-                  // 2 Hộp tóm tắt: Tiết kiệm & Khả dụng
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 14, vertical: 10),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.14),
-                            borderRadius: BorderRadius.circular(16),
-                            border: Border.all(
-                              color: Colors.white.withValues(alpha: 0.16),
-                            ),
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'TIẾT KIỆM',
-                                style: GoogleFonts.inter(
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.w800,
-                                  color: Colors.white.withValues(alpha: 0.8),
-                                  letterSpacing: 0.5,
-                                ),
-                              ),
-                              const SizedBox(height: 3),
-                              Text(
-                                isHidden
-                                    ? '••••••'
-                                    : CurrencyFormatter.format(totalSavings,
-                                        currency: currency),
-                                style: GoogleFonts.outfit(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w900,
-                                  color: const Color(0xFFD1E8FF),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 14, vertical: 10),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.14),
-                            borderRadius: BorderRadius.circular(16),
-                            border: Border.all(
-                              color: Colors.white.withValues(alpha: 0.16),
-                            ),
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'KHẢ DỤNG',
-                                style: GoogleFonts.inter(
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.w800,
-                                  color: Colors.white.withValues(alpha: 0.8),
-                                  letterSpacing: 0.5,
-                                ),
-                              ),
-                              const SizedBox(height: 3),
-                              Text(
-                                isHidden
-                                    ? '••••••'
-                                    : CurrencyFormatter.format(totalAvailable,
-                                        currency: currency),
-                                style: GoogleFonts.outfit(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w900,
-                                  color: Colors.white,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
+                ),
               ),
             ],
           ),
