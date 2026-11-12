@@ -45,7 +45,7 @@ class WalletsOverviewScreen extends ConsumerWidget {
         dynamicOverview != null && dynamicOverview.items.isNotEmpty;
 
     return Scaffold(
-      backgroundColor: isDark ? AppColors.darkBackground : const Color(0xFFF8FAFC),
+      backgroundColor: isDark ? AppColors.darkBackground : AppColors.lightBackground,
       body: RefreshIndicator(
         onRefresh: () async {
           await ref.refresh(walletsOverviewProvider.future);
@@ -290,10 +290,10 @@ class WalletsOverviewScreen extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 36, horizontal: 20),
       decoration: BoxDecoration(
-        color: isDark ? AppColors.darkSurface : Colors.white,
+        color: isDark ? AppColors.darkSurface : AppColors.lightSurface,
         borderRadius: BorderRadius.circular(22),
         border: Border.all(
-          color: isDark ? AppColors.darkBorder : const Color(0xFFE2E8F0),
+          color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
         ),
       ),
       child: Column(
@@ -327,7 +327,7 @@ class WalletsOverviewScreen extends ConsumerWidget {
             textAlign: TextAlign.center,
             style: GoogleFonts.inter(
               fontSize: 12.5,
-              color: const Color(0xFF64748B),
+              color: isDark ? AppColors.darkMuted : AppColors.lightMuted,
               height: 1.4,
             ),
           ),
@@ -362,7 +362,7 @@ class WalletsOverviewScreen extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 20),
       decoration: BoxDecoration(
-        color: isDark ? AppColors.darkSurface : Colors.white,
+        color: isDark ? AppColors.darkSurface : AppColors.lightSurface,
         borderRadius: BorderRadius.circular(22),
         border: Border.all(color: AppColors.danger.withValues(alpha: 0.3)),
       ),
@@ -379,10 +379,13 @@ class WalletsOverviewScreen extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: 6),
-          const Text(
+          Text(
             'Vui lòng kiểm tra lại kết nối mạng hoặc thử lại.',
             textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 12, color: Color(0xFF64748B)),
+            style: TextStyle(
+              fontSize: 12,
+              color: isDark ? AppColors.darkMuted : AppColors.lightMuted,
+            ),
           ),
           const SizedBox(height: 16),
           ElevatedButton.icon(
@@ -412,8 +415,8 @@ class WalletsOverviewScreen extends ConsumerWidget {
     final wallet = item.wallet;
     final balance = item.balance;
     final accounts = item.accountsPreview;
-    final cardBg = isDark ? AppColors.darkSurface : Colors.white;
-    final borderColor = isDark ? AppColors.darkBorder : const Color(0xFFE2E8F0);
+    final cardBg = isDark ? AppColors.darkSurface : AppColors.lightSurface;
+    final borderColor = isDark ? AppColors.darkBorder : AppColors.lightBorder;
 
     return Container(
       decoration: BoxDecoration(
@@ -476,7 +479,7 @@ class WalletsOverviewScreen extends ConsumerWidget {
                           style: GoogleFonts.inter(
                             fontSize: 11,
                             fontWeight: FontWeight.w600,
-                            color: const Color(0xFF94A3B8),
+                            color: isDark ? AppColors.darkMuted : AppColors.lightMuted,
                           ),
                         ),
                       ],
@@ -590,7 +593,7 @@ class WalletsOverviewScreen extends ConsumerWidget {
               ),
             ),
             const SizedBox(width: 9),
-            Icon(icon, size: 15, color: const Color(0xFF94A3B8)),
+            Icon(icon, size: 15, color: isDark ? AppColors.darkMuted : AppColors.lightMuted),
             const SizedBox(width: 7),
             Expanded(
               child: Text(
@@ -748,7 +751,7 @@ class WalletsOverviewScreen extends ConsumerWidget {
               : Colors.white.withValues(alpha: 0.6),
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: isDark ? AppColors.darkBorder : const Color(0xFFCBD5E1),
+            color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
             style: BorderStyle.solid,
             width: 1.5,
           ),
