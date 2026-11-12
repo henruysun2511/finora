@@ -88,10 +88,7 @@ class _WalletDetailScreenState extends ConsumerState<WalletDetailScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // ──────────────── 1. STATUS BAR & HEADER ────────────────
-                _buildHeader(context, isDark, walletName),
-
-                // ──────────────── 2. BANK CARD HERO ─────────────────────
+                // ──────────────── 1. BANK CARD HERO ─────────────────────
                 _buildBankCardHero(
                   walletName: walletName,
                   balance: balance,
@@ -128,53 +125,6 @@ class _WalletDetailScreenState extends ConsumerState<WalletDetailScreen> {
     );
   }
 
-  /// Header chuẩn với nút Back, Tiêu đề và Nút Cài đặt / Đồng bộ
-  Widget _buildHeader(BuildContext context, bool isDark, String title) {
-    return Container(
-      color: isDark ? AppColors.darkSurface : Colors.white,
-      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
-      child: Row(
-        children: [
-          // Nút Quay lại
-          GestureDetector(
-            onTap: () {
-              if (context.canPop()) {
-                context.pop();
-              } else {
-                context.go(RoutePaths.wallets);
-              }
-            },
-            child: Container(
-              width: 38,
-              height: 38,
-              decoration: BoxDecoration(
-                color: isDark ? AppColors.darkBackground : const Color(0xFFF1F5F9),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Icon(
-                Icons.chevron_left_rounded,
-                color: isDark ? AppColors.darkForeground : AppColors.lightForeground,
-                size: 20,
-              ),
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Text(
-              title,
-              style: GoogleFonts.inter(
-                fontSize: 16,
-                fontWeight: FontWeight.w900,
-                letterSpacing: -0.4,
-                color: isDark ? AppColors.darkForeground : AppColors.lightForeground,
-              ),
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 
   /// Thẻ Bank Card Hero chuẩn Solarn Blue
   Widget _buildBankCardHero({
