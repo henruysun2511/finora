@@ -54,7 +54,7 @@ class WalletMembersTab extends ConsumerWidget {
                     .kickMember(member.userId);
                 AppToast.success(context, 'Đã xóa thành viên khỏi ví');
               } catch (e) {
-                AppToast.error(context, e.toString());
+                AppToast.error(context, e);
               }
             },
             child: const Text('Xóa', style: TextStyle(color: Colors.red)),
@@ -79,7 +79,7 @@ class WalletMembersTab extends ConsumerWidget {
         'Đã đổi vai trò của ${member.fullName} thành ${newRole.displayName}',
       );
     } catch (e) {
-      AppToast.error(context, e.toString());
+      AppToast.error(context, e);
     }
   }
 

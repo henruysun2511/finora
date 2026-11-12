@@ -12,6 +12,7 @@ import '../../../accounts/presentation/providers/account_providers.dart';
 import '../../data/dto/create_wallet_request.dart';
 import '../providers/wallet_detail_provider.dart';
 import '../providers/wallet_providers.dart';
+import '../../../../core/widgets/page_header.dart';
 import '../providers/wallets_overview_provider.dart';
 
 /// Màn hình Thêm tài khoản ngân hàng chuẩn 1:1 theo `device-preview/screens/accounts/add.html`
@@ -272,14 +273,22 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
 
     return Scaffold(
       backgroundColor: isDark ? AppColors.darkBackground : const Color(0xFFF8FAFC),
+      appBar: PageHeader.subPage(
+        title: 'Liên kết Ngân hàng',
+        subtitle: 'Kết nối Open Banking & Ví điện tử',
+        onBack: () {
+          if (context.canPop()) {
+            context.pop();
+          } else {
+            context.go(RoutePaths.wallets);
+          }
+        },
+      ),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Header
-              _buildHeader(context, isDark),
-
               Padding(
                 padding: const EdgeInsets.all(16),
                 child: Column(
@@ -388,49 +397,6 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
             ],
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _buildHeader(BuildContext context, bool isDark) {
-    return Container(
-      color: isDark ? AppColors.darkSurface : Colors.white,
-      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
-      child: Row(
-        children: [
-          GestureDetector(
-            onTap: () {
-              if (context.canPop()) {
-                context.pop();
-              } else {
-                context.go(RoutePaths.wallets);
-              }
-            },
-            child: Container(
-              width: 38,
-              height: 38,
-              decoration: BoxDecoration(
-                color: isDark ? AppColors.darkBackground : const Color(0xFFF1F5F9),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Icon(
-                Icons.chevron_left_rounded,
-                color: isDark ? AppColors.darkForeground : AppColors.lightForeground,
-                size: 20,
-              ),
-            ),
-          ),
-          const SizedBox(width: 12),
-          Text(
-            'Liên kết Ngân hàng',
-            style: GoogleFonts.inter(
-              fontSize: 16,
-              fontWeight: FontWeight.w900,
-              letterSpacing: -0.4,
-              color: isDark ? AppColors.darkForeground : AppColors.lightForeground,
-            ),
-          ),
-        ],
       ),
     );
   }

@@ -210,6 +210,11 @@ class ApiConstants {
   // ─── 18. Dashboard & Executive Analytics (/dashboard) ───────────────────────
   static const String dashboardOverview = '/dashboard/overview';
   static const String dashboardCashFlow = '/dashboard/cash-flow';
+  static const String dashboardCategoryBreakdown = '/dashboard/category-breakdown';
+  static const String dashboardBudgetHealth = '/dashboard/budget-health';
+  static const String dashboardDebts = '/dashboard/debts';
+  static const String dashboardCalendar = '/dashboard/calendar';
+  static String dashboardSharedWallet(String walletId) => '/dashboard/shared-wallet/$walletId';
   static const String dashboardNetWorth = '/dashboard/net-worth';
 
   // ─── 19. Settings & PIN Security (/settings) ────────────────────────────────

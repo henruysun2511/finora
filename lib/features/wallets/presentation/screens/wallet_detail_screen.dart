@@ -8,6 +8,7 @@ import '../../../../app/theme/app_colors.dart';
 import '../../../../core/utils/currency_formatter.dart';
 import '../../../../core/widgets/app_toast.dart';
 import '../../../accounts/domain/models/account_model.dart';
+import '../../../../core/widgets/page_header.dart';
 import '../providers/wallet_detail_provider.dart';
 import '../providers/wallets_overview_provider.dart';
 
@@ -58,6 +59,24 @@ class _WalletDetailScreenState extends ConsumerState<WalletDetailScreen> {
 
     return Scaffold(
       backgroundColor: isDark ? AppColors.darkBackground : const Color(0xFFF8FAFC),
+      appBar: PageHeader.subPage(
+        title: walletName,
+        subtitle: isMain ? 'Ví cá nhân' : 'Ví dùng chung',
+        onBack: () {
+          if (context.canPop()) {
+            context.pop();
+          } else {
+            context.go(RoutePaths.wallets);
+          }
+        },
+        action: IconButton(
+          icon: Icon(
+            Icons.tune_rounded,
+            color: isDark ? AppColors.darkForeground : AppColors.lightForeground,
+          ),
+          onPressed: () => context.push(RoutePaths.accountDetailWithId(widget.walletId)),
+        ),
+      ),
       body: SafeArea(
         child: RefreshIndicator(
           onRefresh: () async {

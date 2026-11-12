@@ -11,6 +11,7 @@ import '../../../accounts/domain/enums/account_type.dart';
 import '../../../accounts/presentation/providers/account_providers.dart';
 import '../../data/dto/create_wallet_request.dart';
 import '../providers/wallet_providers.dart';
+import '../../../../core/widgets/page_header.dart';
 import '../providers/wallets_overview_provider.dart';
 
 /// Màn hình Thêm ví & Nguồn tiền chuẩn 1:1 theo `device-preview/screens/wallets/add.html`
@@ -141,15 +142,23 @@ class _CreateWalletScreenState extends ConsumerState<CreateWalletScreen> {
 
     return Scaffold(
       backgroundColor: isDark ? AppColors.darkBackground : const Color(0xFFF8FAFC),
+      appBar: PageHeader.subPage(
+        title: 'Thêm ví & Nguồn tiền',
+        subtitle: 'Khởi tạo ví mới hoặc kết nối ngân hàng',
+        onBack: () {
+          if (context.canPop()) {
+            context.pop();
+          } else {
+            context.go(RoutePaths.wallets);
+          }
+        },
+      ),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // ──────────────── 1. HEADER ────────────────
-              _buildHeader(context, isDark),
-
-              // ──────────────── 2. BODY FORM ─────────────
+              // ──────────────── BODY FORM ─────────────
               Padding(
                 padding: const EdgeInsets.all(16),
                 child: Column(
@@ -209,49 +218,6 @@ class _CreateWalletScreenState extends ConsumerState<CreateWalletScreen> {
             ],
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _buildHeader(BuildContext context, bool isDark) {
-    return Container(
-      color: isDark ? AppColors.darkSurface : Colors.white,
-      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
-      child: Row(
-        children: [
-          GestureDetector(
-            onTap: () {
-              if (context.canPop()) {
-                context.pop();
-              } else {
-                context.go(RoutePaths.wallets);
-              }
-            },
-            child: Container(
-              width: 38,
-              height: 38,
-              decoration: BoxDecoration(
-                color: isDark ? AppColors.darkBackground : const Color(0xFFF1F5F9),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Icon(
-                Icons.chevron_left_rounded,
-                color: isDark ? AppColors.darkForeground : AppColors.lightForeground,
-                size: 20,
-              ),
-            ),
-          ),
-          const SizedBox(width: 12),
-          Text(
-            'Thêm ví & Nguồn tiền',
-            style: GoogleFonts.inter(
-              fontSize: 16,
-              fontWeight: FontWeight.w900,
-              letterSpacing: -0.4,
-              color: isDark ? AppColors.darkForeground : AppColors.lightForeground,
-            ),
-          ),
-        ],
       ),
     );
   }

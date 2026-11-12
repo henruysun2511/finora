@@ -1,7 +1,9 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../app/theme/app_colors.dart';
+import '../errors/app_exception.dart';
 
 enum ToastType {
   success,
@@ -13,6 +15,91 @@ enum ToastType {
 /// Widget & Helper hiển thị thông báo Toast / SnackBar chuẩn Solarn FinTech
 class AppToast {
   AppToast._();
+
+  /// Bóc tách thông điệp lỗi chuẩn xác từ Backend (NestJS / Dio / AppException)
+  static String extractErrorMessage(
+    dynamic error, [
+    String defaultMessage = 'Đã có lỗi xảy ra. Vui lòng thử lại.',
+  ]) {
+    if (error == null) return defaultMessage;
+
+    // 1. Xử lý DioException
+    if (error is DioException) {
+      final res = error.response;
+      if (res != null && res.data != null) {
+        final data = res.data;
+        if (data is Map) {
+          // Validation errors: {"errors": ["property q should not exist"]}
+          final errors = data['errors'];
+          if (errors is List && errors.isNotEmpty) {
+            return errors.map((e) => e.toString()).join('\n');
+          } else if (errors is Map && errors.isNotEmpty) {
+            return errors.values.map((e) => e.toString()).join('\n');
+          } else if (errors is String && errors.isNotEmpty) {
+            return errors;
+          }
+
+          // NestJS exception: {"message": "..."} hoặc {"message": ["..."]}
+          final msg = data['message'];
+          if (msg is List && msg.isNotEmpty) {
+            return msg.map((e) => e.toString()).join(', ');
+          } else if (msg is String && msg.isNotEmpty) {
+            return msg;
+          }
+
+          // Field "error"
+          final errField = data['error'];
+          if (errField is String && errField.isNotEmpty) {
+            return errField;
+          }
+        } else if (data is String && data.isNotEmpty) {
+          return data;
+        }
+      }
+
+      switch (error.type) {
+        case DioExceptionType.connectionTimeout:
+        case DioExceptionType.sendTimeout:
+        case DioExceptionType.receiveTimeout:
+          return 'Kết nối mạng quá thời gian chờ. Vui lòng thử lại.';
+        case DioExceptionType.connectionError:
+          return 'Không thể kết nối đến máy chủ. Vui lòng kiểm tra mạng.';
+        case DioExceptionType.cancel:
+          return 'Yêu cầu đã bị hủy.';
+        default:
+          if (error.response?.statusCode != null) {
+            final code = error.response!.statusCode;
+            if (code == 401) return 'Phiên đăng nhập đã hết hạn.';
+            if (code == 403) return 'Bạn không có quyền thực hiện thao tác này.';
+            if (code == 404) return 'Không tìm thấy dữ liệu yêu cầu.';
+            if (code == 500) return 'Máy chủ đang gặp sự cố. Vui lòng thử lại sau.';
+          }
+          break;
+      }
+    }
+
+    // 2. Xử lý AppException
+    if (error is AppException) {
+      return error.message;
+    }
+
+    // 3. Xử lý chuỗi
+    if (error is String) {
+      if (error.trim().isEmpty) return defaultMessage;
+      var str = error.trim();
+      if (str.startsWith('Exception: ')) {
+        str = str.substring(11).trim();
+      }
+      return str.isNotEmpty ? str : defaultMessage;
+    }
+
+    // 4. Các exception hoặc đối tượng khác
+    var str = error.toString().trim();
+    if (str.startsWith('Exception: ')) {
+      str = str.substring(11).trim();
+    }
+    return str.isNotEmpty ? str : defaultMessage;
+  }
 
   static void show(
     BuildContext context, {
@@ -94,12 +181,14 @@ class AppToast {
     );
   }
 
+  /// Hiển thị Toast lỗi tự động bóc tách thông điệp lỗi từ Backend hoặc Exception
   static void error(
     BuildContext context,
-    String message, {
+    dynamic errorOrMessage, {
     Duration duration = const Duration(seconds: 3),
     SnackBarAction? action,
   }) {
+    final message = extractErrorMessage(errorOrMessage);
     show(
       context,
       message: message,
@@ -180,8 +269,8 @@ extension BuildContextToastX on BuildContext {
   void showSuccessToast(String message, {Duration? duration}) =>
       AppToast.success(this, message, duration: duration ?? const Duration(seconds: 3));
 
-  void showErrorToast(String message, {Duration? duration}) =>
-      AppToast.error(this, message, duration: duration ?? const Duration(seconds: 3));
+  void showErrorToast(dynamic errorOrMessage, {Duration? duration}) =>
+      AppToast.error(this, errorOrMessage, duration: duration ?? const Duration(seconds: 3));
 
   void showInfoToast(String message, {Duration? duration}) =>
       AppToast.info(this, message, duration: duration ?? const Duration(seconds: 3));

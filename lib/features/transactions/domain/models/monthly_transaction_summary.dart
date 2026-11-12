@@ -19,6 +19,8 @@ class MonthlyTransactionSummary {
   final int totalTransactions;
   final List<DailyTransactionGroup> days;
 
+  List<DailyTransactionGroup> get dailyGroups => days;
+
   factory MonthlyTransactionSummary.empty({int? month, int? year}) {
     final now = DateTime.now();
     return MonthlyTransactionSummary(

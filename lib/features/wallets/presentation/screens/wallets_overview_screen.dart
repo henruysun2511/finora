@@ -7,6 +7,8 @@ import '../../../../app/router/route_names.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/utils/currency_formatter.dart';
 import '../../../loans/presentation/providers/loan_list_provider.dart';
+import '../../../../core/widgets/banner_header.dart';
+import '../../domain/models/wallet_model.dart';
 import '../providers/wallet_providers.dart';
 import '../providers/wallets_overview_provider.dart';
 
@@ -133,65 +135,143 @@ class WalletsOverviewScreen extends ConsumerWidget {
           stops: [0.0, 0.55, 1.0],
         ),
       ),
-      child: Stack(
-        clipBehavior: Clip.none,
+      borderRadius: BorderRadius.zero,
+      padding: const EdgeInsets.fromLTRB(18, 12, 18, 28),
+      onBack: () {
+        if (context.canPop()) {
+          context.pop();
+        } else {
+          context.go(RoutePaths.home);
+        }
+      },
+      action: BannerHeader.glassButton(
+        icon: const Icon(Icons.add_rounded, color: Colors.white, size: 20),
+        onTap: () => context.push(RoutePaths.createWallet),
+        tooltip: 'Thêm ví mới',
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // Circular Watermark
-          Positioned(
-            top: -50,
-            right: -30,
-            child: Container(
-              width: 190,
-              height: 190,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.white.withValues(alpha: 0.07),
+          // Top row: Label TỔNG TÀI SẢN + Nút Ẩn/Hiện
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'TỔNG TÀI SẢN',
+                style: GoogleFonts.inter(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w800,
+                  color: Colors.white.withValues(alpha: 0.8),
+                  letterSpacing: 1.0,
+                ),
               ),
+              GestureDetector(
+                onTap: () {
+                  ref.read(isBalanceHiddenProvider.notifier).state = !isHidden;
+                },
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      isHidden ? Icons.visibility_rounded : Icons.visibility_off_rounded,
+                      size: 14,
+                      color: Colors.white.withValues(alpha: 0.85),
+                    ),
+                    const SizedBox(width: 5),
+                    Text(
+                      isHidden ? 'Hiện' : 'Ẩn',
+                      style: GoogleFonts.inter(
+                        fontSize: 11.5,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.white.withValues(alpha: 0.85),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 6),
+
+          // Số tiền Tổng tài sản ròng
+          Text(
+            isHidden ? '••••••••' : CurrencyFormatter.format(totalNetWorth),
+            style: GoogleFonts.outfit(
+              fontSize: 34,
+              fontWeight: FontWeight.w900,
+              letterSpacing: -1.0,
+              color: Colors.white,
             ),
           ),
+          const SizedBox(height: 14),
 
-          SafeArea(
-            bottom: false,
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(18, 12, 18, 28),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  // Header Nav Bar
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          // 2 Hộp tóm tắt: Tiết kiệm & Khả dụng
+          Row(
+            children: [
+              Expanded(
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.14),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: Colors.white.withValues(alpha: 0.16),
+                    ),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      GestureDetector(
-                        onTap: () {
-                          if (context.canPop()) {
-                            context.pop();
-                          } else {
-                            context.go(RoutePaths.home);
-                          }
-                        },
-                        child: Container(
-                          width: 36,
-                          height: 36,
-                          decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.18),
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(
-                              color: Colors.white.withValues(alpha: 0.25),
-                            ),
-                          ),
-                          child: const Icon(
-                            Icons.chevron_left_rounded,
-                            color: Colors.white,
-                            size: 20,
-                          ),
+                      Text(
+                        'TIẾT KIỆM',
+                        style: GoogleFonts.inter(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w800,
+                          color: Colors.white.withValues(alpha: 0.8),
+                          letterSpacing: 0.5,
                         ),
                       ),
+                      const SizedBox(height: 3),
                       Text(
-                        'Tài khoản & Nguồn tiền',
-                        style: GoogleFonts.inter(
-                          fontSize: 16,
+                        isHidden ? '••••••' : CurrencyFormatter.format(totalSavings),
+                        style: GoogleFonts.outfit(
+                          fontSize: 15,
                           fontWeight: FontWeight.w900,
-                          letterSpacing: -0.4,
+                          color: const Color(0xFFD1E8FF),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.14),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: Colors.white.withValues(alpha: 0.16),
+                    ),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'KHẢ DỤNG',
+                        style: GoogleFonts.inter(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w800,
+                          color: Colors.white.withValues(alpha: 0.8),
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                      const SizedBox(height: 3),
+                      Text(
+                        isHidden ? '••••••' : CurrencyFormatter.format(totalAvailable),
+                        style: GoogleFonts.outfit(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w900,
                           color: Colors.white,
                         ),
                       ),
@@ -363,7 +443,7 @@ class WalletsOverviewScreen extends ConsumerWidget {
                   ),
                 ],
               ),
-            ),
+            ],
           ),
         ],
       ),

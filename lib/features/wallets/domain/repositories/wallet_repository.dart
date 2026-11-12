@@ -15,8 +15,12 @@ abstract class WalletRepository {
   Future<WalletModel> createWallet(CreateWalletRequest request);
   Future<WalletModel> updateWallet(String id, UpdateWalletRequest request);
   Future<void> deleteWallet(String id);
+  Future<WalletModel> transferOwnership(String walletId, String newOwnerId);
+  Future<void> leaveWallet(String walletId);
   Future<List<WalletMemberModel>> getMembers(String walletId);
   Future<void> inviteMember(String walletId, InviteMemberRequest request);
+  Future<WalletModel> acceptInvite(String walletId);
+  Future<void> rejectInvite(String walletId);
   Future<void> updateMemberRole(
     String walletId,
     String userId,

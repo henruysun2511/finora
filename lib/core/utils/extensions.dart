@@ -9,11 +9,11 @@ extension BuildContextX on BuildContext {
   Size get screenSize => MediaQuery.sizeOf(this);
   EdgeInsets get viewInsets => MediaQuery.viewInsetsOf(this);
 
-  void showSnackBar(String message, {bool isError = false}) {
+  void showSnackBar(dynamic message, {bool isError = false}) {
     if (isError) {
       AppToast.error(this, message);
     } else {
-      AppToast.success(this, message);
+      AppToast.success(this, message.toString());
     }
   }
 

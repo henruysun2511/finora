@@ -4,6 +4,8 @@ import 'package:go_router/go_router.dart';
 
 import '../../../app/theme/app_colors.dart';
 import '../../../features/feed/presentation/providers/feed_list_provider.dart';
+import '../../../features/friends/presentation/providers/friends_list_provider.dart';
+import '../../../features/messages/presentation/providers/conversation_list_provider.dart';
 import 'social_tab.dart';
 import 'social_tab_item.dart';
 
@@ -43,6 +45,16 @@ class SocialBottomBar extends ConsumerWidget {
     final surface = isDark ? AppColors.darkSurface : Colors.white;
     final border = isDark ? AppColors.darkBorder : AppColors.lightBorder;
 
+    final effectiveFriendRequestsCount = friendRequestsCount > 0
+        ? friendRequestsCount
+        : (ref.watch(friendsListProvider).valueOrNull?.pendingRequests.length ?? 0);
+
+    final effectiveUnreadMessagesCount = unreadMessagesCount > 0
+        ? unreadMessagesCount
+        : (ref.watch(conversationListProvider).valueOrNull?.fold<int>(
+                0, (sum, c) => sum + (c.unreadCount > 0 ? c.unreadCount : 0)) ??
+            0);
+
     return Container(
       decoration: BoxDecoration(
         color: surface,
@@ -77,7 +89,7 @@ class SocialBottomBar extends ConsumerWidget {
               SocialTabItem(
                 tab: SocialTab.friends,
                 isSelected: currentTab == SocialTab.friends,
-                badgeCount: friendRequestsCount,
+                badgeCount: effectiveFriendRequestsCount,
                 onTap: () => _handleTabTap(context, ref, SocialTab.friends),
               ),
               SocialTabItem(
@@ -88,7 +100,7 @@ class SocialBottomBar extends ConsumerWidget {
               SocialTabItem(
                 tab: SocialTab.messages,
                 isSelected: currentTab == SocialTab.messages,
-                badgeCount: unreadMessagesCount,
+                badgeCount: effectiveUnreadMessagesCount,
                 onTap: () => _handleTabTap(context, ref, SocialTab.messages),
               ),
             ],

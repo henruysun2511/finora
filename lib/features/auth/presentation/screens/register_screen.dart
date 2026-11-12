@@ -9,6 +9,7 @@ import '../../../../core/utils/extensions.dart';
 import '../../../../core/widgets/app_toast.dart';
 import '../../domain/models/register_input.dart';
 import '../../domain/validators/auth_validators.dart';
+import '../../../onboarding/presentation/providers/onboarding_controller.dart';
 import '../providers/register_form_provider.dart';
 import '../widgets/auth_ambient_rings.dart';
 import '../widgets/auth_hero_header.dart';
@@ -71,16 +72,15 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     final user = await ref.read(registerFormProvider.notifier).submit(input);
 
     if (user != null && mounted) {
+      ref.read(onboardingControllerProvider.notifier).updateProfile(
+            name: user.name,
+          );
       AppToast.success(
         context,
         'Đăng ký tài khoản thành công! Chào mừng ${user.name}',
       );
-      // Điều hướng người dùng khám phá Onboarding hoặc Trang chủ
-      if (context.canPop()) {
-        context.pop();
-      } else {
-        context.go(RoutePaths.home);
-      }
+      // Điều hướng người dùng mới vào luồng Onboarding 5 bước để thiết lập ví & linh vật
+      context.go(RoutePaths.onboardingWelcome);
     }
   }
 

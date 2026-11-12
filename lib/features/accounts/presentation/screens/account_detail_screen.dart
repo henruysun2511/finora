@@ -10,6 +10,8 @@ import '../../../../core/widgets/app_toast.dart';
 import '../../../wallets/presentation/providers/wallets_overview_provider.dart';
 import '../../domain/models/account_model.dart';
 import '../providers/account_detail_provider.dart';
+import '../../../../core/widgets/form_card.dart';
+import '../../../../core/widgets/page_header.dart';
 import '../widgets/adjust_balance_dialog.dart';
 
 /// Màn hình Chi tiết tài khoản & Đồng bộ Open Banking chuẩn 1:1 theo `device-preview/screens/accounts/detail.html`
@@ -122,6 +124,17 @@ class _AccountDetailScreenState extends ConsumerState<AccountDetailScreen> {
 
     return Scaffold(
       backgroundColor: isDark ? AppColors.darkBackground : const Color(0xFFF8FAFC),
+      appBar: PageHeader.subPage(
+        title: 'Đồng bộ Open Banking',
+        subtitle: 'Vietcombank API Sync',
+        onBack: () {
+          if (context.canPop()) {
+            context.pop();
+          } else {
+            context.go(RoutePaths.wallets);
+          }
+        },
+      ),
       body: SafeArea(
         child: RefreshIndicator(
           onRefresh: () async {
@@ -306,7 +319,6 @@ class _AccountDetailScreenState extends ConsumerState<AccountDetailScreen> {
                 context.go(RoutePaths.wallets);
               }
             },
-            child: Container(
               width: 38,
               height: 38,
               decoration: BoxDecoration(
@@ -356,9 +368,6 @@ class _AccountDetailScreenState extends ConsumerState<AccountDetailScreen> {
             blurRadius: 14,
             offset: const Offset(0, 4),
           ),
-        ],
-      ),
-      child: Column(
         children: [
           Container(
             width: 64,
@@ -429,58 +438,41 @@ class _AccountDetailScreenState extends ConsumerState<AccountDetailScreen> {
   }
 
   Widget _buildSettingsCard(bool isDark) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-      decoration: BoxDecoration(
-        color: isDark ? AppColors.darkSurface : Colors.white,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
-      ),
+    return FormCard(
+      title: 'Cài đặt đồng bộ',
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Column(
         children: [
-          // Row 1
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Tự động đọc biến động số dư',
-                style: GoogleFonts.inter(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w700,
-                  color: isDark ? AppColors.darkForeground : const Color(0xFF334155),
-                ),
+          SwitchListTile(
+            contentPadding: EdgeInsets.zero,
+            title: Text(
+              'Tự động đọc biến động số dư',
+              style: GoogleFonts.inter(
+                fontSize: 13,
+                fontWeight: FontWeight.w700,
+                color: isDark ? AppColors.darkForeground : const Color(0xFF334155),
               ),
-              Switch(
-                value: _autoReadTx,
-                activeColor: AppColors.primary,
-                onChanged: (val) => setState(() => _autoReadTx = val),
-              ),
-            ],
+            ),
+            value: _autoReadTx,
+            activeColor: AppColors.primary,
+            onChanged: (val) => setState(() => _autoReadTx = val),
           ),
-          const Divider(height: 1, color: Color(0xFFE2E8F0)),
-
-          // Row 2
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'AI Nora tự gán danh mục',
-                style: GoogleFonts.inter(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w700,
-                  color: isDark ? AppColors.darkForeground : const Color(0xFF334155),
-                ),
+          const Divider(height: 1),
+          SwitchListTile(
+            contentPadding: EdgeInsets.zero,
+            title: Text(
+              'AI Nora tự gán danh mục',
+              style: GoogleFonts.inter(
+                fontSize: 13,
+                fontWeight: FontWeight.w700,
+                color: isDark ? AppColors.darkForeground : const Color(0xFF334155),
               ),
-              Switch(
-                value: _aiNoraCategorize,
-                activeColor: AppColors.primary,
-                onChanged: (val) => setState(() => _aiNoraCategorize = val),
-              ),
-            ],
+            ),
+            value: _aiNoraCategorize,
+            activeColor: AppColors.primary,
+            onChanged: (val) => setState(() => _aiNoraCategorize = val),
           ),
-          const Divider(height: 1, color: Color(0xFFE2E8F0)),
-
-          // Row 3
+          const Divider(height: 1),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 14),
             child: Row(

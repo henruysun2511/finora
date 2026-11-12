@@ -1,3 +1,4 @@
+import '../../domain/models/receipt_model.dart';
 import '../../domain/models/transaction_enums.dart';
 import '../../domain/models/transaction_item.dart';
 
@@ -22,6 +23,15 @@ class TransactionResponseDto {
     this.toAccountId,
     this.toAccountName,
     this.status = 'CONFIRMED',
+    this.locationName,
+    this.source = 'MANUAL',
+    this.visibility = 'PRIVATE',
+    this.excludeFromReport = false,
+    this.receiptId,
+    this.receipt,
+    this.latitude,
+    this.longitude,
+    this.isRecurring = false,
   });
 
   final String id;
@@ -41,6 +51,15 @@ class TransactionResponseDto {
   final String? toAccountId;
   final String? toAccountName;
   final String status;
+  final String? locationName;
+  final String source;
+  final String visibility;
+  final bool excludeFromReport;
+  final String? receiptId;
+  final ReceiptModel? receipt;
+  final double? latitude;
+  final double? longitude;
+  final bool isRecurring;
   final DateTime transactionDate;
   final DateTime createdAt;
 
@@ -63,6 +82,17 @@ class TransactionResponseDto {
       toAccountId: json['toAccountId'] as String?,
       toAccountName: json['toAccountName'] as String?,
       status: json['status'] as String? ?? 'CONFIRMED',
+      locationName: json['locationName'] as String?,
+      source: json['source'] as String? ?? 'MANUAL',
+      visibility: json['visibility'] as String? ?? 'PRIVATE',
+      excludeFromReport: json['excludeFromReport'] as bool? ?? false,
+      receiptId: json['receiptId'] as String?,
+      receipt: json['receipt'] != null && json['receipt'] is Map<String, dynamic>
+          ? ReceiptModel.fromJson(json['receipt'] as Map<String, dynamic>)
+          : null,
+      latitude: (json['latitude'] as num?)?.toDouble(),
+      longitude: (json['longitude'] as num?)?.toDouble(),
+      isRecurring: json['isRecurring'] as bool? ?? (json['recurringRule'] != null),
       transactionDate: json['transactionDate'] != null
           ? DateTime.tryParse(json['transactionDate'].toString()) ?? DateTime.now()
           : DateTime.now(),
@@ -91,6 +121,15 @@ class TransactionResponseDto {
       toAccountId: toAccountId,
       toAccountName: toAccountName,
       status: TransactionStatus.fromString(status),
+      locationName: locationName,
+      source: source,
+      visibility: visibility,
+      excludeFromReport: excludeFromReport,
+      receiptId: receiptId,
+      receipt: receipt,
+      latitude: latitude,
+      longitude: longitude,
+      isRecurring: isRecurring,
       transactionDate: transactionDate,
       createdAt: createdAt,
     );

@@ -43,10 +43,8 @@ class FeedApiService {
   Future<List<PostReactionResponseDto>> getReactions(
       String transactionId) async {
     final res = await _dio.get(ApiConstants.feedReactions(transactionId));
-    final data = res.data is Map ? res.data['data'] : res.data;
-    final List items = data is List
-        ? data
-        : (data is Map && data['items'] is List ? data['items'] as List : []);
+    final data = res.data['data'];
+    final List items = data is List ? data : [];
     return items
         .map((e) => PostReactionResponseDto.fromJson(e as Map<String, dynamic>))
         .toList();

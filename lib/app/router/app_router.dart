@@ -4,9 +4,9 @@ import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../features/ai_chat/presentation/screens/ai_chat_screen.dart';
-import '../../features/analytics/presentation/screens/analytics_screen.dart';
-import '../../features/analytics/presentation/screens/cashflow_report_screen.dart';
-import '../../features/analytics/presentation/screens/category_report_screen.dart';
+import '../../features/dashboard/presentation/screens/dashboard_screen.dart';
+import '../../features/dashboard/presentation/screens/cashflow_report_screen.dart';
+import '../../features/dashboard/presentation/screens/category_report_screen.dart';
 import '../../features/exchange_rates/presentation/screens/exchange_rates_screen.dart';
 import '../../features/auth/presentation/providers/auth_provider.dart';
 import '../../features/auth/presentation/screens/forgot_password_screen.dart';
@@ -37,8 +37,8 @@ import '../../features/categories/presentation/screens/category_list_screen.dart
 import '../../features/settings/presentation/screens/notification_settings_screen.dart';
 import '../../features/settings/presentation/screens/security_settings_screen.dart';
 import '../../features/settings/presentation/screens/settings_screen.dart';
-import '../../features/feed/presentation/screens/friends_screen.dart';
-import '../../features/feed/presentation/screens/social_chat_screen.dart';
+import '../../features/friends/presentation/screens/friends_list_screen.dart';
+import '../../features/messages/presentation/screens/messages_screen.dart';
 import '../../features/feed/presentation/screens/feed_screen.dart';
 import '../../features/split_expenses/presentation/screens/create_split_expense_screen.dart';
 import '../../features/split_expenses/presentation/screens/split_expense_detail_screen.dart';
@@ -51,14 +51,13 @@ import '../../features/transactions/presentation/screens/scan_receipt_screen.dar
 import '../../features/transactions/presentation/screens/receipt_capture_screen.dart';
 import '../../features/transactions/presentation/screens/transaction_detail_screen.dart';
 import '../../features/transactions/presentation/screens/transactions_screen.dart';
-import '../../features/wallets/presentation/screens/account_detail_screen.dart';
+import '../../features/accounts/presentation/screens/account_detail_screen.dart';
 import '../../features/wallets/presentation/screens/create_account_screen.dart';
-import '../../features/wallets/presentation/screens/create_shared_wallet_screen.dart';
 import '../../features/wallets/presentation/screens/create_wallet_screen.dart';
 import '../../features/wallets/presentation/screens/shared_wallets_screen.dart';
 import '../../features/wallets/presentation/screens/transfer_screen.dart';
 import '../../features/wallets/presentation/screens/wallet_detail_screen.dart';
-import '../../features/wallets/presentation/screens/wallets_screen.dart';
+import '../../features/wallets/presentation/screens/wallets_overview_screen.dart';
 import 'route_names.dart';
 import 'scaffold_with_nav_bar.dart';
 
@@ -73,7 +72,7 @@ GoRouter appRouter(AppRouterRef ref) {
 
   return GoRouter(
     navigatorKey: _rootNavigatorKey,
-    initialLocation: RoutePaths.home,
+    initialLocation: RoutePaths.welcome,
     debugLogDiagnostics: false,
     refreshListenable: notifier,
     redirect: (context, state) {
@@ -89,9 +88,16 @@ GoRouter appRouter(AppRouterRef ref) {
           location == RoutePaths.forgotPassword ||
           location.startsWith('/onboarding');
 
-      if (!isLoggedIn && !isOnPublicAuthPage) return RoutePaths.login;
-      if (isLoggedIn && (location == RoutePaths.login || location == RoutePaths.register)) {
-        return RoutePaths.home;
+      if (!isLoggedIn && !isOnPublicAuthPage) return RoutePaths.welcome;
+      if (isLoggedIn) {
+        // Đăng ký mới thành công -> Bắt buộc chuyển tiếp vào Onboarding để thiết lập hồ sơ & ví
+        if (location == RoutePaths.register) {
+          return RoutePaths.onboardingWelcome;
+        }
+        // Đăng nhập tài khoản cũ -> Chuyển vào Trang chủ
+        if (location == RoutePaths.login || location == RoutePaths.welcome) {
+          return RoutePaths.home;
+        }
       }
       return null;
     },
@@ -166,7 +172,7 @@ GoRouter appRouter(AppRouterRef ref) {
               GoRoute(
                 path: RoutePaths.wallets,
                 name: RouteNames.wallets,
-                builder: (context, state) => const WalletsScreen(),
+                builder: (context, state) => const WalletsOverviewScreen(),
               ),
               GoRoute(
                 path: RoutePaths.sharedWallets,
@@ -184,13 +190,13 @@ GoRouter appRouter(AppRouterRef ref) {
             ],
           ),
 
-          // Branch 1: Ngân sách & Sổ GD (Budgets)
+          // Branch 1: Dashboard Báo cáo & Phân tích (Dashboard)
           StatefulShellBranch(
             routes: [
               GoRoute(
-                path: RoutePaths.budgets,
-                name: RouteNames.budgets,
-                builder: (context, state) => const BudgetsScreen(),
+                path: RoutePaths.dashboard,
+                name: RouteNames.dashboard,
+                builder: (context, state) => const DashboardScreen(),
               ),
             ],
           ),
@@ -305,7 +311,7 @@ GoRouter appRouter(AppRouterRef ref) {
         parentNavigatorKey: _rootNavigatorKey,
         path: RoutePaths.createSharedWallet,
         name: RouteNames.createSharedWallet,
-        builder: (context, state) => const CreateSharedWalletScreen(),
+        builder: (context, state) => const CreateWalletScreen(),
       ),
       GoRoute(
         parentNavigatorKey: _rootNavigatorKey,
@@ -335,6 +341,12 @@ GoRouter appRouter(AppRouterRef ref) {
       // ==========================================
       // 5. PHÂN HỆ NGÂN SÁCH (Budgets Sub-routes)
       // ==========================================
+      GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
+        path: RoutePaths.budgets,
+        name: RouteNames.budgets,
+        builder: (context, state) => const BudgetsScreen(),
+      ),
       GoRoute(
         parentNavigatorKey: _rootNavigatorKey,
         path: RoutePaths.createBudget,
@@ -422,9 +434,9 @@ GoRouter appRouter(AppRouterRef ref) {
       // ==========================================
       GoRoute(
         parentNavigatorKey: _rootNavigatorKey,
-        path: RoutePaths.analytics,
-        name: RouteNames.analytics,
-        builder: (context, state) => const AnalyticsScreen(),
+        path: RoutePaths.reportsOverview,
+        name: RouteNames.reportsOverview,
+        builder: (context, state) => const DashboardScreen(),
       ),
       GoRoute(
         parentNavigatorKey: _rootNavigatorKey,
@@ -458,13 +470,13 @@ GoRouter appRouter(AppRouterRef ref) {
         parentNavigatorKey: _rootNavigatorKey,
         path: RoutePaths.friends,
         name: RouteNames.friends,
-        builder: (context, state) => const FriendsScreen(),
+        builder: (context, state) => const FriendsListScreen(),
       ),
       GoRoute(
         parentNavigatorKey: _rootNavigatorKey,
         path: RoutePaths.socialChat,
         name: RouteNames.socialChat,
-        builder: (context, state) => const SocialChatScreen(),
+        builder: (context, state) => const MessagesScreen(),
       ),
 
       // ==========================================

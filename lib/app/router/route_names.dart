@@ -17,7 +17,7 @@ class RouteNames {
 
   // 2. Shell Tabs (Bottom Navigation)
   static const String home = 'home';
-  static const String dashboard = home;
+  static const String dashboard = 'dashboard';
   static const String budgets = 'budgets';
   static const String aiChat = 'aiChat';
   static const String profile = 'profile';
@@ -58,7 +58,8 @@ class RouteNames {
   static const String createSplitExpense = 'createSplitExpense';
 
   // 8. Reports & Analytics (Báo cáo & Phân tích)
-  static const String analytics = 'analytics';
+  static const String reportsOverview = 'reportsOverview';
+  static const String analytics = 'dashboard';
   static const String cashflowReport = 'cashflowReport';
   static const String categoryReport = 'categoryReport';
   static const String exchangeRates = 'exchangeRates';
@@ -103,7 +104,7 @@ class RoutePaths {
 
   // 2. Shell Tabs
   static const String home = '/home';
-  static const String dashboard = home;
+  static const String dashboard = '/dashboard';
   static const String budgets = '/budgets';
   static const String aiChat = '/chat-ai';
   static const String profile = '/profile';
@@ -146,7 +147,8 @@ class RoutePaths {
   static const String createSplitExpense = '/split-expenses/create';
 
   // 8. Reports & Analytics
-  static const String analytics = '/analytics';
+  static const String reportsOverview = '/reports/overview';
+  static const String analytics = '/dashboard';
   static const String cashflowReport = '/reports/cashflow';
   static const String categoryReport = '/reports/category';
   static const String exchangeRates = '/exchange-rates';
