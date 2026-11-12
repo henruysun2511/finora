@@ -175,9 +175,7 @@ class _ChatDetailScreenState extends ConsumerState<ChatDetailScreen> {
               error: (err, _) => Center(
                 child: Text('Lỗi tải tin nhắn: $err', style: TextStyle(color: muted)),
               ),
-              data: (chatState) {
-                final messages = chatState.messages;
-
+              data: (messages) {
                 if (messages.isEmpty) {
                   return Center(
                     child: Text(
@@ -191,24 +189,8 @@ class _ChatDetailScreenState extends ConsumerState<ChatDetailScreen> {
                   controller: _scrollController,
                   reverse: true,
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-                  itemCount: messages.length + (chatState.isLoadingMore ? 1 : 0),
+                  itemCount: messages.length,
                   itemBuilder: (ctx, i) {
-                    if (i == messages.length) {
-                      return const Center(
-                        child: Padding(
-                          padding: EdgeInsets.symmetric(vertical: 12),
-                          child: SizedBox(
-                            width: 20,
-                            height: 20,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              color: AppColors.primary,
-                            ),
-                          ),
-                        ),
-                      );
-                    }
-
                     final msg = messages[i];
                     return ChatBubble(
                       message: msg,
