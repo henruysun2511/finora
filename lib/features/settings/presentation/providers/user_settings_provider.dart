@@ -1,11 +1,64 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/network/dio_client.dart';
 import '../../data/services/settings_api_service.dart';
+import '../../domain/models/general_settings.dart';
 import '../../domain/models/notification_preferences.dart';
 
 final settingsApiServiceProvider = Provider<SettingsApiService>((ref) {
   return DioSettingsApiService(ref.watch(dioProvider));
 });
+
+final generalSettingsProvider =
+    AsyncNotifierProvider<GeneralSettingsNotifier, GeneralSettings>(() {
+  return GeneralSettingsNotifier();
+});
+
+class GeneralSettingsNotifier extends AsyncNotifier<GeneralSettings> {
+  @override
+  Future<GeneralSettings> build() async {
+    final service = ref.watch(settingsApiServiceProvider);
+    try {
+      final data = await service.getSettings();
+      return GeneralSettings.fromMap(data);
+    } catch (_) {
+      return const GeneralSettings();
+    }
+  }
+
+  Future<void> updateGeneral({
+    String? defaultCurrency,
+    String? language,
+    String? defaultTransactionVisibility,
+    bool? defaultAmountHidden,
+  }) async {
+    final current = state.value ?? const GeneralSettings();
+    final updated = current.copyWith(
+      defaultCurrency: defaultCurrency,
+      language: language,
+      defaultTransactionVisibility: defaultTransactionVisibility,
+      defaultAmountHidden: defaultAmountHidden,
+    );
+
+    // Optimistic update
+    state = AsyncData(updated);
+
+    try {
+      final service = ref.read(settingsApiServiceProvider);
+      await service.updateGeneralSettings(
+        defaultCurrency: defaultCurrency,
+        language: language,
+        defaultTransactionVisibility: defaultTransactionVisibility,
+        defaultAmountHidden: defaultAmountHidden,
+      );
+      if (defaultCurrency != null) {
+        ref.invalidate(defaultCurrencyProvider);
+      }
+    } catch (e) {
+      state = AsyncData(current);
+      rethrow;
+    }
+  }
+}
 
 final defaultCurrencyProvider =
     AsyncNotifierProvider<DefaultCurrencyNotifier, String>(() {

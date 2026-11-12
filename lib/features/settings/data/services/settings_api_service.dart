@@ -5,7 +5,12 @@ import '../../../../core/network/api_exception.dart';
 
 abstract class SettingsApiService {
   Future<Map<String, dynamic>> getSettings();
-  Future<void> updateGeneralSettings({String? defaultCurrency});
+  Future<void> updateGeneralSettings({
+    String? defaultCurrency,
+    String? language,
+    String? defaultTransactionVisibility,
+    bool? defaultAmountHidden,
+  });
   Future<Map<String, dynamic>> updateNotificationPreferences(Map<String, dynamic> preferences);
 }
 
@@ -42,12 +47,22 @@ class DioSettingsApiService implements SettingsApiService {
       });
 
   @override
-  Future<void> updateGeneralSettings({String? defaultCurrency}) =>
+  Future<void> updateGeneralSettings({
+    String? defaultCurrency,
+    String? language,
+    String? defaultTransactionVisibility,
+    bool? defaultAmountHidden,
+  }) =>
       _guard(() async {
         await _dio.patch<dynamic>(
           ApiConstants.updateGeneralSettings,
           data: {
             if (defaultCurrency != null) 'defaultCurrency': defaultCurrency,
+            if (language != null) 'language': language,
+            if (defaultTransactionVisibility != null)
+              'defaultTransactionVisibility': defaultTransactionVisibility,
+            if (defaultAmountHidden != null)
+              'defaultAmountHidden': defaultAmountHidden,
           },
         );
       });

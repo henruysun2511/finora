@@ -348,6 +348,13 @@ class ProfileScreen extends ConsumerWidget {
                 ),
                 Divider(height: 20, color: isDark ? AppColors.darkBorder : AppColors.lightBorder),
                 ProfileSettingsTile(
+                  icon: Icons.tune_rounded,
+                  title: 'Cài đặt chung',
+                  subtitle: 'Tiền tệ, ngôn ngữ & quyền riêng tư',
+                  onTap: () => context.push(RoutePaths.settings),
+                ),
+                Divider(height: 20, color: isDark ? AppColors.darkBorder : AppColors.lightBorder),
+                ProfileSettingsTile(
                   icon: Icons.currency_exchange_rounded,
                   title: 'Tỷ giá & Quy đổi ngoại tệ',
                   subtitle: 'Tra cứu tỷ giá & công cụ quy đổi',
