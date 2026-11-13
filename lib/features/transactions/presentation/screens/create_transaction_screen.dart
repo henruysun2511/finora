@@ -26,7 +26,14 @@ import '../widgets/transaction_type_toggle.dart';
 import 'receipt_capture_screen.dart';
 
 class CreateTransactionScreen extends ConsumerStatefulWidget {
-  const CreateTransactionScreen({super.key});
+  final String? initialWalletId;
+  final String? initialType;
+
+  const CreateTransactionScreen({
+    super.key,
+    this.initialWalletId,
+    this.initialType,
+  });
 
   @override
   ConsumerState<CreateTransactionScreen> createState() =>
@@ -58,6 +65,24 @@ class _CreateTransactionScreenState
     if (formState.amount > 0) {
       _amountController.text = _formatNumber(formState.amount);
     }
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final notifier = ref.read(transactionFormProvider.notifier);
+      if (widget.initialType == 'income') {
+        notifier.setType(TransactionType.income);
+      } else if (widget.initialType == 'expense') {
+        notifier.setType(TransactionType.expense);
+      }
+      if (widget.initialWalletId != null) {
+        final accounts = ref.read(accountsListProvider).valueOrNull ?? [];
+        final walletAcc = accounts
+            .where((a) => a.walletId == widget.initialWalletId)
+            .firstOrNull;
+        if (walletAcc != null) {
+          notifier.setAccount(id: walletAcc.id, name: walletAcc.name);
+        }
+      }
+    });
   }
 
   @override

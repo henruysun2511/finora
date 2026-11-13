@@ -157,6 +157,7 @@ class WalletTransactionItem {
   final double amount;
   final String type; // INCOME / EXPENSE
   final DateTime transactionDate;
+  final String? createdBy;
 
   const WalletTransactionItem({
     required this.id,
@@ -164,6 +165,7 @@ class WalletTransactionItem {
     required this.amount,
     required this.type,
     required this.transactionDate,
+    this.createdBy,
   });
 }
 
@@ -173,7 +175,7 @@ final walletTransactionsProvider =
   try {
     final res = await dio.get(
       '/transactions',
-      queryParameters: {'walletId': walletId, 'limit': 10},
+      queryParameters: {'walletId': walletId, 'limit': 30},
     );
     final data = res.data;
     dynamic items;
@@ -193,17 +195,22 @@ final walletTransactionsProvider =
       return items.map((raw) {
         final m = raw as Map<String, dynamic>;
         final typeStr = (m['type'] as String?)?.toUpperCase() ?? 'EXPENSE';
+        final title = (m['name'] as String?)?.trim().isNotEmpty == true
+            ? m['name'] as String
+            : (m['note'] as String?)?.trim().isNotEmpty == true
+                ? m['note'] as String
+                : (m['category']?['name'] as String? ?? 'Giao dịch');
+
         return WalletTransactionItem(
           id: m['id'] as String? ?? '',
-          title: m['note'] as String? ??
-              m['category']?['name'] as String? ??
-              'Giao dịch',
+          title: title,
           amount: (m['amount'] as num?)?.toDouble() ?? 0.0,
           type: typeStr,
           transactionDate: m['transactionDate'] != null
               ? DateTime.tryParse(m['transactionDate'].toString()) ??
                   DateTime.now()
               : DateTime.now(),
+          createdBy: m['createdBy'] as String?,
         );
       }).toList();
     }

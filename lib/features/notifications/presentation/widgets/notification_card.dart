@@ -17,6 +17,8 @@ class NotificationCard extends StatelessWidget {
     this.isRead = false,
     this.onTap,
     this.onDelete,
+    this.onAccept,
+    this.onReject,
   });
 
   factory NotificationCard.fromItem({
@@ -24,6 +26,8 @@ class NotificationCard extends StatelessWidget {
     required NotificationItem item,
     VoidCallback? onTap,
     VoidCallback? onDelete,
+    VoidCallback? onAccept,
+    VoidCallback? onReject,
   }) {
     return NotificationCard(
       key: key,
@@ -35,6 +39,8 @@ class NotificationCard extends StatelessWidget {
       isRead: item.isRead,
       onTap: onTap,
       onDelete: onDelete,
+      onAccept: onAccept,
+      onReject: onReject,
     );
   }
 
@@ -47,6 +53,8 @@ class NotificationCard extends StatelessWidget {
   final bool isRead;
   final VoidCallback? onTap;
   final VoidCallback? onDelete;
+  final VoidCallback? onAccept;
+  final VoidCallback? onReject;
 
   @override
   Widget build(BuildContext context) {
@@ -149,6 +157,64 @@ class NotificationCard extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 10),
+                      if (onAccept != null || onReject != null) ...[
+                        Row(
+                          children: [
+                            if (onReject != null)
+                              Expanded(
+                                child: OutlinedButton(
+                                  onPressed: onReject,
+                                  style: OutlinedButton.styleFrom(
+                                    padding: const EdgeInsets.symmetric(vertical: 8),
+                                    side: BorderSide(
+                                      color: isDark
+                                          ? AppColors.darkBorder
+                                          : AppColors.lightBorder,
+                                    ),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                  ),
+                                  child: Text(
+                                    'Từ chối',
+                                    style: GoogleFonts.inter(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w600,
+                                      color: isDark
+                                          ? AppColors.darkMuted
+                                          : AppColors.lightMuted,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            if (onReject != null && onAccept != null)
+                              const SizedBox(width: 8),
+                            if (onAccept != null)
+                              Expanded(
+                                child: ElevatedButton(
+                                  onPressed: onAccept,
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: AppColors.primary,
+                                    foregroundColor: Colors.white,
+                                    elevation: 0,
+                                    padding: const EdgeInsets.symmetric(vertical: 8),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                  ),
+                                  child: Text(
+                                    'Tham gia ngay',
+                                    style: GoogleFonts.inter(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                          ],
+                        ),
+                        const SizedBox(height: 10),
+                      ],
                       Row(
                         children: [
                           Icon(

@@ -6,6 +6,9 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/widgets/app_toast.dart';
 import '../../../../core/widgets/page_header.dart';
+import '../../wallets/presentation/providers/wallet_detail_provider.dart';
+import '../../wallets/presentation/providers/wallets_overview_provider.dart';
+import '../../domain/models/notification_type.dart';
 import '../providers/notification_list_provider.dart';
 import '../widgets/notification_banner_hero.dart';
 import '../widgets/notification_card.dart';
@@ -118,6 +121,12 @@ class NotificationsScreen extends ConsumerWidget {
 
                 return Column(
                   children: list.map((item) {
+                    final isWalletInvite =
+                        item.type == NotificationType.walletInvite &&
+                            !item.isRead;
+                    final walletId = item.relatedEntityId ??
+                        item.metadata?['walletId']?.toString();
+
                     return NotificationCard.fromItem(
                       item: item,
                       onTap: () {
@@ -131,6 +140,51 @@ class NotificationsScreen extends ConsumerWidget {
                           context.push(item.actionUrl!);
                         }
                       },
+                      onAccept: isWalletInvite && walletId != null
+                          ? () async {
+                              try {
+                                await ref
+                                    .read(walletDetailActionsProvider(walletId))
+                                    .acceptInvite();
+                                await ref
+                                    .read(notificationListProvider.notifier)
+                                    .markAsRead(item.id);
+                                ref.invalidate(walletsOverviewProvider);
+                                if (context.mounted) {
+                                  AppToast.success(
+                                    context,
+                                    'Đã chấp nhận tham gia quỹ nhóm!',
+                                  );
+                                }
+                              } catch (e) {
+                                if (context.mounted) {
+                                  AppToast.error(context, e.toString());
+                                }
+                              }
+                            }
+                          : null,
+                      onReject: isWalletInvite && walletId != null
+                          ? () async {
+                              try {
+                                await ref
+                                    .read(walletDetailActionsProvider(walletId))
+                                    .rejectInvite();
+                                await ref
+                                    .read(notificationListProvider.notifier)
+                                    .markAsRead(item.id);
+                                if (context.mounted) {
+                                  AppToast.info(
+                                    context,
+                                    'Đã từ chối lời mời tham gia quỹ',
+                                  );
+                                }
+                              } catch (e) {
+                                if (context.mounted) {
+                                  AppToast.error(context, e.toString());
+                                }
+                              }
+                            }
+                          : null,
                       onDelete: () {
                         ref
                             .read(notificationListProvider.notifier)

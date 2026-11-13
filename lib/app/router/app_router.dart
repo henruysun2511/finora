@@ -249,7 +249,14 @@ GoRouter appRouter(AppRouterRef ref) {
         parentNavigatorKey: _rootNavigatorKey,
         path: RoutePaths.createTransaction,
         name: RouteNames.createTransaction,
-        builder: (context, state) => const CreateTransactionScreen(),
+        builder: (context, state) {
+          final walletId = state.uri.queryParameters['walletId'];
+          final type = state.uri.queryParameters['type'];
+          return CreateTransactionScreen(
+            initialWalletId: walletId,
+            initialType: type,
+          );
+        },
       ),
       GoRoute(
         parentNavigatorKey: _rootNavigatorKey,
