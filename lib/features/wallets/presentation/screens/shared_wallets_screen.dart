@@ -1526,7 +1526,7 @@ class _SharedWalletsScreenState extends ConsumerState<SharedWalletsScreen> {
                     value: m.userId,
                     child: Text('${m.fullName} (${m.role.displayName})'),
                   );
-                }).toList],
+                }).toList(),
                 onChanged: (val) => setDlgState(() => selectedNewOwnerId = val),
               ),
             ],
