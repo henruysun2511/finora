@@ -51,7 +51,9 @@ import '../../features/transactions/presentation/screens/scan_receipt_screen.dar
 import '../../features/transactions/presentation/screens/receipt_capture_screen.dart';
 import '../../features/transactions/presentation/screens/transaction_detail_screen.dart';
 import '../../features/transactions/presentation/screens/transactions_screen.dart';
+import '../../features/accounts/domain/models/account_model.dart';
 import '../../features/accounts/presentation/screens/account_detail_screen.dart';
+import '../../features/accounts/presentation/screens/adjust_balance_screen.dart';
 import '../../features/wallets/presentation/screens/create_account_screen.dart';
 import '../../features/wallets/presentation/screens/create_wallet_screen.dart';
 import '../../features/wallets/presentation/screens/shared_wallets_screen.dart';
@@ -329,6 +331,20 @@ GoRouter appRouter(AppRouterRef ref) {
         builder: (context, state) {
           final id = state.pathParameters['id'] ?? '';
           return AccountDetailScreen(accountId: id);
+        },
+      ),
+      GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
+        path: RoutePaths.adjustBalance,
+        name: RouteNames.adjustBalance,
+        builder: (context, state) {
+          final id = state.pathParameters['id'] ?? '';
+          final extraAccount =
+              state.extra is AccountModel ? state.extra as AccountModel : null;
+          return AdjustBalanceScreen(
+            accountId: id,
+            initialAccount: extraAccount,
+          );
         },
       ),
       GoRoute(

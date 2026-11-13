@@ -40,6 +40,7 @@ class RouteNames {
   static const String sharedWallets = 'sharedWallets';
   static const String createSharedWallet = 'createSharedWallet';
   static const String accountDetail = 'accountDetail';
+  static const String adjustBalance = 'adjustBalance';
   static const String createAccount = 'createAccount';
   static const String transfer = 'transfer';
 
@@ -129,6 +130,8 @@ class RoutePaths {
   static const String createSharedWallet = '/wallets/shared/create';
   static const String accountDetail = '/accounts/:id';
   static String accountDetailWithId(String id) => '/accounts/$id';
+  static const String adjustBalance = '/accounts/:id/adjust';
+  static String adjustBalanceWithId(String id) => '/accounts/$id/adjust';
   static const String createAccount = '/accounts/create';
   static const String transfer = '/transfer';
 

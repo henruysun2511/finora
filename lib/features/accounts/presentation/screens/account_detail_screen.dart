@@ -12,7 +12,6 @@ import '../../../../core/widgets/page_header.dart';
 import '../../../wallets/presentation/providers/wallets_overview_provider.dart';
 import '../../domain/models/account_model.dart';
 import '../providers/account_detail_provider.dart';
-import '../widgets/adjust_balance_dialog.dart';
 
 /// Màn hình Chi tiết tài khoản nguồn tiền chuẩn FinTech
 class AccountDetailScreen extends ConsumerStatefulWidget {
@@ -34,9 +33,9 @@ class _AccountDetailScreenState extends ConsumerState<AccountDetailScreen> {
       AppToast.error(context, 'Chưa tải xong dữ liệu tài khoản để đối soát');
       return;
     }
-    showDialog(
-      context: context,
-      builder: (ctx) => AdjustBalanceDialog(account: account),
+    context.push(
+      RoutePaths.adjustBalanceWithId(account.id),
+      extra: account,
     );
   }
 
