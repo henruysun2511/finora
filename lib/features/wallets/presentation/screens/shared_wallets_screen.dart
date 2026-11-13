@@ -1063,143 +1063,348 @@ class _SharedWalletsScreenState extends ConsumerState<SharedWalletsScreen> {
     bool isDark,
     WalletItemState selectedItem,
   ) {
+    final isCurrentOwner =
+        selectedItem.wallet.currentUserRole == WalletMemberRole.owner;
+    final detailAsync =
+        ref.watch(walletDetailProvider(selectedItem.wallet.id));
+    final otherMembers = detailAsync.valueOrNull?.members
+            .where((m) => !m.isOwner)
+            .toList() ??
+        [];
+
     return FormCard(
       title: 'Cài đặt quỹ nhóm',
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Column(
         children: [
-          ListTile(
-            contentPadding: EdgeInsets.zero,
-            leading: const Icon(Icons.edit_rounded, color: AppColors.primary),
-            title: Text(
-              'Đổi tên quỹ nhóm',
-              style: GoogleFonts.inter(
-                fontWeight: FontWeight.w700,
-                fontSize: 13.5,
-                color: isDark
-                    ? AppColors.darkForeground
-                    : AppColors.lightForeground,
-              ),
-            ),
-            trailing: Icon(
-              Icons.chevron_right_rounded,
-              size: 20,
-              color: isDark ? AppColors.darkMuted : AppColors.lightMuted,
-            ),
-            onTap: () {
-              final nameCtrl =
-                  TextEditingController(text: selectedItem.wallet.name);
-              showDialog(
-                context: context,
-                builder: (ctx) => AlertDialog(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  title: const Text('Đổi tên quỹ nhóm'),
-                  content: TextField(
-                    controller: nameCtrl,
-                    decoration: const InputDecoration(
-                      labelText: 'Tên quỹ mới',
-                      hintText: 'Nhập tên mới cho quỹ...',
-                    ),
-                  ),
-                  actions: [
-                    TextButton(
-                      onPressed: () => Navigator.pop(ctx),
-                      child: const Text('HỦY'),
-                    ),
-                    TextButton(
-                      onPressed: () async {
-                        Navigator.pop(ctx);
-                        try {
-                          await ref
-                              .read(walletDetailActionsProvider(
-                                  selectedItem.wallet.id))
-                              .updateWallet(
-                                UpdateWalletRequest(name: nameCtrl.text.trim()),
-                              );
-                          ref.invalidate(walletsOverviewProvider);
-                          if (mounted) {
-                            AppToast.success(
-                                context, 'Đã đổi tên quỹ thành công!');
-                          }
-                        } catch (e) {
-                          if (mounted) AppToast.error(context, e.toString());
-                        }
-                      },
-                      child: const Text('LƯU'),
-                    ),
-                  ],
+          if (isCurrentOwner) ...[
+            // 1. Đổi tên quỹ nhóm (Owner)
+            ListTile(
+              contentPadding: EdgeInsets.zero,
+              leading: const Icon(Icons.edit_rounded, color: AppColors.primary),
+              title: Text(
+                'Đổi tên quỹ nhóm',
+                style: GoogleFonts.inter(
+                  fontWeight: FontWeight.w700,
+                  fontSize: 13.5,
+                  color: isDark
+                      ? AppColors.darkForeground
+                      : AppColors.lightForeground,
                 ),
-              );
+              ),
+              trailing: Icon(
+                Icons.chevron_right_rounded,
+                size: 20,
+                color: isDark ? AppColors.darkMuted : AppColors.lightMuted,
+              ),
+              onTap: () => _showRenameDialog(context, selectedItem),
+            ),
+            Divider(
+              height: 1,
+              color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
+            ),
+
+            // 2. Chuyển quyền Chủ sở hữu (Owner)
+            if (otherMembers.isNotEmpty) ...[
+              ListTile(
+                contentPadding: EdgeInsets.zero,
+                leading: const Icon(Icons.swap_horiz_rounded,
+                    color: Color(0xFF6366F1)),
+                title: Text(
+                  'Chuyển quyền Chủ sở hữu',
+                  style: GoogleFonts.inter(
+                    fontWeight: FontWeight.w700,
+                    fontSize: 13.5,
+                    color: isDark
+                        ? AppColors.darkForeground
+                        : AppColors.lightForeground,
+                  ),
+                ),
+                subtitle: Text(
+                  'Bàn giao vai trò Chủ quỹ cho thành viên khác',
+                  style: GoogleFonts.inter(
+                    fontSize: 11,
+                    color: isDark ? AppColors.darkMuted : AppColors.lightMuted,
+                  ),
+                ),
+                trailing: Icon(
+                  Icons.chevron_right_rounded,
+                  size: 20,
+                  color: isDark ? AppColors.darkMuted : AppColors.lightMuted,
+                ),
+                onTap: () => _showTransferOwnershipDialog(
+                  context,
+                  isDark,
+                  selectedItem,
+                  otherMembers,
+                ),
+              ),
+              Divider(
+                height: 1,
+                color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
+              ),
+            ],
+
+            // 3. Giải tán / Xóa quỹ nhóm (Owner)
+            ListTile(
+              contentPadding: EdgeInsets.zero,
+              leading: const Icon(Icons.delete_outline_rounded,
+                  color: AppColors.danger),
+              title: Text(
+                'Giải tán / Xóa quỹ nhóm',
+                style: GoogleFonts.inter(
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.danger,
+                  fontSize: 13.5,
+                ),
+              ),
+              trailing: Icon(
+                Icons.chevron_right_rounded,
+                size: 20,
+                color: isDark ? AppColors.darkMuted : AppColors.lightMuted,
+              ),
+              onTap: () => _showDisbandDialog(context, selectedItem),
+            ),
+          ] else ...[
+            // 4. Tự rời khỏi quỹ nhóm (Editor / Viewer)
+            ListTile(
+              contentPadding: EdgeInsets.zero,
+              leading: const Icon(Icons.logout_rounded, color: AppColors.danger),
+              title: Text(
+                'Rời khỏi quỹ nhóm này',
+                style: GoogleFonts.inter(
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.danger,
+                  fontSize: 13.5,
+                ),
+              ),
+              subtitle: Text(
+                'Bạn sẽ không còn quyền truy cập vào quỹ nhóm này nữa',
+                style: GoogleFonts.inter(
+                  fontSize: 11,
+                  color: isDark ? AppColors.darkMuted : AppColors.lightMuted,
+                ),
+              ),
+              trailing: Icon(
+                Icons.chevron_right_rounded,
+                size: 20,
+                color: isDark ? AppColors.darkMuted : AppColors.lightMuted,
+              ),
+              onTap: () => _showLeaveDialog(context, selectedItem),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  void _showRenameDialog(BuildContext context, WalletItemState selectedItem) {
+    final nameCtrl = TextEditingController(text: selectedItem.wallet.name);
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+        ),
+        title: const Text('Đổi tên quỹ nhóm'),
+        content: TextField(
+          controller: nameCtrl,
+          decoration: const InputDecoration(
+            labelText: 'Tên quỹ mới',
+            hintText: 'Nhập tên mới cho quỹ...',
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('HỦY'),
+          ),
+          TextButton(
+            onPressed: () async {
+              Navigator.pop(ctx);
+              try {
+                await ref
+                    .read(walletDetailActionsProvider(selectedItem.wallet.id))
+                    .updateWallet(
+                      UpdateWalletRequest(name: nameCtrl.text.trim()),
+                    );
+                ref.invalidate(walletsOverviewProvider);
+                if (mounted) {
+                  AppToast.success(context, 'Đã đổi tên quỹ thành công!');
+                }
+              } catch (e) {
+                if (mounted) AppToast.error(context, e.toString());
+              }
             },
+            child: const Text('LƯU'),
           ),
-          Divider(
-            height: 1,
-            color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
+        ],
+      ),
+    );
+  }
+
+  void _showDisbandDialog(BuildContext context, WalletItemState selectedItem) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+        ),
+        title: const Text('Giải tán quỹ nhóm?'),
+        content: Text(
+          'Bạn có chắc chắn muốn giải tán quỹ "${selectedItem.wallet.name}" không? Hành động này không thể hoàn tác.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('HỦY'),
           ),
-          ListTile(
-            contentPadding: EdgeInsets.zero,
-            leading: const Icon(Icons.delete_outline_rounded,
-                color: AppColors.danger),
-            title: Text(
-              'Giải tán / Xóa quỹ nhóm',
-              style: GoogleFonts.inter(
-                fontWeight: FontWeight.w700,
+          TextButton(
+            onPressed: () async {
+              Navigator.pop(ctx);
+              try {
+                await ref
+                    .read(walletDetailActionsProvider(selectedItem.wallet.id))
+                    .deleteWallet();
+                ref.invalidate(walletsOverviewProvider);
+                if (mounted) {
+                  AppToast.success(context, 'Đã giải tán quỹ nhóm!');
+                  setState(() => _selectedWalletId = null);
+                }
+              } catch (e) {
+                if (mounted) AppToast.error(context, e.toString());
+              }
+            },
+            child: const Text(
+              'XÓA QUỸ',
+              style: TextStyle(
                 color: AppColors.danger,
-                fontSize: 13.5,
+                fontWeight: FontWeight.bold,
               ),
             ),
-            trailing: Icon(
-              Icons.chevron_right_rounded,
-              size: 20,
-              color: isDark ? AppColors.darkMuted : AppColors.lightMuted,
-            ),
-            onTap: () {
-              showDialog(
-                context: context,
-                builder: (ctx) => AlertDialog(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  title: const Text('Giải tán quỹ nhóm?'),
-                  content: Text(
-                    'Bạn có chắc chắn muốn giải tán quỹ "${selectedItem.wallet.name}" không? Hành động này không thể hoàn tác.',
-                  ),
-                  actions: [
-                    TextButton(
-                      onPressed: () => Navigator.pop(ctx),
-                      child: const Text('HỦY'),
-                    ),
-                    TextButton(
-                      onPressed: () async {
-                        Navigator.pop(ctx);
-                        try {
-                          await ref
-                              .read(walletDetailActionsProvider(
-                                  selectedItem.wallet.id))
-                              .deleteWallet();
-                          ref.invalidate(walletsOverviewProvider);
-                          if (mounted) {
-                            AppToast.success(context, 'Đã giải tán quỹ nhóm!');
-                            setState(() => _selectedWalletId = null);
-                          }
-                        } catch (e) {
-                          if (mounted) AppToast.error(context, e.toString());
-                        }
-                      },
-                      child: const Text(
-                        'XÓA QUỸ',
-                        style: TextStyle(
-                          color: AppColors.danger,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showTransferOwnershipDialog(
+    BuildContext context,
+    bool isDark,
+    WalletItemState selectedItem,
+    List<WalletMemberModel> otherMembers,
+  ) {
+    String? selectedNewOwnerId;
+    showDialog(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (context, setDlgState) => AlertDialog(
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          title: const Text('Chuyển quyền Chủ sở hữu'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              const Text(
+                'Chọn thành viên bạn muốn trao quyền Chủ quỹ. Sau khi chuyển giao, bạn sẽ trở thành Biên tập viên.',
+                style: TextStyle(fontSize: 12.5),
+              ),
+              const SizedBox(height: 14),
+              DropdownButtonFormField<String>(
+                value: selectedNewOwnerId,
+                hint: const Text('Chọn thành viên nhận quyền...'),
+                isExpanded: true,
+                items: otherMembers.map((m) {
+                  return DropdownMenuItem(
+                    value: m.userId,
+                    child: Text('${m.fullName} (${m.role.displayName})'),
+                  );
+                }).toList],
+                onChanged: (val) => setDlgState(() => selectedNewOwnerId = val),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+                onPressed: () => Navigator.pop(ctx),
+                child: const Text('HỦY')),
+            TextButton(
+              onPressed: () async {
+                if (selectedNewOwnerId == null) {
+                  AppToast.error(
+                      context, 'Vui lòng chọn thành viên nhận quyền');
+                  return;
+                }
+                Navigator.pop(ctx);
+                try {
+                  await ref
+                      .read(walletDetailActionsProvider(
+                          selectedItem.wallet.id))
+                      .transferOwnership(selectedNewOwnerId!);
+                  ref.invalidate(walletsOverviewProvider);
+                  if (mounted) {
+                    AppToast.success(context,
+                        'Chuyển giao quyền chủ sở hữu thành công!');
+                  }
+                } catch (e) {
+                  if (mounted) AppToast.error(context, e.toString());
+                }
+              },
+              child: const Text(
+                'XÁC NHẬN',
+                style: TextStyle(
+                  color: AppColors.primary,
+                  fontWeight: FontWeight.bold,
                 ),
-              );
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showLeaveDialog(
+    BuildContext context,
+    WalletItemState selectedItem,
+  ) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape:
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: const Text('Rời khỏi quỹ nhóm?'),
+        content: Text(
+          'Bạn có chắc chắn muốn rời khỏi quỹ "${selectedItem.wallet.name}" không? Bạn sẽ cần được mời lại nếu muốn tham gia tiếp.',
+        ),
+        actions: [
+          TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text('HỦY')),
+          TextButton(
+            onPressed: () async {
+              Navigator.pop(ctx);
+              try {
+                await ref
+                    .read(walletDetailActionsProvider(selectedItem.wallet.id))
+                    .leaveWallet();
+                ref.invalidate(walletsOverviewProvider);
+                if (mounted) {
+                  AppToast.success(context, 'Đã rời khỏi quỹ nhóm thành công!');
+                  setState(() => _selectedWalletId = null);
+                }
+              } catch (e) {
+                if (mounted) AppToast.error(context, e.toString());
+              }
             },
+            child: const Text(
+              'RỜI QUỸ',
+              style: TextStyle(
+                color: AppColors.danger,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
           ),
         ],
       ),
