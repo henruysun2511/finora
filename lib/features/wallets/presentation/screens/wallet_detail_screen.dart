@@ -7,8 +7,10 @@ import '../../../../app/router/route_names.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/utils/currency_formatter.dart';
 import '../../../../core/widgets/app_toast.dart';
+import '../../../../core/widgets/form_card.dart';
 import '../../../accounts/domain/models/account_model.dart';
 import '../../../../core/widgets/page_header.dart';
+import '../../data/dto/update_wallet_request.dart';
 import '../providers/wallet_detail_provider.dart';
 import '../providers/wallets_overview_provider.dart';
 
@@ -37,6 +39,70 @@ class _WalletDetailScreenState extends ConsumerState<WalletDetailScreen> {
         AppToast.error(context, e.toString());
       }
     }
+  }
+
+  void _confirmToggleShared(
+    BuildContext context,
+    bool enableShared,
+    String walletName,
+  ) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+        ),
+        title: Text(
+          enableShared ? 'Chuyển thành Ví chung?' : 'Chuyển về Ví cá nhân?',
+          style: GoogleFonts.inter(fontWeight: FontWeight.w700),
+        ),
+        content: Text(
+          enableShared
+              ? 'Bạn có muốn chuyển ví "$walletName" thành Ví chung để mời bạn bè, người thân cùng quản lý thu chi không? Sau khi chuyển, ví sẽ xuất hiện trong mục Ví chung & Quỹ nhóm.'
+              : 'Bạn có chắc chắn muốn chuyển ví "$walletName" về ví cá nhân không? Các thành viên khác sẽ không thể tiếp tục truy cập ví này.',
+          style: GoogleFonts.inter(fontSize: 13, height: 1.4),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('HỦY'),
+          ),
+          TextButton(
+            onPressed: () async {
+              Navigator.pop(ctx);
+              try {
+                await ref
+                    .read(walletDetailActionsProvider(widget.walletId))
+                    .updateWallet(UpdateWalletRequest(isShared: enableShared));
+                ref.invalidate(walletsOverviewProvider);
+                if (mounted) {
+                  AppToast.success(
+                    context,
+                    enableShared
+                        ? 'Đã chuyển ví thành Ví chung thành công!'
+                        : 'Đã chuyển ví về Ví cá nhân!',
+                  );
+                  if (enableShared) {
+                    context.push(RoutePaths.sharedWallets);
+                  }
+                }
+              } catch (e) {
+                if (mounted) {
+                  AppToast.error(context, e.toString());
+                }
+              }
+            },
+            child: Text(
+              'XÁC NHẬN',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: enableShared ? AppColors.primary : AppColors.danger,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -69,13 +135,88 @@ class _WalletDetailScreenState extends ConsumerState<WalletDetailScreen> {
             context.go(RoutePaths.wallets);
           }
         },
-        action: IconButton(
-          icon: Icon(
-            Icons.tune_rounded,
-            color: isDark ? AppColors.darkForeground : AppColors.lightForeground,
-          ),
-          onPressed: () => context.push(RoutePaths.accountDetailWithId(widget.walletId)),
-        ),
+        action: walletDetail == null || !walletDetail.isOwner
+            ? null
+            : PopupMenuButton<String>(
+                icon: Icon(
+                  Icons.more_vert_rounded,
+                  color: isDark
+                      ? AppColors.darkForeground
+                      : AppColors.lightForeground,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                color: isDark ? AppColors.darkSurface : Colors.white,
+                onSelected: (val) {
+                  if (val == 'TOGGLE_SHARED') {
+                    _confirmToggleShared(
+                      context,
+                      !walletDetail.isShared,
+                      walletDetail.wallet.name,
+                    );
+                  } else if (val == 'OPEN_SHARED') {
+                    context.push(RoutePaths.sharedWallets);
+                  } else if (val == 'SYNC') {
+                    _syncWallet(context);
+                  }
+                },
+                itemBuilder: (ctx) => [
+                  if (!walletDetail.isShared)
+                    PopupMenuItem(
+                      value: 'TOGGLE_SHARED',
+                      child: Row(
+                        children: [
+                          const Icon(Icons.groups_rounded,
+                              size: 18, color: AppColors.primary),
+                          const SizedBox(width: 8),
+                          Text(
+                            'Chuyển thành Ví chung',
+                            style: GoogleFonts.inter(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                  else
+                    PopupMenuItem(
+                      value: 'OPEN_SHARED',
+                      child: Row(
+                        children: [
+                          const Icon(Icons.groups_rounded,
+                              size: 18, color: Color(0xFF0D9488)),
+                          const SizedBox(width: 8),
+                          Text(
+                            'Mở mục Ví chung & Quỹ',
+                            style: GoogleFonts.inter(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  PopupMenuItem(
+                    value: 'SYNC',
+                    child: Row(
+                      children: [
+                        const Icon(Icons.sync_rounded,
+                            size: 18, color: Color(0xFF64748B)),
+                        const SizedBox(width: 8),
+                        Text(
+                          'Đồng bộ số dư ví',
+                          style: GoogleFonts.inter(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
       ),
       body: SafeArea(
         child: RefreshIndicator(
@@ -113,7 +254,55 @@ class _WalletDetailScreenState extends ConsumerState<WalletDetailScreen> {
 
                 const SizedBox(height: 20),
 
-                // ──────────────── 5. TRANSACTION HISTORY ────────────────
+                // ──────────────── 5. CÀI ĐẶT VÍ (FormCard Quy chuẩn 3 GEMINI.md) ────────────────
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: FormCard(
+                    title: 'CÀI ĐẶT VÍ & CHIA SẺ',
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 8),
+                    child: SwitchListTile(
+                      contentPadding: EdgeInsets.zero,
+                      title: Text(
+                        'Chuyển thành Ví chung (Quỹ nhóm)',
+                        style: GoogleFonts.inter(
+                          fontSize: 13.5,
+                          fontWeight: FontWeight.w700,
+                          color: isDark
+                              ? AppColors.darkForeground
+                              : AppColors.lightForeground,
+                        ),
+                      ),
+                      subtitle: Text(
+                        (walletDetail?.isShared ?? false)
+                            ? 'Ví đang là Ví chung. Bạn có thể mời bạn bè và thành viên cùng quản lý.'
+                            : 'Bật để mời bạn bè cùng quản lý thu chi, phân quyền và theo dõi đóng góp quỹ.',
+                        style: GoogleFonts.inter(
+                          fontSize: 11.5,
+                          color: isDark
+                              ? AppColors.darkMuted
+                              : AppColors.lightMuted,
+                        ),
+                      ),
+                      value: walletDetail?.isShared ?? false,
+                      activeColor: Colors.white,
+                      activeTrackColor: AppColors.primary,
+                      trackOutlineColor:
+                          WidgetStateProperty.all(Colors.transparent),
+                      onChanged: walletDetail == null || !walletDetail.isOwner
+                          ? null
+                          : (val) => _confirmToggleShared(
+                                context,
+                                val,
+                                walletDetail.wallet.name,
+                              ),
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 20),
+
+                // ──────────────── 6. TRANSACTION HISTORY ────────────────
                 _buildTransactionHistory(context, isDark),
 
                 const SizedBox(height: 80),
