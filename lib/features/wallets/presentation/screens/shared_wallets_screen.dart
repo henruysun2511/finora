@@ -347,13 +347,17 @@ class _SharedWalletsScreenState extends ConsumerState<SharedWalletsScreen> {
             ),
           ),
           const SizedBox(height: 2),
-          Text(
-            CurrencyFormatter.format(balance, currency: currency),
-            style: GoogleFonts.outfit(
-              fontSize: 34,
-              fontWeight: FontWeight.w900,
-              letterSpacing: -0.8,
-              color: Colors.white,
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            alignment: Alignment.centerLeft,
+            child: Text(
+              CurrencyFormatter.format(balance, currency: currency),
+              style: GoogleFonts.outfit(
+                fontSize: 34,
+                fontWeight: FontWeight.w900,
+                letterSpacing: -0.8,
+                color: Colors.white,
+              ),
             ),
           ),
         ],

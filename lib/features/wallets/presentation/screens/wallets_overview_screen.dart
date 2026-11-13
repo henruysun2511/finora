@@ -155,15 +155,20 @@ class WalletsOverviewScreen extends ConsumerWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                'TỔNG TÀI SẢN RÒNG (NET WORTH)',
-                style: GoogleFonts.inter(
-                  fontSize: 11,
-                  fontWeight: FontWeight.w800,
-                  color: Colors.white.withValues(alpha: 0.8),
-                  letterSpacing: 1.0,
+              Expanded(
+                child: Text(
+                  'TỔNG TÀI SẢN RÒNG (NET WORTH)',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: GoogleFonts.inter(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w800,
+                    color: Colors.white.withValues(alpha: 0.8),
+                    letterSpacing: 1.0,
+                  ),
                 ),
               ),
+              const SizedBox(width: 8),
               GestureDetector(
                 onTap: () {
                   ref.read(isBalanceHiddenProvider.notifier).state = !isHidden;
@@ -193,11 +198,19 @@ class WalletsOverviewScreen extends ConsumerWidget {
           const SizedBox(height: 6),
 
           // Số tiền Tổng tài sản ròng
-          Text(
-            isHidden ? '••••••••' : CurrencyFormatter.format(totalNetWorth, currency: currency),
-            style: GoogleFonts.outfit(
-              fontSize: 34,
-              fontWeight: FontWeight.w900,
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            alignment: Alignment.centerLeft,
+            child: Text(
+              isHidden ? '••••••••' : CurrencyFormatter.format(totalNetWorth, currency: currency),
+              style: GoogleFonts.outfit(
+                fontSize: 34,
+                fontWeight: FontWeight.w900,
+                letterSpacing: -1.0,
+                color: Colors.white,
+              ),
+            ),
+          ),
               letterSpacing: -1.0,
               color: Colors.white,
             ),
@@ -465,6 +478,8 @@ class WalletsOverviewScreen extends ConsumerWidget {
                       children: [
                         Text(
                           wallet.name,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                           style: GoogleFonts.inter(
                             fontSize: 14,
                             fontWeight: FontWeight.w800,
@@ -476,6 +491,8 @@ class WalletsOverviewScreen extends ConsumerWidget {
                         const SizedBox(height: 2),
                         Text(
                           '${wallet.defaultCurrency} · ${accounts.length} tài khoản kết nối',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                           style: GoogleFonts.inter(
                             fontSize: 11,
                             fontWeight: FontWeight.w600,
@@ -485,17 +502,24 @@ class WalletsOverviewScreen extends ConsumerWidget {
                       ],
                     ),
                   ),
-                  Text(
-                    isHidden
-                        ? '••••••'
-                        : CurrencyFormatter.format(balance.totalBalance,
-                            currency: wallet.defaultCurrency),
-                    style: GoogleFonts.outfit(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w900,
-                      color: isDark
-                          ? AppColors.darkForeground
-                          : AppColors.lightForeground,
+                  const SizedBox(width: 8),
+                  Flexible(
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      alignment: Alignment.centerRight,
+                      child: Text(
+                        isHidden
+                            ? '••••••'
+                            : CurrencyFormatter.format(balance.totalBalance,
+                                currency: wallet.defaultCurrency),
+                        style: GoogleFonts.outfit(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w900,
+                          color: isDark
+                              ? AppColors.darkForeground
+                              : AppColors.lightForeground,
+                        ),
+                      ),
                     ),
                   ),
                 ],
@@ -513,12 +537,16 @@ class WalletsOverviewScreen extends ConsumerWidget {
                     const Icon(Icons.add_circle_outline_rounded,
                         size: 18, color: AppColors.primary),
                     const SizedBox(width: 8),
-                    Text(
-                      'Thêm tài khoản vào ví này',
-                      style: GoogleFonts.inter(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w700,
-                        color: AppColors.primary,
+                    Flexible(
+                      child: Text(
+                        'Thêm tài khoản vào ví này',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: GoogleFonts.inter(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.primary,
+                        ),
                       ),
                     ),
                   ],
@@ -598,6 +626,8 @@ class WalletsOverviewScreen extends ConsumerWidget {
             Expanded(
               child: Text(
                 name,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
                 style: GoogleFonts.inter(
                   fontSize: 13,
                   fontWeight: FontWeight.w700,
@@ -606,6 +636,7 @@ class WalletsOverviewScreen extends ConsumerWidget {
                 ),
               ),
             ),
+            const SizedBox(width: 8),
             Text(
               amount,
               style: GoogleFonts.outfit(
@@ -664,72 +695,96 @@ class WalletsOverviewScreen extends ConsumerWidget {
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'NET (CHO VAY − ĐI VAY)',
-                  style: GoogleFonts.inter(
-                    fontSize: 10,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: 0.6,
-                    color: Colors.white.withValues(alpha: 0.8),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'NET (CHO VAY − ĐI VAY)',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: GoogleFonts.inter(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 0.6,
+                      color: Colors.white.withValues(alpha: 0.8),
+                    ),
                   ),
-                ),
-                const SizedBox(height: 3),
-                Text(
-                  isHidden
-                      ? '••••••'
-                      : '$netPrefix${CurrencyFormatter.format(net.abs())}',
-                  style: GoogleFonts.outfit(
-                    fontSize: 22,
-                    fontWeight: FontWeight.w900,
-                    letterSpacing: -0.5,
-                    color: Colors.white,
+                  const SizedBox(height: 3),
+                  FittedBox(
+                    fit: BoxFit.scaleDown,
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      isHidden
+                          ? '••••••'
+                          : '$netPrefix${CurrencyFormatter.format(net.abs())}',
+                      style: GoogleFonts.outfit(
+                        fontSize: 22,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: -0.5,
+                        color: Colors.white,
+                      ),
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Text(
-                  'Người nợ bạn',
-                  style: GoogleFonts.inter(
-                    fontSize: 10,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.white.withValues(alpha: 0.75),
+            const SizedBox(width: 12),
+            Flexible(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text(
+                    'Người nợ bạn',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: GoogleFonts.inter(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white.withValues(alpha: 0.75),
+                    ),
                   ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  isHidden ? '••••••' : '+${CurrencyFormatter.format(lent)}',
-                  style: GoogleFonts.inter(
-                    fontSize: 13.5,
-                    fontWeight: FontWeight.w800,
-                    color: const Color(0xFF6EF0C4),
+                  const SizedBox(height: 2),
+                  FittedBox(
+                    fit: BoxFit.scaleDown,
+                    alignment: Alignment.centerRight,
+                    child: Text(
+                      isHidden ? '••••••' : '+${CurrencyFormatter.format(lent)}',
+                      style: GoogleFonts.inter(
+                        fontSize: 13.5,
+                        fontWeight: FontWeight.w800,
+                        color: const Color(0xFF6EF0C4),
+                      ),
+                    ),
                   ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  'Bạn đang nợ',
-                  style: GoogleFonts.inter(
-                    fontSize: 10,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.white.withValues(alpha: 0.75),
+                  const SizedBox(height: 4),
+                  Text(
+                    'Bạn đang nợ',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: GoogleFonts.inter(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white.withValues(alpha: 0.75),
+                    ),
                   ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  isHidden ? '••••••' : '-${CurrencyFormatter.format(borrowed)}',
-                  style: GoogleFonts.inter(
-                    fontSize: 13.5,
-                    fontWeight: FontWeight.w800,
-                    color: const Color(0xFFFF8FAA),
+                  const SizedBox(height: 2),
+                  FittedBox(
+                    fit: BoxFit.scaleDown,
+                    alignment: Alignment.centerRight,
+                    child: Text(
+                      isHidden ? '••••••' : '-${CurrencyFormatter.format(borrowed)}',
+                      style: GoogleFonts.inter(
+                        fontSize: 13.5,
+                        fontWeight: FontWeight.w800,
+                        color: const Color(0xFFFF8FAA),
+                      ),
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ],
         ),
@@ -765,12 +820,16 @@ class WalletsOverviewScreen extends ConsumerWidget {
               size: 20,
             ),
             const SizedBox(width: 8),
-            Text(
-              'Thêm nguồn tiền mới (Ngân hàng / Ví ĐT / Tiền mặt)',
-              style: GoogleFonts.inter(
-                fontSize: 12.5,
-                fontWeight: FontWeight.w800,
-                color: AppColors.primary,
+            Flexible(
+              child: Text(
+                'Thêm nguồn tiền mới (Ngân hàng / Ví ĐT / Tiền mặt)',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: GoogleFonts.inter(
+                  fontSize: 12.5,
+                  fontWeight: FontWeight.w800,
+                  color: AppColors.primary,
+                ),
               ),
             ),
           ],
