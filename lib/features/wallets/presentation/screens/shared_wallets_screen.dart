@@ -166,7 +166,7 @@ class _SharedWalletsScreenState extends ConsumerState<SharedWalletsScreen> {
             OutlinedButton.icon(
               onPressed: () {
                 Navigator.pop(ctx);
-                context.push(RoutePaths.createWallet);
+                context.push(RoutePaths.createSharedWallet);
               },
               icon: const Icon(Icons.add_rounded, color: AppColors.primary),
               label: Text(
@@ -362,7 +362,7 @@ class _SharedWalletsScreenState extends ConsumerState<SharedWalletsScreen> {
             ),
             const SizedBox(height: 24),
             ElevatedButton.icon(
-              onPressed: () => context.push(RoutePaths.createWallet),
+              onPressed: () => context.push(RoutePaths.createSharedWallet),
               icon: const Icon(Icons.add_rounded, color: Colors.white),
               label: const Text(
                 'Tạo Quỹ nhóm mới',
@@ -409,7 +409,7 @@ class _SharedWalletsScreenState extends ConsumerState<SharedWalletsScreen> {
       },
       action: BannerHeader.primaryButton(
         icon: const Icon(Icons.add_rounded, color: Colors.white, size: 20),
-        onTap: () => context.push(RoutePaths.createWallet),
+        onTap: () => context.push(RoutePaths.createSharedWallet),
       ),
       gradient: const LinearGradient(
         begin: Alignment.topLeft,

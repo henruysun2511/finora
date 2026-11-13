@@ -307,13 +307,16 @@ GoRouter appRouter(AppRouterRef ref) {
         parentNavigatorKey: _rootNavigatorKey,
         path: RoutePaths.createWallet,
         name: RouteNames.createWallet,
-        builder: (context, state) => const CreateWalletScreen(),
+        builder: (context, state) {
+          final isShared = state.uri.queryParameters['isShared'] == 'true';
+          return CreateWalletScreen(isShared: isShared);
+        },
       ),
       GoRoute(
         parentNavigatorKey: _rootNavigatorKey,
         path: RoutePaths.createSharedWallet,
         name: RouteNames.createSharedWallet,
-        builder: (context, state) => const CreateWalletScreen(),
+        builder: (context, state) => const CreateWalletScreen(isShared: true),
       ),
       GoRoute(
         parentNavigatorKey: _rootNavigatorKey,

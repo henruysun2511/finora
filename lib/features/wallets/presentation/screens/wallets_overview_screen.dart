@@ -22,6 +22,7 @@ class WalletsOverviewScreen extends ConsumerWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final isHidden = ref.watch(isBalanceHiddenProvider);
     final overviewAsync = ref.watch(walletsOverviewProvider);
+    final currentFilter = ref.watch(walletFilterProvider);
 
     final dynamicOverview = overviewAsync.valueOrNull;
     final totalNetWorth = dynamicOverview?.totalNetWorth ?? 0.0;
@@ -73,6 +74,18 @@ class WalletsOverviewScreen extends ConsumerWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
+                    if (hasRealWallets) ...[
+                      // Bộ lọc: Tất cả, Cá nhân, Ví chung (Quy chuẩn 2 GEMINI.md)
+                      _buildFilterChips(
+                        context,
+                        ref,
+                        isDark,
+                        dynamicOverview,
+                        currentFilter,
+                      ),
+                      const SizedBox(height: 14),
+                    ],
+
                     if (overviewAsync.isLoading && dynamicOverview == null) ...[
                       const Center(
                         child: Padding(
@@ -89,10 +102,95 @@ class WalletsOverviewScreen extends ConsumerWidget {
                       _buildEmptyState(context, isDark),
                       const SizedBox(height: 14),
                     ] else ...[
-                      for (final item in dynamicOverview.items) ...[
-                        _buildDynamicWalletCard(context, isDark, isHidden, item),
-                        const SizedBox(height: 14),
-                      ],
+                      () {
+                        final filteredItems =
+                            dynamicOverview.getFilteredItems(currentFilter);
+                        if (filteredItems.isEmpty) {
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: 14),
+                            child: Container(
+                              padding: const EdgeInsets.all(24),
+                              decoration: BoxDecoration(
+                                color: isDark
+                                    ? AppColors.darkSurface
+                                    : Colors.white,
+                                borderRadius: BorderRadius.circular(20),
+                                border: Border.all(
+                                  color: isDark
+                                      ? AppColors.darkBorder
+                                      : AppColors.lightBorder,
+                                ),
+                              ),
+                              child: Column(
+                                children: [
+                                  Icon(
+                                    currentFilter == WalletFilterTab.shared
+                                        ? Icons.groups_outlined
+                                        : Icons.account_balance_wallet_outlined,
+                                    size: 38,
+                                    color: isDark
+                                        ? AppColors.darkMuted
+                                        : AppColors.lightMuted,
+                                  ),
+                                  const SizedBox(height: 10),
+                                  Text(
+                                    currentFilter == WalletFilterTab.shared
+                                        ? 'Chưa có ví chung nào'
+                                        : 'Không có ví nào trong mục này',
+                                    style: GoogleFonts.inter(
+                                      fontWeight: FontWeight.w700,
+                                      fontSize: 14,
+                                      color: isDark
+                                          ? AppColors.darkForeground
+                                          : AppColors.lightForeground,
+                                    ),
+                                  ),
+                                  if (currentFilter ==
+                                      WalletFilterTab.shared) ...[
+                                    const SizedBox(height: 6),
+                                    Text(
+                                      'Tạo ví chung để cùng người thân, bạn bè đóng góp và quản lý thu chi minh bạch.',
+                                      textAlign: TextAlign.center,
+                                      style: GoogleFonts.inter(
+                                        fontSize: 12,
+                                        color: isDark
+                                            ? AppColors.darkMuted
+                                            : AppColors.lightMuted,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 14),
+                                    ElevatedButton.icon(
+                                      onPressed: () => context
+                                          .push(RoutePaths.createSharedWallet),
+                                      icon: const Icon(Icons.add_rounded,
+                                          size: 18),
+                                      label: const Text('Tạo ví chung ngay'),
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: AppColors.primary,
+                                        foregroundColor: Colors.white,
+                                        elevation: 0,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ],
+                              ),
+                            ),
+                          );
+                        }
+                        return Column(
+                          children: [
+                            for (final item in filteredItems) ...[
+                              _buildDynamicWalletCard(
+                                  context, isDark, isHidden, item),
+                              const SizedBox(height: 14),
+                            ],
+                          ],
+                        );
+                      }(),
                     ],
 
                     // THẺ 4: Net Loans Summary Card (Net Cho vay - Đi vay) từ API
@@ -289,6 +387,86 @@ class WalletsOverviewScreen extends ConsumerWidget {
     );
   }
 
+  /// Bộ lọc nguồn tiền (Tất cả, Cá nhân, Ví chung) chuẩn Quy chuẩn 2 GEMINI.md
+  Widget _buildFilterChips(
+    BuildContext context,
+    WidgetRef ref,
+    bool isDark,
+    WalletsOverviewState? overview,
+    WalletFilterTab currentFilter,
+  ) {
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        children: [
+          _filterChip(
+            ref,
+            isDark,
+            label: 'Tất cả (${overview?.countForTab(WalletFilterTab.all) ?? 0})',
+            tab: WalletFilterTab.all,
+            isSelected: currentFilter == WalletFilterTab.all,
+          ),
+          const SizedBox(width: 8),
+          _filterChip(
+            ref,
+            isDark,
+            label: 'Cá nhân (${overview?.countForTab(WalletFilterTab.personal) ?? 0})',
+            tab: WalletFilterTab.personal,
+            isSelected: currentFilter == WalletFilterTab.personal,
+          ),
+          const SizedBox(width: 8),
+          _filterChip(
+            ref,
+            isDark,
+            label: 'Ví chung (${overview?.countForTab(WalletFilterTab.shared) ?? 0})',
+            tab: WalletFilterTab.shared,
+            isSelected: currentFilter == WalletFilterTab.shared,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _filterChip(
+    WidgetRef ref,
+    bool isDark, {
+    required String label,
+    required WalletFilterTab tab,
+    required bool isSelected,
+  }) {
+    return InkWell(
+      onTap: () => ref.read(walletFilterProvider.notifier).state = tab,
+      borderRadius: BorderRadius.circular(12),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 160),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? AppColors.primary
+              : (isDark ? AppColors.darkSurface : Colors.white),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: isSelected
+                ? AppColors.primary
+                : (isDark ? AppColors.darkBorder : AppColors.lightBorder),
+          ),
+        ),
+        child: Text(
+          label,
+          style: GoogleFonts.inter(
+            fontSize: 12,
+            fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+            color: isSelected
+                ? Colors.white
+                : (isDark
+                    ? AppColors.darkForeground
+                    : AppColors.lightForeground),
+          ),
+        ),
+      ),
+    );
+  }
+
   /// Trạng thái trống khi chưa có ví nào từ API
   Widget _buildEmptyState(BuildContext context, bool isDark) {
     return Container(
@@ -439,7 +617,13 @@ class WalletsOverviewScreen extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           InkWell(
-            onTap: () => context.push(RoutePaths.walletDetailWithId(wallet.id)),
+            onTap: () {
+              if (wallet.isShared) {
+                context.push(RoutePaths.sharedWallets);
+              } else {
+                context.push(RoutePaths.walletDetailWithId(wallet.id));
+              }
+            },
             borderRadius: const BorderRadius.vertical(top: Radius.circular(22)),
             child: Padding(
               padding: const EdgeInsets.fromLTRB(16, 15, 16, 12),
@@ -467,17 +651,43 @@ class WalletsOverviewScreen extends ConsumerWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          wallet.name,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: GoogleFonts.inter(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w800,
-                            color: isDark
-                                ? AppColors.darkForeground
-                                : AppColors.lightForeground,
-                          ),
+                        Row(
+                          children: [
+                            Flexible(
+                              child: Text(
+                                wallet.name,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: GoogleFonts.inter(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w800,
+                                  color: isDark
+                                      ? AppColors.darkForeground
+                                      : AppColors.lightForeground,
+                                ),
+                              ),
+                            ),
+                            if (wallet.isShared) ...[
+                              const SizedBox(width: 6),
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 6, vertical: 2),
+                                decoration: BoxDecoration(
+                                  color: AppColors.primary
+                                      .withValues(alpha: 0.12),
+                                  borderRadius: BorderRadius.circular(6),
+                                ),
+                                child: Text(
+                                  'Ví chung',
+                                  style: GoogleFonts.inter(
+                                    fontSize: 9.5,
+                                    fontWeight: FontWeight.w700,
+                                    color: AppColors.primary,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ],
                         ),
                         const SizedBox(height: 2),
                         Text(

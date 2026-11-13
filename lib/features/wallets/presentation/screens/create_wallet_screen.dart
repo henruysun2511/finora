@@ -6,6 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../../app/router/route_names.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/widgets/app_toast.dart';
+import '../../../../core/widgets/form_card.dart';
 import '../../../accounts/data/dto/create_account_request.dart';
 import '../../../accounts/domain/enums/account_type.dart';
 import '../../../accounts/presentation/providers/account_providers.dart';
@@ -16,7 +17,8 @@ import '../providers/wallets_overview_provider.dart';
 
 /// Màn hình Thêm ví & Nguồn tiền chuẩn 1:1 theo `device-preview/screens/wallets/add.html`
 class CreateWalletScreen extends ConsumerStatefulWidget {
-  const CreateWalletScreen({super.key});
+  final bool isShared;
+  const CreateWalletScreen({super.key, this.isShared = false});
 
   @override
   ConsumerState<CreateWalletScreen> createState() => _CreateWalletScreenState();
@@ -28,6 +30,13 @@ class _CreateWalletScreenState extends ConsumerState<CreateWalletScreen> {
   final _balanceController = TextEditingController(text: '0');
   String _selectedCurrency = 'VND (₫) · Việt Nam Đồng';
   bool _isLoading = false;
+  late bool _isShared;
+
+  @override
+  void initState() {
+    super.initState();
+    _isShared = widget.isShared;
+  }
 
   final List<Map<String, dynamic>> _types = [
     {
@@ -99,6 +108,7 @@ class _CreateWalletScreenState extends ConsumerState<CreateWalletScreen> {
             CreateWalletRequest(
               name: name,
               defaultCurrency: currencyCode,
+              isShared: _isShared,
             ),
           );
 
@@ -117,9 +127,13 @@ class _CreateWalletScreenState extends ConsumerState<CreateWalletScreen> {
         ref.invalidate(walletsOverviewProvider);
         AppToast.success(
           context,
-          'Đã thêm nguồn tiền thành công vào danh mục của bạn!',
+          _isShared
+              ? 'Đã tạo ví chung thành công! Bạn có thể mời bạn bè tham gia.'
+              : 'Đã thêm nguồn tiền thành công vào danh mục của bạn!',
         );
-        if (context.canPop()) {
+        if (_isShared) {
+          context.go(RoutePaths.sharedWallets);
+        } else if (context.canPop()) {
           context.pop();
         } else {
           context.go(RoutePaths.wallets);
@@ -143,13 +157,15 @@ class _CreateWalletScreenState extends ConsumerState<CreateWalletScreen> {
     return Scaffold(
       backgroundColor: isDark ? AppColors.darkBackground : const Color(0xFFF8FAFC),
       appBar: PageHeader.subPage(
-        title: 'Thêm ví & Nguồn tiền',
-        subtitle: 'Khởi tạo ví mới hoặc kết nối ngân hàng',
+        title: _isShared ? 'Thêm ví chung (Quỹ nhóm)' : 'Thêm ví & Nguồn tiền',
+        subtitle: _isShared
+            ? 'Khởi tạo ví mới để chia sẻ cùng bạn bè, gia đình'
+            : 'Khởi tạo ví mới hoặc kết nối ngân hàng',
         onBack: () {
           if (context.canPop()) {
             context.pop();
           } else {
-            context.go(RoutePaths.wallets);
+            context.go(_isShared ? RoutePaths.sharedWallets : RoutePaths.wallets);
           }
         },
       ),
@@ -183,6 +199,42 @@ class _CreateWalletScreenState extends ConsumerState<CreateWalletScreen> {
                     // Form Group Container
                     _buildFormGroup(isDark),
 
+                    const SizedBox(height: 16),
+
+                    // Cài đặt ví chung / Quỹ nhóm (Quy chuẩn 3 GEMINI.md)
+                    FormCard(
+                      title: 'LOẠI VÍ & TÍNH NĂNG CHIA SẺ',
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      child: SwitchListTile(
+                        contentPadding: EdgeInsets.zero,
+                        title: Text(
+                          'Ví chung (Quỹ nhóm)',
+                          style: GoogleFonts.inter(
+                            fontSize: 13.5,
+                            fontWeight: FontWeight.w700,
+                            color: isDark
+                                ? AppColors.darkForeground
+                                : AppColors.lightForeground,
+                          ),
+                        ),
+                        subtitle: Text(
+                          'Cho phép mời nhiều thành viên, bạn bè cùng quản lý thu chi và đóng góp quỹ',
+                          style: GoogleFonts.inter(
+                            fontSize: 11.5,
+                            color: isDark
+                                ? AppColors.darkMuted
+                                : AppColors.lightMuted,
+                          ),
+                        ),
+                        value: _isShared,
+                        activeColor: Colors.white,
+                        activeTrackColor: AppColors.primary,
+                        trackOutlineColor:
+                            WidgetStateProperty.all(Colors.transparent),
+                        onChanged: (val) => setState(() => _isShared = val),
+                      ),
+                    ),
+
                     const SizedBox(height: 24),
 
                     // Nút Tạo nguồn tiền ngay
@@ -192,11 +244,16 @@ class _CreateWalletScreenState extends ConsumerState<CreateWalletScreen> {
                           ? const SizedBox(
                               width: 18,
                               height: 18,
-                              child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                              child: CircularProgressIndicator(
+                                  strokeWidth: 2, color: Colors.white),
                             )
                           : const Icon(Icons.check_rounded, color: Colors.white),
                       label: Text(
-                        _isLoading ? 'Đang tạo...' : 'Tạo nguồn tiền ngay',
+                        _isLoading
+                            ? 'Đang tạo...'
+                            : (_isShared
+                                ? 'Tạo ví chung ngay'
+                                : 'Tạo nguồn tiền ngay'),
                         style: GoogleFonts.inter(
                           fontSize: 14.5,
                           fontWeight: FontWeight.w800,
