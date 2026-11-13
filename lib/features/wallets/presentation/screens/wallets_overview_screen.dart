@@ -227,7 +227,10 @@ class WalletsOverviewScreen extends ConsumerWidget {
         ],
         stops: [0.0, 0.55, 1.0],
       ),
-      borderRadius: BorderRadius.zero,
+      borderRadius: const BorderRadius.only(
+        bottomLeft: Radius.circular(28),
+        bottomRight: Radius.circular(28),
+      ),
       padding: const EdgeInsets.fromLTRB(18, 12, 18, 28),
       onBack: () {
         if (context.canPop()) {
