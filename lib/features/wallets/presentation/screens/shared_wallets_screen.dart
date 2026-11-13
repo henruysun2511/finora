@@ -9,6 +9,7 @@ import '../../../../core/utils/currency_formatter.dart';
 import '../../../../core/widgets/app_toast.dart';
 import '../../../../core/widgets/banner_header.dart';
 import '../../../../core/widgets/form_card.dart';
+import '../../../accounts/domain/models/account_model.dart';
 import '../../data/dto/update_wallet_request.dart';
 import '../../domain/enums/wallet_member_role.dart';
 import '../../domain/models/wallet_member_model.dart';
@@ -27,7 +28,7 @@ class SharedWalletsScreen extends ConsumerStatefulWidget {
 }
 
 class _SharedWalletsScreenState extends ConsumerState<SharedWalletsScreen> {
-  int _activeTabIndex = 0; // 0: Đóng góp, 1: Giao dịch, 2: Cài đặt
+  int _activeTabIndex = 0; // 0: Nguồn tiền, 1: Thành viên, 2: Giao dịch, 3: Cài đặt
   String? _selectedWalletId;
 
   void _changeRole(
@@ -547,7 +548,7 @@ class _SharedWalletsScreenState extends ConsumerState<SharedWalletsScreen> {
             icon: Icons.tune_rounded,
             iconColor: const Color(0xFF7C3AED),
             label: 'Cài đặt',
-            onTap: () => setState(() => _activeTabIndex = 2),
+            onTap: () => setState(() => _activeTabIndex = 3),
           ),
         ],
       ),
@@ -594,17 +595,19 @@ class _SharedWalletsScreenState extends ConsumerState<SharedWalletsScreen> {
     );
   }
 
-  /// 3 Tabs Bar: Đóng góp, Giao dịch, Cài đặt (Quy chuẩn 2 GEMINI.md)
+  /// 4 Tabs Bar: Nguồn tiền, Thành viên, Giao dịch, Cài đặt (Quy chuẩn 2 GEMINI.md)
   Widget _buildTabsBar(bool isDark) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Row(
         children: [
-          _tabPill(0, 'Thành viên & Đóng góp', isDark),
-          const SizedBox(width: 8),
-          _tabPill(1, 'Giao dịch quỹ', isDark),
-          const SizedBox(width: 8),
-          _tabPill(2, 'Cài đặt quỹ', isDark),
+          _tabPill(0, 'Nguồn tiền', isDark),
+          const SizedBox(width: 6),
+          _tabPill(1, 'Thành viên', isDark),
+          const SizedBox(width: 6),
+          _tabPill(2, 'Giao dịch', isDark),
+          const SizedBox(width: 6),
+          _tabPill(3, 'Cài đặt', isDark),
         ],
       ),
     );
@@ -668,14 +671,217 @@ class _SharedWalletsScreenState extends ConsumerState<SharedWalletsScreen> {
   ) {
     switch (_activeTabIndex) {
       case 0:
-        return _buildMembersTab(context, isDark, selectedItem);
+        return _buildAccountsTab(context, isDark, selectedItem);
       case 1:
-        return _buildTransactionsTab(context, isDark, selectedItem);
+        return _buildMembersTab(context, isDark, selectedItem);
       case 2:
+        return _buildTransactionsTab(context, isDark, selectedItem);
+      case 3:
         return _buildSettingsTab(context, isDark, selectedItem);
       default:
         return const SizedBox.shrink();
     }
+  }
+
+  /// Tab 0: Tài khoản nguồn tiền thật từ API
+  Widget _buildAccountsTab(
+    BuildContext context,
+    bool isDark,
+    WalletItemState selectedItem,
+  ) {
+    final detailAsync = ref.watch(walletDetailProvider(selectedItem.wallet.id));
+    final accounts = detailAsync.valueOrNull?.activeAccounts ?? [];
+    final canManage = selectedItem.wallet.canEdit;
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: isDark ? AppColors.darkSurface : Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Tài khoản nguồn tiền (${accounts.length})',
+                style: GoogleFonts.inter(
+                  fontSize: 14.5,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: -0.3,
+                  color: isDark
+                      ? AppColors.darkForeground
+                      : AppColors.lightForeground,
+                ),
+              ),
+              if (canManage)
+                GestureDetector(
+                  onTap: () => context.push(
+                    '${RoutePaths.createAccount}?walletId=${selectedItem.wallet.id}',
+                  ),
+                  child: Text(
+                    '+ Thêm tài khoản',
+                    style: GoogleFonts.inter(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w800,
+                      color: AppColors.primary,
+                    ),
+                  ),
+                ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          if (accounts.isEmpty)
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 8),
+              child: Column(
+                children: [
+                  Container(
+                    width: 52,
+                    height: 52,
+                    decoration: BoxDecoration(
+                      color: AppColors.primary.withValues(alpha: 0.1),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      Icons.account_balance_wallet_outlined,
+                      color: AppColors.primary,
+                      size: 26,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    'Chưa có tài khoản nào trong quỹ này',
+                    style: GoogleFonts.inter(
+                      fontWeight: FontWeight.w700,
+                      fontSize: 13.5,
+                      color: isDark
+                          ? AppColors.darkForeground
+                          : AppColors.lightForeground,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    canManage
+                        ? 'Thêm tài khoản ngân hàng hoặc tiền mặt để bắt đầu quản lý chi tiêu chung.'
+                        : 'Quỹ hiện chưa có tài khoản nguồn tiền nào.',
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.inter(
+                      color: isDark ? AppColors.darkMuted : AppColors.lightMuted,
+                      fontSize: 12,
+                    ),
+                  ),
+                  if (canManage) ...[
+                    const SizedBox(height: 14),
+                    ElevatedButton.icon(
+                      onPressed: () => context.push(
+                        '${RoutePaths.createAccount}?walletId=${selectedItem.wallet.id}',
+                      ),
+                      icon: const Icon(Icons.add_rounded, size: 18),
+                      label: const Text('Thêm tài khoản ngay'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primary,
+                        foregroundColor: Colors.white,
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        textStyle: GoogleFonts.inter(
+                          fontWeight: FontWeight.w700,
+                          fontSize: 12.5,
+                        ),
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            )
+          else
+            ListView.separated(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: accounts.length,
+              separatorBuilder: (_, __) => Divider(
+                height: 1,
+                color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
+              ),
+              itemBuilder: (ctx, index) {
+                final acc = accounts[index];
+                return ListTile(
+                  contentPadding: const EdgeInsets.symmetric(vertical: 4),
+                  onTap: () =>
+                      context.push(RoutePaths.accountDetailWithId(acc.id)),
+                  leading: Container(
+                    width: 42,
+                    height: 42,
+                    decoration: BoxDecoration(
+                      color: acc.displayColor.withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Icon(
+                      acc.displayIcon,
+                      color: acc.displayColor,
+                      size: 22,
+                    ),
+                  ),
+                  title: Text(
+                    acc.name,
+                    style: GoogleFonts.inter(
+                      fontSize: 13.5,
+                      fontWeight: FontWeight.w700,
+                      color: isDark
+                          ? AppColors.darkForeground
+                          : AppColors.lightForeground,
+                    ),
+                  ),
+                  subtitle: Text(
+                    acc.maskedNumber.isNotEmpty
+                        ? '${acc.maskedNumber} · ${acc.type.displayName}'
+                        : acc.type.displayName,
+                    style: GoogleFonts.inter(
+                      fontSize: 11,
+                      color: isDark
+                          ? AppColors.darkMuted
+                          : AppColors.lightMuted,
+                    ),
+                  ),
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        CurrencyFormatter.format(
+                          acc.balance,
+                          currency: acc.currency,
+                        ),
+                        style: GoogleFonts.outfit(
+                          fontSize: 13.5,
+                          fontWeight: FontWeight.w800,
+                          color: isDark
+                              ? AppColors.darkForeground
+                              : AppColors.lightForeground,
+                        ),
+                      ),
+                      const SizedBox(width: 4),
+                      Icon(
+                        Icons.chevron_right_rounded,
+                        size: 18,
+                        color: isDark
+                            ? AppColors.darkMuted
+                            : AppColors.lightMuted,
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
+        ],
+      ),
+    );
   }
 
   /// Tab 1: Thành viên thật từ API
