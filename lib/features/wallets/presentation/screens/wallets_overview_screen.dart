@@ -211,10 +211,6 @@ class WalletsOverviewScreen extends ConsumerWidget {
               ),
             ),
           ),
-              letterSpacing: -1.0,
-              color: Colors.white,
-            ),
-          ),
           const SizedBox(height: 14),
 
           // 2 Hộp tóm tắt: Tiết kiệm & Khả dụng
