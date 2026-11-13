@@ -109,89 +109,112 @@ class _SharedWalletsScreenState extends ConsumerState<SharedWalletsScreen> {
   ) {
     showModalBottomSheet(
       context: context,
-      backgroundColor: isDark ? AppColors.darkSurface : Colors.white,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-      ),
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
       builder: (ctx) => Container(
-        padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 18),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Center(
-              child: Container(
-                width: 40,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: isDark ? AppColors.darkBorder : Colors.grey.shade300,
-                  borderRadius: BorderRadius.circular(99),
-                ),
-              ),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'Chọn Quỹ nhóm / Ví chung',
-              style: GoogleFonts.inter(
-                fontSize: 16,
-                fontWeight: FontWeight.w800,
-                color: isDark
-                    ? AppColors.darkForeground
-                    : AppColors.lightForeground,
-              ),
-            ),
-            const SizedBox(height: 14),
-            if (sharedItems.isNotEmpty)
-              ...sharedItems.map((item) {
-                final isSelected = item.wallet.id == _selectedWalletId;
-                return _groupTile(
-                  isDark,
-                  item.wallet.name,
-                  '${CurrencyFormatter.format(item.balance.totalBalance, currency: item.wallet.defaultCurrency)} · ${item.accountsPreview.length} tài khoản',
-                  isSelected,
-                  onTap: () {
-                    setState(() {
-                      _selectedWalletId = item.wallet.id;
-                    });
-                    Navigator.pop(context);
-                  },
-                );
-              })
-            else
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 20),
-                child: Text(
-                  'Bạn chưa có ví chung hoặc quỹ nhóm nào.',
-                  textAlign: TextAlign.center,
-                  style: GoogleFonts.inter(
-                    color: isDark ? AppColors.darkMuted : AppColors.lightMuted,
-                    fontSize: 13,
+        constraints: BoxConstraints(
+          maxHeight: MediaQuery.of(context).size.height * 0.75,
+        ),
+        decoration: BoxDecoration(
+          color: isDark ? AppColors.darkSurface : Colors.white,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+        child: Material(
+          color: Colors.transparent,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 18),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Center(
+                  child: Container(
+                    width: 40,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color:
+                          isDark ? AppColors.darkBorder : Colors.grey.shade300,
+                      borderRadius: BorderRadius.circular(99),
+                    ),
                   ),
                 ),
-              ),
-            const SizedBox(height: 12),
-            OutlinedButton.icon(
-              onPressed: () {
-                Navigator.pop(ctx);
-                context.push(RoutePaths.createSharedWallet);
-              },
-              icon: const Icon(Icons.add_rounded, color: AppColors.primary),
-              label: Text(
-                'Tạo thêm quỹ nhóm mới',
-                style: GoogleFonts.inter(
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.primary,
+                const SizedBox(height: 16),
+                Text(
+                  'Chọn Quỹ nhóm / Ví chung',
+                  style: GoogleFonts.inter(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w800,
+                    color: isDark
+                        ? AppColors.darkForeground
+                        : AppColors.lightForeground,
+                  ),
                 ),
-              ),
-              style: OutlinedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 14),
-                side: const BorderSide(color: AppColors.primary),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
+                const SizedBox(height: 14),
+                Flexible(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        if (sharedItems.isNotEmpty)
+                          ...sharedItems.map((item) {
+                            final isSelected =
+                                item.wallet.id == _selectedWalletId;
+                            return _groupTile(
+                              isDark,
+                              item.wallet.name,
+                              '${CurrencyFormatter.format(item.balance.totalBalance, currency: item.wallet.defaultCurrency)} · ${item.accountsPreview.length} tài khoản',
+                              isSelected,
+                              onTap: () {
+                                setState(() {
+                                  _selectedWalletId = item.wallet.id;
+                                });
+                                Navigator.pop(context);
+                              },
+                            );
+                          })
+                        else
+                          Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 20),
+                            child: Text(
+                              'Bạn chưa có ví chung hoặc quỹ nhóm nào.',
+                              textAlign: TextAlign.center,
+                              style: GoogleFonts.inter(
+                                color: isDark
+                                    ? AppColors.darkMuted
+                                    : AppColors.lightMuted,
+                                fontSize: 13,
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
                 ),
-              ),
+                const SizedBox(height: 12),
+                OutlinedButton.icon(
+                  onPressed: () {
+                    Navigator.pop(ctx);
+                    context.push(RoutePaths.createSharedWallet);
+                  },
+                  icon: const Icon(Icons.add_rounded, color: AppColors.primary),
+                  label: Text(
+                    'Tạo thêm quỹ nhóm mới',
+                    style: GoogleFonts.inter(
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.primary,
+                    ),
+                  ),
+                  style: OutlinedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    side: const BorderSide(color: AppColors.primary),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );
@@ -204,7 +227,42 @@ class _SharedWalletsScreenState extends ConsumerState<SharedWalletsScreen> {
     bool isSelected, {
     VoidCallback? onTap,
   }) {
-    return ListTile(
+    return Material(
+      color: Colors.transparent,
+      child: ListTile(
+        contentPadding: EdgeInsets.zero,
+        leading: Container(
+          width: 42,
+          height: 42,
+          decoration: BoxDecoration(
+            color: isSelected
+                ? AppColors.primary.withValues(alpha: 0.15)
+                : (isDark
+                    ? AppColors.darkBackground
+                    : const Color(0xFFF1F5F9)),
+            borderRadius: BorderRadius.circular(14),
+          ),
+          child: Icon(
+            Icons.groups_rounded,
+            color: isSelected
+                ? AppColors.primary
+                : (isDark ? AppColors.darkMuted : AppColors.lightMuted),
+            size: 22,
+          ),
+        ),
+        title: Text(
+          title,
+          style: GoogleFonts.inter(
+            fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
+            color: isSelected
+                ? AppColors.primary
+                : (isDark
+                    ? AppColors.darkForeground
+                    : AppColors.lightForeground),
+          ),
+        ),
+        subtitle: Text(
+          subtitle,
       contentPadding: EdgeInsets.zero,
       leading: Container(
         width: 42,
@@ -247,8 +305,9 @@ class _SharedWalletsScreenState extends ConsumerState<SharedWalletsScreen> {
           ? const Icon(Icons.check_circle_rounded, color: AppColors.primary)
           : null,
       onTap: onTap,
-    );
-  }
+    ),
+  );
+}
 
   @override
   Widget build(BuildContext context) {
@@ -1022,7 +1081,9 @@ class _SharedWalletsScreenState extends ConsumerState<SharedWalletsScreen> {
               ),
               itemBuilder: (ctx, index) {
                 final acc = accounts[index];
-                return ListTile(
+                return Material(
+                  color: Colors.transparent,
+                  child: ListTile(
                   contentPadding: const EdgeInsets.symmetric(vertical: 4),
                   onTap: () =>
                       context.push(RoutePaths.accountDetailWithId(acc.id)),
@@ -1086,8 +1147,9 @@ class _SharedWalletsScreenState extends ConsumerState<SharedWalletsScreen> {
                       ),
                     ],
                   ),
-                );
-              },
+                ),
+              );
+            },
             ),
         ],
       ),
@@ -1964,7 +2026,9 @@ class _SharedWalletsScreenState extends ConsumerState<SharedWalletsScreen> {
 
                   return Column(
                     children: [
-                      ListTile(
+                      Material(
+                        color: Colors.transparent,
+                        child: ListTile(
                         contentPadding: EdgeInsets.zero,
                         leading: Container(
                           width: 38,
@@ -2016,7 +2080,8 @@ class _SharedWalletsScreenState extends ConsumerState<SharedWalletsScreen> {
                           ),
                         ),
                       ),
-                      if (!isLast)
+                    ),
+                    if (!isLast)
                         Divider(
                           height: 1,
                           color: isDark

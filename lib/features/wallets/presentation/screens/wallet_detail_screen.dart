@@ -757,12 +757,16 @@ class _WalletDetailScreenState extends ConsumerState<WalletDetailScreen> {
               ),
             )
           else
-            Container(
-              decoration: BoxDecoration(
-                color: isDark ? AppColors.darkSurface : Colors.white,
+            Material(
+              color: isDark ? AppColors.darkSurface : Colors.white,
+              borderRadius: BorderRadius.circular(18),
+              shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(18),
-                border: Border.all(color: const Color(0xFFE2E8F0)),
+                side: BorderSide(
+                  color: isDark ? AppColors.darkBorder : const Color(0xFFE2E8F0),
+                ),
               ),
+              clipBehavior: Clip.antiAlias,
               child: Column(
                 children: accounts.map((acc) {
                   return ListTile(

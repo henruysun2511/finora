@@ -78,12 +78,13 @@ class _InviteMemberDialogState extends ConsumerState<InviteMemberDialog> {
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
       backgroundColor: isDark ? AppColors.darkSurface : Colors.white,
-      child: Padding(
-        padding: const EdgeInsets.all(22),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
+      child: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(22),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
             // Tiêu đề Header
             Row(
               children: [
@@ -423,8 +424,9 @@ class _InviteMemberDialogState extends ConsumerState<InviteMemberDialog> {
           ],
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 
   Widget _buildRoleOption({
     required bool isDark,
@@ -507,6 +509,7 @@ class _InviteMemberDialogState extends ConsumerState<InviteMemberDialog> {
           ],
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 }
