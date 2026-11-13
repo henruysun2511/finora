@@ -10,6 +10,8 @@ import '../../../../core/widgets/app_toast.dart';
 import '../../../../core/widgets/banner_header.dart';
 import '../../../../core/widgets/form_card.dart';
 import '../../data/dto/update_wallet_request.dart';
+import '../../domain/enums/wallet_member_role.dart';
+import '../../domain/models/wallet_member_model.dart';
 import '../providers/wallet_detail_provider.dart';
 import '../providers/wallets_overview_provider.dart';
 import '../widgets/invite_member_dialog.dart';
@@ -27,6 +29,70 @@ class SharedWalletsScreen extends ConsumerStatefulWidget {
 class _SharedWalletsScreenState extends ConsumerState<SharedWalletsScreen> {
   int _activeTabIndex = 0; // 0: Đóng góp, 1: Giao dịch, 2: Cài đặt
   String? _selectedWalletId;
+
+  void _changeRole(
+    String walletId,
+    WalletMemberModel member,
+    WalletMemberRole newRole,
+  ) async {
+    try {
+      await ref
+          .read(walletDetailActionsProvider(walletId))
+          .updateMemberRole(member.userId, newRole);
+      if (mounted) {
+        AppToast.success(
+          context,
+          'Đã đổi vai trò của ${member.fullName} thành ${newRole.displayName}',
+        );
+      }
+    } catch (e) {
+      if (mounted) AppToast.error(context, e.toString());
+    }
+  }
+
+  void _confirmKick(
+    String walletId,
+    WalletMemberModel member,
+  ) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: const Text('Xác nhận xóa thành viên'),
+        content: Text(
+          'Bạn có chắc chắn muốn xóa "${member.fullName}" khỏi quỹ nhóm này không?',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('HỦY'),
+          ),
+          TextButton(
+            onPressed: () async {
+              Navigator.pop(ctx);
+              try {
+                await ref
+                    .read(walletDetailActionsProvider(walletId))
+                    .kickMember(member.userId);
+                if (mounted) {
+                  AppToast.success(context, 'Đã xóa thành viên khỏi quỹ');
+                }
+              } catch (e) {
+                if (mounted) AppToast.error(context, e.toString());
+              }
+            },
+            child: const Text(
+              'XÓA KHỎI QUỸ',
+              style: TextStyle(
+                color: AppColors.danger,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
   void _showGroupSelector(
     BuildContext context,
@@ -620,6 +686,8 @@ class _SharedWalletsScreenState extends ConsumerState<SharedWalletsScreen> {
   ) {
     final detailAsync = ref.watch(walletDetailProvider(selectedItem.wallet.id));
     final members = detailAsync.valueOrNull?.members ?? [];
+    final isCurrentOwner =
+        selectedItem.wallet.currentUserRole == WalletMemberRole.owner;
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -759,6 +827,96 @@ class _SharedWalletsScreenState extends ConsumerState<SharedWalletsScreen> {
                             color: AppColors.primary,
                           ),
                         ),
+                      )
+                    else if (isCurrentOwner)
+                      PopupMenuButton<String>(
+                        icon: Icon(
+                          Icons.more_vert_rounded,
+                          size: 20,
+                          color: isDark
+                              ? AppColors.darkMuted
+                              : AppColors.lightMuted,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        color: isDark ? AppColors.darkSurface : Colors.white,
+                        onSelected: (val) {
+                          if (val == 'MAKE_EDITOR') {
+                            _changeRole(
+                              selectedItem.wallet.id,
+                              member,
+                              WalletMemberRole.editor,
+                            );
+                          } else if (val == 'MAKE_VIEWER') {
+                            _changeRole(
+                              selectedItem.wallet.id,
+                              member,
+                              WalletMemberRole.viewer,
+                            );
+                          } else if (val == 'KICK') {
+                            _confirmKick(
+                              selectedItem.wallet.id,
+                              member,
+                            );
+                          }
+                        },
+                        itemBuilder: (ctx) => [
+                          if (member.role != WalletMemberRole.editor)
+                            PopupMenuItem(
+                              value: 'MAKE_EDITOR',
+                              child: Row(
+                                children: [
+                                  const Icon(Icons.edit_note_rounded,
+                                      size: 18, color: AppColors.primary),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    'Đổi thành Biên tập viên',
+                                    style: GoogleFonts.inter(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          if (member.role != WalletMemberRole.viewer)
+                            PopupMenuItem(
+                              value: 'MAKE_VIEWER',
+                              child: Row(
+                                children: [
+                                  const Icon(Icons.visibility_rounded,
+                                      size: 18, color: Color(0xFF64748B)),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    'Đổi thành Người xem',
+                                    style: GoogleFonts.inter(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          PopupMenuItem(
+                            value: 'KICK',
+                            child: Row(
+                              children: [
+                                const Icon(Icons.person_remove_rounded,
+                                    size: 18, color: AppColors.danger),
+                                const SizedBox(width: 8),
+                                Text(
+                                  'Xóa khỏi quỹ',
+                                  style: GoogleFonts.inter(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w700,
+                                    color: AppColors.danger,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
                       ),
                   ],
                 ),
