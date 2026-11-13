@@ -1,17 +1,20 @@
 import '../../domain/enums/wallet_member_role.dart';
 
 class InviteMemberRequest {
-  final String email;
+  final String? email;
+  final String? userId;
   final WalletMemberRole role;
 
   const InviteMemberRequest({
-    required this.email,
+    this.email,
+    this.userId,
     this.role = WalletMemberRole.viewer,
   });
 
   Map<String, dynamic> toJson() {
     return {
-      'email': email.trim(),
+      if (email != null && email!.isNotEmpty) 'email': email!.trim(),
+      if (userId != null && userId!.isNotEmpty) 'userId': userId!.trim(),
       'role': role.toServerString(),
     };
   }

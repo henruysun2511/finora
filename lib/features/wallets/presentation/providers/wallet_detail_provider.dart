@@ -77,11 +77,15 @@ class WalletDetailActions {
 
   WalletDetailActions(this._ref, this._walletId);
 
-  Future<void> inviteMember(String email, WalletMemberRole role) async {
+  Future<void> inviteMember({
+    String? email,
+    String? userId,
+    WalletMemberRole role = WalletMemberRole.editor,
+  }) async {
     final repo = _ref.read(walletRepositoryProvider);
     await repo.inviteMember(
       _walletId,
-      InviteMemberRequest(email: email, role: role),
+      InviteMemberRequest(email: email, userId: userId, role: role),
     );
     _ref.invalidate(walletDetailProvider(_walletId));
   }
