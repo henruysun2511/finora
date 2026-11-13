@@ -97,11 +97,6 @@ class WalletsOverviewScreen extends ConsumerWidget {
 
                     // THẺ 4: Net Loans Summary Card (Net Cho vay - Đi vay) từ API
                     _buildNetLoansCard(context, ref, isHidden),
-
-                    const SizedBox(height: 14),
-
-                    // NÚT DASHED: Thêm nguồn tiền mới
-                    _buildDashedAddButton(context, isDark),
                   ],
                 ),
               ),
@@ -523,37 +518,8 @@ class WalletsOverviewScreen extends ConsumerWidget {
             ),
           ),
           Divider(height: 1, color: borderColor),
-          if (accounts.isEmpty)
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              child: InkWell(
-                onTap: () => context.push('${RoutePaths.createAccount}?walletId=${wallet.id}'),
-                child: Row(
-                  children: [
-                    const Icon(Icons.add_circle_outline_rounded,
-                        size: 18, color: AppColors.primary),
-                    const SizedBox(width: 8),
-                    Flexible(
-                      child: Text(
-                        'Thêm tài khoản vào ví này',
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: GoogleFonts.inter(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w700,
-                          color: AppColors.primary,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            )
-          else
-            ...accounts.asMap().entries.map((entry) {
-              final idx = entry.key;
-              final acc = entry.value;
-              final isLast = idx == accounts.length - 1;
+          if (accounts.isNotEmpty)
+            ...accounts.map((acc) {
               Color dotColor = AppColors.primary;
               IconData icon = Icons.account_balance_rounded;
               if (acc.type.isCash) {
@@ -575,10 +541,11 @@ class WalletsOverviewScreen extends ConsumerWidget {
                         currency: acc.currency),
                 borderColor: borderColor,
                 isDark: isDark,
-                isLast: isLast,
                 onTap: () => context.push(RoutePaths.accountDetailWithId(acc.id)),
               );
             }),
+          // Nút thêm nguồn tiền cho riêng ví này
+          _buildAddAccountRow(context, wallet.id, isDark),
         ],
       ),
     );
@@ -593,18 +560,14 @@ class WalletsOverviewScreen extends ConsumerWidget {
     required String amount,
     required Color borderColor,
     required bool isDark,
-    bool isLast = false,
     required VoidCallback onTap,
   }) {
     return InkWell(
       onTap: onTap,
-      borderRadius: isLast
-          ? const BorderRadius.vertical(bottom: Radius.circular(22))
-          : BorderRadius.zero,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
         decoration: BoxDecoration(
-          border: isLast ? null : Border(bottom: BorderSide(color: borderColor)),
+          border: Border(bottom: BorderSide(color: borderColor)),
         ),
         child: Row(
           children: [
@@ -640,6 +603,46 @@ class WalletsOverviewScreen extends ConsumerWidget {
                 fontWeight: FontWeight.w800,
                 color:
                     isDark ? AppColors.darkForeground : AppColors.lightForeground,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// Nút thêm nguồn tiền ở đáy mỗi thẻ ví
+  Widget _buildAddAccountRow(
+    BuildContext context,
+    String walletId,
+    bool isDark,
+  ) {
+    return InkWell(
+      onTap: () => context.push('${RoutePaths.createAccount}?walletId=$walletId'),
+      borderRadius: const BorderRadius.vertical(bottom: Radius.circular(22)),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        decoration: BoxDecoration(
+          color: isDark
+              ? Colors.white.withValues(alpha: 0.02)
+              : AppColors.primary.withValues(alpha: 0.04),
+          borderRadius: const BorderRadius.vertical(bottom: Radius.circular(22)),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(
+              Icons.add_circle_outline_rounded,
+              size: 16,
+              color: AppColors.primary,
+            ),
+            const SizedBox(width: 8),
+            Text(
+              'Thêm nguồn tiền vào ví này',
+              style: GoogleFonts.inter(
+                fontSize: 12.5,
+                fontWeight: FontWeight.w700,
+                color: AppColors.primary,
               ),
             ),
           ],
@@ -788,49 +791,4 @@ class WalletsOverviewScreen extends ConsumerWidget {
     );
   }
 
-  /// Nút Dashed: Thêm nguồn tiền mới
-  Widget _buildDashedAddButton(BuildContext context, bool isDark) {
-    return InkWell(
-      onTap: () => context.push(RoutePaths.createAccount),
-      borderRadius: BorderRadius.circular(16),
-      child: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.symmetric(vertical: 14),
-        decoration: BoxDecoration(
-          color: isDark
-              ? Colors.white.withValues(alpha: 0.03)
-              : Colors.white.withValues(alpha: 0.6),
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
-            style: BorderStyle.solid,
-            width: 1.5,
-          ),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(
-              Icons.add_circle_outline_rounded,
-              color: AppColors.primary,
-              size: 20,
-            ),
-            const SizedBox(width: 8),
-            Flexible(
-              child: Text(
-                'Thêm nguồn tiền mới (Ngân hàng / Ví ĐT / Tiền mặt)',
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: GoogleFonts.inter(
-                  fontSize: 12.5,
-                  fontWeight: FontWeight.w800,
-                  color: AppColors.primary,
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
 }
