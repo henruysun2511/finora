@@ -43,6 +43,8 @@ class RouteNames {
   static const String adjustBalance = 'adjustBalance';
   static const String createAccount = 'createAccount';
   static const String transfer = 'transfer';
+  static const String transferHistory = 'transferHistory';
+  static const String transferDetail = 'transferDetail';
 
   // 5. Budgets (Ngân sách)
   static const String createBudget = 'createBudget';
@@ -134,6 +136,9 @@ class RoutePaths {
   static String adjustBalanceWithId(String id) => '/accounts/$id/adjust';
   static const String createAccount = '/accounts/create';
   static const String transfer = '/transfer';
+  static const String transferHistory = '/transfers';
+  static const String transferDetail = '/transfers/:id';
+  static String transferDetailWithId(String id) => '/transfers/$id';
 
   // 5. Budgets
   static const String createBudget = '/budgets/create';

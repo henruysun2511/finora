@@ -509,7 +509,6 @@ class _InviteMemberDialogState extends ConsumerState<InviteMemberDialog> {
           ],
         ),
       ),
-    ),
-  );
-}
+    );
+  }
 }

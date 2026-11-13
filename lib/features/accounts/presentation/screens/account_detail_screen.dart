@@ -139,6 +139,33 @@ class _AccountDetailScreenState extends ConsumerState<AccountDetailScreen> {
 
                   const SizedBox(height: 20),
 
+                  // Nút Chuyển tiền từ tài khoản này
+                  if (account != null) ...[
+                    OutlinedButton.icon(
+                      onPressed: () => context.push(
+                        '${RoutePaths.transfer}?fromAccountId=${account.id}',
+                      ),
+                      icon: const Icon(Icons.swap_horiz_rounded,
+                          color: AppColors.primary),
+                      label: Text(
+                        'Chuyển tiền từ tài khoản này',
+                        style: GoogleFonts.inter(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.primary,
+                        ),
+                      ),
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        side: const BorderSide(color: AppColors.primary),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                  ],
+
                   // 3. Nút Điều chỉnh số dư thực tế (Đối soát)
                   ElevatedButton.icon(
                     onPressed: () => _openAdjustBalance(account),

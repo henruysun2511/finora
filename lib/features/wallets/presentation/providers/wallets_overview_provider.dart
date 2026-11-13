@@ -9,11 +9,13 @@ class WalletItemState {
   final WalletModel wallet;
   final WalletBalanceModel balance;
   final List<AccountModel> accountsPreview;
+  final List<AccountModel> accounts;
 
   const WalletItemState({
     required this.wallet,
     required this.balance,
     required this.accountsPreview,
+    required this.accounts,
   });
 }
 
@@ -102,6 +104,7 @@ class WalletsOverviewNotifier extends AsyncNotifier<WalletsOverviewState> {
           wallet: wallet,
           balance: balance,
           accountsPreview: accounts.take(3).toList(),
+          accounts: accounts,
         );
       }),
     );

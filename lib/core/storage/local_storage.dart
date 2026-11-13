@@ -29,6 +29,12 @@ class LocalStorage {
   Future<void> clearCachedUser() =>
       _prefs.remove(AppConstants.keyCachedUser);
 
+  String? getLastSeenMascotTier() =>
+      _prefs.getString(AppConstants.keyLastSeenMascotTier);
+
+  Future<void> setLastSeenMascotTier(String tier) =>
+      _prefs.setString(AppConstants.keyLastSeenMascotTier, tier);
+
   Future<void> clear() => _prefs.clear();
 }
 

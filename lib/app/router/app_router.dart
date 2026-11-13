@@ -57,9 +57,12 @@ import '../../features/accounts/presentation/screens/adjust_balance_screen.dart'
 import '../../features/wallets/presentation/screens/create_account_screen.dart';
 import '../../features/wallets/presentation/screens/create_wallet_screen.dart';
 import '../../features/wallets/presentation/screens/shared_wallets_screen.dart';
-import '../../features/wallets/presentation/screens/transfer_screen.dart';
 import '../../features/wallets/presentation/screens/wallet_detail_screen.dart';
 import '../../features/wallets/presentation/screens/wallets_overview_screen.dart';
+import '../../features/transfers/domain/models/transfer.dart';
+import '../../features/transfers/presentation/screens/transfer_form_screen.dart';
+import '../../features/transfers/presentation/screens/transfer_detail_screen.dart';
+import '../../features/transfers/presentation/screens/transfer_history_screen.dart';
 import 'route_names.dart';
 import 'scaffold_with_nav_bar.dart';
 
@@ -361,7 +364,37 @@ GoRouter appRouter(AppRouterRef ref) {
         parentNavigatorKey: _rootNavigatorKey,
         path: RoutePaths.transfer,
         name: RouteNames.transfer,
-        builder: (context, state) => const TransferScreen(),
+        builder: (context, state) {
+          final fromAccountId = state.uri.queryParameters['fromAccountId'];
+          final fromWalletId = state.uri.queryParameters['fromWalletId'];
+          return TransferFormScreen(
+            fromAccountId: fromAccountId,
+            fromWalletId: fromWalletId,
+          );
+        },
+      ),
+      GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
+        path: RoutePaths.transferHistory,
+        name: RouteNames.transferHistory,
+        builder: (context, state) {
+          final accountId = state.uri.queryParameters['accountId'];
+          return TransferHistoryScreen(accountIdFilter: accountId);
+        },
+      ),
+      GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
+        path: RoutePaths.transferDetail,
+        name: RouteNames.transferDetail,
+        builder: (context, state) {
+          final id = state.pathParameters['id'] ?? '';
+          final extraTransfer =
+              state.extra is Transfer ? state.extra as Transfer : null;
+          return TransferDetailScreen(
+            transferId: id,
+            initialTransfer: extraTransfer,
+          );
+        },
       ),
 
       // ==========================================

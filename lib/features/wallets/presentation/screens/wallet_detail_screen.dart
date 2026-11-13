@@ -620,7 +620,9 @@ class _WalletDetailScreenState extends ConsumerState<WalletDetailScreen> {
             label: 'Chuyển tiền',
             bgColor: const Color(0xFF0D9488).withValues(alpha: 0.12),
             iconColor: const Color(0xFF0D9488),
-            onTap: () => context.push(RoutePaths.transfer),
+            onTap: () => context.push(
+              '${RoutePaths.transfer}?fromWalletId=${widget.walletId}',
+            ),
           ),
           const SizedBox(width: 12),
           _actionTile(
@@ -759,7 +761,6 @@ class _WalletDetailScreenState extends ConsumerState<WalletDetailScreen> {
           else
             Material(
               color: isDark ? AppColors.darkSurface : Colors.white,
-              borderRadius: BorderRadius.circular(18),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(18),
                 side: BorderSide(

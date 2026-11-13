@@ -263,50 +263,17 @@ class _SharedWalletsScreenState extends ConsumerState<SharedWalletsScreen> {
         ),
         subtitle: Text(
           subtitle,
-      contentPadding: EdgeInsets.zero,
-      leading: Container(
-        width: 42,
-        height: 42,
-        decoration: BoxDecoration(
-          color: isSelected
-              ? AppColors.primary.withValues(alpha: 0.15)
-              : (isDark
-                  ? AppColors.darkBackground
-                  : const Color(0xFFF1F5F9)),
-          borderRadius: BorderRadius.circular(14),
+          style: GoogleFonts.inter(
+            fontSize: 11.5,
+            color: isDark ? AppColors.darkMuted : AppColors.lightMuted,
+          ),
         ),
-        child: Icon(
-          Icons.groups_rounded,
-          color: isSelected
-              ? AppColors.primary
-              : (isDark ? AppColors.darkMuted : AppColors.lightMuted),
-          size: 22,
-        ),
+        trailing: isSelected
+            ? const Icon(Icons.check_circle_rounded, color: AppColors.primary)
+            : null,
+        onTap: onTap,
       ),
-      title: Text(
-        title,
-        style: GoogleFonts.inter(
-          fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
-          color: isSelected
-              ? AppColors.primary
-              : (isDark
-                  ? AppColors.darkForeground
-                  : AppColors.lightForeground),
-        ),
-      ),
-      subtitle: Text(
-        subtitle,
-        style: GoogleFonts.inter(
-          fontSize: 11.5,
-          color: isDark ? AppColors.darkMuted : AppColors.lightMuted,
-        ),
-      ),
-      trailing: isSelected
-          ? const Icon(Icons.check_circle_rounded, color: AppColors.primary)
-          : null,
-      onTap: onTap,
-    ),
-  );
+    );
 }
 
   @override
