@@ -758,7 +758,8 @@ class _CreateTransactionScreenState
                     SwitchListTile(
                       contentPadding: EdgeInsets.zero,
                       value: formState.excludeFromReport,
-                      activeColor: AppColors.primary,
+                      activeColor: Colors.white,
+                      activeTrackColor: AppColors.primary,
                       title: Text(
                         'Không tính vào báo cáo',
                         style: GoogleFonts.inter(
@@ -777,7 +778,8 @@ class _CreateTransactionScreenState
                     SwitchListTile(
                       contentPadding: EdgeInsets.zero,
                       value: formState.amountHidden,
-                      activeColor: AppColors.primary,
+                      activeColor: Colors.white,
+                      activeTrackColor: AppColors.primary,
                       title: Text(
                         'Ẩn số tiền trong ví chia sẻ',
                         style: GoogleFonts.inter(
@@ -796,7 +798,8 @@ class _CreateTransactionScreenState
                     SwitchListTile(
                       contentPadding: EdgeInsets.zero,
                       value: formState.visibility == 'FRIENDS',
-                      activeColor: AppColors.primary,
+                      activeColor: Colors.white,
+                      activeTrackColor: AppColors.primary,
                       title: Text(
                         'Chia sẻ lên Bảng tin & Ví chung',
                         style: GoogleFonts.inter(

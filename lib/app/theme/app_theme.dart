@@ -178,7 +178,7 @@ class AppTheme {
               ? const Color(0xFF475569)
               : const Color(0xFFCBD5E1);
         }),
-        thumbIcon: WidgetStateProperty.all(const Icon(null)),
+        thumbIcon: WidgetStateProperty.resolveWith((states) => null),
       ),
     );
   }
