@@ -105,6 +105,63 @@ class _WalletDetailScreenState extends ConsumerState<WalletDetailScreen> {
     );
   }
 
+  void _confirmLeaveWallet(
+    BuildContext context,
+    String walletName,
+  ) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+        ),
+        title: Text(
+          'Rời khỏi ví chung?',
+          style: GoogleFonts.inter(fontWeight: FontWeight.w700),
+        ),
+        content: Text(
+          'Bạn có chắc chắn muốn rời khỏi ví "$walletName" không? Bạn sẽ không còn quyền truy cập hay theo dõi các giao dịch thuộc ví này nữa.',
+          style: GoogleFonts.inter(fontSize: 13, height: 1.4),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('HỦY'),
+          ),
+          TextButton(
+            onPressed: () async {
+              Navigator.pop(ctx);
+              try {
+                await ref
+                    .read(walletDetailActionsProvider(widget.walletId))
+                    .leaveWallet();
+                ref.invalidate(walletsOverviewProvider);
+                if (mounted) {
+                  AppToast.success(
+                    context,
+                    'Đã rời khỏi ví chung thành công!',
+                  );
+                  context.go(RoutePaths.wallets);
+                }
+              } catch (e) {
+                if (mounted) {
+                  AppToast.error(context, e.toString());
+                }
+              }
+            },
+            child: const Text(
+              'RỜI VÍ',
+              style: TextStyle(
+                color: AppColors.danger,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -135,7 +192,7 @@ class _WalletDetailScreenState extends ConsumerState<WalletDetailScreen> {
             context.go(RoutePaths.wallets);
           }
         },
-        action: walletDetail == null || !walletDetail.isOwner
+        action: walletDetail == null
             ? null
             : PopupMenuButton<String>(
                 icon: Icon(
@@ -159,10 +216,12 @@ class _WalletDetailScreenState extends ConsumerState<WalletDetailScreen> {
                     context.push(RoutePaths.sharedWallets);
                   } else if (val == 'SYNC') {
                     _syncWallet(context);
+                  } else if (val == 'LEAVE') {
+                    _confirmLeaveWallet(context, walletDetail.wallet.name);
                   }
                 },
                 itemBuilder: (ctx) => [
-                  if (!walletDetail.isShared)
+                  if (walletDetail.isOwner && !walletDetail.isShared)
                     PopupMenuItem(
                       value: 'TOGGLE_SHARED',
                       child: Row(
@@ -179,8 +238,8 @@ class _WalletDetailScreenState extends ConsumerState<WalletDetailScreen> {
                           ),
                         ],
                       ),
-                    )
-                  else
+                    ),
+                  if (walletDetail.isShared)
                     PopupMenuItem(
                       value: 'OPEN_SHARED',
                       child: Row(
@@ -215,6 +274,25 @@ class _WalletDetailScreenState extends ConsumerState<WalletDetailScreen> {
                       ],
                     ),
                   ),
+                  if (!walletDetail.isOwner && walletDetail.isShared)
+                    PopupMenuItem(
+                      value: 'LEAVE',
+                      child: Row(
+                        children: [
+                          const Icon(Icons.logout_rounded,
+                              size: 18, color: AppColors.danger),
+                          const SizedBox(width: 8),
+                          Text(
+                            'Rời khỏi ví này',
+                            style: GoogleFonts.inter(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w700,
+                              color: AppColors.danger,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                 ],
               ),
       ),
@@ -261,41 +339,88 @@ class _WalletDetailScreenState extends ConsumerState<WalletDetailScreen> {
                     title: 'CÀI ĐẶT VÍ & CHIA SẺ',
                     padding: const EdgeInsets.symmetric(
                         horizontal: 16, vertical: 8),
-                    child: SwitchListTile(
-                      contentPadding: EdgeInsets.zero,
-                      title: Text(
-                        'Chuyển thành Ví chung (Quỹ nhóm)',
-                        style: GoogleFonts.inter(
-                          fontSize: 13.5,
-                          fontWeight: FontWeight.w700,
-                          color: isDark
-                              ? AppColors.darkForeground
-                              : AppColors.lightForeground,
+                    child: Column(
+                      children: [
+                        SwitchListTile(
+                          contentPadding: EdgeInsets.zero,
+                          title: Text(
+                            'Chuyển thành Ví chung (Quỹ nhóm)',
+                            style: GoogleFonts.inter(
+                              fontSize: 13.5,
+                              fontWeight: FontWeight.w700,
+                              color: isDark
+                                  ? AppColors.darkForeground
+                                  : AppColors.lightForeground,
+                            ),
+                          ),
+                          subtitle: Text(
+                            (walletDetail?.isShared ?? false)
+                                ? 'Ví đang là Ví chung. Bạn có thể mời bạn bè và thành viên cùng quản lý.'
+                                : 'Bật để mời bạn bè cùng quản lý thu chi, phân quyền và theo dõi đóng góp quỹ.',
+                            style: GoogleFonts.inter(
+                              fontSize: 11.5,
+                              color: isDark
+                                  ? AppColors.darkMuted
+                                  : AppColors.lightMuted,
+                            ),
+                          ),
+                          value: walletDetail?.isShared ?? false,
+                          activeColor: Colors.white,
+                          activeTrackColor: AppColors.primary,
+                          trackOutlineColor:
+                              WidgetStateProperty.all(Colors.transparent),
+                          onChanged: walletDetail == null || !walletDetail.isOwner
+                              ? null
+                              : (val) => _confirmToggleShared(
+                                    context,
+                                    val,
+                                    walletDetail.wallet.name,
+                                  ),
                         ),
-                      ),
-                      subtitle: Text(
-                        (walletDetail?.isShared ?? false)
-                            ? 'Ví đang là Ví chung. Bạn có thể mời bạn bè và thành viên cùng quản lý.'
-                            : 'Bật để mời bạn bè cùng quản lý thu chi, phân quyền và theo dõi đóng góp quỹ.',
-                        style: GoogleFonts.inter(
-                          fontSize: 11.5,
-                          color: isDark
-                              ? AppColors.darkMuted
-                              : AppColors.lightMuted,
-                        ),
-                      ),
-                      value: walletDetail?.isShared ?? false,
-                      activeColor: Colors.white,
-                      activeTrackColor: AppColors.primary,
-                      trackOutlineColor:
-                          WidgetStateProperty.all(Colors.transparent),
-                      onChanged: walletDetail == null || !walletDetail.isOwner
-                          ? null
-                          : (val) => _confirmToggleShared(
-                                context,
-                                val,
-                                walletDetail.wallet.name,
+                        if (walletDetail != null &&
+                            !walletDetail.isOwner &&
+                            walletDetail.isShared) ...[
+                          Divider(
+                            height: 1,
+                            color: isDark
+                                ? AppColors.darkBorder
+                                : AppColors.lightBorder,
+                          ),
+                          ListTile(
+                            contentPadding: EdgeInsets.zero,
+                            leading: const Icon(Icons.logout_rounded,
+                                color: AppColors.danger),
+                            title: Text(
+                              'Rời khỏi ví chung này',
+                              style: GoogleFonts.inter(
+                                fontSize: 13.5,
+                                fontWeight: FontWeight.w700,
+                                color: AppColors.danger,
                               ),
+                            ),
+                            subtitle: Text(
+                              'Bạn sẽ không còn quyền truy cập vào ví này nữa',
+                              style: GoogleFonts.inter(
+                                fontSize: 11.5,
+                                color: isDark
+                                    ? AppColors.darkMuted
+                                    : AppColors.lightMuted,
+                              ),
+                            ),
+                            trailing: Icon(
+                              Icons.chevron_right_rounded,
+                              size: 20,
+                              color: isDark
+                                  ? AppColors.darkMuted
+                                  : AppColors.lightMuted,
+                            ),
+                            onTap: () => _confirmLeaveWallet(
+                              context,
+                              walletDetail.wallet.name,
+                            ),
+                          ),
+                        ],
+                      ],
                     ),
                   ),
                 ),
