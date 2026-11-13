@@ -288,7 +288,7 @@ class _SharedWalletsScreenState extends ConsumerState<SharedWalletsScreen> {
           context.go(RoutePaths.wallets);
         }
       },
-      action: BannerHeader.glassButton(
+      action: BannerHeader.primaryButton(
         icon: const Icon(Icons.add_rounded, color: Colors.white, size: 20),
         onTap: () => context.push(RoutePaths.createWallet),
         tooltip: 'Thêm quỹ mới',

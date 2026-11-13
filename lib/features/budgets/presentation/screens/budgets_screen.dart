@@ -55,7 +55,7 @@ class BudgetsScreen extends ConsumerWidget {
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
-            action: BannerHeader.glassButton(
+            action: BannerHeader.primaryButton(
               icon: const Icon(
                 Icons.add_rounded,
                 size: 22,

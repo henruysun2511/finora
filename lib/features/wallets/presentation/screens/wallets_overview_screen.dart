@@ -143,7 +143,7 @@ class WalletsOverviewScreen extends ConsumerWidget {
           context.go(RoutePaths.home);
         }
       },
-      action: BannerHeader.glassButton(
+      action: BannerHeader.primaryButton(
         icon: const Icon(Icons.add_rounded, color: Colors.white, size: 20),
         onTap: () => context.push(RoutePaths.createWallet),
         tooltip: 'Thêm ví mới',

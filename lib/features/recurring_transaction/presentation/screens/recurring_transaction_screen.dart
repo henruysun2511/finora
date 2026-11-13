@@ -53,7 +53,7 @@ class RecurringTransactionsScreen extends ConsumerWidget {
             title: 'Giao dịch định kỳ',
             centerTitle: true,
             showBackButton: true,
-            action: BannerHeader.glassButton(
+            action: BannerHeader.primaryButton(
               icon: const Icon(
                 Icons.add_rounded,
                 size: 22,
