@@ -7,27 +7,35 @@ import '../../../../app/router/route_names.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/utils/currency_formatter.dart';
 import '../../../../core/widgets/app_toast.dart';
+import '../../../../core/widgets/banner_header.dart';
+import '../../../../core/widgets/form_card.dart';
 import '../../data/dto/update_wallet_request.dart';
 import '../providers/wallet_detail_provider.dart';
 import '../providers/wallets_overview_provider.dart';
 import '../widgets/invite_member_dialog.dart';
 
-/// Màn hình Ví chung & Quỹ nhóm chuẩn 1:1 theo `device-preview/screens/wallets/shared.html`
+/// Màn hình Ví chung & Quỹ nhóm chuẩn FinTech Design System
 /// 100% kết nối API thật, loại bỏ hoàn toàn mock data
 class SharedWalletsScreen extends ConsumerStatefulWidget {
   const SharedWalletsScreen({super.key});
 
   @override
-  ConsumerState<SharedWalletsScreen> createState() => _SharedWalletsScreenState();
+  ConsumerState<SharedWalletsScreen> createState() =>
+      _SharedWalletsScreenState();
 }
 
 class _SharedWalletsScreenState extends ConsumerState<SharedWalletsScreen> {
   int _activeTabIndex = 0; // 0: Đóng góp, 1: Giao dịch, 2: Cài đặt
   String? _selectedWalletId;
 
-  void _showGroupSelector(List<WalletItemState> sharedItems) {
+  void _showGroupSelector(
+    BuildContext context,
+    bool isDark,
+    List<WalletItemState> sharedItems,
+  ) {
     showModalBottomSheet(
       context: context,
+      backgroundColor: isDark ? AppColors.darkSurface : Colors.white,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
@@ -42,7 +50,7 @@ class _SharedWalletsScreenState extends ConsumerState<SharedWalletsScreen> {
                 width: 40,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: Colors.grey.shade300,
+                  color: isDark ? AppColors.darkBorder : Colors.grey.shade300,
                   borderRadius: BorderRadius.circular(99),
                 ),
               ),
@@ -50,13 +58,20 @@ class _SharedWalletsScreenState extends ConsumerState<SharedWalletsScreen> {
             const SizedBox(height: 16),
             Text(
               'Chọn Quỹ nhóm / Ví chung',
-              style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.w800),
+              style: GoogleFonts.inter(
+                fontSize: 16,
+                fontWeight: FontWeight.w800,
+                color: isDark
+                    ? AppColors.darkForeground
+                    : AppColors.lightForeground,
+              ),
             ),
             const SizedBox(height: 14),
             if (sharedItems.isNotEmpty)
               ...sharedItems.map((item) {
                 final isSelected = item.wallet.id == _selectedWalletId;
                 return _groupTile(
+                  isDark,
                   item.wallet.name,
                   '${CurrencyFormatter.format(item.balance.totalBalance, currency: item.wallet.defaultCurrency)} · ${item.accountsPreview.length} tài khoản',
                   isSelected,
@@ -69,12 +84,15 @@ class _SharedWalletsScreenState extends ConsumerState<SharedWalletsScreen> {
                 );
               })
             else
-              const Padding(
-                padding: EdgeInsets.symmetric(vertical: 20),
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 20),
                 child: Text(
                   'Bạn chưa có ví chung hoặc quỹ nhóm nào.',
                   textAlign: TextAlign.center,
-                  style: TextStyle(color: Color(0xFF64748B), fontSize: 13),
+                  style: GoogleFonts.inter(
+                    color: isDark ? AppColors.darkMuted : AppColors.lightMuted,
+                    fontSize: 13,
+                  ),
                 ),
               ),
             const SizedBox(height: 12),
@@ -83,11 +101,20 @@ class _SharedWalletsScreenState extends ConsumerState<SharedWalletsScreen> {
                 Navigator.pop(ctx);
                 context.push(RoutePaths.createWallet);
               },
-              icon: const Icon(Icons.add_rounded),
-              label: const Text('Tạo thêm quỹ nhóm mới'),
+              icon: const Icon(Icons.add_rounded, color: AppColors.primary),
+              label: Text(
+                'Tạo thêm quỹ nhóm mới',
+                style: GoogleFonts.inter(
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.primary,
+                ),
+              ),
               style: OutlinedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: 14),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                side: const BorderSide(color: AppColors.primary),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
               ),
             ),
           ],
@@ -96,19 +123,31 @@ class _SharedWalletsScreenState extends ConsumerState<SharedWalletsScreen> {
     );
   }
 
-  Widget _groupTile(String title, String subtitle, bool isSelected, {VoidCallback? onTap}) {
+  Widget _groupTile(
+    bool isDark,
+    String title,
+    String subtitle,
+    bool isSelected, {
+    VoidCallback? onTap,
+  }) {
     return ListTile(
       contentPadding: EdgeInsets.zero,
       leading: Container(
         width: 42,
         height: 42,
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.primary.withValues(alpha: 0.15) : Colors.grey.shade100,
+          color: isSelected
+              ? AppColors.primary.withValues(alpha: 0.15)
+              : (isDark
+                  ? AppColors.darkBackground
+                  : const Color(0xFFF1F5F9)),
           borderRadius: BorderRadius.circular(14),
         ),
         child: Icon(
           Icons.groups_rounded,
-          color: isSelected ? AppColors.primary : Colors.grey.shade600,
+          color: isSelected
+              ? AppColors.primary
+              : (isDark ? AppColors.darkMuted : AppColors.lightMuted),
           size: 22,
         ),
       ),
@@ -116,11 +155,23 @@ class _SharedWalletsScreenState extends ConsumerState<SharedWalletsScreen> {
         title,
         style: GoogleFonts.inter(
           fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
-          color: isSelected ? AppColors.primary : null,
+          color: isSelected
+              ? AppColors.primary
+              : (isDark
+                  ? AppColors.darkForeground
+                  : AppColors.lightForeground),
         ),
       ),
-      subtitle: Text(subtitle, style: const TextStyle(fontSize: 11.5)),
-      trailing: isSelected ? const Icon(Icons.check_circle_rounded, color: AppColors.primary) : null,
+      subtitle: Text(
+        subtitle,
+        style: GoogleFonts.inter(
+          fontSize: 11.5,
+          color: isDark ? AppColors.darkMuted : AppColors.lightMuted,
+        ),
+      ),
+      trailing: isSelected
+          ? const Icon(Icons.check_circle_rounded, color: AppColors.primary)
+          : null,
       onTap: onTap,
     );
   }
@@ -146,7 +197,8 @@ class _SharedWalletsScreenState extends ConsumerState<SharedWalletsScreen> {
         );
 
     return Scaffold(
-      backgroundColor: isDark ? AppColors.darkBackground : const Color(0xFFF8FAFC),
+      backgroundColor:
+          isDark ? AppColors.darkBackground : AppColors.lightBackground,
       body: RefreshIndicator(
         onRefresh: () async {
           await ref.refresh(walletsOverviewProvider.future);
@@ -160,19 +212,20 @@ class _SharedWalletsScreenState extends ConsumerState<SharedWalletsScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // ──────────────── 1. HERO SECTION ────────────────
-              _buildHero(context, selectedItem, sharedItems),
+              // ──────────────── 1. BANNER HEADER CHUẨN HERO ────
+              _buildHero(context, isDark, selectedItem, sharedItems),
 
               if (selectedItem == null) ...[
                 _buildEmptySharedState(context, isDark),
               ] else ...[
                 // ──────────────── 2. FLOATING QUICK ACTIONS ──────
-                _buildFloatingActions(context, selectedItem),
+                // (Giữ nguyên chuẩn theo hình ảnh người dùng yêu cầu)
+                _buildFloatingActions(context, isDark, selectedItem),
 
                 const SizedBox(height: 18),
 
-                // ──────────────── 3. TABS BAR ─────────────────────
-                _buildTabsBar(),
+                // ──────────────── 3. TABS BAR (Quy chuẩn 2) ──────
+                _buildTabsBar(isDark),
 
                 const SizedBox(height: 14),
 
@@ -199,7 +252,9 @@ class _SharedWalletsScreenState extends ConsumerState<SharedWalletsScreen> {
         decoration: BoxDecoration(
           color: isDark ? AppColors.darkSurface : Colors.white,
           borderRadius: BorderRadius.circular(22),
-          border: Border.all(color: const Color(0xFFE2E8F0)),
+          border: Border.all(
+            color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
+          ),
         ),
         child: Column(
           children: [
@@ -222,25 +277,40 @@ class _SharedWalletsScreenState extends ConsumerState<SharedWalletsScreen> {
               style: GoogleFonts.inter(
                 fontSize: 16,
                 fontWeight: FontWeight.w800,
-                color: isDark ? AppColors.darkForeground : AppColors.lightForeground,
+                color: isDark
+                    ? AppColors.darkForeground
+                    : AppColors.lightForeground,
               ),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 8),
-            const Text(
+            Text(
               'Tạo quỹ nhóm để cùng bạn bè, đồng nghiệp hoặc người thân quản lý chi tiêu chung minh bạch.',
               textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 13, color: Color(0xFF64748B), height: 1.4),
+              style: GoogleFonts.inter(
+                fontSize: 13,
+                color: isDark ? AppColors.darkMuted : AppColors.lightMuted,
+                height: 1.4,
+              ),
             ),
             const SizedBox(height: 24),
             ElevatedButton.icon(
               onPressed: () => context.push(RoutePaths.createWallet),
               icon: const Icon(Icons.add_rounded, color: Colors.white),
-              label: const Text('Tạo Quỹ nhóm mới', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+              label: const Text(
+                'Tạo Quỹ nhóm mới',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primary,
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
                 elevation: 0,
               ),
             ),
@@ -250,9 +320,10 @@ class _SharedWalletsScreenState extends ConsumerState<SharedWalletsScreen> {
     );
   }
 
-  /// Banner Hero màu xanh thương hiệu Solarn & vàng kim (#0055A9 -> #0072D5 -> #F5B53F)
+  /// Banner Header chuẩn Quy chuẩn 1 GEMINI.md (.acc-hero Solarn Gradient)
   Widget _buildHero(
     BuildContext context,
+    bool isDark,
     WalletItemState? selectedItem,
     List<WalletItemState> sharedItems,
   ) {
@@ -260,163 +331,90 @@ class _SharedWalletsScreenState extends ConsumerState<SharedWalletsScreen> {
     final balance = selectedItem?.balance.totalBalance ?? 0.0;
     final currency = selectedItem?.wallet.defaultCurrency ?? 'VND';
 
-    return Container(
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            Color(0xFF0055A9),
-            Color(0xFF0072D5),
-            Color(0xFFF5B53F),
-          ],
-          stops: [0.0, 0.55, 1.0],
-        ),
+    return BannerHeader(
+      title: 'Ví chung & Quỹ nhóm',
+      onBack: () {
+        if (context.canPop()) {
+          context.pop();
+        } else {
+          context.go(RoutePaths.wallets);
+        }
+      },
+      action: BannerHeader.primaryButton(
+        icon: const Icon(Icons.add_rounded, color: Colors.white, size: 20),
+        onTap: () => context.push(RoutePaths.createWallet),
       ),
-      child: Stack(
-        clipBehavior: Clip.none,
+      gradient: const LinearGradient(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: [
+          Color(0xFF0055A9),
+          Color(0xFF0072D5),
+          Color(0xFFF5B53F),
+        ],
+        stops: [0.0, 0.55, 1.0],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Positioned(
-            top: -60,
-            right: -40,
-            child: Container(
-              width: 220,
-              height: 220,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.white.withValues(alpha: 0.08),
-              ),
-            ),
-          ),
-          SafeArea(
-            bottom: false,
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(18, 12, 18, 28),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  // Header Nav Bar
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          // Group Selector Chip
+          if (sharedItems.isNotEmpty)
+            Align(
+              alignment: Alignment.centerLeft,
+              child: GestureDetector(
+                onTap: () => _showGroupSelector(context, isDark, sharedItems),
+                child: Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: Colors.black.withValues(alpha: 0.25),
+                    borderRadius: BorderRadius.circular(99),
+                    border: Border.all(
+                      color: Colors.white.withValues(alpha: 0.25),
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      GestureDetector(
-                        onTap: () {
-                          if (context.canPop()) {
-                            context.pop();
-                          } else {
-                            context.go(RoutePaths.wallets);
-                          }
-                        },
-                        child: Container(
-                          width: 36,
-                          height: 36,
-                          decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.18),
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(
-                              color: Colors.white.withValues(alpha: 0.25),
-                            ),
-                          ),
-                          child: const Icon(
-                            Icons.chevron_left_rounded,
-                            color: Colors.white,
-                            size: 20,
-                          ),
-                        ),
-                      ),
                       Text(
-                        'Ví chung & Quỹ nhóm',
+                        title,
                         style: GoogleFonts.inter(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w900,
-                          letterSpacing: -0.4,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w800,
                           color: Colors.white,
                         ),
                       ),
-                      GestureDetector(
-                        onTap: () => context.push(RoutePaths.createWallet),
-                        child: Container(
-                          width: 36,
-                          height: 36,
-                          decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.18),
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(
-                              color: Colors.white.withValues(alpha: 0.25),
-                            ),
-                          ),
-                          child: const Icon(
-                            Icons.add_rounded,
-                            color: Colors.white,
-                            size: 20,
-                          ),
-                        ),
+                      const SizedBox(width: 5),
+                      const Icon(
+                        Icons.keyboard_arrow_down_rounded,
+                        size: 16,
+                        color: Colors.white,
                       ),
                     ],
                   ),
-                  const SizedBox(height: 14),
-
-                  // Group Selector Chip
-                  if (sharedItems.isNotEmpty)
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: GestureDetector(
-                        onTap: () => _showGroupSelector(sharedItems),
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                          decoration: BoxDecoration(
-                            color: Colors.black.withValues(alpha: 0.25),
-                            borderRadius: BorderRadius.circular(99),
-                            border: Border.all(
-                              color: Colors.white.withValues(alpha: 0.25),
-                            ),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text(
-                                title,
-                                style: GoogleFonts.inter(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w800,
-                                  color: Colors.white,
-                                ),
-                              ),
-                              const SizedBox(width: 5),
-                              const Icon(
-                                Icons.keyboard_arrow_down_rounded,
-                                size: 16,
-                                color: Colors.white,
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  const SizedBox(height: 10),
-
-                  // Số dư quỹ hiện tại
-                  Text(
-                    'SỐ DƯ QUỸ HIỆN TẠI',
-                    style: GoogleFonts.inter(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w700,
-                      color: Colors.white.withValues(alpha: 0.85),
-                      letterSpacing: 0.8,
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    CurrencyFormatter.format(balance, currency: currency),
-                    style: GoogleFonts.outfit(
-                      fontSize: 34,
-                      fontWeight: FontWeight.w900,
-                      letterSpacing: -0.8,
-                      color: Colors.white,
-                    ),
-                  ),
-                ],
+                ),
               ),
+            ),
+          const SizedBox(height: 10),
+
+          // Số dư quỹ hiện tại
+          Text(
+            'SỐ DƯ QUỸ HIỆN TẠI',
+            style: GoogleFonts.inter(
+              fontSize: 12,
+              fontWeight: FontWeight.w700,
+              color: Colors.white.withValues(alpha: 0.85),
+              letterSpacing: 0.8,
+            ),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            CurrencyFormatter.format(balance, currency: currency),
+            style: GoogleFonts.outfit(
+              fontSize: 34,
+              fontWeight: FontWeight.w900,
+              letterSpacing: -0.8,
+              color: Colors.white,
             ),
           ),
         ],
@@ -424,19 +422,25 @@ class _SharedWalletsScreenState extends ConsumerState<SharedWalletsScreen> {
     );
   }
 
-  /// 4 Nút Floating Quick Actions
-  Widget _buildFloatingActions(BuildContext context, WalletItemState selectedItem) {
+  /// 4 Nút Floating Quick Actions (Giữ nguyên chuẩn theo hình ảnh người dùng yêu cầu)
+  Widget _buildFloatingActions(
+    BuildContext context,
+    bool isDark,
+    WalletItemState selectedItem,
+  ) {
     return Container(
       transform: Matrix4.translationValues(0, -18, 0),
       margin: const EdgeInsets.symmetric(horizontal: 16),
       padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 10),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDark ? AppColors.darkSurface : Colors.white,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
+        border: Border.all(
+          color: isDark ? AppColors.darkBorder : const Color(0xFFE2E8F0),
+        ),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF0F172A).withValues(alpha: 0.08),
+            color: const Color(0xFF0F172A).withValues(alpha: isDark ? 0.3 : 0.08),
             blurRadius: 20,
             offset: const Offset(0, 6),
           ),
@@ -446,29 +450,34 @@ class _SharedWalletsScreenState extends ConsumerState<SharedWalletsScreen> {
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
           _qAction(
+            isDark: isDark,
             icon: Icons.add_rounded,
             iconColor: const Color(0xFF0072D5),
             label: 'Đóng góp',
             onTap: () => context.push(RoutePaths.createTransaction),
           ),
           _qAction(
+            isDark: isDark,
             icon: Icons.payments_rounded,
             iconColor: const Color(0xFFEA580C),
             label: 'Chi quỹ',
             onTap: () => context.push(RoutePaths.createTransaction),
           ),
           _qAction(
+            isDark: isDark,
             icon: Icons.person_add_rounded,
             iconColor: const Color(0xFF0D9488),
             label: 'Mời bạn',
             onTap: () {
               showDialog(
                 context: context,
-                builder: (ctx) => InviteMemberDialog(walletId: selectedItem.wallet.id),
+                builder: (ctx) =>
+                    InviteMemberDialog(walletId: selectedItem.wallet.id),
               );
             },
           ),
           _qAction(
+            isDark: isDark,
             icon: Icons.tune_rounded,
             iconColor: const Color(0xFF7C3AED),
             label: 'Cài đặt',
@@ -480,6 +489,7 @@ class _SharedWalletsScreenState extends ConsumerState<SharedWalletsScreen> {
   }
 
   Widget _qAction({
+    required bool isDark,
     required IconData icon,
     required Color iconColor,
     required String label,
@@ -507,7 +517,9 @@ class _SharedWalletsScreenState extends ConsumerState<SharedWalletsScreen> {
               style: GoogleFonts.inter(
                 fontSize: 11.5,
                 fontWeight: FontWeight.w800,
-                color: const Color(0xFF0F172A),
+                color: isDark
+                    ? AppColors.darkForeground
+                    : const Color(0xFF0F172A),
               ),
             ),
           ],
@@ -516,35 +528,41 @@ class _SharedWalletsScreenState extends ConsumerState<SharedWalletsScreen> {
     );
   }
 
-  /// 3 Tabs Bar: Đóng góp, Giao dịch, Cài đặt
-  Widget _buildTabsBar() {
+  /// 3 Tabs Bar: Đóng góp, Giao dịch, Cài đặt (Quy chuẩn 2 GEMINI.md)
+  Widget _buildTabsBar(bool isDark) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Row(
         children: [
-          _tabPill(0, 'Thành viên & Đóng góp'),
+          _tabPill(0, 'Thành viên & Đóng góp', isDark),
           const SizedBox(width: 8),
-          _tabPill(1, 'Giao dịch quỹ'),
+          _tabPill(1, 'Giao dịch quỹ', isDark),
           const SizedBox(width: 8),
-          _tabPill(2, 'Cài đặt quỹ'),
+          _tabPill(2, 'Cài đặt quỹ', isDark),
         ],
       ),
     );
   }
 
-  Widget _tabPill(int index, String title) {
+  Widget _tabPill(int index, String title, bool isDark) {
     final isSelected = _activeTabIndex == index;
     return Expanded(
       child: InkWell(
         onTap: () => setState(() => _activeTabIndex = index),
-        borderRadius: BorderRadius.circular(99),
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 8),
+        borderRadius: BorderRadius.circular(12),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 180),
+          padding: const EdgeInsets.symmetric(vertical: 9),
           decoration: BoxDecoration(
-            color: isSelected ? AppColors.primary : Colors.white,
-            borderRadius: BorderRadius.circular(99),
+            color: isSelected
+                ? AppColors.primary
+                : (isDark ? AppColors.darkSurface : Colors.white),
+            borderRadius: BorderRadius.circular(12),
             border: Border.all(
-              color: isSelected ? AppColors.primary : const Color(0xFFE2E8F0),
+              color: isSelected
+                  ? AppColors.primary
+                  : (isDark ? AppColors.darkBorder : AppColors.lightBorder),
+              width: 1.2,
             ),
             boxShadow: isSelected
                 ? [
@@ -559,10 +577,16 @@ class _SharedWalletsScreenState extends ConsumerState<SharedWalletsScreen> {
           child: Text(
             title,
             textAlign: TextAlign.center,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
             style: GoogleFonts.inter(
               fontSize: 11.5,
-              fontWeight: FontWeight.w800,
-              color: isSelected ? Colors.white : const Color(0xFF64748B),
+              fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+              color: isSelected
+                  ? Colors.white
+                  : (isDark
+                      ? AppColors.darkForeground
+                      : AppColors.lightForeground),
             ),
           ),
         ),
@@ -601,8 +625,10 @@ class _SharedWalletsScreenState extends ConsumerState<SharedWalletsScreen> {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: isDark ? AppColors.darkSurface : Colors.white,
-        borderRadius: BorderRadius.circular(22),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -616,14 +642,17 @@ class _SharedWalletsScreenState extends ConsumerState<SharedWalletsScreen> {
                   fontSize: 14.5,
                   fontWeight: FontWeight.w900,
                   letterSpacing: -0.3,
-                  color: isDark ? AppColors.darkForeground : AppColors.lightForeground,
+                  color: isDark
+                      ? AppColors.darkForeground
+                      : AppColors.lightForeground,
                 ),
               ),
               GestureDetector(
                 onTap: () {
                   showDialog(
                     context: context,
-                    builder: (ctx) => InviteMemberDialog(walletId: selectedItem.wallet.id),
+                    builder: (ctx) =>
+                        InviteMemberDialog(walletId: selectedItem.wallet.id),
                   );
                 },
                 child: Text(
@@ -639,12 +668,15 @@ class _SharedWalletsScreenState extends ConsumerState<SharedWalletsScreen> {
           ),
           const SizedBox(height: 12),
           if (members.isEmpty)
-            const Padding(
-              padding: EdgeInsets.symmetric(vertical: 20),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 20),
               child: Text(
                 'Chưa có thành viên nào khác trong quỹ này.',
                 textAlign: TextAlign.center,
-                style: TextStyle(color: Color(0xFF64748B), fontSize: 13),
+                style: GoogleFonts.inter(
+                  color: isDark ? AppColors.darkMuted : AppColors.lightMuted,
+                  fontSize: 13,
+                ),
               ),
             )
           else
@@ -657,19 +689,30 @@ class _SharedWalletsScreenState extends ConsumerState<SharedWalletsScreen> {
               return Container(
                 padding: const EdgeInsets.symmetric(vertical: 10),
                 decoration: BoxDecoration(
-                  border: isLast ? null : const Border(bottom: BorderSide(color: Color(0xFFE2E8F0))),
+                  border: isLast
+                      ? null
+                      : Border(
+                          bottom: BorderSide(
+                            color: isDark
+                                ? AppColors.darkBorder
+                                : AppColors.lightBorder,
+                          ),
+                        ),
                 ),
                 child: Row(
                   children: [
                     CircleAvatar(
                       radius: 18,
-                      backgroundColor: isOwner ? AppColors.primary : Colors.grey.shade400,
+                      backgroundColor:
+                          isOwner ? AppColors.primary : Colors.grey.shade400,
                       child: Text(
                         member.fullName.isNotEmpty
                             ? member.fullName[0].toUpperCase()
                             : 'U',
                         style: const TextStyle(
-                            color: Colors.white, fontWeight: FontWeight.bold),
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
                     const SizedBox(width: 12),
@@ -682,25 +725,40 @@ class _SharedWalletsScreenState extends ConsumerState<SharedWalletsScreen> {
                             style: GoogleFonts.inter(
                               fontSize: 13.5,
                               fontWeight: FontWeight.w800,
-                              color: isDark ? AppColors.darkForeground : AppColors.lightForeground,
+                              color: isDark
+                                  ? AppColors.darkForeground
+                                  : AppColors.lightForeground,
                             ),
                           ),
                           const SizedBox(height: 2),
                           Text(
                             member.role.displayName,
-                            style: const TextStyle(fontSize: 11, color: Color(0xFF94A3B8)),
+                            style: GoogleFonts.inter(
+                              fontSize: 11,
+                              color: isDark
+                                  ? AppColors.darkMuted
+                                  : AppColors.lightMuted,
+                            ),
                           ),
                         ],
                       ),
                     ),
                     if (isOwner)
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 3),
                         decoration: BoxDecoration(
                           color: AppColors.primary.withValues(alpha: 0.12),
                           borderRadius: BorderRadius.circular(99),
                         ),
-                        child: const Text('👑 Chủ ví', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: AppColors.primary)),
+                        child: const Text(
+                          '👑 Chủ ví',
+                          style: TextStyle(
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.primary,
+                          ),
+                        ),
                       ),
                   ],
                 ),
@@ -717,69 +775,122 @@ class _SharedWalletsScreenState extends ConsumerState<SharedWalletsScreen> {
     bool isDark,
     WalletItemState selectedItem,
   ) {
-    final txsAsync = ref.watch(walletTransactionsProvider(selectedItem.wallet.id));
+    final txsAsync =
+        ref.watch(walletTransactionsProvider(selectedItem.wallet.id));
 
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: isDark ? AppColors.darkSurface : Colors.white,
-        borderRadius: BorderRadius.circular(22),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
+        ),
       ),
       child: txsAsync.when(
         loading: () => const Center(
           child: Padding(
             padding: EdgeInsets.symmetric(vertical: 24),
-            child: CircularProgressIndicator(color: AppColors.primary, strokeWidth: 2),
+            child: CircularProgressIndicator(
+              color: AppColors.primary,
+              strokeWidth: 2,
+            ),
           ),
         ),
-        error: (_, __) => const Center(
+        error: (_, __) => Center(
           child: Padding(
-            padding: EdgeInsets.symmetric(vertical: 20),
-            child: Text('Chưa thể tải giao dịch quỹ.', style: TextStyle(color: Color(0xFF64748B))),
+            padding: const EdgeInsets.symmetric(vertical: 20),
+            child: Text(
+              'Chưa thể tải giao dịch quỹ.',
+              style: GoogleFonts.inter(
+                color: isDark ? AppColors.darkMuted : AppColors.lightMuted,
+              ),
+            ),
           ),
         ),
         data: (txs) {
           if (txs.isEmpty) {
-            return const Center(
+            return Center(
               child: Padding(
-                padding: EdgeInsets.symmetric(vertical: 24),
-                child: Text('Chưa có giao dịch nào trong quỹ nhóm này.', style: TextStyle(color: Color(0xFF64748B))),
+                padding: const EdgeInsets.symmetric(vertical: 24),
+                child: Text(
+                  'Chưa có giao dịch nào trong quỹ nhóm này.',
+                  style: GoogleFonts.inter(
+                    color: isDark ? AppColors.darkMuted : AppColors.lightMuted,
+                  ),
+                ),
               ),
             );
           }
           return Column(
             children: txs.asMap().entries.map((entry) {
+              final idx = entry.key;
               final tx = entry.value;
+              final isLast = idx == txs.length - 1;
               final isIncome = tx.type == 'INCOME';
-              return ListTile(
-                contentPadding: EdgeInsets.zero,
-                leading: Container(
-                  width: 38,
-                  height: 38,
-                  decoration: BoxDecoration(
-                    color: (isIncome ? AppColors.success : AppColors.danger).withValues(alpha: 0.12),
-                    borderRadius: BorderRadius.circular(12),
+
+              return Column(
+                children: [
+                  ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    leading: Container(
+                      width: 38,
+                      height: 38,
+                      decoration: BoxDecoration(
+                        color: (isIncome
+                                ? AppColors.success
+                                : AppColors.danger)
+                            .withValues(alpha: 0.12),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Icon(
+                        isIncome
+                            ? Icons.arrow_downward_rounded
+                            : Icons.arrow_upward_rounded,
+                        color: isIncome
+                            ? AppColors.success
+                            : AppColors.danger,
+                        size: 18,
+                      ),
+                    ),
+                    title: Text(
+                      tx.title,
+                      style: GoogleFonts.inter(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w800,
+                        color: isDark
+                            ? AppColors.darkForeground
+                            : AppColors.lightForeground,
+                      ),
+                    ),
+                    subtitle: Text(
+                      '${tx.transactionDate.day}/${tx.transactionDate.month}/${tx.transactionDate.year}',
+                      style: GoogleFonts.inter(
+                        fontSize: 11,
+                        color: isDark
+                            ? AppColors.darkMuted
+                            : AppColors.lightMuted,
+                      ),
+                    ),
+                    trailing: Text(
+                      '${isIncome ? '+' : '-'}${CurrencyFormatter.format(tx.amount)}',
+                      style: GoogleFonts.outfit(
+                        fontSize: 13.5,
+                        fontWeight: FontWeight.w900,
+                        color: isIncome
+                            ? AppColors.success
+                            : AppColors.danger,
+                      ),
+                    ),
                   ),
-                  child: Icon(
-                    isIncome ? Icons.arrow_downward_rounded : Icons.arrow_upward_rounded,
-                    color: isIncome ? AppColors.success : AppColors.danger,
-                    size: 18,
-                  ),
-                ),
-                title: Text(tx.title, style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w800)),
-                subtitle: Text(
-                  '${tx.transactionDate.day}/${tx.transactionDate.month}/${tx.transactionDate.year}',
-                  style: const TextStyle(fontSize: 11, color: Color(0xFF94A3B8)),
-                ),
-                trailing: Text(
-                  '${isIncome ? '+' : '-'}${CurrencyFormatter.format(tx.amount)}',
-                  style: GoogleFonts.outfit(
-                    fontSize: 13.5,
-                    fontWeight: FontWeight.w900,
-                    color: isIncome ? AppColors.success : AppColors.danger,
-                  ),
-                ),
+                  if (!isLast)
+                    Divider(
+                      height: 1,
+                      color: isDark
+                          ? AppColors.darkBorder
+                          : AppColors.lightBorder,
+                    ),
+                ],
               );
             }).toList(),
           );
@@ -788,42 +899,75 @@ class _SharedWalletsScreenState extends ConsumerState<SharedWalletsScreen> {
     );
   }
 
-  /// Tab 3: Cài đặt quỹ nhóm thật
+  /// Tab 3: Cài đặt quỹ nhóm chuẩn FormCard (Quy chuẩn 3 GEMINI.md)
   Widget _buildSettingsTab(
     BuildContext context,
     bool isDark,
     WalletItemState selectedItem,
   ) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: isDark ? AppColors.darkSurface : Colors.white,
-        borderRadius: BorderRadius.circular(22),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
-      ),
+    return FormCard(
+      title: 'Cài đặt quỹ nhóm',
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Column(
         children: [
           ListTile(
+            contentPadding: EdgeInsets.zero,
             leading: const Icon(Icons.edit_rounded, color: AppColors.primary),
-            title: const Text('Đổi tên quỹ nhóm', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13.5)),
-            trailing: const Icon(Icons.chevron_right_rounded, size: 18),
+            title: Text(
+              'Đổi tên quỹ nhóm',
+              style: GoogleFonts.inter(
+                fontWeight: FontWeight.w700,
+                fontSize: 13.5,
+                color: isDark
+                    ? AppColors.darkForeground
+                    : AppColors.lightForeground,
+              ),
+            ),
+            trailing: Icon(
+              Icons.chevron_right_rounded,
+              size: 20,
+              color: isDark ? AppColors.darkMuted : AppColors.lightMuted,
+            ),
             onTap: () {
-              final nameCtrl = TextEditingController(text: selectedItem.wallet.name);
+              final nameCtrl =
+                  TextEditingController(text: selectedItem.wallet.name);
               showDialog(
                 context: context,
                 builder: (ctx) => AlertDialog(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
                   title: const Text('Đổi tên quỹ nhóm'),
-                  content: TextField(controller: nameCtrl, decoration: const InputDecoration(labelText: 'Tên quỹ mới')),
+                  content: TextField(
+                    controller: nameCtrl,
+                    decoration: const InputDecoration(
+                      labelText: 'Tên quỹ mới',
+                      hintText: 'Nhập tên mới cho quỹ...',
+                    ),
+                  ),
                   actions: [
-                    TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('HỦY')),
+                    TextButton(
+                      onPressed: () => Navigator.pop(ctx),
+                      child: const Text('HỦY'),
+                    ),
                     TextButton(
                       onPressed: () async {
                         Navigator.pop(ctx);
-                        await ref.read(walletDetailActionsProvider(selectedItem.wallet.id)).updateWallet(
-                              UpdateWalletRequest(name: nameCtrl.text.trim()),
-                            );
-                        ref.invalidate(walletsOverviewProvider);
-                        if (mounted) AppToast.success(context, 'Đã đổi tên quỹ thành công!');
+                        try {
+                          await ref
+                              .read(walletDetailActionsProvider(
+                                  selectedItem.wallet.id))
+                              .updateWallet(
+                                UpdateWalletRequest(name: nameCtrl.text.trim()),
+                              );
+                          ref.invalidate(walletsOverviewProvider);
+                          if (mounted) {
+                            AppToast.success(
+                                context, 'Đã đổi tên quỹ thành công!');
+                          }
+                        } catch (e) {
+                          if (mounted) AppToast.error(context, e.toString());
+                        }
                       },
                       child: const Text('LƯU'),
                     ),
@@ -832,30 +976,67 @@ class _SharedWalletsScreenState extends ConsumerState<SharedWalletsScreen> {
               );
             },
           ),
-          const Divider(),
+          Divider(
+            height: 1,
+            color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
+          ),
           ListTile(
-            leading: const Icon(Icons.delete_outline_rounded, color: AppColors.danger),
-            title: const Text('Giải tán / Xóa quỹ nhóm', style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.danger, fontSize: 13.5)),
-            trailing: const Icon(Icons.chevron_right_rounded, size: 18),
+            contentPadding: EdgeInsets.zero,
+            leading: const Icon(Icons.delete_outline_rounded,
+                color: AppColors.danger),
+            title: Text(
+              'Giải tán / Xóa quỹ nhóm',
+              style: GoogleFonts.inter(
+                fontWeight: FontWeight.w700,
+                color: AppColors.danger,
+                fontSize: 13.5,
+              ),
+            ),
+            trailing: Icon(
+              Icons.chevron_right_rounded,
+              size: 20,
+              color: isDark ? AppColors.darkMuted : AppColors.lightMuted,
+            ),
             onTap: () {
               showDialog(
                 context: context,
                 builder: (ctx) => AlertDialog(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
                   title: const Text('Giải tán quỹ nhóm?'),
-                  content: Text('Bạn có chắc chắn muốn giải tán quỹ "${selectedItem.wallet.name}" không?'),
+                  content: Text(
+                    'Bạn có chắc chắn muốn giải tán quỹ "${selectedItem.wallet.name}" không? Hành động này không thể hoàn tác.',
+                  ),
                   actions: [
-                    TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('HỦY')),
+                    TextButton(
+                      onPressed: () => Navigator.pop(ctx),
+                      child: const Text('HỦY'),
+                    ),
                     TextButton(
                       onPressed: () async {
                         Navigator.pop(ctx);
-                        await ref.read(walletDetailActionsProvider(selectedItem.wallet.id)).deleteWallet();
-                        ref.invalidate(walletsOverviewProvider);
-                        if (mounted) {
-                          AppToast.success(context, 'Đã giải tán quỹ nhóm!');
-                          setState(() => _selectedWalletId = null);
+                        try {
+                          await ref
+                              .read(walletDetailActionsProvider(
+                                  selectedItem.wallet.id))
+                              .deleteWallet();
+                          ref.invalidate(walletsOverviewProvider);
+                          if (mounted) {
+                            AppToast.success(context, 'Đã giải tán quỹ nhóm!');
+                            setState(() => _selectedWalletId = null);
+                          }
+                        } catch (e) {
+                          if (mounted) AppToast.error(context, e.toString());
                         }
                       },
-                      child: const Text('XÓA QUỸ', style: TextStyle(color: AppColors.danger)),
+                      child: const Text(
+                        'XÓA QUỸ',
+                        style: TextStyle(
+                          color: AppColors.danger,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ),
                   ],
                 ),

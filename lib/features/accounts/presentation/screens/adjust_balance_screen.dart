@@ -694,3 +694,4 @@ class _AdjustBalanceScreenState extends ConsumerState<AdjustBalanceScreen> {
     );
   }
 }
+
