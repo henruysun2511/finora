@@ -35,6 +35,7 @@ import '../../features/mascot/presentation/screens/mascot_settings_screen.dart';
 import '../../features/mascot/presentation/screens/mascot_showcase_screen.dart';
 import '../../features/categories/presentation/screens/category_list_screen.dart';
 import '../../features/settings/presentation/screens/notification_settings_screen.dart';
+import '../../features/settings/presentation/screens/quick_actions_settings_screen.dart';
 import '../../features/settings/presentation/screens/security_settings_screen.dart';
 import '../../features/settings/presentation/screens/settings_screen.dart';
 import '../../features/friends/presentation/screens/friends_list_screen.dart';
@@ -579,6 +580,13 @@ GoRouter appRouter(AppRouterRef ref) {
         path: RoutePaths.settings,
         name: RouteNames.settings,
         builder: (context, state) => const SettingsScreen(),
+        routes: [
+          GoRoute(
+            parentNavigatorKey: _rootNavigatorKey,
+            path: 'quick-actions',
+            builder: (context, state) => const QuickActionsSettingsScreen(),
+          ),
+        ],
       ),
       GoRoute(
         parentNavigatorKey: _rootNavigatorKey,
@@ -612,6 +620,17 @@ GoRouter appRouter(AppRouterRef ref) {
         path: RoutePaths.notificationSettings,
         name: RouteNames.notificationSettings,
         builder: (context, state) => const NotificationSettingsScreen(),
+      ),
+      GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
+        path: RoutePaths.quickActionsSettings,
+        name: RouteNames.quickActionsSettings,
+        builder: (context, state) => const QuickActionsSettingsScreen(),
+      ),
+      GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
+        path: '/quick-actions',
+        builder: (context, state) => const QuickActionsSettingsScreen(),
       ),
 
       // ==========================================

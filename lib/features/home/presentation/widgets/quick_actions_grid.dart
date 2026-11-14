@@ -1,23 +1,42 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../app/router/route_names.dart';
 import '../../../../app/theme/app_colors.dart';
+import '../../domain/models/quick_action_item_model.dart';
+import '../providers/quick_actions_provider.dart';
 
-/// Lưới 12 nút tác vụ nhanh (3 dòng x 4 cột cân đối)
-/// Chuẩn thiết kế FinTech SOLARN Style - Tinh giản các mục trùng lặp
-class QuickActionsGrid extends StatelessWidget {
+/// Lưới các phím tắt Thao tác nhanh trên màn hình chính
+/// Chuẩn thiết kế FinTech SOLARN Style gốc (GEMINI.md)
+class QuickActionsGrid extends ConsumerWidget {
   const QuickActionsGrid({super.key});
 
+  void _handleNavigation(BuildContext context, String routePath) {
+    if (routePath == RoutePaths.budgets ||
+        routePath == RoutePaths.wallets ||
+        routePath == RoutePaths.aiChat ||
+        routePath == RoutePaths.dashboard) {
+      context.go(routePath);
+    } else {
+      context.push(routePath);
+    }
+  }
+
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final asyncState = ref.watch(quickActionsProvider);
+
+    // Lấy danh sách item: nếu đang load hoặc lỗi thì fallback về danh mục mặc định
+    final List<QuickActionItemModel> items = asyncState.valueOrNull?.enabledItems ??
+        allQuickActionsCatalog.where((e) => e.isDefaultEnabled).toList();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        // ── Card bọc lưới 12 tiện ích thiết yếu ──────────────────────────────
+        // ── Card bọc lưới tiện ích thiết yếu (giữ nguyên phong cách gốc) ──
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 16),
           decoration: BoxDecoration(
@@ -34,111 +53,26 @@ class QuickActionsGrid extends StatelessWidget {
               ),
             ],
           ),
-          child: GridView.count(
-            crossAxisCount: 4,
+          child: GridView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
-            mainAxisSpacing: 16,
-            crossAxisSpacing: 6,
-            childAspectRatio: 0.88,
-            children: [
-              // 1. Thu/Chi thủ công
-              _QuickActionItem(
+            itemCount: items.length,
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 4,
+              childAspectRatio: 0.88,
+              mainAxisSpacing: 16,
+              crossAxisSpacing: 6,
+            ),
+            itemBuilder: (context, index) {
+              final item = items[index];
+              return _QuickActionItem(
                 isDark: isDark,
-                icon: Icons.add_circle_outline_rounded,
-                label: 'Thu/Chi',
-                bgColor: const Color(0xFF1E5BD8),
-                onTap: () => context.push(RoutePaths.createTransaction),
-              ),
-              // 2. Quét hóa đơn OCR
-              _QuickActionItem(
-                isDark: isDark,
-                icon: Icons.document_scanner_rounded,
-                label: 'Quét bill',
-                bgColor: const Color(0xFFF97316),
-                onTap: () => context.push(RoutePaths.scanReceipt),
-              ),
-              // 3. Lịch sử giao dịch
-              _QuickActionItem(
-                isDark: isDark,
-                icon: Icons.receipt_long_rounded,
-                label: 'Sổ GD',
-                bgColor: const Color(0xFF3B82F6),
-                onTap: () => context.push(RoutePaths.transactions),
-              ),
-              // 4. Ngân sách chi tiêu
-              _QuickActionItem(
-                isDark: isDark,
-                icon: Icons.calendar_month_rounded,
-                label: 'Ngân sách',
-                bgColor: const Color(0xFF8B5CF6),
-                onTap: () => context.go(RoutePaths.budgets),
-              ),
-              // 5. Báo cáo & Phân tích
-              _QuickActionItem(
-                isDark: isDark,
-                icon: Icons.pie_chart_rounded,
-                label: 'Báo cáo',
-                bgColor: const Color(0xFFEC4899),
-                onTap: () => context.push(RoutePaths.dashboard),
-              ),
-              // 6. Giao dịch định kỳ
-              _QuickActionItem(
-                isDark: isDark,
-                icon: Icons.event_repeat_rounded,
-                label: 'Định kỳ',
-                bgColor: const Color(0xFF10B981),
-                onTap: () => context.push(RoutePaths.recurringTransactions),
-              ),
-              // 7. Sổ ghi nợ
-              _QuickActionItem(
-                isDark: isDark,
-                icon: Icons.handshake_rounded,
-                label: 'Sổ nợ',
-                bgColor: const Color(0xFFF59E0B),
-                onTap: () => context.push(RoutePaths.loans),
-              ),
-              // 8. Chia tiền nhóm
-              _QuickActionItem(
-                isDark: isDark,
-                icon: Icons.call_split_rounded,
-                label: 'Chia tiền',
-                bgColor: const Color(0xFF6366F1),
-                onTap: () => context.push(RoutePaths.splitExpenses),
-              ),
-              // 9. Danh mục thu chi
-              _QuickActionItem(
-                isDark: isDark,
-                icon: Icons.category_rounded,
-                label: 'Danh mục',
-                bgColor: const Color(0xFF14B8A6),
-                onTap: () => context.push(RoutePaths.categorySettings),
-              ),
-              // 10. Danh sách ví tiền
-              _QuickActionItem(
-                isDark: isDark,
-                icon: Icons.account_balance_wallet_rounded,
-                label: 'Ví tiền',
-                bgColor: const Color(0xFF2563EB),
-                onTap: () => context.go(RoutePaths.wallets),
-              ),
-              // 11. Tỷ giá ngoại tệ
-              _QuickActionItem(
-                isDark: isDark,
-                icon: Icons.currency_exchange_rounded,
-                label: 'Tỷ giá',
-                bgColor: const Color(0xFFD97706),
-                onTap: () => context.push(RoutePaths.exchangeRates),
-              ),
-              // 12. Bảng tin tài chính
-              _QuickActionItem(
-                isDark: isDark,
-                icon: Icons.dynamic_feed_rounded,
-                label: 'Bảng tin',
-                bgColor: const Color(0xFF84CC16),
-                onTap: () => context.push(RoutePaths.socialFeed),
-              ),
-            ],
+                icon: item.icon,
+                label: item.label,
+                bgColor: item.bgColor,
+                onTap: () => _handleNavigation(context, item.routePath),
+              );
+            },
           ),
         ),
       ],

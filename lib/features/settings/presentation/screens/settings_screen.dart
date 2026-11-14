@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
+import '../../../../app/router/route_names.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/widgets/app_toast.dart';
 import '../../../../core/widgets/confirm_dialog.dart';
@@ -1207,6 +1209,53 @@ class SettingsScreen extends ConsumerWidget {
                       ),
                     ),
                   ],
+                ),
+              ),
+
+              // ── 1.1 TÙY BIẾN THAO TÁC NHANH TRANG CHỦ ──
+              FormCard(
+                title: 'Giao diện & Tiện ích trang chủ',
+                child: InkWell(
+                  onTap: () => context.pushNamed(RouteNames.quickActionsSettings),
+                  borderRadius: BorderRadius.circular(10),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 4),
+                    child: Row(
+                      children: [
+                        _buildIconBadge(
+                          icon: Icons.dashboard_customize_rounded,
+                          color: const Color(0xFF8B5CF6),
+                          isDark: isDark,
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Thao tác nhanh trang chủ',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                  color: foreground,
+                                ),
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                'Tùy chọn hiển thị và sắp xếp vị trí các tiện ích',
+                                style: TextStyle(fontSize: 12, color: muted),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Icon(
+                          Icons.chevron_right_rounded,
+                          size: 22,
+                          color: muted,
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               ),
 

@@ -152,7 +152,9 @@ class PageHeader extends StatelessWidget implements PreferredSizeWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              height: 56,
+              height: isSubPage
+                  ? (showBottomBorder && bottom == null ? 55.0 : 56.0)
+                  : 64.0,
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Row(
                 children: [

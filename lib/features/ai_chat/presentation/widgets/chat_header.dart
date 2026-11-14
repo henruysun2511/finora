@@ -70,56 +70,67 @@ class ChatHeader extends StatelessWidget implements PreferredSizeWidget {
                   ],
                 ),
                 const SizedBox(height: 12),
-                ...wallets.map((w) {
-                  final isSelected = w.name == activeWalletName;
-                  return ListTile(
-                    contentPadding: EdgeInsets.zero,
-                    leading: Container(
-                      width: 40,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        color: (isSelected ? AppColors.primary : Colors.grey)
-                            .withValues(alpha: 0.12),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Icon(
-                        w.isShared
-                            ? Icons.group_rounded
-                            : Icons.account_balance_wallet_rounded,
-                        color: isSelected ? AppColors.primary : Colors.grey,
-                        size: 22,
-                      ),
-                    ),
-                    title: Text(
-                      w.name,
-                      style: GoogleFonts.inter(
-                        fontWeight:
-                            isSelected ? FontWeight.w700 : FontWeight.w500,
-                        color: isSelected
-                            ? AppColors.primary
-                            : (isDark
-                                ? AppColors.darkForeground
-                                : AppColors.lightForeground),
-                      ),
-                    ),
-                    subtitle: Text(
-                      w.isShared ? 'Ví chia sẻ' : 'Ví cá nhân',
-                      style: GoogleFonts.inter(
-                        fontSize: 12,
-                        color:
-                            isDark ? AppColors.darkMuted : AppColors.lightMuted,
-                      ),
-                    ),
-                    trailing: isSelected
-                        ? const Icon(Icons.check_circle_rounded,
-                            color: AppColors.primary)
-                        : null,
-                    onTap: () {
-                      Navigator.pop(ctx);
-                      onSelectWallet?.call(w);
-                    },
-                  );
-                }),
+                Flexible(
+                  child: ListView(
+                    shrinkWrap: true,
+                    children: [
+                      ...wallets.map((w) {
+                        final isSelected = w.name == activeWalletName;
+                        return ListTile(
+                          contentPadding: EdgeInsets.zero,
+                          leading: Container(
+                            width: 40,
+                            height: 40,
+                            decoration: BoxDecoration(
+                              color:
+                                  (isSelected ? AppColors.primary : Colors.grey)
+                                      .withValues(alpha: 0.12),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Icon(
+                              w.isShared
+                                  ? Icons.group_rounded
+                                  : Icons.account_balance_wallet_rounded,
+                              color:
+                                  isSelected ? AppColors.primary : Colors.grey,
+                              size: 22,
+                            ),
+                          ),
+                          title: Text(
+                            w.name,
+                            style: GoogleFonts.inter(
+                              fontWeight: isSelected
+                                  ? FontWeight.w700
+                                  : FontWeight.w500,
+                              color: isSelected
+                                  ? AppColors.primary
+                                  : (isDark
+                                      ? AppColors.darkForeground
+                                      : AppColors.lightForeground),
+                            ),
+                          ),
+                          subtitle: Text(
+                            w.isShared ? 'Ví chia sẻ' : 'Ví cá nhân',
+                            style: GoogleFonts.inter(
+                              fontSize: 12,
+                              color: isDark
+                                  ? AppColors.darkMuted
+                                  : AppColors.lightMuted,
+                            ),
+                          ),
+                          trailing: isSelected
+                              ? const Icon(Icons.check_circle_rounded,
+                                  color: AppColors.primary)
+                              : null,
+                          onTap: () {
+                            Navigator.pop(ctx);
+                            onSelectWallet?.call(w);
+                          },
+                        );
+                      }),
+                    ],
+                  ),
+                ),
               ],
             ),
           ),

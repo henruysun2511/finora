@@ -82,6 +82,7 @@ class RouteNames {
   static const String aiPersonaSettings = 'aiPersonaSettings';
   static const String mascotShowcase = 'mascotShowcase';
   static const String notificationSettings = 'notificationSettings';
+  static const String quickActionsSettings = 'quickActionsSettings';
 
   // 11. Sample Features (CRUD Mẫu)
   static const String products = 'products';
@@ -178,6 +179,7 @@ class RoutePaths {
   static const String aiPersonaSettings = '/settings/ai-persona';
   static const String mascotShowcase = '/mascots/showcase';
   static const String notificationSettings = '/settings/notifications';
+  static const String quickActionsSettings = '/settings/quick-actions';
 
   // 11. Sample Features (CRUD Mẫu)
   static const String products = '/products';

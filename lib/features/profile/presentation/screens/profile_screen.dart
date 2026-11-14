@@ -370,6 +370,16 @@ class ProfileScreen extends ConsumerWidget {
                     color:
                         isDark ? AppColors.darkBorder : AppColors.lightBorder),
                 ProfileSettingsTile(
+                  icon: Icons.dashboard_customize_rounded,
+                  title: 'Thao tác nhanh trang chủ',
+                  subtitle: 'Chọn và sắp xếp các phím tắt tiện ích',
+                  onTap: () => context.pushNamed(RouteNames.quickActionsSettings),
+                ),
+                Divider(
+                    height: 20,
+                    color:
+                        isDark ? AppColors.darkBorder : AppColors.lightBorder),
+                ProfileSettingsTile(
                   icon: Icons.category_rounded,
                   title: 'Quản lý Danh mục',
                   subtitle: 'Cấu hình danh mục thu chi',
