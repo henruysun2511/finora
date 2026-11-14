@@ -31,12 +31,24 @@ class _HomePhotoCalendarSectionState
 
   // 6 bộ phối màu gradient phong cách Solarn FinTech cho các ô có chi tiêu
   static const List<List<Color>> _gradientPalettes = [
-    [Color(0xFFFFD5AB), Color(0xFFFF9C47)], // 0: Cam san hô / Vàng hổ phách (Ăn uống, cà phê)
-    [Color(0xFFC7D2FE), Color(0xFF818CF8)], // 1: Xanh tím / Lavender (Di chuyển / Xe cộ)
-    [Color(0xFFC9F0DA), Color(0xFF4ADE80)], // 2: Xanh mint tươi (Tiết kiệm, heo đất)
+    [
+      Color(0xFFFFD5AB),
+      Color(0xFFFF9C47)
+    ], // 0: Cam san hô / Vàng hổ phách (Ăn uống, cà phê)
+    [
+      Color(0xFFC7D2FE),
+      Color(0xFF818CF8)
+    ], // 1: Xanh tím / Lavender (Di chuyển / Xe cộ)
+    [
+      Color(0xFFC9F0DA),
+      Color(0xFF4ADE80)
+    ], // 2: Xanh mint tươi (Tiết kiệm, heo đất)
     [Color(0xFFFFD2E0), Color(0xFFFF7FA5)], // 3: Hồng phấn (Mua sắm)
     [Color(0xFFB9D4FF), Color(0xFF5F8BFF)], // 4: Xanh biển (Hóa đơn / Đăng ký)
-    [Color(0xFFFEF08A), Color(0xFFFACC15)], // 5: Vàng chanh tươi sáng (Thu nhập / Thưởng)
+    [
+      Color(0xFFFEF08A),
+      Color(0xFFFACC15)
+    ], // 5: Vàng chanh tươi sáng (Thu nhập / Thưởng)
   ];
 
   static _CellVisuals _getCellVisuals(int dayNum) {
@@ -50,26 +62,34 @@ class _HomePhotoCalendarSectionState
       return _CellVisuals(_gradientPalettes[1], _gradientPalettes[0], 'car');
     }
     if (dayNum == 8) {
-      return _CellVisuals(_gradientPalettes[4], _gradientPalettes[1], 'utensils');
+      return _CellVisuals(
+          _gradientPalettes[4], _gradientPalettes[1], 'utensils');
     }
     if (dayNum == 10) {
-      return _CellVisuals(_gradientPalettes[3], _gradientPalettes[5], 'shopping-bag');
+      return _CellVisuals(
+          _gradientPalettes[3], _gradientPalettes[5], 'shopping-bag');
     }
     if (dayNum == 13) {
-      return _CellVisuals(_gradientPalettes[2], _gradientPalettes[0], 'piggy-bank');
+      return _CellVisuals(
+          _gradientPalettes[2], _gradientPalettes[0], 'piggy-bank');
     }
 
     switch (dayNum % 6) {
       case 0:
-        return _CellVisuals(_gradientPalettes[4], _gradientPalettes[2], 'receipt');
+        return _CellVisuals(
+            _gradientPalettes[4], _gradientPalettes[2], 'receipt');
       case 1:
-        return _CellVisuals(_gradientPalettes[0], _gradientPalettes[1], 'coffee');
+        return _CellVisuals(
+            _gradientPalettes[0], _gradientPalettes[1], 'coffee');
       case 2:
-        return _CellVisuals(_gradientPalettes[3], _gradientPalettes[5], 'shopping-bag');
+        return _CellVisuals(
+            _gradientPalettes[3], _gradientPalettes[5], 'shopping-bag');
       case 3:
-        return _CellVisuals(_gradientPalettes[2], _gradientPalettes[4], 'piggy-bank');
+        return _CellVisuals(
+            _gradientPalettes[2], _gradientPalettes[4], 'piggy-bank');
       case 4:
-        return _CellVisuals(_gradientPalettes[0], _gradientPalettes[1], 'utensils');
+        return _CellVisuals(
+            _gradientPalettes[0], _gradientPalettes[1], 'utensils');
       case 5:
       default:
         return _CellVisuals(_gradientPalettes[1], _gradientPalettes[0], 'car');
@@ -249,15 +269,20 @@ class _HomePhotoCalendarSectionState
                     icon: Icons.chevron_left_rounded,
                     onTap: () => _shiftMonth(-1),
                   ),
-                  Text(
-                    'Tháng $month · $year',
-                    style: GoogleFonts.inter(
-                      fontSize: 15.5,
-                      fontWeight: FontWeight.w900,
-                      letterSpacing: -0.4,
-                      color: isDark
-                          ? AppColors.darkForeground
-                          : AppColors.lightForeground,
+                  Flexible(
+                    child: Text(
+                      'Tháng $month · $year',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      textAlign: TextAlign.center,
+                      style: GoogleFonts.inter(
+                        fontSize: 15.5,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: -0.4,
+                        color: isDark
+                            ? AppColors.darkForeground
+                            : AppColors.lightForeground,
+                      ),
                     ),
                   ),
                   _NavButton(
@@ -271,17 +296,22 @@ class _HomePhotoCalendarSectionState
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    totalMonthTx > 0
-                        ? '$totalMonthTx giao dịch trong tháng'
-                        : 'Khám phá chi tiêu từng ngày',
-                    style: GoogleFonts.inter(
-                      fontSize: 11.5,
-                      fontWeight: FontWeight.w600,
-                      color:
-                          isDark ? AppColors.darkMuted : AppColors.lightMuted,
+                  Expanded(
+                    child: Text(
+                      totalMonthTx > 0
+                          ? '$totalMonthTx giao dịch trong tháng'
+                          : 'Khám phá chi tiêu từng ngày',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: GoogleFonts.inter(
+                        fontSize: 11.5,
+                        fontWeight: FontWeight.w600,
+                        color:
+                            isDark ? AppColors.darkMuted : AppColors.lightMuted,
+                      ),
                     ),
                   ),
+                  const SizedBox(width: 8),
                   Material(
                     color: Colors.transparent,
                     child: InkWell(
@@ -303,14 +333,17 @@ class _HomePhotoCalendarSectionState
                               color: AppColors.primary,
                             ),
                             const SizedBox(width: 4),
-                            Text(
+                            Flexible(
+                                child: Text(
                               'Thêm GD',
                               style: GoogleFonts.inter(
                                 fontSize: 11,
                                 fontWeight: FontWeight.w700,
                                 color: AppColors.primary,
                               ),
-                            ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            )),
                           ],
                         ),
                       ),
@@ -529,14 +562,17 @@ class _HomePhotoCalendarSectionState
                           color: AppColors.primary,
                         ),
                         const SizedBox(width: 4),
-                        Text(
+                        Flexible(
+                            child: Text(
                           'Xem chi tiết',
                           style: GoogleFonts.inter(
                             fontSize: 11,
                             fontWeight: FontWeight.w700,
                             color: AppColors.primary,
                           ),
-                        ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        )),
                         const SizedBox(width: 2),
                         const Icon(
                           Icons.chevron_right_rounded,
@@ -662,8 +698,7 @@ class _HomePhotoCalendarSectionState
     }
 
     if (entries.isEmpty) {
-      final total =
-          dayItem.totalExpense > 0 ? dayItem.totalExpense : 155000.0;
+      final total = dayItem.totalExpense > 0 ? dayItem.totalExpense : 155000.0;
       final p1 = dayItem.highlightPhotoUrl ??
           'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=700&auto=format&fit=crop';
       const p2 =
@@ -741,8 +776,7 @@ class _PhotoCalendarCell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final emptyBg =
-        isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9);
+    final emptyBg = isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9);
     final hasRealPhoto =
         highlightPhotoUrl != null && highlightPhotoUrl!.trim().isNotEmpty;
 
@@ -798,7 +832,8 @@ class _PhotoCalendarCell extends StatelessWidget {
               // 2. Có chi tiêu & Fan Stack (nhiều giao dịch xếp xòe quạt theo Solarn UI chuẩn preview)
               if (hasExpense && isFan)
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 5),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 5, vertical: 5),
                   child: Stack(
                     alignment: Alignment.center,
                     children: [
@@ -815,10 +850,12 @@ class _PhotoCalendarCell extends StatelessWidget {
                                 end: Alignment.bottomRight,
                               ),
                               borderRadius: BorderRadius.circular(9),
-                              border: Border.all(color: Colors.white, width: 1.5),
+                              border:
+                                  Border.all(color: Colors.white, width: 1.5),
                               boxShadow: [
                                 BoxShadow(
-                                  color: const Color(0xFF0F172A).withValues(alpha: 0.22),
+                                  color: const Color(0xFF0F172A)
+                                      .withValues(alpha: 0.22),
                                   blurRadius: 4,
                                   offset: const Offset(0, 1.5),
                                 ),
@@ -840,10 +877,12 @@ class _PhotoCalendarCell extends StatelessWidget {
                                 end: Alignment.bottomRight,
                               ),
                               borderRadius: BorderRadius.circular(9),
-                              border: Border.all(color: Colors.white, width: 1.5),
+                              border:
+                                  Border.all(color: Colors.white, width: 1.5),
                               boxShadow: [
                                 BoxShadow(
-                                  color: const Color(0xFF0F172A).withValues(alpha: 0.28),
+                                  color: const Color(0xFF0F172A)
+                                      .withValues(alpha: 0.28),
                                   blurRadius: 5,
                                   offset: const Offset(0, 2),
                                 ),
@@ -871,7 +910,8 @@ class _PhotoCalendarCell extends StatelessWidget {
                   top: 3.5,
                   left: 3.5,
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 3.5, vertical: 1),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 3.5, vertical: 1),
                     decoration: BoxDecoration(
                       color: Colors.white.withValues(alpha: 0.94),
                       borderRadius: BorderRadius.circular(5),
@@ -900,8 +940,10 @@ class _PhotoCalendarCell extends StatelessWidget {
                     top: 3.5,
                     right: 3.5,
                     child: Container(
-                      constraints: const BoxConstraints(minWidth: 15, minHeight: 14),
-                      padding: const EdgeInsets.symmetric(horizontal: 3.5, vertical: 0.5),
+                      constraints:
+                          const BoxConstraints(minWidth: 15, minHeight: 14),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 3.5, vertical: 0.5),
                       decoration: BoxDecoration(
                         color: isSelected ? Colors.white : AppColors.primary,
                         borderRadius: BorderRadius.circular(99),
@@ -918,7 +960,8 @@ class _PhotoCalendarCell extends StatelessWidget {
                           style: GoogleFonts.inter(
                             fontSize: 8,
                             fontWeight: FontWeight.w900,
-                            color: isSelected ? AppColors.primary : Colors.white,
+                            color:
+                                isSelected ? AppColors.primary : Colors.white,
                             height: 1.0,
                           ),
                         ),
@@ -1010,9 +1053,8 @@ class _DayDetailRow extends StatelessWidget {
                       meta,
                       style: GoogleFonts.inter(
                         fontSize: 10.5,
-                        color: isDark
-                            ? AppColors.darkMuted
-                            : AppColors.lightMuted,
+                        color:
+                            isDark ? AppColors.darkMuted : AppColors.lightMuted,
                       ),
                     ),
                   ],
@@ -1032,14 +1074,17 @@ class _DayDetailRow extends StatelessWidget {
                   Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Text(
+                      Flexible(
+                          child: Text(
                         'Chi tiết',
                         style: GoogleFonts.inter(
                           fontSize: 9.5,
                           fontWeight: FontWeight.w600,
                           color: AppColors.primary,
                         ),
-                      ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      )),
                       const Icon(
                         Icons.chevron_right_rounded,
                         size: 11,
@@ -1085,7 +1130,8 @@ class _NavButton extends StatelessWidget {
           child: Icon(
             icon,
             size: 20,
-            color: isDark ? AppColors.darkForeground : AppColors.lightForeground,
+            color:
+                isDark ? AppColors.darkForeground : AppColors.lightForeground,
           ),
         ),
       ),
@@ -1141,7 +1187,8 @@ class _DayTransactionDetailSheet extends StatefulWidget {
       _DayTransactionDetailSheetState();
 }
 
-class _DayTransactionDetailSheetState extends State<_DayTransactionDetailSheet> {
+class _DayTransactionDetailSheetState
+    extends State<_DayTransactionDetailSheet> {
   late int _selectedIndex;
 
   @override
@@ -1212,30 +1259,36 @@ class _DayTransactionDetailSheetState extends State<_DayTransactionDetailSheet> 
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Chi tiết giao dịch',
-                      style: GoogleFonts.inter(
-                        fontSize: 16.5,
-                        fontWeight: FontWeight.w900,
-                        color: isDark
-                            ? AppColors.darkForeground
-                            : const Color(0xFF0F172A),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Chi tiết giao dịch',
+                        style: GoogleFonts.inter(
+                          fontSize: 16.5,
+                          fontWeight: FontWeight.w900,
+                          color: isDark
+                              ? AppColors.darkForeground
+                              : const Color(0xFF0F172A),
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      widget.dateStr,
-                      style: GoogleFonts.inter(
-                        fontSize: 11.5,
-                        color:
-                            isDark ? AppColors.darkMuted : AppColors.lightMuted,
+                      const SizedBox(height: 2),
+                      Text(
+                        widget.dateStr,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: GoogleFonts.inter(
+                          fontSize: 11.5,
+                          color: isDark
+                              ? AppColors.darkMuted
+                              : AppColors.lightMuted,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
+                const SizedBox(width: 8),
                 IconButton(
                   onPressed: () => Navigator.pop(context),
                   icon: Container(
@@ -1386,14 +1439,17 @@ class _DayTransactionDetailSheetState extends State<_DayTransactionDetailSheet> 
                                     color: Colors.white,
                                   ),
                                   const SizedBox(width: 4),
-                                  Text(
+                                  Flexible(
+                                      child: Text(
                                     'Ảnh hóa đơn / Biên lai',
                                     style: GoogleFonts.inter(
                                       fontSize: 10.5,
                                       fontWeight: FontWeight.w700,
                                       color: Colors.white,
                                     ),
-                                  ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  )),
                                 ],
                               ),
                             ),
@@ -1406,8 +1462,8 @@ class _DayTransactionDetailSheetState extends State<_DayTransactionDetailSheet> 
                               bottom: 10,
                               right: 10,
                               child: GestureDetector(
-                                onTap: () => _showZoomDialog(
-                                    context, entry.photoUrl!),
+                                onTap: () =>
+                                    _showZoomDialog(context, entry.photoUrl!),
                                 child: Container(
                                   padding: const EdgeInsets.symmetric(
                                       horizontal: 9, vertical: 5),
@@ -1424,14 +1480,17 @@ class _DayTransactionDetailSheetState extends State<_DayTransactionDetailSheet> 
                                         color: Colors.white,
                                       ),
                                       const SizedBox(width: 4),
-                                      Text(
+                                      Flexible(
+                                          child: Text(
                                         'Phóng to',
                                         style: GoogleFonts.inter(
                                           fontSize: 10.5,
                                           fontWeight: FontWeight.w700,
                                           color: Colors.white,
                                         ),
-                                      ),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      )),
                                     ],
                                   ),
                                 ),
@@ -1461,36 +1520,41 @@ class _DayTransactionDetailSheetState extends State<_DayTransactionDetailSheet> 
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Số tiền chi tiêu',
-                              style: GoogleFonts.inter(
-                                fontSize: 11,
-                                fontWeight: FontWeight.w600,
-                                color: isDark
-                                    ? AppColors.darkMuted
-                                    : AppColors.lightMuted,
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Số tiền chi tiêu',
+                                style: GoogleFonts.inter(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w600,
+                                  color: isDark
+                                      ? AppColors.darkMuted
+                                      : AppColors.lightMuted,
+                                ),
                               ),
-                            ),
-                            const SizedBox(height: 2),
-                            Text(
-                              CurrencyFormatter.format(entry.amount),
-                              style: GoogleFonts.outfit(
-                                fontSize: 22,
-                                fontWeight: FontWeight.w900,
-                                color: AppColors.danger,
+                              const SizedBox(height: 2),
+                              Text(
+                                CurrencyFormatter.format(entry.amount),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: GoogleFonts.outfit(
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.w900,
+                                  color: AppColors.danger,
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
+                        const SizedBox(width: 8),
                         Container(
                           padding: const EdgeInsets.symmetric(
                               horizontal: 10, vertical: 4),
                           decoration: BoxDecoration(
-                            color: const Color(0xFF10B981)
-                                .withValues(alpha: 0.12),
+                            color:
+                                const Color(0xFF10B981).withValues(alpha: 0.12),
                             borderRadius: BorderRadius.circular(99),
                           ),
                           child: Row(
@@ -1502,14 +1566,17 @@ class _DayTransactionDetailSheetState extends State<_DayTransactionDetailSheet> 
                                 color: Color(0xFF10B981),
                               ),
                               const SizedBox(width: 4),
-                              Text(
+                              Flexible(
+                                  child: Text(
                                 'Đã xác thực',
                                 style: GoogleFonts.inter(
                                   fontSize: 11,
                                   fontWeight: FontWeight.w700,
                                   color: const Color(0xFF10B981),
                                 ),
-                              ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              )),
                             ],
                           ),
                         ),
@@ -1656,9 +1723,8 @@ class _DayTransactionDetailSheetState extends State<_DayTransactionDetailSheet> 
               style: GoogleFonts.inter(
                 fontSize: 12.5,
                 fontWeight: FontWeight.w700,
-                color: isDark
-                    ? AppColors.darkForeground
-                    : const Color(0xFF0F172A),
+                color:
+                    isDark ? AppColors.darkForeground : const Color(0xFF0F172A),
               ),
             ),
           ),
@@ -1667,4 +1733,3 @@ class _DayTransactionDetailSheetState extends State<_DayTransactionDetailSheet> 
     );
   }
 }
-

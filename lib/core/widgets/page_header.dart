@@ -42,8 +42,8 @@ class PageHeader extends StatelessWidget implements PreferredSizeWidget {
   }) : isSubPage = true;
 
   @override
-  Size get preferredSize =>
-      Size.fromHeight((isSubPage ? 56.0 : 64.0) + (bottom?.preferredSize.height ?? 0.0));
+  Size get preferredSize => Size.fromHeight(
+      (isSubPage ? 56.0 : 64.0) + (bottom?.preferredSize.height ?? 0.0));
 
   @override
   Widget build(BuildContext context) {
@@ -51,15 +51,16 @@ class PageHeader extends StatelessWidget implements PreferredSizeWidget {
 
     if (!isSubPage) {
       // ── 1. Root Page Header (.page-hdr) ──
-      final bgColor = backgroundColor ??
-          (isDark ? AppColors.darkSurface : Colors.white);
+      final bgColor =
+          backgroundColor ?? (isDark ? AppColors.darkSurface : Colors.white);
       return Container(
         decoration: BoxDecoration(
           color: bgColor,
           border: showBottomBorder && bottom == null
               ? Border(
                   bottom: BorderSide(
-                    color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
+                    color:
+                        isDark ? AppColors.darkBorder : AppColors.lightBorder,
                     width: 0.8,
                   ),
                 )
@@ -78,35 +79,44 @@ class PageHeader extends StatelessWidget implements PreferredSizeWidget {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            title,
-                            style: GoogleFonts.inter(
-                              fontSize: 20,
-                              fontWeight: FontWeight.w900,
-                              letterSpacing: -0.5,
-                              color: isDark
-                                  ? AppColors.darkForeground
-                                  : AppColors.lightForeground,
-                            ),
-                          ),
-                          if (subtitle != null) ...[
-                            const SizedBox(height: 2),
+                      child: MediaQuery.withClampedTextScaling(
+                        maxScaleFactor: 1.3,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
                             Text(
-                              subtitle!,
+                              title,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                               style: GoogleFonts.inter(
-                                fontSize: 12,
+                                fontSize: 20,
+                                height: 1.15,
+                                fontWeight: FontWeight.w900,
+                                letterSpacing: -0.5,
                                 color: isDark
-                                    ? AppColors.darkMuted
-                                    : AppColors.lightMuted,
-                                fontWeight: FontWeight.w500,
+                                    ? AppColors.darkForeground
+                                    : AppColors.lightForeground,
                               ),
                             ),
+                            if (subtitle != null) ...[
+                              const SizedBox(height: 2),
+                              Text(
+                                subtitle!,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: GoogleFonts.inter(
+                                  fontSize: 12,
+                                  height: 1.15,
+                                  color: isDark
+                                      ? AppColors.darkMuted
+                                      : AppColors.lightMuted,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
                           ],
-                        ],
+                        ),
                       ),
                     ),
                     if (action != null) action!,
@@ -121,8 +131,8 @@ class PageHeader extends StatelessWidget implements PreferredSizeWidget {
     }
 
     // ── 2. Sub-page Header với Nút Back mềm mại (.tx-hdr) ──
-    final bgColor = backgroundColor ??
-        (isDark ? AppColors.darkSurface : Colors.white);
+    final bgColor =
+        backgroundColor ?? (isDark ? AppColors.darkSurface : Colors.white);
 
     return Container(
       decoration: BoxDecoration(
@@ -182,39 +192,44 @@ class PageHeader extends StatelessWidget implements PreferredSizeWidget {
 
                   // Tiêu đề (.tx-hdr-title)
                   Expanded(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          title,
-                          style: GoogleFonts.inter(
-                            fontSize: 16.5,
-                            fontWeight: FontWeight.w900,
-                            letterSpacing: -0.4,
-                            color: isDark
-                                ? AppColors.darkForeground
-                                : AppColors.lightForeground,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        if (subtitle != null) ...[
-                          const SizedBox(height: 1),
+                    child: MediaQuery.withClampedTextScaling(
+                      maxScaleFactor: 1.3,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
                           Text(
-                            subtitle!,
+                            title,
                             style: GoogleFonts.inter(
-                              fontSize: 11,
-                              fontWeight: FontWeight.w500,
+                              fontSize: 16.5,
+                              height: 1.15,
+                              fontWeight: FontWeight.w900,
+                              letterSpacing: -0.4,
                               color: isDark
-                                  ? AppColors.darkMuted
-                                  : AppColors.lightMuted,
+                                  ? AppColors.darkForeground
+                                  : AppColors.lightForeground,
                             ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                           ),
+                          if (subtitle != null) ...[
+                            const SizedBox(height: 1),
+                            Text(
+                              subtitle!,
+                              style: GoogleFonts.inter(
+                                fontSize: 11,
+                                height: 1.15,
+                                fontWeight: FontWeight.w500,
+                                color: isDark
+                                    ? AppColors.darkMuted
+                                    : AppColors.lightMuted,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
                         ],
-                      ],
+                      ),
                     ),
                   ),
 
@@ -233,4 +248,3 @@ class PageHeader extends StatelessWidget implements PreferredSizeWidget {
 
 /// Alias tương thích ngược
 typedef SolarnHeader = PageHeader;
-

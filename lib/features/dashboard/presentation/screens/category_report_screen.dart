@@ -274,16 +274,21 @@ class _RuleBar extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              title,
-              style: GoogleFonts.inter(
-                fontSize: 12.5,
-                fontWeight: FontWeight.w700,
-                color: isDark
-                    ? AppColors.darkForeground
-                    : AppColors.lightForeground,
+            Expanded(
+              child: Text(
+                title,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: GoogleFonts.inter(
+                  fontSize: 12.5,
+                  fontWeight: FontWeight.w700,
+                  color: isDark
+                      ? AppColors.darkForeground
+                      : AppColors.lightForeground,
+                ),
               ),
             ),
+            const SizedBox(width: 8),
             Text(
               '${pct.toStringAsFixed(1)}% (chuẩn $target%)',
               style: GoogleFonts.inter(

@@ -79,14 +79,18 @@ class MascotToneSelector extends StatelessWidget {
                         children: [
                           Row(
                             children: [
-                              Text(
-                                tone.label,
-                                style: GoogleFonts.inter(
-                                  fontSize: 14.5,
-                                  fontWeight: FontWeight.w800,
-                                  color: isDark
-                                      ? AppColors.darkForeground
-                                      : AppColors.lightForeground,
+                              Flexible(
+                                child: Text(
+                                  tone.label,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: GoogleFonts.inter(
+                                    fontSize: 14.5,
+                                    fontWeight: FontWeight.w800,
+                                    color: isDark
+                                        ? AppColors.darkForeground
+                                        : AppColors.lightForeground,
+                                  ),
                                 ),
                               ),
                               if (isSelected) ...[

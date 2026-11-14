@@ -81,9 +81,7 @@ class _AdjustBalanceDialogState extends ConsumerState<AdjustBalanceDialog> {
     setState(() => _isLoading = true);
     try {
       final key = _generateIdempotencyKey();
-      await ref
-          .read(accountDetailActionsProvider(_account.id))
-          .adjustBalance(
+      await ref.read(accountDetailActionsProvider(_account.id)).adjustBalance(
             walletId: _account.walletId,
             direction: _direction,
             amount: amount,
@@ -169,9 +167,8 @@ class _AdjustBalanceDialogState extends ConsumerState<AdjustBalanceDialog> {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: isDark
-                    ? const Color(0xFF1E293B)
-                    : const Color(0xFFF1F5F9),
+                color:
+                    isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Row(
@@ -181,22 +178,27 @@ class _AdjustBalanceDialogState extends ConsumerState<AdjustBalanceDialog> {
                     'Số dư ghi nhận hiện tại:',
                     style: GoogleFonts.inter(
                       fontSize: 12,
-                      color: isDark
-                          ? AppColors.darkMuted
-                          : AppColors.lightMuted,
+                      color:
+                          isDark ? AppColors.darkMuted : AppColors.lightMuted,
                     ),
                   ),
-                  Text(
-                    CurrencyFormatter.format(
-                      account.balance,
-                      currency: account.currency,
-                    ),
-                    style: GoogleFonts.inter(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w700,
-                      color: isDark
-                          ? AppColors.darkForeground
-                          : AppColors.lightForeground,
+                  const SizedBox(width: 12),
+                  Flexible(
+                    child: Text(
+                      CurrencyFormatter.format(
+                        account.balance,
+                        currency: account.currency,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      textAlign: TextAlign.end,
+                      style: GoogleFonts.inter(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                        color: isDark
+                            ? AppColors.darkForeground
+                            : AppColors.lightForeground,
+                      ),
                     ),
                   ),
                 ],
@@ -250,14 +252,17 @@ class _AdjustBalanceDialogState extends ConsumerState<AdjustBalanceDialog> {
                             color: Color(0xFF10B981),
                           ),
                           const SizedBox(width: 6),
-                          Text(
+                          Flexible(
+                              child: Text(
                             'TĂNG (+)',
                             style: GoogleFonts.inter(
                               fontSize: 13,
                               fontWeight: FontWeight.w700,
                               color: const Color(0xFF10B981),
                             ),
-                          ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          )),
                         ],
                       ),
                     ),
@@ -296,14 +301,17 @@ class _AdjustBalanceDialogState extends ConsumerState<AdjustBalanceDialog> {
                             color: Color(0xFFEF4444),
                           ),
                           const SizedBox(width: 6),
-                          Text(
+                          Flexible(
+                              child: Text(
                             'GIẢM (-)',
                             style: GoogleFonts.inter(
                               fontSize: 13,
                               fontWeight: FontWeight.w700,
                               color: const Color(0xFFEF4444),
                             ),
-                          ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          )),
                         ],
                       ),
                     ),
@@ -324,9 +332,8 @@ class _AdjustBalanceDialogState extends ConsumerState<AdjustBalanceDialog> {
                 hintText: 'VD: 150000',
                 suffixText: account.currency,
                 filled: true,
-                fillColor: isDark
-                    ? const Color(0xFF1E293B)
-                    : const Color(0xFFF8FAFC),
+                fillColor:
+                    isDark ? const Color(0xFF1E293B) : const Color(0xFFF8FAFC),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
@@ -346,20 +353,25 @@ class _AdjustBalanceDialogState extends ConsumerState<AdjustBalanceDialog> {
                       'Ước tính số dư mới:',
                       style: GoogleFonts.inter(
                         fontSize: 12,
-                        color: isDark
-                            ? AppColors.darkMuted
-                            : AppColors.lightMuted,
+                        color:
+                            isDark ? AppColors.darkMuted : AppColors.lightMuted,
                       ),
                     ),
-                    Text(
-                      CurrencyFormatter.format(
-                        _calculatedNewBalance,
-                        currency: account.currency,
-                      ),
-                      style: GoogleFonts.inter(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w700,
-                        color: AppColors.primary,
+                    const SizedBox(width: 12),
+                    Flexible(
+                      child: Text(
+                        CurrencyFormatter.format(
+                          _calculatedNewBalance,
+                          currency: account.currency,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        textAlign: TextAlign.end,
+                        style: GoogleFonts.inter(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.primary,
+                        ),
                       ),
                     ),
                   ],
@@ -373,9 +385,8 @@ class _AdjustBalanceDialogState extends ConsumerState<AdjustBalanceDialog> {
                 labelText: 'Lý do điều chỉnh (* Bắt buộc)',
                 hintText: 'VD: Đối chiếu số dư với SMS Banking...',
                 filled: true,
-                fillColor: isDark
-                    ? const Color(0xFF1E293B)
-                    : const Color(0xFFF8FAFC),
+                fillColor:
+                    isDark ? const Color(0xFF1E293B) : const Color(0xFFF8FAFC),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
@@ -395,9 +406,8 @@ class _AdjustBalanceDialogState extends ConsumerState<AdjustBalanceDialog> {
                 counterText: '',
                 prefixIcon: const Icon(Icons.lock_rounded, size: 20),
                 filled: true,
-                fillColor: isDark
-                    ? const Color(0xFF1E293B)
-                    : const Color(0xFFF8FAFC),
+                fillColor:
+                    isDark ? const Color(0xFF1E293B) : const Color(0xFFF8FAFC),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
@@ -436,4 +446,3 @@ class _AdjustBalanceDialogState extends ConsumerState<AdjustBalanceDialog> {
     );
   }
 }
-

@@ -62,14 +62,18 @@ class MascotLineupList extends StatelessWidget {
                     children: [
                       Row(
                         children: [
-                          Text(
-                            tier.fullTitle,
-                            style: GoogleFonts.inter(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w800,
-                              color: isDark
-                                  ? AppColors.darkForeground
-                                  : AppColors.lightForeground,
+                          Flexible(
+                            child: Text(
+                              tier.fullTitle,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: GoogleFonts.inter(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w800,
+                                color: isDark
+                                    ? AppColors.darkForeground
+                                    : AppColors.lightForeground,
+                              ),
                             ),
                           ),
                           if (isCurrent) ...[

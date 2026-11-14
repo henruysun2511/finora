@@ -178,45 +178,24 @@ class _MascotLevelUpDialogState extends State<MascotLevelUpDialog>
                         mainAxisSize: MainAxisSize.min,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          // ── Badge "THĂNG HẠNG LINH VẬT" ──
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 14,
-                              vertical: 6,
-                            ),
-                            decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                colors: [
-                                  const Color(0xFFF59E0B),
-                                  mascot.color,
-                                ],
+                          // ── Lời chúc mừng mở khóa linh vật mới ──
+                          RichText(
+                            textAlign: TextAlign.center,
+                            text: TextSpan(
+                              style: GoogleFonts.outfit(
+                                fontSize: 20,
+                                fontWeight: FontWeight.w800,
+                                height: 1.28,
+                                letterSpacing: -0.2,
+                                color: isDark
+                                    ? Colors.white
+                                    : const Color(0xFF0F172A),
                               ),
-                              borderRadius: BorderRadius.circular(20),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: mascot.color.withValues(alpha: 0.3),
-                                  blurRadius: 10,
-                                  offset: const Offset(0, 3),
-                                ),
-                              ],
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
                               children: [
-                                const Icon(
-                                  Icons.auto_awesome_rounded,
-                                  color: Colors.white,
-                                  size: 15,
-                                ),
-                                const SizedBox(width: 6),
-                                Text(
-                                  'THĂNG HẠNG LINH VẬT!',
-                                  style: GoogleFonts.inter(
-                                    fontSize: 11.5,
-                                    fontWeight: FontWeight.w900,
-                                    color: Colors.white,
-                                    letterSpacing: 0.6,
-                                  ),
+                                const TextSpan(text: 'Chúc mừng bạn\n'),
+                                TextSpan(
+                                  text: 'mở khóa linh vật mới',
+                                  style: TextStyle(color: mascot.color),
                                 ),
                               ],
                             ),
@@ -309,14 +288,18 @@ class _MascotLevelUpDialogState extends State<MascotLevelUpDialog>
                               child: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  Text(
-                                    prevMascot.name,
-                                    style: GoogleFonts.inter(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w600,
-                                      color: isDark
-                                          ? AppColors.darkMuted
-                                          : AppColors.lightMuted,
+                                  Flexible(
+                                    child: Text(
+                                      prevMascot.name,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: GoogleFonts.inter(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w600,
+                                        color: isDark
+                                            ? AppColors.darkMuted
+                                            : AppColors.lightMuted,
+                                      ),
                                     ),
                                   ),
                                   const SizedBox(width: 8),
@@ -326,12 +309,16 @@ class _MascotLevelUpDialogState extends State<MascotLevelUpDialog>
                                     color: AppColors.primary,
                                   ),
                                   const SizedBox(width: 8),
-                                  Text(
-                                    mascot.name,
-                                    style: GoogleFonts.inter(
-                                      fontSize: 12.5,
-                                      fontWeight: FontWeight.w800,
-                                      color: mascot.color,
+                                  Flexible(
+                                    child: Text(
+                                      mascot.name,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: GoogleFonts.inter(
+                                        fontSize: 12.5,
+                                        fontWeight: FontWeight.w800,
+                                        color: mascot.color,
+                                      ),
                                     ),
                                   ),
                                 ],
@@ -497,3 +484,4 @@ class _ConfettiParticlesPainter extends CustomPainter {
     return oldDelegate.progress != progress;
   }
 }
+

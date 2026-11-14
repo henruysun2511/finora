@@ -91,20 +91,26 @@ class CashflowReportScreen extends ConsumerWidget {
                                   color: Color(0xFF86EFAC),
                                 ),
                                 const SizedBox(width: 4),
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text('Tổng thu',
-                                        style: GoogleFonts.inter(
-                                            fontSize: 10.5,
-                                            color: Colors.white70)),
-                                    Text(
-                                        '+${CurrencyFormatter.formatCompact(cf.totalIncome)}',
-                                        style: GoogleFonts.outfit(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w800,
-                                            color: Colors.white)),
-                                  ],
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text('Tổng thu',
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: GoogleFonts.inter(
+                                              fontSize: 10.5,
+                                              color: Colors.white70)),
+                                      Text(
+                                          '+${CurrencyFormatter.formatCompact(cf.totalIncome)}',
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: GoogleFonts.outfit(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w800,
+                                              color: Colors.white)),
+                                    ],
+                                  ),
                                 ),
                               ],
                             ),
@@ -118,20 +124,26 @@ class CashflowReportScreen extends ConsumerWidget {
                                   color: Color(0xFFFCA5A5),
                                 ),
                                 const SizedBox(width: 4),
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text('Tổng chi',
-                                        style: GoogleFonts.inter(
-                                            fontSize: 10.5,
-                                            color: Colors.white70)),
-                                    Text(
-                                        '-${CurrencyFormatter.formatCompact(cf.totalExpense)}',
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text('Tổng chi',
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: GoogleFonts.inter(
+                                              fontSize: 10.5,
+                                              color: Colors.white70)),
+                                      Text(
+                                          '-${CurrencyFormatter.formatCompact(cf.totalExpense)}',
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
                                         style: GoogleFonts.outfit(
                                             fontSize: 14,
                                             fontWeight: FontWeight.w800,
                                             color: Colors.white)),
                                   ],
+                                ),
                                 ),
                               ],
                             ),

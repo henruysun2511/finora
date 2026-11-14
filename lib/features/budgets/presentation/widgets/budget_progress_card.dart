@@ -96,7 +96,9 @@ class BudgetProgressCard extends StatelessWidget {
                         style: GoogleFonts.inter(
                           fontSize: 14.5,
                           fontWeight: FontWeight.w800,
-                          color: isDark ? AppColors.darkForeground : AppColors.lightForeground,
+                          color: isDark
+                              ? AppColors.darkForeground
+                              : AppColors.lightForeground,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -119,7 +121,8 @@ class BudgetProgressCard extends StatelessWidget {
                   height: 7,
                   width: double.infinity,
                   decoration: BoxDecoration(
-                    color: isDark ? AppColors.darkBorder : const Color(0xFFF1F5F9),
+                    color:
+                        isDark ? AppColors.darkBorder : const Color(0xFFF1F5F9),
                     borderRadius: BorderRadius.circular(99),
                   ),
                   child: FractionallySizedBox(
@@ -139,16 +142,24 @@ class BudgetProgressCard extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      '${currencyFormatter.format(budget.spentAmount)} / ${currencyFormatter.format(budget.effectiveLimit)}',
-                      style: GoogleFonts.inter(
-                        fontSize: 11.5,
-                        fontWeight: FontWeight.w700,
-                        color: isDark ? AppColors.darkMuted : AppColors.lightMuted,
+                    Expanded(
+                      child: Text(
+                        '${currencyFormatter.format(budget.spentAmount)} / ${currencyFormatter.format(budget.effectiveLimit)}',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: GoogleFonts.inter(
+                          fontSize: 11.5,
+                          fontWeight: FontWeight.w700,
+                          color: isDark
+                              ? AppColors.darkMuted
+                              : AppColors.lightMuted,
+                        ),
                       ),
                     ),
+                    const SizedBox(width: 8),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 3),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 9, vertical: 3),
                       decoration: BoxDecoration(
                         color: pillBg,
                         borderRadius: BorderRadius.circular(99),
@@ -158,14 +169,17 @@ class BudgetProgressCard extends StatelessWidget {
                         children: [
                           Icon(pillIcon, size: 12, color: statusColor),
                           const SizedBox(width: 4),
-                          Text(
+                          Flexible(
+                              child: Text(
                             pillText,
                             style: GoogleFonts.inter(
                               fontSize: 11,
                               fontWeight: FontWeight.w800,
                               color: statusColor,
                             ),
-                          ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          )),
                         ],
                       ),
                     ),

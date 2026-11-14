@@ -138,12 +138,16 @@ class _ReportDonutChartState extends State<ReportDonutChart> {
                         color: _parseColor(selectedSlice.colorHex),
                       ),
                       const SizedBox(width: 8),
-                      Text(
-                        selectedSlice.name,
-                        style: GoogleFonts.inter(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w700,
-                          color: isDark ? AppColors.darkForeground : AppColors.lightForeground,
+                      Flexible(
+                        child: Text(
+                          selectedSlice.name,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: GoogleFonts.inter(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w700,
+                            color: isDark ? AppColors.darkForeground : AppColors.lightForeground,
+                          ),
                         ),
                       ),
                       const SizedBox(width: 8),

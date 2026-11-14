@@ -9,7 +9,6 @@ import '../../../../core/widgets/mascot/mascot_model.dart';
 import '../../../../core/widgets/mascot/mascot_registry.dart';
 import '../../../../core/widgets/mascot/mascot_widget.dart';
 import '../../../mascot/presentation/providers/current_mascot_provider.dart';
-import '../../../mascot/presentation/widgets/mascot_level_up_dialog.dart';
 import 'section_header.dart';
 
 /// Section hiển thị danh sách các Linh vật AI đồng hành trên Trang chủ
@@ -35,85 +34,6 @@ class HomeMascotSection extends ConsumerWidget {
           onTap: () => context.push(RoutePaths.mascotShowcase),
         ),
         const SizedBox(height: 12),
-
-        // ── Banner Nút Xem Demo Thăng Hạng Mascot ──
-        InkWell(
-          onTap: () => _openLevelUpDemo(context, currentTierName),
-          borderRadius: BorderRadius.circular(16),
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: isDark
-                    ? [
-                        const Color(0xFF1E293B),
-                        AppColors.primary.withValues(alpha: 0.25),
-                      ]
-                    : [
-                        const Color(0xFFF0FDF4),
-                        AppColors.primary.withValues(alpha: 0.12),
-                      ],
-              ),
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(
-                color: AppColors.primary.withValues(alpha: 0.35),
-                width: 1.2,
-              ),
-            ),
-            child: Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(7),
-                  decoration: BoxDecoration(
-                    color: AppColors.primary,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: const Icon(
-                    Icons.auto_awesome_rounded,
-                    color: Colors.white,
-                    size: 16,
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Xem demo Thăng hạng Mascot 🎉',
-                        style: GoogleFonts.inter(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w800,
-                          color: isDark
-                              ? AppColors.darkForeground
-                              : AppColors.lightForeground,
-                        ),
-                      ),
-                      const SizedBox(height: 1),
-                      Text(
-                        'Nhấn để xem hiệu ứng popup chúc mừng khi đạt cột mốc mới',
-                        style: GoogleFonts.inter(
-                          fontSize: 11,
-                          color: isDark
-                              ? AppColors.darkMuted
-                              : AppColors.lightMuted,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const Icon(
-                  Icons.arrow_forward_ios_rounded,
-                  size: 14,
-                  color: AppColors.primary,
-                ),
-              ],
-            ),
-          ),
-        ),
-
-        const SizedBox(height: 14),
-
         SizedBox(
           height: 172,
           child: ListView.separated(
@@ -138,143 +58,6 @@ class HomeMascotSection extends ConsumerWidget {
           ),
         ),
       ],
-    );
-  }
-
-  void _openLevelUpDemo(BuildContext context, String? currentTier) {
-    showModalBottomSheet<void>(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (ctx) {
-        final isDark = Theme.of(ctx).brightness == Brightness.dark;
-        final allMascots = MascotRegistry.all;
-
-        return Container(
-          constraints: BoxConstraints(
-            maxHeight: MediaQuery.of(ctx).size.height * 0.72,
-          ),
-          decoration: BoxDecoration(
-            color: isDark ? const Color(0xFF1E293B) : Colors.white,
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-          ),
-          child: SafeArea(
-            top: false,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Center(
-                  child: Container(
-                    margin: const EdgeInsets.only(top: 10, bottom: 12),
-                    width: 38,
-                    height: 4,
-                    decoration: BoxDecoration(
-                      color:
-                          isDark ? AppColors.darkBorder : Colors.grey.shade300,
-                      borderRadius: BorderRadius.circular(2),
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
-                  child: Row(
-                    children: [
-                      const Icon(Icons.auto_awesome_rounded,
-                          color: AppColors.primary, size: 20),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          'Chọn Mascot để xem Demo Thăng hạng',
-                          style: GoogleFonts.inter(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w800,
-                            color: isDark
-                                ? AppColors.darkForeground
-                                : AppColors.lightForeground,
-                          ),
-                        ),
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.close_rounded, size: 20),
-                        onPressed: () => Navigator.pop(ctx),
-                      ),
-                    ],
-                  ),
-                ),
-                const Divider(height: 1),
-                Flexible(
-                  child: ListView.separated(
-                    shrinkWrap: true,
-                    padding: const EdgeInsets.all(16),
-                    itemCount: allMascots.length,
-                    separatorBuilder: (_, __) => const SizedBox(height: 8),
-                    itemBuilder: (context, index) {
-                      final m = allMascots[index];
-                      return ListTile(
-                        onTap: () {
-                          Navigator.pop(ctx);
-                          MascotLevelUpDialog.show(
-                            context,
-                            tierName: m.id,
-                            previousTierName: currentTier ?? 'penny',
-                          );
-                        },
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(14),
-                          side: BorderSide(
-                            color: isDark
-                                ? AppColors.darkBorder
-                                : AppColors.lightBorder,
-                          ),
-                        ),
-                        tileColor: isDark
-                            ? AppColors.darkBackground
-                            : const Color(0xFFF8FAFC),
-                        leading: CircleAvatar(
-                          backgroundColor: m.color.withValues(alpha: 0.15),
-                          child: Text(
-                            m.name.substring(0, 1),
-                            style: TextStyle(
-                              fontWeight: FontWeight.w800,
-                              color: m.color,
-                            ),
-                          ),
-                        ),
-                        title: Text(
-                          '${m.name} · ${m.role}',
-                          style: GoogleFonts.inter(
-                            fontWeight: FontWeight.w700,
-                            fontSize: 13.5,
-                            color: isDark
-                                ? AppColors.darkForeground
-                                : AppColors.lightForeground,
-                          ),
-                        ),
-                        subtitle: Text(
-                          'Cột mốc: ${m.range}',
-                          style: GoogleFonts.inter(
-                            fontSize: 11,
-                            color: isDark
-                                ? AppColors.darkMuted
-                                : AppColors.lightMuted,
-                          ),
-                        ),
-                        trailing: const Icon(
-                          Icons.play_circle_fill_rounded,
-                          color: AppColors.primary,
-                          size: 24,
-                        ),
-                      );
-                    },
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
     );
   }
 }
@@ -374,7 +157,8 @@ class _MascotPreviewCard extends StatelessWidget {
                             ),
                           ),
                           const SizedBox(width: 4),
-                          Text(
+                          Flexible(
+                              child: Text(
                             'ĐANG DÙNG',
                             style: GoogleFonts.inter(
                               fontSize: 9,
@@ -382,7 +166,9 @@ class _MascotPreviewCard extends StatelessWidget {
                               color: tierColor,
                               letterSpacing: 0.3,
                             ),
-                          ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          )),
                         ],
                       ),
                     )
@@ -392,9 +178,8 @@ class _MascotPreviewCard extends StatelessWidget {
                       style: GoogleFonts.inter(
                         fontSize: 10,
                         fontWeight: FontWeight.w700,
-                        color: isDark
-                            ? AppColors.darkMuted
-                            : AppColors.lightMuted,
+                        color:
+                            isDark ? AppColors.darkMuted : AppColors.lightMuted,
                       ),
                     ),
                 ],
@@ -436,9 +221,8 @@ class _MascotPreviewCard extends StatelessWidget {
                     style: GoogleFonts.inter(
                       fontSize: 10,
                       fontWeight: FontWeight.w500,
-                      color: isDark
-                          ? AppColors.darkMuted
-                          : AppColors.lightMuted,
+                      color:
+                          isDark ? AppColors.darkMuted : AppColors.lightMuted,
                     ),
                   ),
                   const SizedBox(height: 4),
@@ -474,4 +258,3 @@ class _MascotPreviewCard extends StatelessWidget {
     );
   }
 }
-

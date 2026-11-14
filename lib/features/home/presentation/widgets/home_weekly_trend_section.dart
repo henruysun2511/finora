@@ -464,7 +464,8 @@ class _HomeWeeklyTrendSectionState
                             child: CustomPaint(
                               size: const Size(double.infinity, 1),
                               painter: _DashedLinePainter(
-                                color: AppColors.primary.withValues(alpha: 0.35),
+                                color:
+                                    AppColors.primary.withValues(alpha: 0.35),
                               ),
                             ),
                           ),
@@ -548,10 +549,10 @@ class _HomeWeeklyTrendSectionState
                                             boxShadow: isSelected
                                                 ? [
                                                     BoxShadow(
-                                                      color:
-                                                          const Color(0xFF10B981)
-                                                              .withValues(
-                                                                  alpha: 0.35),
+                                                      color: const Color(
+                                                              0xFF10B981)
+                                                          .withValues(
+                                                              alpha: 0.35),
                                                       blurRadius: 4,
                                                       offset:
                                                           const Offset(0, 1),
@@ -589,10 +590,10 @@ class _HomeWeeklyTrendSectionState
                                             boxShadow: isSelected
                                                 ? [
                                                     BoxShadow(
-                                                      color:
-                                                          const Color(0xFFF43F5E)
-                                                              .withValues(
-                                                                  alpha: 0.35),
+                                                      color: const Color(
+                                                              0xFFF43F5E)
+                                                          .withValues(
+                                                              alpha: 0.35),
                                                       blurRadius: 4,
                                                       offset:
                                                           const Offset(0, 1),
@@ -777,14 +778,17 @@ class _StatChip extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 5),
-              Text(
+              Flexible(
+                  child: Text(
                 label,
                 style: GoogleFonts.inter(
                   fontSize: 11,
                   fontWeight: FontWeight.w700,
                   color: isDark ? AppColors.darkMuted : const Color(0xFF64748B),
                 ),
-              ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              )),
             ],
           ),
           const SizedBox(height: 3),
@@ -863,7 +867,9 @@ class _PeriodPillButton extends StatelessWidget {
                   fontWeight: isSelected ? FontWeight.w900 : FontWeight.w700,
                   color: isSelected
                       ? AppColors.primary
-                      : (isDark ? AppColors.darkMuted : const Color(0xFF64748B)),
+                      : (isDark
+                          ? AppColors.darkMuted
+                          : const Color(0xFF64748B)),
                   height: 1.1,
                 ),
               ),

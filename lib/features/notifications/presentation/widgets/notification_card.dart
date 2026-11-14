@@ -65,8 +65,8 @@ class NotificationCard extends StatelessWidget {
     final muted = isDark ? AppColors.darkMuted : AppColors.lightMuted;
 
     final effectiveColor = iconColor ?? AppColors.primary;
-    final effectiveBgColor = iconBgColor ??
-        effectiveColor.withValues(alpha: isDark ? 0.16 : 0.10);
+    final effectiveBgColor =
+        iconBgColor ?? effectiveColor.withValues(alpha: isDark ? 0.16 : 0.10);
 
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
@@ -165,7 +165,8 @@ class NotificationCard extends StatelessWidget {
                                 child: OutlinedButton(
                                   onPressed: onReject,
                                   style: OutlinedButton.styleFrom(
-                                    padding: const EdgeInsets.symmetric(vertical: 8),
+                                    padding:
+                                        const EdgeInsets.symmetric(vertical: 8),
                                     side: BorderSide(
                                       color: isDark
                                           ? AppColors.darkBorder
@@ -197,7 +198,8 @@ class NotificationCard extends StatelessWidget {
                                     backgroundColor: AppColors.primary,
                                     foregroundColor: Colors.white,
                                     elevation: 0,
-                                    padding: const EdgeInsets.symmetric(vertical: 8),
+                                    padding:
+                                        const EdgeInsets.symmetric(vertical: 8),
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(10),
                                     ),
@@ -223,14 +225,18 @@ class NotificationCard extends StatelessWidget {
                             color: muted,
                           ),
                           const SizedBox(width: 5),
-                          Text(
-                            time,
-                            style: GoogleFonts.inter(
-                              fontSize: 11,
-                              color: muted,
+                          Expanded(
+                            child: Text(
+                              time,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: GoogleFonts.inter(
+                                fontSize: 11,
+                                color: muted,
+                              ),
                             ),
                           ),
-                          const Spacer(),
+                          const SizedBox(width: 8),
                           if (onDelete != null)
                             GestureDetector(
                               onTap: onDelete,

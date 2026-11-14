@@ -127,14 +127,17 @@ class TransactionDetailReceiptCard extends StatelessWidget {
                           size: 12,
                         ),
                         const SizedBox(width: 4),
-                        Text(
+                        Flexible(
+                            child: Text(
                           'OCR Đã quét',
                           style: GoogleFonts.inter(
                             fontSize: 10,
                             fontWeight: FontWeight.w700,
                             color: AppColors.primary,
                           ),
-                        ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        )),
                       ],
                     ),
                   ),
@@ -201,14 +204,17 @@ class TransactionDetailReceiptCard extends StatelessWidget {
                                 size: 16,
                               ),
                               const SizedBox(width: 6),
-                              Text(
+                              Flexible(
+                                  child: Text(
                                 'Chạm để phóng to ảnh chứng từ',
                                 style: GoogleFonts.inter(
                                   color: Colors.white,
                                   fontSize: 12,
                                   fontWeight: FontWeight.w600,
                                 ),
-                              ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              )),
                             ],
                           ),
                         ),
@@ -503,12 +509,18 @@ class TransactionDetailReceiptCard extends StatelessWidget {
             letterSpacing: isBold ? 0.3 : 0,
           ),
         ),
-        Text(
-          value,
-          style: GoogleFonts.inter(
-            fontSize: isBold ? 14 : 12,
-            fontWeight: isBold ? FontWeight.w800 : FontWeight.w600,
-            color: highlightColor ?? (isMuted ? muted : fg),
+        const SizedBox(width: 12),
+        Flexible(
+          child: Text(
+            value,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            textAlign: TextAlign.end,
+            style: GoogleFonts.inter(
+              fontSize: isBold ? 14 : 12,
+              fontWeight: isBold ? FontWeight.w800 : FontWeight.w600,
+              color: highlightColor ?? (isMuted ? muted : fg),
+            ),
           ),
         ),
       ],

@@ -36,17 +36,20 @@ class ChatTransactionCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final surface = isDark ? AppColors.darkSurface : Colors.white;
-    final foreground = isDark ? AppColors.darkForeground : AppColors.lightForeground;
+    final foreground =
+        isDark ? AppColors.darkForeground : AppColors.lightForeground;
     final muted = isDark ? AppColors.darkMuted : AppColors.lightMuted;
     final border = isDark ? AppColors.darkBorder : AppColors.lightBorder;
 
-    final hasPhoto = transaction.photoUrl != null && transaction.photoUrl!.isNotEmpty;
+    final hasPhoto =
+        transaction.photoUrl != null && transaction.photoUrl!.isNotEmpty;
     final maxCardWidth = MediaQuery.of(context).size.width * 0.74;
 
     return Container(
       constraints: BoxConstraints(maxWidth: maxCardWidth),
       child: Column(
-        crossAxisAlignment: isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+        crossAxisAlignment:
+            isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
           // ── 1. LOCKET CARD (PHOTO + BADGES + CAPTION) ──
@@ -77,7 +80,8 @@ class ChatTransactionCard extends StatelessWidget {
                       Image.network(
                         transaction.photoUrl!,
                         fit: BoxFit.cover,
-                        errorBuilder: (_, __, ___) => _buildFallbackBackground(),
+                        errorBuilder: (_, __, ___) =>
+                            _buildFallbackBackground(),
                       )
                     else
                       _buildFallbackBackground(),
@@ -106,11 +110,13 @@ class ChatTransactionCard extends StatelessWidget {
                       child: Row(
                         children: [
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 3.5),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 9, vertical: 3.5),
                             decoration: BoxDecoration(
                               color: Colors.black.withValues(alpha: 0.5),
                               borderRadius: BorderRadius.circular(99),
-                              border: Border.all(color: Colors.white.withValues(alpha: 0.18)),
+                              border: Border.all(
+                                  color: Colors.white.withValues(alpha: 0.18)),
                             ),
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
@@ -124,14 +130,17 @@ class ChatTransactionCard extends StatelessWidget {
                                   ),
                                 ),
                                 const SizedBox(width: 5),
-                                Text(
+                                Flexible(
+                                    child: Text(
                                   '${isMe ? 'Bạn' : (senderName ?? 'Bạn bè')} · $time',
                                   style: const TextStyle(
                                     fontSize: 11,
                                     fontWeight: FontWeight.w700,
                                     color: Colors.white,
                                   ),
-                                ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                )),
                               ],
                             ),
                           ),
@@ -142,9 +151,11 @@ class ChatTransactionCard extends StatelessWidget {
                             decoration: BoxDecoration(
                               color: Colors.black.withValues(alpha: 0.45),
                               shape: BoxShape.circle,
-                              border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
+                              border: Border.all(
+                                  color: Colors.white.withValues(alpha: 0.2)),
                             ),
-                            child: const Icon(Icons.remove_red_eye_rounded, size: 14, color: Colors.white),
+                            child: const Icon(Icons.remove_red_eye_rounded,
+                                size: 14, color: Colors.white),
                           ),
                         ],
                       ),
@@ -167,11 +178,14 @@ class ChatTransactionCard extends StatelessWidget {
                               children: [
                                 // Amount pill
                                 Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 8, vertical: 3),
                                   decoration: BoxDecoration(
                                     color: Colors.black.withValues(alpha: 0.6),
                                     borderRadius: BorderRadius.circular(99),
-                                    border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
+                                    border: Border.all(
+                                        color: Colors.white
+                                            .withValues(alpha: 0.2)),
                                   ),
                                   child: Text(
                                     '${transaction.isExpense ? '-' : '+'}${_formatAmount(transaction.amount)}đ',
@@ -187,25 +201,33 @@ class ChatTransactionCard extends StatelessWidget {
                                 // Category / Group wallet pill
                                 if (transaction.groupWalletName != null)
                                   Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 8, vertical: 3),
                                     decoration: BoxDecoration(
-                                      color: Colors.black.withValues(alpha: 0.6),
+                                      color:
+                                          Colors.black.withValues(alpha: 0.6),
                                       borderRadius: BorderRadius.circular(99),
-                                      border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
+                                      border: Border.all(
+                                          color: Colors.white
+                                              .withValues(alpha: 0.2)),
                                     ),
                                     child: Row(
                                       mainAxisSize: MainAxisSize.min,
                                       children: [
-                                        const Icon(Icons.local_cafe_rounded, size: 11, color: Colors.white),
+                                        const Icon(Icons.local_cafe_rounded,
+                                            size: 11, color: Colors.white),
                                         const SizedBox(width: 4),
-                                        Text(
+                                        Flexible(
+                                            child: Text(
                                           transaction.groupWalletName!,
                                           style: const TextStyle(
                                             color: Colors.white,
                                             fontWeight: FontWeight.w700,
                                             fontSize: 11.5,
                                           ),
-                                        ),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                        )),
                                       ],
                                     ),
                                   ),
@@ -222,7 +244,10 @@ class ChatTransactionCard extends StatelessWidget {
                                 fontWeight: FontWeight.w700,
                                 height: 1.3,
                                 shadows: [
-                                  Shadow(color: Colors.black87, blurRadius: 4, offset: Offset(0, 1)),
+                                  Shadow(
+                                      color: Colors.black87,
+                                      blurRadius: 4,
+                                      offset: Offset(0, 1)),
                                 ],
                               ),
                             ),
@@ -284,10 +309,13 @@ class ChatTransactionCard extends StatelessWidget {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(
+                Flexible(
+                    child: Text(
                   time,
                   style: TextStyle(fontSize: 10.5, color: muted),
-                ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                )),
                 if (isMe) ...[
                   const SizedBox(width: 4),
                   const Text(

@@ -137,7 +137,14 @@ class NotificationsScreen extends ConsumerWidget {
                         }
                         if (item.actionUrl != null &&
                             item.actionUrl!.isNotEmpty) {
-                          context.push(item.actionUrl!);
+                          var url = item.actionUrl!;
+                          if (url.startsWith('/splits/')) {
+                            final splitId = url.replaceFirst('/splits/', '');
+                            url = '/split-expenses/$splitId';
+                          } else if (url == '/splits') {
+                            url = '/split-expenses';
+                          }
+                          context.push(url);
                         }
                       },
                       onAccept: isWalletInvite && walletId != null

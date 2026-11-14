@@ -54,13 +54,17 @@ class BudgetHistoryList extends StatelessWidget {
             children: [
               const Text('📜', style: TextStyle(fontSize: 16)),
               const SizedBox(width: 8),
-              Text(
-                'LỊCH SỬ CÁC CHU KỲ TRƯỚC',
-                style: GoogleFonts.inter(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: 0.5,
-                  color: isDark ? AppColors.darkForeground : AppColors.lightForeground,
+              Expanded(
+                child: Text(
+                  'LỊCH SỬ CÁC CHU KỲ TRƯỚC',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: GoogleFonts.inter(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 0.5,
+                    color: isDark ? AppColors.darkForeground : AppColors.lightForeground,
+                  ),
                 ),
               ),
             ],

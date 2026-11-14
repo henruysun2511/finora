@@ -44,7 +44,8 @@ class _DualBarChartWidgetState extends State<DualBarChartWidget> {
       maxVal = math.max(maxVal, math.max(item.income, item.expense));
       totalExp += item.expense;
     }
-    final avgExpense = displayItems.isNotEmpty ? totalExp / displayItems.length : 0.0;
+    final avgExpense =
+        displayItems.isNotEmpty ? totalExp / displayItems.length : 0.0;
     final avgHeightPct = (avgExpense / maxVal).clamp(0.05, 0.95);
 
     // Mặc định chọn mốc cuối cùng nếu chưa chọn
@@ -78,28 +79,33 @@ class _DualBarChartWidgetState extends State<DualBarChartWidget> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'XU HƯỚNG THU & CHI',
-                    style: GoogleFonts.inter(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: 0.8,
-                      color: AppColors.primary,
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'XU HƯỚNG THU & CHI',
+                      style: GoogleFonts.inter(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: 0.8,
+                        color: AppColors.primary,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    'So sánh dòng tiền các mốc gần nhất',
-                    style: GoogleFonts.inter(
-                      fontSize: 11.5,
-                      color: widget.isDark ? AppColors.darkMuted : AppColors.lightMuted,
+                    const SizedBox(height: 2),
+                    Text(
+                      'So sánh dòng tiền các mốc gần nhất',
+                      style: GoogleFonts.inter(
+                        fontSize: 11.5,
+                        color: widget.isDark
+                            ? AppColors.darkMuted
+                            : AppColors.lightMuted,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
+              const SizedBox(width: 8),
               // Chú thích Thu / Chi
               Row(
                 children: [
@@ -129,27 +135,40 @@ class _DualBarChartWidgetState extends State<DualBarChartWidget> {
                   : const Color(0xFFF1F5F9),
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: widget.isDark ? AppColors.darkBorder : AppColors.lightBorder,
+                color: widget.isDark
+                    ? AppColors.darkBorder
+                    : AppColors.lightBorder,
               ),
             ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            child: Wrap(
+              alignment: WrapAlignment.spaceBetween,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              spacing: 8,
+              runSpacing: 4,
               children: [
                 Row(
                   children: [
-                    const LucideIcon(name: 'calendar', size: 14, color: AppColors.primary),
+                    const LucideIcon(
+                        name: 'calendar', size: 14, color: AppColors.primary),
                     const SizedBox(width: 6),
-                    Text(
+                    Flexible(
+                        child: Text(
                       'Ngày ${selectedItem.dateLabel}',
                       style: GoogleFonts.inter(
                         fontSize: 12,
                         fontWeight: FontWeight.w700,
-                        color: widget.isDark ? AppColors.darkForeground : AppColors.lightForeground,
+                        color: widget.isDark
+                            ? AppColors.darkForeground
+                            : AppColors.lightForeground,
                       ),
-                    ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    )),
                   ],
                 ),
-                Row(
+                Wrap(
+                  spacing: 0,
+                  runSpacing: 2,
                   children: [
                     Text(
                       '+${CurrencyFormatter.formatCompact(selectedItem.income)}',
@@ -169,9 +188,12 @@ class _DualBarChartWidgetState extends State<DualBarChartWidget> {
                     ),
                     const SizedBox(width: 8),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 6, vertical: 2),
                       decoration: BoxDecoration(
-                        color: (selectedItem.net >= 0 ? AppColors.success : AppColors.danger)
+                        color: (selectedItem.net >= 0
+                                ? AppColors.success
+                                : AppColors.danger)
                             .withValues(alpha: 0.15),
                         borderRadius: BorderRadius.circular(6),
                       ),
@@ -180,7 +202,9 @@ class _DualBarChartWidgetState extends State<DualBarChartWidget> {
                         style: GoogleFonts.inter(
                           fontSize: 10.5,
                           fontWeight: FontWeight.w800,
-                          color: selectedItem.net >= 0 ? AppColors.success : AppColors.danger,
+                          color: selectedItem.net >= 0
+                              ? AppColors.success
+                              : AppColors.danger,
                         ),
                       ),
                     ),
@@ -204,12 +228,17 @@ class _DualBarChartWidgetState extends State<DualBarChartWidget> {
                   child: Row(
                     children: [
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 6, vertical: 1),
                         decoration: BoxDecoration(
-                          color: widget.isDark ? AppColors.darkSurface : Colors.white,
+                          color: widget.isDark
+                              ? AppColors.darkSurface
+                              : Colors.white,
                           borderRadius: BorderRadius.circular(4),
                           border: Border.all(
-                            color: widget.isDark ? AppColors.darkMuted : AppColors.lightMuted,
+                            color: widget.isDark
+                                ? AppColors.darkMuted
+                                : AppColors.lightMuted,
                             width: 0.8,
                           ),
                         ),
@@ -218,7 +247,9 @@ class _DualBarChartWidgetState extends State<DualBarChartWidget> {
                           style: GoogleFonts.inter(
                             fontSize: 9,
                             fontWeight: FontWeight.w600,
-                            color: widget.isDark ? AppColors.darkMuted : AppColors.lightMuted,
+                            color: widget.isDark
+                                ? AppColors.darkMuted
+                                : AppColors.lightMuted,
                           ),
                         ),
                       ),
@@ -226,7 +257,9 @@ class _DualBarChartWidgetState extends State<DualBarChartWidget> {
                       Expanded(
                         child: Container(
                           height: 1,
-                          color: (widget.isDark ? AppColors.darkMuted : AppColors.lightMuted)
+                          color: (widget.isDark
+                                  ? AppColors.darkMuted
+                                  : AppColors.lightMuted)
                               .withValues(alpha: 0.35),
                         ),
                       ),
@@ -241,8 +274,10 @@ class _DualBarChartWidgetState extends State<DualBarChartWidget> {
                     final item = displayItems[idx];
                     final isCurrentSelected = idx == selectedIdx;
 
-                    final incomeHeight = ((item.income / maxVal) * 100).clamp(6.0, 100.0);
-                    final expenseHeight = ((item.expense / maxVal) * 100).clamp(6.0, 100.0);
+                    final incomeHeight =
+                        ((item.income / maxVal) * 100).clamp(6.0, 100.0);
+                    final expenseHeight =
+                        ((item.expense / maxVal) * 100).clamp(6.0, 100.0);
 
                     return Expanded(
                       child: GestureDetector(
@@ -257,7 +292,8 @@ class _DualBarChartWidgetState extends State<DualBarChartWidget> {
                           children: [
                             // 2 Cột song song
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 2),
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 2),
                               decoration: BoxDecoration(
                                 color: isCurrentSelected
                                     ? AppColors.primary.withValues(alpha: 0.08)
@@ -271,20 +307,23 @@ class _DualBarChartWidgetState extends State<DualBarChartWidget> {
                                   // Cột Thu
                                   Flexible(
                                     child: AnimatedContainer(
-                                      duration: const Duration(milliseconds: 300),
+                                      duration:
+                                          const Duration(milliseconds: 300),
                                       width: 10,
                                       height: incomeHeight,
                                       decoration: BoxDecoration(
                                         color: AppColors.success.withValues(
                                           alpha: isCurrentSelected ? 1.0 : 0.65,
                                         ),
-                                        borderRadius: const BorderRadius.vertical(
+                                        borderRadius:
+                                            const BorderRadius.vertical(
                                           top: Radius.circular(4),
                                         ),
                                         boxShadow: isCurrentSelected
                                             ? [
                                                 BoxShadow(
-                                                  color: AppColors.success.withValues(alpha: 0.4),
+                                                  color: AppColors.success
+                                                      .withValues(alpha: 0.4),
                                                   blurRadius: 6,
                                                 )
                                               ]
@@ -296,20 +335,23 @@ class _DualBarChartWidgetState extends State<DualBarChartWidget> {
                                   // Cột Chi
                                   Flexible(
                                     child: AnimatedContainer(
-                                      duration: const Duration(milliseconds: 300),
+                                      duration:
+                                          const Duration(milliseconds: 300),
                                       width: 10,
                                       height: expenseHeight,
                                       decoration: BoxDecoration(
                                         color: AppColors.danger.withValues(
                                           alpha: isCurrentSelected ? 1.0 : 0.65,
                                         ),
-                                        borderRadius: const BorderRadius.vertical(
+                                        borderRadius:
+                                            const BorderRadius.vertical(
                                           top: Radius.circular(4),
                                         ),
                                         boxShadow: isCurrentSelected
                                             ? [
                                                 BoxShadow(
-                                                  color: AppColors.danger.withValues(alpha: 0.4),
+                                                  color: AppColors.danger
+                                                      .withValues(alpha: 0.4),
                                                   blurRadius: 6,
                                                 )
                                               ]
@@ -323,7 +365,8 @@ class _DualBarChartWidgetState extends State<DualBarChartWidget> {
                             const SizedBox(height: 8),
                             // Nhãn ngày mốc
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 5, vertical: 2),
                               decoration: BoxDecoration(
                                 color: isCurrentSelected
                                     ? AppColors.primary
@@ -385,16 +428,18 @@ class _LegendChip extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 4),
-        Text(
+        Flexible(
+            child: Text(
           label,
           style: GoogleFonts.inter(
             fontSize: 11,
             fontWeight: FontWeight.w600,
             color: isDark ? AppColors.darkMuted : AppColors.lightMuted,
           ),
-        ),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        )),
       ],
     );
   }
 }
-

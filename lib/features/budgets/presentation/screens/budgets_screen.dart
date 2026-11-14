@@ -125,7 +125,8 @@ class BudgetsScreen extends ConsumerWidget {
                             width: double.infinity,
                             padding: const EdgeInsets.symmetric(vertical: 14),
                             decoration: BoxDecoration(
-                              color: isDark ? AppColors.darkSurface : Colors.white,
+                              color:
+                                  isDark ? AppColors.darkSurface : Colors.white,
                               borderRadius: BorderRadius.circular(18),
                               border: Border.all(
                                 color: isDark
@@ -140,14 +141,17 @@ class BudgetsScreen extends ConsumerWidget {
                                 const Icon(Icons.add_circle_outline_rounded,
                                     size: 20, color: AppColors.primary),
                                 const SizedBox(width: 8),
-                                Text(
+                                Flexible(
+                                    child: Text(
                                   'Thêm ngân sách mới',
                                   style: GoogleFonts.inter(
                                     fontSize: 14,
                                     fontWeight: FontWeight.w600,
                                     color: AppColors.primary,
                                   ),
-                                ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                )),
                               ],
                             ),
                           ),

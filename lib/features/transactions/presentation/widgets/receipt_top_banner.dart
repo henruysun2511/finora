@@ -200,14 +200,17 @@ class ReceiptTopBanner extends StatelessWidget {
                             color: Colors.white,
                           ),
                           const SizedBox(width: 5),
-                          Text(
+                          Flexible(
+                              child: Text(
                             'Ảnh chứng từ',
                             style: GoogleFonts.inter(
                               fontSize: 11,
                               fontWeight: FontWeight.w700,
                               color: Colors.white,
                             ),
-                          ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          )),
                         ],
                       ),
                     ),
@@ -235,14 +238,17 @@ class ReceiptTopBanner extends StatelessWidget {
                             color: Colors.white,
                           ),
                           const SizedBox(width: 4),
-                          Text(
+                          Flexible(
+                              child: Text(
                             'Đã lưu Cloudinary',
                             style: GoogleFonts.inter(
                               fontSize: 11,
                               fontWeight: FontWeight.w700,
                               color: Colors.white,
                             ),
-                          ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          )),
                         ],
                       ),
                     ),
@@ -270,14 +276,17 @@ class ReceiptTopBanner extends StatelessWidget {
                             color: Colors.white,
                           ),
                           const SizedBox(width: 4),
-                          Text(
+                          Flexible(
+                              child: Text(
                             'Chạm để phóng to',
                             style: GoogleFonts.inter(
                               fontSize: 10.5,
                               fontWeight: FontWeight.w600,
                               color: Colors.white,
                             ),
-                          ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          )),
                         ],
                       ),
                     ),
@@ -289,7 +298,11 @@ class ReceiptTopBanner extends StatelessWidget {
             // Action bar under image
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              child: Row(
+              child: Wrap(
+                alignment: WrapAlignment.center,
+                crossAxisAlignment: WrapCrossAlignment.center,
+                spacing: 4,
+                runSpacing: 4,
                 children: [
                   TextButton.icon(
                     onPressed: onCapture,

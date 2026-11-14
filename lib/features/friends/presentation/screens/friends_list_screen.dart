@@ -113,7 +113,9 @@ class _FriendsListScreenState extends ConsumerState<FriendsListScreen>
 
   Future<void> _acceptRequest(BuildContext ctx, FriendRequest req) async {
     try {
-      await ref.read(friendsListProvider.notifier).acceptRequest(req.friendshipId);
+      await ref
+          .read(friendsListProvider.notifier)
+          .acceptRequest(req.friendshipId);
       if (ctx.mounted) {
         AppToast.success(ctx, 'Đã kết bạn với ${req.displayName} 🎉');
       }
@@ -126,7 +128,9 @@ class _FriendsListScreenState extends ConsumerState<FriendsListScreen>
 
   Future<void> _rejectRequest(BuildContext ctx, FriendRequest req) async {
     try {
-      await ref.read(friendsListProvider.notifier).rejectRequest(req.friendshipId);
+      await ref
+          .read(friendsListProvider.notifier)
+          .rejectRequest(req.friendshipId);
       if (ctx.mounted) {
         AppToast.info(ctx, 'Đã từ chối lời mời từ ${req.displayName}');
       }
@@ -139,7 +143,9 @@ class _FriendsListScreenState extends ConsumerState<FriendsListScreen>
 
   Future<void> _cancelSentRequest(BuildContext ctx, FriendRequest req) async {
     try {
-      await ref.read(friendsListProvider.notifier).rejectRequest(req.friendshipId);
+      await ref
+          .read(friendsListProvider.notifier)
+          .rejectRequest(req.friendshipId);
       if (ctx.mounted) {
         AppToast.info(ctx, 'Đã hủy lời mời gửi tới ${req.displayName}');
       }
@@ -154,7 +160,8 @@ class _FriendsListScreenState extends ConsumerState<FriendsListScreen>
     try {
       await ref.read(friendsListProvider.notifier).sendRequest(user.userId);
       if (ctx.mounted) {
-        AppToast.success(ctx, 'Đã gửi lời mời kết bạn tới ${user.displayName} ✉️');
+        AppToast.success(
+            ctx, 'Đã gửi lời mời kết bạn tới ${user.displayName} ✉️');
       }
     } catch (e) {
       if (ctx.mounted) {
@@ -171,7 +178,8 @@ class _FriendsListScreenState extends ConsumerState<FriendsListScreen>
     final isDark = theme.brightness == Brightness.dark;
     final surface = isDark ? AppColors.darkSurface : Colors.white;
     final bg = isDark ? AppColors.darkBackground : AppColors.lightBackground;
-    final foreground = isDark ? AppColors.darkForeground : AppColors.lightForeground;
+    final foreground =
+        isDark ? AppColors.darkForeground : AppColors.lightForeground;
     final muted = isDark ? AppColors.darkMuted : AppColors.lightMuted;
     final border = isDark ? AppColors.darkBorder : AppColors.lightBorder;
 
@@ -187,7 +195,7 @@ class _FriendsListScreenState extends ConsumerState<FriendsListScreen>
           subtitle: 'Quản lý kết nối Finora',
           onBack: () => context.go(RoutePaths.feed),
           bottom: PreferredSize(
-            preferredSize: const Size.fromHeight(48),
+            preferredSize: const Size.fromHeight(50),
             child: Container(
               decoration: BoxDecoration(
                 border: Border(bottom: BorderSide(color: border, width: 1)),
@@ -197,19 +205,24 @@ class _FriendsListScreenState extends ConsumerState<FriendsListScreen>
                 unselectedLabelColor: muted,
                 indicatorColor: AppColors.primary,
                 indicatorWeight: 2.5,
-                labelStyle: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
-                unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.w500, fontSize: 13),
+                labelStyle:
+                    const TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
+                unselectedLabelStyle:
+                    const TextStyle(fontWeight: FontWeight.w500, fontSize: 13),
                 tabs: [
                   const Tab(text: 'Bạn bè'),
                   Tab(
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Text('Lời mời'),
+                        Flexible(
+                            child: const Text('Lời mời',
+                                maxLines: 1, overflow: TextOverflow.ellipsis)),
                         if (pendingCount > 0) ...[
                           const SizedBox(width: 6),
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 6, vertical: 1),
                             decoration: BoxDecoration(
                               color: AppColors.danger,
                               borderRadius: BorderRadius.circular(10),
@@ -238,13 +251,17 @@ class _FriendsListScreenState extends ConsumerState<FriendsListScreen>
           error: (err, _) => _buildErrorState(context, foreground, muted),
           data: (state) => TabBarView(
             children: [
-              _buildFriendsTab(context, state.friends, surface, foreground, muted, border),
-              _buildRequestsTab(context, state.pendingRequests, state.sentRequests, foreground, muted),
-              _buildSearchTab(context, state, surface, bg, foreground, muted, border),
+              _buildFriendsTab(
+                  context, state.friends, surface, foreground, muted, border),
+              _buildRequestsTab(context, state.pendingRequests,
+                  state.sentRequests, foreground, muted),
+              _buildSearchTab(
+                  context, state, surface, bg, foreground, muted, border),
             ],
           ),
         ),
-        bottomNavigationBar: const SocialBottomBar(currentTab: SocialTab.friends),
+        bottomNavigationBar:
+            const SocialBottomBar(currentTab: SocialTab.friends),
       ),
     );
   }
@@ -291,7 +308,8 @@ class _FriendsListScreenState extends ConsumerState<FriendsListScreen>
                   : null,
               filled: true,
               fillColor: surface,
-              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              contentPadding:
+                  const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(14),
                 borderSide: BorderSide(color: border),
@@ -302,7 +320,8 @@ class _FriendsListScreenState extends ConsumerState<FriendsListScreen>
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(14),
-                borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
+                borderSide:
+                    const BorderSide(color: AppColors.primary, width: 1.5),
               ),
             ),
           ),
@@ -316,7 +335,8 @@ class _FriendsListScreenState extends ConsumerState<FriendsListScreen>
               children: [
                 Text(
                   '${filtered.length} bạn bè${_friendFilter.isNotEmpty ? ' (đang lọc)' : ''}',
-                  style: TextStyle(fontSize: 12, color: muted, fontWeight: FontWeight.w600),
+                  style: TextStyle(
+                      fontSize: 12, color: muted, fontWeight: FontWeight.w600),
                 ),
               ],
             ),
@@ -327,7 +347,9 @@ class _FriendsListScreenState extends ConsumerState<FriendsListScreen>
           child: filtered.isEmpty
               ? FriendsEmptyState(
                   icon: Icons.people_outline_rounded,
-                  title: _friendFilter.isNotEmpty ? 'Không tìm thấy bạn bè' : 'Chưa có bạn bè nào',
+                  title: _friendFilter.isNotEmpty
+                      ? 'Không tìm thấy bạn bè'
+                      : 'Chưa có bạn bè nào',
                   description: _friendFilter.isNotEmpty
                       ? 'Thử tìm kiếm với từ khóa khác.'
                       : 'Chuyển sang tab "Tìm bạn" để kết nối với bạn bè trên Finora.',
@@ -420,13 +442,17 @@ class _FriendsListScreenState extends ConsumerState<FriendsListScreen>
       padding: const EdgeInsets.fromLTRB(16, 20, 16, 8),
       child: Row(
         children: [
-          Text(
-            title.toUpperCase(),
-            style: const TextStyle(
-              fontSize: 11,
-              fontWeight: FontWeight.w800,
-              color: AppColors.primary,
-              letterSpacing: 0.5,
+          Expanded(
+            child: Text(
+              title.toUpperCase(),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w800,
+                color: AppColors.primary,
+                letterSpacing: 0.5,
+              ),
             ),
           ),
           const SizedBox(width: 8),
@@ -472,7 +498,8 @@ class _FriendsListScreenState extends ConsumerState<FriendsListScreen>
             decoration: InputDecoration(
               hintText: 'Nhập email hoặc tên để tìm bạn...',
               hintStyle: TextStyle(fontSize: 14, color: muted),
-              prefixIcon: const Icon(Icons.person_search_rounded, size: 22, color: AppColors.primary),
+              prefixIcon: const Icon(Icons.person_search_rounded,
+                  size: 22, color: AppColors.primary),
               suffixIcon: _searchCtrl.text.isNotEmpty
                   ? IconButton(
                       icon: Icon(Icons.clear_rounded, size: 18, color: muted),
@@ -484,10 +511,12 @@ class _FriendsListScreenState extends ConsumerState<FriendsListScreen>
                   : null,
               filled: true,
               fillColor: surface,
-              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              contentPadding:
+                  const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(16),
-                borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
+                borderSide:
+                    const BorderSide(color: AppColors.primary, width: 1.5),
               ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(16),
@@ -495,7 +524,8 @@ class _FriendsListScreenState extends ConsumerState<FriendsListScreen>
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(16),
-                borderSide: const BorderSide(color: AppColors.primary, width: 2),
+                borderSide:
+                    const BorderSide(color: AppColors.primary, width: 2),
               ),
             ),
           ),
@@ -511,10 +541,15 @@ class _FriendsListScreenState extends ConsumerState<FriendsListScreen>
                 const SizedBox(
                   width: 16,
                   height: 16,
-                  child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.primary),
+                  child: CircularProgressIndicator(
+                      strokeWidth: 2, color: AppColors.primary),
                 ),
                 const SizedBox(width: 10),
-                Text('Đang tìm kiếm...', style: TextStyle(fontSize: 13, color: muted)),
+                Flexible(
+                    child: Text('Đang tìm kiếm...',
+                        style: TextStyle(fontSize: 13, color: muted),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis)),
               ],
             ),
           ),
@@ -525,13 +560,15 @@ class _FriendsListScreenState extends ConsumerState<FriendsListScreen>
               ? const FriendsEmptyState(
                   icon: Icons.person_search_rounded,
                   title: 'Tìm kiếm bạn bè',
-                  description: 'Nhập tên, email hoặc số điện thoại để tìm kiếm người dùng Finora.',
+                  description:
+                      'Nhập tên, email hoặc số điện thoại để tìm kiếm người dùng Finora.',
                 )
               : state.searchResults.isEmpty && !state.isSearching
                   ? FriendsEmptyState(
                       icon: Icons.search_off_rounded,
                       title: 'Không tìm thấy "${state.searchQuery}"',
-                      description: 'Thử tìm bằng email hoặc số điện thoại chính xác hơn.',
+                      description:
+                          'Thử tìm bằng email hoặc số điện thoại chính xác hơn.',
                     )
                   : ListView.builder(
                       padding: const EdgeInsets.only(bottom: 32),
@@ -567,11 +604,17 @@ class _FriendsListScreenState extends ConsumerState<FriendsListScreen>
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.error_outline_rounded, size: 56, color: AppColors.danger),
+            const Icon(Icons.error_outline_rounded,
+                size: 56, color: AppColors.danger),
             const SizedBox(height: 16),
-            Text('Không thể tải dữ liệu', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: foreground)),
+            Text('Không thể tải dữ liệu',
+                style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                    color: foreground)),
             const SizedBox(height: 8),
-            Text('Kiểm tra kết nối mạng và thử lại.', style: TextStyle(fontSize: 13, color: muted)),
+            Text('Kiểm tra kết nối mạng và thử lại.',
+                style: TextStyle(fontSize: 13, color: muted)),
             const SizedBox(height: 20),
             FilledButton.icon(
               style: FilledButton.styleFrom(backgroundColor: AppColors.primary),

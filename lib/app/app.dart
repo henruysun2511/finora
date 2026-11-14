@@ -26,7 +26,15 @@ class MyApp extends ConsumerWidget {
       locale: locale,
       supportedLocales: AppLocalizations.supportedLocales,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
-      builder: DevicePreview.appBuilder,
+      builder: (context, child) => DevicePreview.appBuilder(
+        context,
+        MediaQuery.withClampedTextScaling(
+          // Giữ giao diện ổn định: chặn text scale quá lớn (device preview /
+          // cài đặt hệ thống) gây tràn layout ở các khối có chiều cao cố định.
+          maxScaleFactor: 1.2,
+          child: child!,
+        ),
+      ),
       routerConfig: router,
     );
   }

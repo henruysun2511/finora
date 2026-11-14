@@ -191,8 +191,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                                 child: AuthHeroHeader(
                                   icon: Icons.person_add_rounded,
                                   title: 'Finora ID',
-                                  subtitle:
-                                      'Gia nhập hệ sinh thái 7 trợ lý AI',
+                                  subtitle: 'Gia nhập hệ sinh thái 7 trợ lý AI',
                                 ),
                               ),
 
@@ -217,8 +216,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                                       ),
                                     ],
                                   ),
-                                  padding: const EdgeInsets.fromLTRB(
-                                      24, 26, 24, 30),
+                                  padding:
+                                      const EdgeInsets.fromLTRB(24, 26, 24, 30),
                                   child: Form(
                                     key: _formKey,
                                     child: Column(
@@ -318,7 +317,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                                         AuthTextField(
                                           label: 'Email',
                                           controller: _emailController,
-                                          prefixIcon: Icons.mail_outline_rounded,
+                                          prefixIcon:
+                                              Icons.mail_outline_rounded,
                                           hintText: 'name@example.com',
                                           keyboardType:
                                               TextInputType.emailAddress,
@@ -331,7 +331,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                                         AuthTextField(
                                           label: 'Mật khẩu',
                                           controller: _passwordController,
-                                          prefixIcon: Icons.lock_outline_rounded,
+                                          prefixIcon:
+                                              Icons.lock_outline_rounded,
                                           hintText: 'Tối thiểu 6 ký tự',
                                           obscureText: !_isPasswordVisible,
                                           validator:
@@ -362,7 +363,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                                           label: 'Xác nhận mật khẩu',
                                           controller:
                                               _confirmPasswordController,
-                                          prefixIcon: Icons.lock_outline_rounded,
+                                          prefixIcon:
+                                              Icons.lock_outline_rounded,
                                           hintText: 'Nhập lại mật khẩu',
                                           obscureText:
                                               !_isConfirmPasswordVisible,
@@ -451,7 +453,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                                                             MainAxisAlignment
                                                                 .center,
                                                         children: [
-                                                          Text(
+                                                          Flexible(
+                                                              child: Text(
                                                             'Đăng ký tài khoản',
                                                             style: GoogleFonts
                                                                 .inter(
@@ -464,7 +467,11 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                                                               color:
                                                                   Colors.white,
                                                             ),
-                                                          ),
+                                                            maxLines: 1,
+                                                            overflow:
+                                                                TextOverflow
+                                                                    .ellipsis,
+                                                          )),
                                                           const SizedBox(
                                                               width: 8),
                                                           const Icon(
@@ -483,9 +490,12 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                                         const SizedBox(height: 18),
 
                                         // Footer: Link quay lại Đăng nhập
-                                        Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
+                                        Wrap(
+                                          alignment: WrapAlignment.center,
+                                          crossAxisAlignment:
+                                              WrapCrossAlignment.center,
+                                          spacing: 0,
+                                          runSpacing: 2,
                                           children: [
                                             Text(
                                               'Đã có tài khoản? ',

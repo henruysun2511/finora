@@ -9,14 +9,22 @@ class WalletItemState {
   final WalletModel wallet;
   final WalletBalanceModel balance;
   final List<AccountModel> accountsPreview;
-  final List<AccountModel> accounts;
+
+  /// Toàn bộ tài khoản của ví.
+  ///
+  /// Nullable để không vỡ state được tạo trước khi hot reload (Flutter không
+  /// hỗ trợ thêm field vào class đang có instance sống).
+  final List<AccountModel>? accounts;
 
   const WalletItemState({
     required this.wallet,
     required this.balance,
     required this.accountsPreview,
-    required this.accounts,
+    this.accounts,
   });
+
+  /// Danh sách tài khoản đầy đủ, fallback về preview nếu state còn cũ.
+  List<AccountModel> get allAccounts => accounts ?? accountsPreview;
 }
 
 class WalletsOverviewState {

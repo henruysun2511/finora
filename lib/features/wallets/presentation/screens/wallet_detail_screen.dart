@@ -181,7 +181,8 @@ class _WalletDetailScreenState extends ConsumerState<WalletDetailScreen> {
         : 'FINORA DIGITAL';
 
     return Scaffold(
-      backgroundColor: isDark ? AppColors.darkBackground : const Color(0xFFF8FAFC),
+      backgroundColor:
+          isDark ? AppColors.darkBackground : const Color(0xFFF8FAFC),
       appBar: PageHeader.subPage(
         title: walletName,
         subtitle: isMain ? 'Ví cá nhân' : 'Ví dùng chung',
@@ -229,13 +230,16 @@ class _WalletDetailScreenState extends ConsumerState<WalletDetailScreen> {
                           const Icon(Icons.groups_rounded,
                               size: 18, color: AppColors.primary),
                           const SizedBox(width: 8),
-                          Text(
+                          Flexible(
+                              child: Text(
                             'Chuyển thành Ví chung',
                             style: GoogleFonts.inter(
                               fontSize: 13,
                               fontWeight: FontWeight.w600,
                             ),
-                          ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          )),
                         ],
                       ),
                     ),
@@ -247,13 +251,16 @@ class _WalletDetailScreenState extends ConsumerState<WalletDetailScreen> {
                           const Icon(Icons.groups_rounded,
                               size: 18, color: Color(0xFF0D9488)),
                           const SizedBox(width: 8),
-                          Text(
+                          Flexible(
+                              child: Text(
                             'Mở mục Ví chung & Quỹ',
                             style: GoogleFonts.inter(
                               fontSize: 13,
                               fontWeight: FontWeight.w600,
                             ),
-                          ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          )),
                         ],
                       ),
                     ),
@@ -264,13 +271,16 @@ class _WalletDetailScreenState extends ConsumerState<WalletDetailScreen> {
                         const Icon(Icons.sync_rounded,
                             size: 18, color: Color(0xFF64748B)),
                         const SizedBox(width: 8),
-                        Text(
+                        Flexible(
+                            child: Text(
                           'Đồng bộ số dư ví',
                           style: GoogleFonts.inter(
                             fontSize: 13,
                             fontWeight: FontWeight.w600,
                           ),
-                        ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        )),
                       ],
                     ),
                   ),
@@ -282,14 +292,17 @@ class _WalletDetailScreenState extends ConsumerState<WalletDetailScreen> {
                           const Icon(Icons.logout_rounded,
                               size: 18, color: AppColors.danger),
                           const SizedBox(width: 8),
-                          Text(
+                          Flexible(
+                              child: Text(
                             'Rời khỏi ví này',
                             style: GoogleFonts.inter(
                               fontSize: 13,
                               fontWeight: FontWeight.w700,
                               color: AppColors.danger,
                             ),
-                          ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          )),
                         ],
                       ),
                     ),
@@ -337,8 +350,8 @@ class _WalletDetailScreenState extends ConsumerState<WalletDetailScreen> {
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: FormCard(
                     title: 'CÀI ĐẶT VÍ & CHIA SẺ',
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 16, vertical: 8),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     child: Column(
                       children: [
                         SwitchListTile(
@@ -369,13 +382,14 @@ class _WalletDetailScreenState extends ConsumerState<WalletDetailScreen> {
                           activeTrackColor: AppColors.primary,
                           trackOutlineColor:
                               WidgetStateProperty.all(Colors.transparent),
-                          onChanged: walletDetail == null || !walletDetail.isOwner
-                              ? null
-                              : (val) => _confirmToggleShared(
-                                    context,
-                                    val,
-                                    walletDetail.wallet.name,
-                                  ),
+                          onChanged:
+                              walletDetail == null || !walletDetail.isOwner
+                                  ? null
+                                  : (val) => _confirmToggleShared(
+                                        context,
+                                        val,
+                                        walletDetail.wallet.name,
+                                      ),
                         ),
                         if (walletDetail != null &&
                             !walletDetail.isOwner &&
@@ -439,7 +453,6 @@ class _WalletDetailScreenState extends ConsumerState<WalletDetailScreen> {
     );
   }
 
-
   /// Thẻ Bank Card Hero chuẩn Solarn Blue
   Widget _buildBankCardHero({
     required String walletName,
@@ -489,27 +502,35 @@ class _WalletDetailScreenState extends ConsumerState<WalletDetailScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Row(
-                    children: [
-                      const Icon(
-                        Icons.account_balance_rounded,
-                        color: Colors.white,
-                        size: 20,
-                      ),
-                      const SizedBox(width: 8),
-                      Text(
-                        walletName,
-                        style: GoogleFonts.inter(
-                          color: Colors.white.withValues(alpha: 0.95),
-                          fontWeight: FontWeight.w800,
-                          fontSize: 13,
+                  Expanded(
+                    child: Row(
+                      children: [
+                        const Icon(
+                          Icons.account_balance_rounded,
+                          color: Colors.white,
+                          size: 20,
                         ),
-                      ),
-                    ],
+                        const SizedBox(width: 8),
+                        Flexible(
+                          child: Text(
+                            walletName,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: GoogleFonts.inter(
+                              color: Colors.white.withValues(alpha: 0.95),
+                              fontWeight: FontWeight.w800,
+                              fontSize: 13,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
+                  const SizedBox(width: 8),
                   if (isMain)
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 4),
                       decoration: BoxDecoration(
                         color: Colors.white.withValues(alpha: 0.22),
                         borderRadius: BorderRadius.circular(99),
@@ -558,29 +579,34 @@ class _WalletDetailScreenState extends ConsumerState<WalletDetailScreen> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'CHỦ VÍ',
-                          style: GoogleFonts.inter(
-                            fontSize: 10,
-                            fontWeight: FontWeight.w700,
-                            color: Colors.white.withValues(alpha: 0.75),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'CHỦ VÍ',
+                            style: GoogleFonts.inter(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w700,
+                              color: Colors.white.withValues(alpha: 0.75),
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          walletName.toUpperCase(),
-                          style: GoogleFonts.inter(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w900,
-                            letterSpacing: 0.5,
-                            color: Colors.white,
+                          const SizedBox(height: 2),
+                          Text(
+                            walletName.toUpperCase(),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: GoogleFonts.inter(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w900,
+                              letterSpacing: 0.5,
+                              color: Colors.white,
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
+                    const SizedBox(width: 8),
                     Text(
                       last4,
                       style: const TextStyle(
@@ -702,17 +728,25 @@ class _WalletDetailScreenState extends ConsumerState<WalletDetailScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                'Tài khoản nguồn tiền (${accounts.length})',
-                style: GoogleFonts.inter(
-                  fontSize: 13.5,
-                  fontWeight: FontWeight.w900,
-                  letterSpacing: -0.3,
-                  color: isDark ? AppColors.darkForeground : AppColors.lightForeground,
+              Expanded(
+                child: Text(
+                  'Tài khoản nguồn tiền (${accounts.length})',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: GoogleFonts.inter(
+                    fontSize: 13.5,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: -0.3,
+                    color: isDark
+                        ? AppColors.darkForeground
+                        : AppColors.lightForeground,
+                  ),
                 ),
               ),
+              const SizedBox(width: 8),
               GestureDetector(
-                onTap: () => context.push('${RoutePaths.createAccount}?walletId=${widget.walletId}'),
+                onTap: () => context.push(
+                    '${RoutePaths.createAccount}?walletId=${widget.walletId}'),
                 child: Text(
                   '+ Thêm tài khoản',
                   style: GoogleFonts.inter(
@@ -727,10 +761,12 @@ class _WalletDetailScreenState extends ConsumerState<WalletDetailScreen> {
           const SizedBox(height: 10),
           if (accounts.isEmpty)
             InkWell(
-              onTap: () => context.push('${RoutePaths.createAccount}?walletId=${widget.walletId}'),
+              onTap: () => context.push(
+                  '${RoutePaths.createAccount}?walletId=${widget.walletId}'),
               borderRadius: BorderRadius.circular(16),
               child: Container(
-                padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
+                padding:
+                    const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
                 decoration: BoxDecoration(
                   color: isDark ? AppColors.darkSurface : Colors.white,
                   borderRadius: BorderRadius.circular(18),
@@ -746,13 +782,16 @@ class _WalletDetailScreenState extends ConsumerState<WalletDetailScreen> {
                       style: GoogleFonts.inter(
                         fontSize: 13,
                         fontWeight: FontWeight.w700,
-                        color: isDark ? AppColors.darkForeground : AppColors.lightForeground,
+                        color: isDark
+                            ? AppColors.darkForeground
+                            : AppColors.lightForeground,
                       ),
                     ),
                     const SizedBox(height: 4),
                     const Text(
                       'Bấm để thêm tài khoản ngân hàng hoặc tiền mặt',
-                      style: TextStyle(fontSize: 11.5, color: Color(0xFF64748B)),
+                      style:
+                          TextStyle(fontSize: 11.5, color: Color(0xFF64748B)),
                     ),
                   ],
                 ),
@@ -764,14 +803,16 @@ class _WalletDetailScreenState extends ConsumerState<WalletDetailScreen> {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(18),
                 side: BorderSide(
-                  color: isDark ? AppColors.darkBorder : const Color(0xFFE2E8F0),
+                  color:
+                      isDark ? AppColors.darkBorder : const Color(0xFFE2E8F0),
                 ),
               ),
               clipBehavior: Clip.antiAlias,
               child: Column(
                 children: accounts.map((acc) {
                   return ListTile(
-                    onTap: () => context.push(RoutePaths.accountDetailWithId(acc.id)),
+                    onTap: () =>
+                        context.push(RoutePaths.accountDetailWithId(acc.id)),
                     leading: Container(
                       width: 38,
                       height: 38,
@@ -791,27 +832,36 @@ class _WalletDetailScreenState extends ConsumerState<WalletDetailScreen> {
                     ),
                     title: Text(
                       acc.name,
-                      style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w800),
+                      style: GoogleFonts.inter(
+                          fontSize: 13, fontWeight: FontWeight.w800),
                     ),
                     subtitle: Text(
                       acc.accountNumberLast4 != null
                           ? '•••• ${acc.accountNumberLast4} · ${acc.type.displayName}'
                           : acc.type.displayName,
-                      style: const TextStyle(fontSize: 11, color: Color(0xFF64748B)),
+                      style: const TextStyle(
+                          fontSize: 11, color: Color(0xFF64748B)),
                     ),
                     trailing: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Text(
-                          CurrencyFormatter.format(acc.balance, currency: acc.currency),
+                        Flexible(
+                            child: Text(
+                          CurrencyFormatter.format(acc.balance,
+                              currency: acc.currency),
                           style: GoogleFonts.outfit(
                             fontSize: 13.5,
                             fontWeight: FontWeight.w800,
-                            color: isDark ? AppColors.darkForeground : AppColors.lightForeground,
+                            color: isDark
+                                ? AppColors.darkForeground
+                                : AppColors.lightForeground,
                           ),
-                        ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        )),
                         const SizedBox(width: 4),
-                        const Icon(Icons.chevron_right_rounded, size: 16, color: Color(0xFF94A3B8)),
+                        const Icon(Icons.chevron_right_rounded,
+                            size: 16, color: Color(0xFF94A3B8)),
                       ],
                     ),
                   );
@@ -834,15 +884,22 @@ class _WalletDetailScreenState extends ConsumerState<WalletDetailScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                'Lịch sử giao dịch ví',
-                style: GoogleFonts.inter(
-                  fontSize: 13.5,
-                  fontWeight: FontWeight.w900,
-                  letterSpacing: -0.3,
-                  color: isDark ? AppColors.darkForeground : AppColors.lightForeground,
+              Expanded(
+                child: Text(
+                  'Lịch sử giao dịch ví',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: GoogleFonts.inter(
+                    fontSize: 13.5,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: -0.3,
+                    color: isDark
+                        ? AppColors.darkForeground
+                        : AppColors.lightForeground,
+                  ),
                 ),
               ),
+              const SizedBox(width: 8),
               GestureDetector(
                 onTap: () => context.push(RoutePaths.transactions),
                 child: Text(
@@ -866,7 +923,8 @@ class _WalletDetailScreenState extends ConsumerState<WalletDetailScreen> {
                 border: Border.all(color: const Color(0xFFE2E8F0)),
               ),
               child: const Center(
-                child: CircularProgressIndicator(color: AppColors.primary, strokeWidth: 2.5),
+                child: CircularProgressIndicator(
+                    color: AppColors.primary, strokeWidth: 2.5),
               ),
             ),
             error: (err, _) => Container(
@@ -878,12 +936,14 @@ class _WalletDetailScreenState extends ConsumerState<WalletDetailScreen> {
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.info_outline_rounded, color: AppColors.danger, size: 20),
+                  const Icon(Icons.info_outline_rounded,
+                      color: AppColors.danger, size: 20),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
                       'Chưa thể tải lịch sử giao dịch',
-                      style: GoogleFonts.inter(fontSize: 12.5, color: const Color(0xFF64748B)),
+                      style: GoogleFonts.inter(
+                          fontSize: 12.5, color: const Color(0xFF64748B)),
                     ),
                   ),
                 ],
@@ -893,7 +953,8 @@ class _WalletDetailScreenState extends ConsumerState<WalletDetailScreen> {
               if (txs.isEmpty) {
                 return Container(
                   width: double.infinity,
-                  padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
                   decoration: BoxDecoration(
                     color: isDark ? AppColors.darkSurface : Colors.white,
                     borderRadius: BorderRadius.circular(18),
@@ -940,14 +1001,22 @@ class _WalletDetailScreenState extends ConsumerState<WalletDetailScreen> {
                         '${tx.transactionDate.day.toString().padLeft(2, '0')}/${tx.transactionDate.month.toString().padLeft(2, '0')} · ${tx.transactionDate.hour.toString().padLeft(2, '0')}:${tx.transactionDate.minute.toString().padLeft(2, '0')}';
 
                     return _txItem(
-                      icon: isIncome ? Icons.arrow_downward_rounded : Icons.shopping_bag_rounded,
-                      iconBg: (isIncome ? AppColors.success : const Color(0xFFF43F5E))
+                      icon: isIncome
+                          ? Icons.arrow_downward_rounded
+                          : Icons.shopping_bag_rounded,
+                      iconBg: (isIncome
+                              ? AppColors.success
+                              : const Color(0xFFF43F5E))
                           .withValues(alpha: 0.12),
-                      iconColor: isIncome ? AppColors.success : const Color(0xFFF43F5E),
+                      iconColor: isIncome
+                          ? AppColors.success
+                          : const Color(0xFFF43F5E),
                       title: tx.title,
                       meta: dateStr,
-                      amount: '${isIncome ? '+' : '-'}${CurrencyFormatter.format(tx.amount)}',
-                      amountColor: isIncome ? AppColors.success : AppColors.danger,
+                      amount:
+                          '${isIncome ? '+' : '-'}${CurrencyFormatter.format(tx.amount)}',
+                      amountColor:
+                          isIncome ? AppColors.success : AppColors.danger,
                       isDark: isDark,
                       hasBorder: !isLast,
                     );
@@ -1000,13 +1069,16 @@ class _WalletDetailScreenState extends ConsumerState<WalletDetailScreen> {
                   style: GoogleFonts.inter(
                     fontWeight: FontWeight.w800,
                     fontSize: 13,
-                    color: isDark ? AppColors.darkForeground : AppColors.lightForeground,
+                    color: isDark
+                        ? AppColors.darkForeground
+                        : AppColors.lightForeground,
                   ),
                 ),
                 const SizedBox(height: 2),
                 Text(
                   meta,
-                  style: const TextStyle(fontSize: 11, color: Color(0xFF64748B)),
+                  style:
+                      const TextStyle(fontSize: 11, color: Color(0xFF64748B)),
                 ),
               ],
             ),

@@ -70,9 +70,8 @@ class ConfirmationPromptCard extends StatelessWidget {
         payload['title'] ??
         'Giao dịch chi tiêu';
 
-    final amountVal = (preview['amount'] as num?) ??
-        (payload['amount'] as num?) ??
-        0;
+    final amountVal =
+        (preview['amount'] as num?) ?? (payload['amount'] as num?) ?? 0;
 
     final formattedAmount = preview['amountFormatted']?.toString();
 
@@ -138,21 +137,26 @@ class ConfirmationPromptCard extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    'XÁC NHẬN GIAO DỊCH TỰ ĐỘNG',
-                    style: GoogleFonts.inter(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: 0.6,
-                      color: isDark
-                          ? const Color(0xFF94A3B8)
-                          : const Color(0xFF64748B),
+                  Expanded(
+                    child: Text(
+                      'XÁC NHẬN GIAO DỊCH TỰ ĐỘNG',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: GoogleFonts.inter(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: 0.6,
+                        color: isDark
+                            ? const Color(0xFF94A3B8)
+                            : const Color(0xFF64748B),
+                      ),
                     ),
                   ),
+                  const SizedBox(width: 8),
                   if (status == PendingActionStatusEnum.confirmed)
                     Container(
-                      padding:
-                          const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 3),
                       decoration: BoxDecoration(
                         color: const Color(0xFF10B981).withValues(alpha: 0.15),
                         borderRadius: BorderRadius.circular(20),
@@ -163,21 +167,24 @@ class ConfirmationPromptCard extends StatelessWidget {
                           const Icon(Icons.check_circle_rounded,
                               size: 13, color: Color(0xFF10B981)),
                           const SizedBox(width: 4),
-                          Text(
+                          Flexible(
+                              child: Text(
                             'Đã ghi sổ',
                             style: GoogleFonts.inter(
                               fontSize: 11,
                               fontWeight: FontWeight.w700,
                               color: const Color(0xFF10B981),
                             ),
-                          ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          )),
                         ],
                       ),
                     )
                   else if (status == PendingActionStatusEnum.rejected)
                     Container(
-                      padding:
-                          const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 3),
                       decoration: BoxDecoration(
                         color: Colors.redAccent.withValues(alpha: 0.15),
                         borderRadius: BorderRadius.circular(20),
@@ -193,8 +200,8 @@ class ConfirmationPromptCard extends StatelessWidget {
                     )
                   else if (status == PendingActionStatusEnum.expired)
                     Container(
-                      padding:
-                          const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 3),
                       decoration: BoxDecoration(
                         color: Colors.orangeAccent.withValues(alpha: 0.15),
                         borderRadius: BorderRadius.circular(20),
@@ -218,7 +225,9 @@ class ConfirmationPromptCard extends StatelessWidget {
                   if (i > 0) ...[
                     const SizedBox(height: 8),
                     Divider(
-                      color: isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9),
+                      color: isDark
+                          ? const Color(0xFF334155)
+                          : const Color(0xFFF1F5F9),
                       height: 16,
                     ),
                     const SizedBox(height: 4),
@@ -275,23 +284,27 @@ class ConfirmationPromptCard extends StatelessWidget {
                             : const Color(0xFF64748B),
                       ),
                     ),
-                    Container(
-                      padding:
-                          const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                      decoration: BoxDecoration(
-                        color: isDark
-                            ? const Color(0xFF334155)
-                            : const Color(0xFFF1F5F9),
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      child: Text(
-                        categoryName.toString(),
-                        style: GoogleFonts.inter(
-                          fontSize: 12.5,
-                          fontWeight: FontWeight.w600,
+                    Flexible(
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 2),
+                        decoration: BoxDecoration(
                           color: isDark
-                              ? AppColors.darkForeground
-                              : AppColors.lightForeground,
+                              ? const Color(0xFF334155)
+                              : const Color(0xFFF1F5F9),
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: Text(
+                          categoryName.toString(),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: GoogleFonts.inter(
+                            fontSize: 12.5,
+                            fontWeight: FontWeight.w600,
+                            color: isDark
+                                ? AppColors.darkForeground
+                                : AppColors.lightForeground,
+                          ),
                         ),
                       ),
                     ),
@@ -312,14 +325,20 @@ class ConfirmationPromptCard extends StatelessWidget {
                             : const Color(0xFF64748B),
                       ),
                     ),
-                    Text(
-                      accountName.toString(),
-                      style: GoogleFonts.inter(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600,
-                        color: isDark
-                            ? AppColors.darkForeground
-                            : AppColors.lightForeground,
+                    const SizedBox(width: 12),
+                    Flexible(
+                      child: Text(
+                        accountName.toString(),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        textAlign: TextAlign.end,
+                        style: GoogleFonts.inter(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          color: isDark
+                              ? AppColors.darkForeground
+                              : AppColors.lightForeground,
+                        ),
                       ),
                     ),
                   ],
@@ -341,14 +360,20 @@ class ConfirmationPromptCard extends StatelessWidget {
                             : const Color(0xFF64748B),
                       ),
                     ),
-                    Text(
-                      dateStr,
-                      style: GoogleFonts.inter(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600,
-                        color: isDark
-                            ? AppColors.darkForeground
-                            : AppColors.lightForeground,
+                    const SizedBox(width: 12),
+                    Flexible(
+                      child: Text(
+                        dateStr,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        textAlign: TextAlign.end,
+                        style: GoogleFonts.inter(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          color: isDark
+                              ? AppColors.darkForeground
+                              : AppColors.lightForeground,
+                        ),
                       ),
                     ),
                   ],
@@ -361,15 +386,20 @@ class ConfirmationPromptCard extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      'Hóa đơn đính kèm',
-                      style: GoogleFonts.inter(
-                        fontSize: 13,
-                        color: isDark
-                            ? const Color(0xFF94A3B8)
-                            : const Color(0xFF64748B),
+                    Expanded(
+                      child: Text(
+                        'Hóa đơn đính kèm',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: GoogleFonts.inter(
+                          fontSize: 13,
+                          color: isDark
+                              ? const Color(0xFF94A3B8)
+                              : const Color(0xFF64748B),
+                        ),
                       ),
                     ),
+                    const SizedBox(width: 8),
                     GestureDetector(
                       onTap: () {
                         showDialog(
@@ -382,7 +412,8 @@ class ConfirmationPromptCard extends StatelessWidget {
                               children: [
                                 ClipRRect(
                                   borderRadius: BorderRadius.circular(16),
-                                  child: Image.network(photoUrl, fit: BoxFit.contain),
+                                  child: Image.network(photoUrl,
+                                      fit: BoxFit.contain),
                                 ),
                                 Positioned(
                                   top: 10,
@@ -391,7 +422,8 @@ class ConfirmationPromptCard extends StatelessWidget {
                                     style: IconButton.styleFrom(
                                       backgroundColor: Colors.black54,
                                     ),
-                                    icon: const Icon(Icons.close_rounded, color: Colors.white),
+                                    icon: const Icon(Icons.close_rounded,
+                                        color: Colors.white),
                                     onPressed: () => Navigator.pop(ctx),
                                   ),
                                 ),
@@ -401,24 +433,30 @@ class ConfirmationPromptCard extends StatelessWidget {
                         );
                       },
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 4),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF0072D5).withValues(alpha: 0.12),
+                          color:
+                              const Color(0xFF0072D5).withValues(alpha: 0.12),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            const Icon(Icons.receipt_long_rounded, size: 14, color: Color(0xFF0072D5)),
+                            const Icon(Icons.receipt_long_rounded,
+                                size: 14, color: Color(0xFF0072D5)),
                             const SizedBox(width: 4),
-                            Text(
+                            Flexible(
+                                child: Text(
                               'Xem hóa đơn',
                               style: GoogleFonts.inter(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w700,
                                 color: const Color(0xFF0072D5),
                               ),
-                            ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            )),
                           ],
                         ),
                       ),
@@ -447,29 +485,35 @@ class ConfirmationPromptCard extends StatelessWidget {
                                   initialName: txName.toString(),
                                   initialAmount: amountVal,
                                   initialCategory: categoryName.toString(),
-                                  initialCategoryId: preview['categoryId']?.toString() ??
-                                      payload['categoryId']?.toString(),
+                                  initialCategoryId:
+                                      preview['categoryId']?.toString() ??
+                                          payload['categoryId']?.toString(),
                                   initialAccount: accountName.toString(),
-                                  initialAccountId: preview['accountId']?.toString() ??
-                                      payload['accountId']?.toString(),
+                                  initialAccountId:
+                                      preview['accountId']?.toString() ??
+                                          payload['accountId']?.toString(),
                                   initialDate: dateStr,
                                   initialNote: noteStr,
-                                  initialLocation: preview['locationName']?.toString() ??
-                                      payload['locationName']?.toString(),
-                                  initialAmountHidden: preview['amountHidden'] == true ||
-                                      payload['amountHidden'] == true,
+                                  initialLocation:
+                                      preview['locationName']?.toString() ??
+                                          payload['locationName']?.toString(),
+                                  initialAmountHidden:
+                                      preview['amountHidden'] == true ||
+                                          payload['amountHidden'] == true,
                                   initialExcludeFromReport:
                                       preview['excludeFromReport'] == true ||
                                           payload['excludeFromReport'] == true,
-                                  initialVisibility: preview['visibility']?.toString() ??
-                                      payload['visibility']?.toString() ??
-                                      'PRIVATE',
+                                  initialVisibility:
+                                      preview['visibility']?.toString() ??
+                                          payload['visibility']?.toString() ??
+                                          'PRIVATE',
                                   initialPhotoUrl: photoUrl,
                                 );
                                 if (draft != null) {
                                   onSaveDraft?.call(actionId, draft);
                                   if (context.mounted) {
-                                    AppToast.success(context, 'Đã cập nhật bản nháp. Bấm "Xác nhận ghi sổ" để hoàn tất.');
+                                    AppToast.success(context,
+                                        'Đã cập nhật bản nháp. Bấm "Xác nhận ghi sổ" để hoàn tất.');
                                   }
                                 }
                               }
@@ -538,7 +582,8 @@ class ConfirmationPromptCard extends StatelessWidget {
                       icon: const Icon(Icons.close_rounded,
                           size: 18, color: Colors.redAccent),
                       style: IconButton.styleFrom(
-                        backgroundColor: Colors.redAccent.withValues(alpha: 0.1),
+                        backgroundColor:
+                            Colors.redAccent.withValues(alpha: 0.1),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10),
                         ),
@@ -563,14 +608,17 @@ class ConfirmationPromptCard extends StatelessWidget {
                   color: Color(0xFF0072D5),
                 ),
                 const SizedBox(width: 5),
-                Text(
+                Flexible(
+                    child: Text(
                   '$categoryName tháng này: còn ${_formatCurrency(budgetRemaining as num?)}',
                   style: GoogleFonts.inter(
                     fontSize: 11.5,
                     fontWeight: FontWeight.w600,
                     color: const Color(0xFF0072D5),
                   ),
-                ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                )),
               ],
             ),
           ),
@@ -628,23 +676,31 @@ class ConfirmationPromptCard extends StatelessWidget {
               'Danh mục',
               style: GoogleFonts.inter(
                 fontSize: 13,
-                color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                color:
+                    isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
               ),
             ),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-              decoration: BoxDecoration(
-                color: isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9),
-                borderRadius: BorderRadius.circular(6),
-              ),
-              child: Text(
-                itCat.toString(),
-                style: GoogleFonts.inter(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
+            const SizedBox(width: 12),
+            Flexible(
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                decoration: BoxDecoration(
                   color: isDark
-                      ? AppColors.darkForeground
-                      : AppColors.lightForeground,
+                      ? const Color(0xFF334155)
+                      : const Color(0xFFF1F5F9),
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: Text(
+                  itCat.toString(),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: GoogleFonts.inter(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: isDark
+                        ? AppColors.darkForeground
+                        : AppColors.lightForeground,
+                  ),
                 ),
               ),
             ),
@@ -659,17 +715,25 @@ class ConfirmationPromptCard extends StatelessWidget {
                 'Tài khoản',
                 style: GoogleFonts.inter(
                   fontSize: 13,
-                  color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                  color: isDark
+                      ? const Color(0xFF94A3B8)
+                      : const Color(0xFF64748B),
                 ),
               ),
-              Text(
-                itAcc.toString(),
-                style: GoogleFonts.inter(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
-                  color: isDark
-                      ? AppColors.darkForeground
-                      : AppColors.lightForeground,
+              const SizedBox(width: 12),
+              Flexible(
+                child: Text(
+                  itAcc.toString(),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.end,
+                  style: GoogleFonts.inter(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: isDark
+                        ? AppColors.darkForeground
+                        : AppColors.lightForeground,
+                  ),
                 ),
               ),
             ],

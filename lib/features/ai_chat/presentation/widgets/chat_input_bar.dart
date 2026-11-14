@@ -161,16 +161,21 @@ class ChatInputBarState extends State<ChatInputBar> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      'Quét hóa đơn thông minh (OCR)',
-                      style: GoogleFonts.inter(
-                        fontSize: 16.5,
-                        fontWeight: FontWeight.w800,
-                        color: isDark
-                            ? AppColors.darkForeground
-                            : AppColors.lightForeground,
+                    Expanded(
+                      child: Text(
+                        'Quét hóa đơn thông minh (OCR)',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: GoogleFonts.inter(
+                          fontSize: 16.5,
+                          fontWeight: FontWeight.w800,
+                          color: isDark
+                              ? AppColors.darkForeground
+                              : AppColors.lightForeground,
+                        ),
                       ),
                     ),
+                    const SizedBox(width: 8),
                     IconButton(
                       icon: const Icon(Icons.close_rounded, size: 20),
                       onPressed: () => Navigator.pop(ctx),

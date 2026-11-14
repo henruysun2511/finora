@@ -61,16 +61,16 @@ class RecurringTransactionCard extends StatelessWidget {
                       width: 42,
                       height: 42,
                       decoration: BoxDecoration(
-                        color: (isExpense ? AppColors.danger : AppColors.success)
-                            .withValues(alpha: 0.1),
+                        color:
+                            (isExpense ? AppColors.danger : AppColors.success)
+                                .withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Icon(
                         isExpense
                             ? Icons.arrow_downward_rounded
                             : Icons.arrow_upward_rounded,
-                        color:
-                            isExpense ? AppColors.danger : AppColors.success,
+                        color: isExpense ? AppColors.danger : AppColors.success,
                         size: 20,
                       ),
                     ),
@@ -125,9 +125,7 @@ class RecurringTransactionCard extends StatelessWidget {
                             style: TextStyle(
                               fontSize: 11,
                               fontWeight: FontWeight.w600,
-                              color: item.isPaused
-                                  ? muted
-                                  : AppColors.primary,
+                              color: item.isPaused ? muted : AppColors.primary,
                             ),
                           ),
                         ),
@@ -138,8 +136,7 @@ class RecurringTransactionCard extends StatelessWidget {
                 const SizedBox(height: 12),
                 Row(
                   children: [
-                    Icon(Icons.calendar_today_rounded,
-                        size: 13, color: muted),
+                    Icon(Icons.calendar_today_rounded, size: 13, color: muted),
                     const SizedBox(width: 4),
                     Text(
                       'Đến hạn: ${_formatDate(item.nextRunDate)}',
@@ -210,7 +207,11 @@ class RecurringTransactionCard extends StatelessWidget {
                         children: [
                           Icon(Icons.bolt_rounded, size: 14),
                           SizedBox(width: 2),
-                          Text('Chạy', style: TextStyle(fontSize: 12)),
+                          Flexible(
+                              child: Text('Chạy',
+                                  style: TextStyle(fontSize: 12),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis)),
                         ],
                       ),
                     ),

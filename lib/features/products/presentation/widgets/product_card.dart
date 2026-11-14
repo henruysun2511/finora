@@ -62,33 +62,41 @@ class ProductCard extends StatelessWidget {
                     children: [
                       Row(
                         children: [
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 6,
-                              vertical: 2,
-                            ),
-                            decoration: BoxDecoration(
-                              color: AppColors.primaryLight,
-                              borderRadius: BorderRadius.circular(4),
-                            ),
-                            child: Text(
-                              product.category.label,
-                              style: const TextStyle(
-                                fontSize: 11,
-                                fontWeight: FontWeight.bold,
-                                color: AppColors.primary,
+                          Flexible(
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 6,
+                                vertical: 2,
+                              ),
+                              decoration: BoxDecoration(
+                                color: AppColors.primaryLight,
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              child: Text(
+                                product.category.label,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.bold,
+                                  color: AppColors.primary,
+                                ),
                               ),
                             ),
                           ),
                           if (product.sku.isNotEmpty) ...[
                             const SizedBox(width: 6),
-                            Text(
-                              product.sku,
-                              style: AppTextStyles.caption.copyWith(
-                                color: isDark
-                                    ? AppColors.darkMuted
-                                    : AppColors.lightMuted,
-                                fontSize: 11,
+                            Flexible(
+                              child: Text(
+                                product.sku,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: AppTextStyles.caption.copyWith(
+                                  color: isDark
+                                      ? AppColors.darkMuted
+                                      : AppColors.lightMuted,
+                                  fontSize: 11,
+                                ),
                               ),
                             ),
                           ],
@@ -109,14 +117,17 @@ class ProductCard extends StatelessWidget {
                       const SizedBox(height: 8),
                       Row(
                         children: [
-                          Text(
+                          Flexible(
+                              child: Text(
                             CurrencyFormatter.formatVnd(product.price),
                             style: const TextStyle(
                               color: AppColors.orange,
                               fontWeight: FontWeight.w700,
                               fontSize: 15,
                             ),
-                          ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          )),
                           const SizedBox(width: 8),
                           StockBadge(product: product),
                         ],
@@ -137,7 +148,8 @@ class ProductCard extends StatelessWidget {
                     PopupMenuItem(value: _CardAction.edit, child: Text('Sửa')),
                     PopupMenuItem(
                       value: _CardAction.delete,
-                      child: Text('Xóa', style: TextStyle(color: AppColors.danger)),
+                      child: Text('Xóa',
+                          style: TextStyle(color: AppColors.danger)),
                     ),
                   ],
                 ),

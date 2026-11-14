@@ -131,15 +131,20 @@ class _CurrencyConverterCardState extends ConsumerState<CurrencyConverterCard> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    'BẠN CHUYỂN ĐỔI',
-                    style: GoogleFonts.inter(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w800,
-                      color: AppColors.primary,
-                      letterSpacing: 0.5,
+                  Expanded(
+                    child: Text(
+                      'BẠN CHUYỂN ĐỔI',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: GoogleFonts.inter(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w800,
+                        color: AppColors.primary,
+                        letterSpacing: 0.5,
+                      ),
                     ),
                   ),
+                  const SizedBox(width: 8),
                   if (state.isLoading)
                     const SizedBox(
                       width: 14,
@@ -180,12 +185,16 @@ class _CurrencyConverterCardState extends ConsumerState<CurrencyConverterCard> {
                         style: const TextStyle(fontSize: 18),
                       ),
                       const SizedBox(width: 8),
-                      Text(
-                        '${state.fromCurrency.code} - ${state.fromCurrency.name}',
-                        style: GoogleFonts.inter(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w600,
-                          color: foreground,
+                      Flexible(
+                        child: Text(
+                          '${state.fromCurrency.code} - ${state.fromCurrency.name}',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: GoogleFonts.inter(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            color: foreground,
+                          ),
                         ),
                       ),
                       const SizedBox(width: 6),
@@ -308,12 +317,16 @@ class _CurrencyConverterCardState extends ConsumerState<CurrencyConverterCard> {
                         style: const TextStyle(fontSize: 18),
                       ),
                       const SizedBox(width: 8),
-                      Text(
-                        '${state.toCurrency.code} - ${state.toCurrency.name}',
-                        style: GoogleFonts.inter(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w600,
-                          color: foreground,
+                      Flexible(
+                        child: Text(
+                          '${state.toCurrency.code} - ${state.toCurrency.name}',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: GoogleFonts.inter(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            color: foreground,
+                          ),
                         ),
                       ),
                       const SizedBox(width: 6),

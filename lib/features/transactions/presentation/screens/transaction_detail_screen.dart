@@ -173,7 +173,10 @@ class TransactionDetailScreen extends ConsumerWidget {
                 // ── 3. KHỐI CHIA TIỀN BẠN BÈ (SPLIT BILL) ──
                 if (item.type == TransactionType.expense && item.amount > 0) ...[
                   const SizedBox(height: 16),
-                  TransactionDetailSplitCard(amount: item.amount),
+                  TransactionDetailSplitCard(
+                    amount: item.amount,
+                    transaction: item,
+                  ),
                 ],
 
                 // ── 4. KHỐI HÓA ĐƠN & BẢNG KÊ CHỨNG TỪ (NẾU CÓ) ──

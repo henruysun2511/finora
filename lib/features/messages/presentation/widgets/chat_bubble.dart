@@ -33,7 +33,8 @@ class ChatBubble extends StatelessWidget {
       builder: (ctx) {
         final isDark = Theme.of(ctx).brightness == Brightness.dark;
         final surface = isDark ? AppColors.darkSurface : Colors.white;
-        final foreground = isDark ? AppColors.darkForeground : AppColors.lightForeground;
+        final foreground =
+            isDark ? AppColors.darkForeground : AppColors.lightForeground;
         final muted = isDark ? AppColors.darkMuted : AppColors.lightMuted;
         final border = isDark ? AppColors.darkBorder : AppColors.lightBorder;
 
@@ -65,15 +66,19 @@ class ChatBubble extends StatelessWidget {
                 // Emoji Reaction Bar
                 if (!message.isRecalled) ...[
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                     decoration: BoxDecoration(
-                      color: isDark ? AppColors.darkBackground : const Color(0xFFF8FAFC),
+                      color: isDark
+                          ? AppColors.darkBackground
+                          : const Color(0xFFF8FAFC),
                       borderRadius: BorderRadius.circular(24),
                       border: Border.all(color: border),
                     ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: ['❤️', '👍', '😂', '😮', '😢', '👏', '😡'].map((emoji) {
+                      children: ['❤️', '👍', '😂', '😮', '😢', '👏', '😡']
+                          .map((emoji) {
                         final isSelected = message.reactions.contains(emoji);
                         return GestureDetector(
                           onTap: () {
@@ -89,7 +94,8 @@ class ChatBubble extends StatelessWidget {
                                   ? AppColors.primary.withValues(alpha: 0.15)
                                   : Colors.transparent,
                             ),
-                            child: Text(emoji, style: const TextStyle(fontSize: 24)),
+                            child: Text(emoji,
+                                style: const TextStyle(fontSize: 24)),
                           ),
                         );
                       }).toList(),
@@ -102,15 +108,20 @@ class ChatBubble extends StatelessWidget {
                 if (!message.isRecalled)
                   ListTile(
                     contentPadding: EdgeInsets.zero,
-                    leading: const Icon(Icons.copy_rounded, color: AppColors.primary),
+                    leading: const Icon(Icons.copy_rounded,
+                        color: AppColors.primary),
                     title: Text(
                       'Sao chép tin nhắn',
-                      style: TextStyle(color: foreground, fontWeight: FontWeight.w600, fontSize: 14),
+                      style: TextStyle(
+                          color: foreground,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 14),
                     ),
                     onTap: () {
                       Navigator.pop(ctx);
                       Clipboard.setData(ClipboardData(text: message.content));
-                      AppToast.success(context, 'Đã sao chép tin nhắn vào bộ nhớ tạm');
+                      AppToast.success(
+                          context, 'Đã sao chép tin nhắn vào bộ nhớ tạm');
                     },
                   ),
 
@@ -118,10 +129,14 @@ class ChatBubble extends StatelessWidget {
                 if (message.isMe && !message.isRecalled)
                   ListTile(
                     contentPadding: EdgeInsets.zero,
-                    leading: const Icon(Icons.undo_rounded, color: AppColors.danger),
+                    leading:
+                        const Icon(Icons.undo_rounded, color: AppColors.danger),
                     title: const Text(
                       'Thu hồi tin nhắn',
-                      style: TextStyle(color: AppColors.danger, fontWeight: FontWeight.w700, fontSize: 14),
+                      style: TextStyle(
+                          color: AppColors.danger,
+                          fontWeight: FontWeight.w700,
+                          fontSize: 14),
                     ),
                     subtitle: Text(
                       'Thu hồi trong vòng 15 phút kể từ lúc gửi',
@@ -144,17 +159,20 @@ class ChatBubble extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final surface = isDark ? AppColors.darkSurface : Colors.white;
-    final foreground = isDark ? AppColors.darkForeground : AppColors.lightForeground;
+    final foreground =
+        isDark ? AppColors.darkForeground : AppColors.lightForeground;
     final muted = isDark ? AppColors.darkMuted : AppColors.lightMuted;
     final border = isDark ? AppColors.darkBorder : AppColors.lightBorder;
 
     final isMe = message.isMe;
 
-    if (message.type == MessageType.transactionShare && message.relatedTransaction != null) {
+    if (message.type == MessageType.transactionShare &&
+        message.relatedTransaction != null) {
       return Padding(
         padding: const EdgeInsets.symmetric(vertical: 6),
         child: Row(
-          mainAxisAlignment: isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
+          mainAxisAlignment:
+              isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
             if (!isMe && isGroup) const SizedBox(width: 32),
@@ -176,7 +194,8 @@ class ChatBubble extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 3),
       child: Row(
-        mainAxisAlignment: isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
+        mainAxisAlignment:
+            isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           if (!isMe && isGroup) ...[
@@ -195,35 +214,44 @@ class ChatBubble extends StatelessWidget {
                 message.senderName.isNotEmpty
                     ? message.senderName.substring(0, 1).toUpperCase()
                     : '?',
-                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 10),
+                style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w900,
+                    fontSize: 10),
               ),
             ),
           ],
-
           Flexible(
             child: Column(
-              crossAxisAlignment: isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+              crossAxisAlignment:
+                  isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
               children: [
                 if (!isMe && isGroup)
                   Padding(
                     padding: const EdgeInsets.only(left: 4, bottom: 2),
                     child: Text(
                       message.senderName,
-                      style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: muted),
+                      style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w700,
+                          color: muted),
                     ),
                   ),
-
                 GestureDetector(
                   onLongPress: () => _showMessageActions(context),
                   child: Stack(
                     clipBehavior: Clip.none,
                     children: [
                       Container(
-                        constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.72),
-                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
+                        constraints: BoxConstraints(
+                            maxWidth: MediaQuery.of(context).size.width * 0.72),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 14, vertical: 9),
                         decoration: BoxDecoration(
                           color: isRecalled
-                              ? (isDark ? AppColors.darkSurface : const Color(0xFFF1F5F9))
+                              ? (isDark
+                                  ? AppColors.darkSurface
+                                  : const Color(0xFFF1F5F9))
                               : (isMe ? AppColors.primary : surface),
                           borderRadius: BorderRadius.only(
                             topLeft: const Radius.circular(18),
@@ -231,7 +259,9 @@ class ChatBubble extends StatelessWidget {
                             bottomLeft: Radius.circular(isMe ? 18 : 4),
                             bottomRight: Radius.circular(isMe ? 4 : 18),
                           ),
-                          border: (isMe && !isRecalled) ? null : Border.all(color: border),
+                          border: (isMe && !isRecalled)
+                              ? null
+                              : Border.all(color: border),
                           boxShadow: [
                             BoxShadow(
                               color: Colors.black.withValues(alpha: 0.04),
@@ -244,16 +274,20 @@ class ChatBubble extends StatelessWidget {
                             ? Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  Icon(Icons.info_outline_rounded, size: 14, color: muted),
+                                  Icon(Icons.info_outline_rounded,
+                                      size: 14, color: muted),
                                   const SizedBox(width: 6),
-                                  Text(
+                                  Flexible(
+                                      child: Text(
                                     'Tin nhắn đã được thu hồi',
                                     style: TextStyle(
                                       fontSize: 13,
                                       fontStyle: FontStyle.italic,
                                       color: muted,
                                     ),
-                                  ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  )),
                                 ],
                               )
                             : Text(
@@ -273,7 +307,8 @@ class ChatBubble extends StatelessWidget {
                           right: isMe ? 4 : null,
                           left: isMe ? null : 4,
                           child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 6, vertical: 2),
                             decoration: BoxDecoration(
                               color: surface,
                               borderRadius: BorderRadius.circular(12),
@@ -289,10 +324,13 @@ class ChatBubble extends StatelessWidget {
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Text(
+                                Flexible(
+                                    child: Text(
                                   message.reactions.take(3).join(' '),
                                   style: const TextStyle(fontSize: 12),
-                                ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                )),
                                 if (message.reactions.length > 1) ...[
                                   const SizedBox(width: 3),
                                   Text(
@@ -311,7 +349,9 @@ class ChatBubble extends StatelessWidget {
                     ],
                   ),
                 ),
-                SizedBox(height: (!isRecalled && message.reactions.isNotEmpty) ? 12 : 2),
+                SizedBox(
+                    height:
+                        (!isRecalled && message.reactions.isNotEmpty) ? 12 : 2),
                 Text(
                   _formatTime(message.createdAt),
                   style: TextStyle(fontSize: 10, color: muted),

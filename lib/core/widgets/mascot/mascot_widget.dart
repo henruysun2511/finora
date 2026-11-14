@@ -404,12 +404,16 @@ class _MascotWidgetState extends State<MascotWidget>
               children: [
                 Row(
                   children: [
-                    Text(
-                      mascot.name,
-                      style: TextStyle(
-                        fontWeight: FontWeight.w800,
-                        fontSize: 13,
-                        color: mascot.color,
+                    Flexible(
+                      child: Text(
+                        mascot.name,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontWeight: FontWeight.w800,
+                          fontSize: 13,
+                          color: mascot.color,
+                        ),
                       ),
                     ),
                     const SizedBox(width: 6),

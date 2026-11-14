@@ -55,15 +55,20 @@ class CategoryQuickChips extends ConsumerWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              'DANH MỤC ${isExpense ? 'CHI TIÊU' : 'THU NHẬP'} (*)',
-              style: GoogleFonts.inter(
-                fontSize: 11,
-                fontWeight: FontWeight.w800,
-                color: AppColors.primary,
-                letterSpacing: 0.5,
+            Expanded(
+              child: Text(
+                'DANH MỤC ${isExpense ? 'CHI TIÊU' : 'THU NHẬP'} (*)',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: GoogleFonts.inter(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w800,
+                  color: AppColors.primary,
+                  letterSpacing: 0.5,
+                ),
               ),
             ),
+            const SizedBox(width: 8),
             GestureDetector(
               onTap: () => _openFullCategoryPicker(context, ref),
               child: Text(
@@ -280,14 +285,19 @@ class _FullCategoryPickerSheet extends ConsumerWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  'Chọn danh mục ${isExpense ? 'chi tiêu' : 'thu nhập'}',
-                  style: GoogleFonts.inter(
-                    fontSize: 17,
-                    fontWeight: FontWeight.w700,
-                    color: foreground,
+                Expanded(
+                  child: Text(
+                    'Chọn danh mục ${isExpense ? 'chi tiêu' : 'thu nhập'}',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: GoogleFonts.inter(
+                      fontSize: 17,
+                      fontWeight: FontWeight.w700,
+                      color: foreground,
+                    ),
                   ),
                 ),
+                const SizedBox(width: 8),
                 IconButton(
                   onPressed: () => Navigator.pop(context),
                   icon: Icon(Icons.close_rounded, color: muted),

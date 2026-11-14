@@ -117,37 +117,44 @@ class HomeBudgetHealthCard extends ConsumerWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Tiến độ Ngân sách & Sức khỏe',
-                  style: GoogleFonts.inter(
-                    fontSize: 15.5,
-                    fontWeight: FontWeight.w900,
-                    letterSpacing: -0.3,
-                    color: isDark
-                        ? AppColors.darkForeground
-                        : AppColors.lightForeground,
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Tiến độ Ngân sách & Sức khỏe',
+                    style: GoogleFonts.inter(
+                      fontSize: 15.5,
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: -0.3,
+                      color: isDark
+                          ? AppColors.darkForeground
+                          : AppColors.lightForeground,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  'So sánh tốc độ chi tiêu so với số ngày còn lại',
-                  style: GoogleFonts.inter(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w600,
-                    color: isDark ? AppColors.darkMuted : AppColors.lightMuted,
+                  const SizedBox(height: 2),
+                  Text(
+                    'So sánh tốc độ chi tiêu so với số ngày còn lại',
+                    style: GoogleFonts.inter(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                      color:
+                          isDark ? AppColors.darkMuted : AppColors.lightMuted,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3.5),
               decoration: BoxDecoration(
                 color: isSafe
-                    ? (isDark ? const Color(0xFF064E3B) : const Color(0xFFECFDF5))
-                    : (isDark ? const Color(0xFF7C2D12) : const Color(0xFFFFF7ED)),
+                    ? (isDark
+                        ? const Color(0xFF064E3B)
+                        : const Color(0xFFECFDF5))
+                    : (isDark
+                        ? const Color(0xFF7C2D12)
+                        : const Color(0xFFFFF7ED)),
                 borderRadius: BorderRadius.circular(8),
                 border: Border.all(
                   color: isSafe
@@ -161,17 +168,24 @@ class HomeBudgetHealthCard extends ConsumerWidget {
                   LucideIcon(
                     name: 'shield-check',
                     size: 11,
-                    color: isSafe ? const Color(0xFF10B981) : const Color(0xFFF97316),
+                    color: isSafe
+                        ? const Color(0xFF10B981)
+                        : const Color(0xFFF97316),
                   ),
                   const SizedBox(width: 4),
-                  Text(
+                  Flexible(
+                      child: Text(
                     statusTag,
                     style: GoogleFonts.inter(
                       fontSize: 10.5,
                       fontWeight: FontWeight.w800,
-                      color: isSafe ? const Color(0xFF10B981) : const Color(0xFFF97316),
+                      color: isSafe
+                          ? const Color(0xFF10B981)
+                          : const Color(0xFFF97316),
                     ),
-                  ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  )),
                 ],
               ),
             ),
@@ -183,44 +197,48 @@ class HomeBudgetHealthCard extends ConsumerWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Đã chi tiêu',
-                  style: GoogleFonts.inter(
-                    fontSize: 10.5,
-                    fontWeight: FontWeight.w700,
-                    color: isDark ? AppColors.darkMuted : AppColors.lightMuted,
-                  ),
-                ),
-                const SizedBox(height: 2),
-                RichText(
-                  text: TextSpan(
-                    style: GoogleFonts.outfit(
-                      fontSize: 16.5,
-                      fontWeight: FontWeight.w900,
-                      color: isDark
-                          ? AppColors.darkForeground
-                          : AppColors.lightForeground,
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Đã chi tiêu',
+                    style: GoogleFonts.inter(
+                      fontSize: 10.5,
+                      fontWeight: FontWeight.w700,
+                      color:
+                          isDark ? AppColors.darkMuted : AppColors.lightMuted,
                     ),
-                    children: [
-                      TextSpan(text: CurrencyFormatter.format(spent)),
-                      TextSpan(
-                        text: ' / ${CurrencyFormatter.format(totalBudget)}',
-                        style: GoogleFonts.inter(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                          color: isDark
-                              ? AppColors.darkMuted
-                              : AppColors.lightMuted,
-                        ),
-                      ),
-                    ],
                   ),
-                ),
-              ],
+                  const SizedBox(height: 2),
+                  RichText(
+                    text: TextSpan(
+                      style: GoogleFonts.outfit(
+                        fontSize: 16.5,
+                        fontWeight: FontWeight.w900,
+                        color: isDark
+                            ? AppColors.darkForeground
+                            : AppColors.lightForeground,
+                      ),
+                      children: [
+                        TextSpan(text: CurrencyFormatter.format(spent)),
+                        TextSpan(
+                          text: ' / ${CurrencyFormatter.format(totalBudget)}',
+                          style: GoogleFonts.inter(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            color: isDark
+                                ? AppColors.darkMuted
+                                : AppColors.lightMuted,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
+            const SizedBox(width: 8),
             Text(
               '$spendingPercent%',
               style: GoogleFonts.outfit(
@@ -268,8 +286,10 @@ class HomeBudgetHealthCard extends ConsumerWidget {
         const SizedBox(height: 6),
 
         // Subline text so sánh
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        Wrap(
+          alignment: WrapAlignment.spaceBetween,
+          spacing: 8,
+          runSpacing: 4,
           children: [
             Text(
               'Tiến độ chi: $spendingPercent%',
@@ -286,7 +306,8 @@ class HomeBudgetHealthCard extends ConsumerWidget {
               style: GoogleFonts.inter(
                 fontSize: 10,
                 fontWeight: FontWeight.w800,
-                color: isSafe ? const Color(0xFF10B981) : const Color(0xFFF97316),
+                color:
+                    isSafe ? const Color(0xFF10B981) : const Color(0xFFF97316),
               ),
             ),
             Text(
@@ -314,9 +335,8 @@ class HomeBudgetHealthCard extends ConsumerWidget {
                       : const Color(0xFFF8FAFC),
                   borderRadius: BorderRadius.circular(14),
                   border: Border.all(
-                    color: isDark
-                        ? AppColors.darkBorder
-                        : AppColors.lightBorder,
+                    color:
+                        isDark ? AppColors.darkBorder : AppColors.lightBorder,
                   ),
                 ),
                 child: Row(
@@ -360,7 +380,8 @@ class HomeBudgetHealthCard extends ConsumerWidget {
                               ),
                               children: [
                                 TextSpan(
-                                    text: '${savingsRate.toStringAsFixed(1)}% '),
+                                    text:
+                                        '${savingsRate.toStringAsFixed(1)}% '),
                                 TextSpan(
                                   text: '(Đạt)',
                                   style: GoogleFonts.inter(
@@ -393,9 +414,8 @@ class HomeBudgetHealthCard extends ConsumerWidget {
                       : const Color(0xFFF8FAFC),
                   borderRadius: BorderRadius.circular(14),
                   border: Border.all(
-                    color: isDark
-                        ? AppColors.darkBorder
-                        : AppColors.lightBorder,
+                    color:
+                        isDark ? AppColors.darkBorder : AppColors.lightBorder,
                   ),
                 ),
                 child: Row(
@@ -482,9 +502,7 @@ class HomeBudgetHealthCard extends ConsumerWidget {
             ),
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
-              color: isDark
-                  ? const Color(0xFF334155)
-                  : const Color(0xFFBFDBFE),
+              color: isDark ? const Color(0xFF334155) : const Color(0xFFBFDBFE),
             ),
           ),
           child: Row(
@@ -494,7 +512,8 @@ class HomeBudgetHealthCard extends ConsumerWidget {
                 width: 38,
                 height: 38,
                 decoration: BoxDecoration(
-                  color: AppColors.primary.withValues(alpha: isDark ? 0.2 : 0.12),
+                  color:
+                      AppColors.primary.withValues(alpha: isDark ? 0.2 : 0.12),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 alignment: Alignment.center,
@@ -536,4 +555,3 @@ class HomeBudgetHealthCard extends ConsumerWidget {
     );
   }
 }
-

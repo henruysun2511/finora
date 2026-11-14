@@ -50,7 +50,8 @@ class SettingsScreen extends ConsumerWidget {
   ) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final surface = isDark ? AppColors.darkSurface : Colors.white;
-    final foreground = isDark ? AppColors.darkForeground : AppColors.lightForeground;
+    final foreground =
+        isDark ? AppColors.darkForeground : AppColors.lightForeground;
     final muted = isDark ? AppColors.darkMuted : AppColors.lightMuted;
     final border = isDark ? AppColors.darkBorder : AppColors.lightBorder;
 
@@ -87,15 +88,19 @@ class SettingsScreen extends ConsumerWidget {
                   padding: const EdgeInsets.fromLTRB(20, 4, 20, 14),
                   child: Row(
                     children: [
-                      Text(
-                        'Chọn đơn vị tiền tệ mặc định',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w700,
-                          color: foreground,
+                      Expanded(
+                        child: Text(
+                          'Chọn đơn vị tiền tệ mặc định',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700,
+                            color: foreground,
+                          ),
                         ),
                       ),
-                      const Spacer(),
+                      const SizedBox(width: 8),
                       IconButton(
                         icon: Icon(Icons.close_rounded, size: 20, color: muted),
                         onPressed: () => Navigator.pop(ctx),
@@ -106,9 +111,11 @@ class SettingsScreen extends ConsumerWidget {
                 Flexible(
                   child: ListView.separated(
                     shrinkWrap: true,
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
                     itemCount: supportedCurrencies.length,
-                    separatorBuilder: (_, __) => Divider(height: 1, color: border),
+                    separatorBuilder: (_, __) =>
+                        Divider(height: 1, color: border),
                     itemBuilder: (c, i) {
                       final item = supportedCurrencies[i];
                       final code = item['code']!;
@@ -117,10 +124,13 @@ class SettingsScreen extends ConsumerWidget {
                       final isSelected = code == currentCode.toUpperCase();
 
                       return ListTile(
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 4),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12)),
                         tileColor: isSelected
-                            ? AppColors.primary.withValues(alpha: isDark ? 0.15 : 0.08)
+                            ? AppColors.primary
+                                .withValues(alpha: isDark ? 0.15 : 0.08)
                             : Colors.transparent,
                         leading: Container(
                           width: 40,
@@ -128,7 +138,9 @@ class SettingsScreen extends ConsumerWidget {
                           decoration: BoxDecoration(
                             color: isSelected
                                 ? AppColors.primary
-                                : (isDark ? AppColors.darkBackground : const Color(0xFFF1F5F9)),
+                                : (isDark
+                                    ? AppColors.darkBackground
+                                    : const Color(0xFFF1F5F9)),
                             borderRadius: BorderRadius.circular(10),
                           ),
                           alignment: Alignment.center,
@@ -137,7 +149,8 @@ class SettingsScreen extends ConsumerWidget {
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w800,
-                              color: isSelected ? Colors.white : AppColors.primary,
+                              color:
+                                  isSelected ? Colors.white : AppColors.primary,
                             ),
                           ),
                         ),
@@ -145,12 +158,14 @@ class SettingsScreen extends ConsumerWidget {
                           '$code - $name',
                           style: TextStyle(
                             fontSize: 14,
-                            fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                            fontWeight:
+                                isSelected ? FontWeight.w700 : FontWeight.w500,
                             color: isSelected ? AppColors.primary : foreground,
                           ),
                         ),
                         trailing: isSelected
-                            ? const Icon(Icons.check_circle_rounded, color: AppColors.primary, size: 22)
+                            ? const Icon(Icons.check_circle_rounded,
+                                color: AppColors.primary, size: 22)
                             : null,
                         onTap: () async {
                           Navigator.pop(ctx);
@@ -160,7 +175,8 @@ class SettingsScreen extends ConsumerWidget {
                                   .read(generalSettingsProvider.notifier)
                                   .updateGeneral(defaultCurrency: code);
                               if (context.mounted) {
-                                AppToast.success(context, 'Đã đổi đơn vị tiền tệ sang $code ($symbol)');
+                                AppToast.success(context,
+                                    'Đã đổi đơn vị tiền tệ sang $code ($symbol)');
                               }
                             } catch (e) {
                               if (context.mounted) {
@@ -188,7 +204,8 @@ class SettingsScreen extends ConsumerWidget {
   ) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final surface = isDark ? AppColors.darkSurface : Colors.white;
-    final foreground = isDark ? AppColors.darkForeground : AppColors.lightForeground;
+    final foreground =
+        isDark ? AppColors.darkForeground : AppColors.lightForeground;
     final muted = isDark ? AppColors.darkMuted : AppColors.lightMuted;
     final border = isDark ? AppColors.darkBorder : AppColors.lightBorder;
 
@@ -226,15 +243,19 @@ class SettingsScreen extends ConsumerWidget {
                   padding: const EdgeInsets.fromLTRB(20, 4, 20, 10),
                   child: Row(
                     children: [
-                      Text(
-                        'Chọn ngôn ngữ hiển thị',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w700,
-                          color: foreground,
+                      Expanded(
+                        child: Text(
+                          'Chọn ngôn ngữ hiển thị',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700,
+                            color: foreground,
+                          ),
                         ),
                       ),
-                      const Spacer(),
+                      const SizedBox(width: 8),
                       IconButton(
                         icon: Icon(Icons.close_rounded, size: 20, color: muted),
                         onPressed: () => Navigator.pop(ctx),
@@ -247,7 +268,8 @@ class SettingsScreen extends ConsumerWidget {
                   physics: const NeverScrollableScrollPhysics(),
                   padding: const EdgeInsets.fromLTRB(16, 4, 16, 20),
                   itemCount: languages.length,
-                  separatorBuilder: (_, __) => Divider(height: 1, color: border),
+                  separatorBuilder: (_, __) =>
+                      Divider(height: 1, color: border),
                   itemBuilder: (c, i) {
                     final item = languages[i];
                     final code = item['code']!;
@@ -256,22 +278,27 @@ class SettingsScreen extends ConsumerWidget {
                     final isSelected = code == currentLang.toLowerCase();
 
                     return ListTile(
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 4),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12)),
                       tileColor: isSelected
-                          ? AppColors.primary.withValues(alpha: isDark ? 0.15 : 0.08)
+                          ? AppColors.primary
+                              .withValues(alpha: isDark ? 0.15 : 0.08)
                           : Colors.transparent,
                       leading: Text(flag, style: const TextStyle(fontSize: 24)),
                       title: Text(
                         name,
                         style: TextStyle(
                           fontSize: 14,
-                          fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                          fontWeight:
+                              isSelected ? FontWeight.w700 : FontWeight.w500,
                           color: isSelected ? AppColors.primary : foreground,
                         ),
                       ),
                       trailing: isSelected
-                          ? const Icon(Icons.check_circle_rounded, color: AppColors.primary, size: 22)
+                          ? const Icon(Icons.check_circle_rounded,
+                              color: AppColors.primary, size: 22)
                           : null,
                       onTap: () async {
                         Navigator.pop(ctx);
@@ -281,7 +308,8 @@ class SettingsScreen extends ConsumerWidget {
                                 .read(generalSettingsProvider.notifier)
                                 .updateGeneral(language: code);
                             if (context.mounted) {
-                              AppToast.success(context, 'Đã chuyển ngôn ngữ sang $name');
+                              AppToast.success(
+                                  context, 'Đã chuyển ngôn ngữ sang $name');
                             }
                           } catch (e) {
                             if (context.mounted) {
@@ -308,7 +336,8 @@ class SettingsScreen extends ConsumerWidget {
   ) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final surface = isDark ? AppColors.darkSurface : Colors.white;
-    final foreground = isDark ? AppColors.darkForeground : AppColors.lightForeground;
+    final foreground =
+        isDark ? AppColors.darkForeground : AppColors.lightForeground;
     final muted = isDark ? AppColors.darkMuted : AppColors.lightMuted;
     final border = isDark ? AppColors.darkBorder : AppColors.lightBorder;
 
@@ -322,7 +351,8 @@ class SettingsScreen extends ConsumerWidget {
       {
         'key': 'FRIENDS',
         'title': 'Bạn bè (Friends & Locket)',
-        'subtitle': 'Chia sẻ với bạn bè trong danh sách và nhận phản hồi tin nhắn',
+        'subtitle':
+            'Chia sẻ với bạn bè trong danh sách và nhận phản hồi tin nhắn',
         'icon': Icons.people_outline_rounded,
       },
     ];
@@ -356,15 +386,19 @@ class SettingsScreen extends ConsumerWidget {
                   padding: const EdgeInsets.fromLTRB(20, 4, 20, 10),
                   child: Row(
                     children: [
-                      Text(
-                        'Quyền riêng tư bài đăng mặc định',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w700,
-                          color: foreground,
+                      Expanded(
+                        child: Text(
+                          'Quyền riêng tư bài đăng mặc định',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700,
+                            color: foreground,
+                          ),
                         ),
                       ),
-                      const Spacer(),
+                      const SizedBox(width: 8),
                       IconButton(
                         icon: Icon(Icons.close_rounded, size: 20, color: muted),
                         onPressed: () => Navigator.pop(ctx),
@@ -377,7 +411,8 @@ class SettingsScreen extends ConsumerWidget {
                   physics: const NeverScrollableScrollPhysics(),
                   padding: const EdgeInsets.fromLTRB(16, 4, 16, 20),
                   itemCount: visOptions.length,
-                  separatorBuilder: (_, __) => Divider(height: 1, color: border),
+                  separatorBuilder: (_, __) =>
+                      Divider(height: 1, color: border),
                   itemBuilder: (c, i) {
                     final item = visOptions[i];
                     final key = item['key'] as String;
@@ -387,10 +422,13 @@ class SettingsScreen extends ConsumerWidget {
                     final isSelected = key == currentVis.toUpperCase();
 
                     return ListTile(
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 6),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12)),
                       tileColor: isSelected
-                          ? AppColors.primary.withValues(alpha: isDark ? 0.15 : 0.08)
+                          ? AppColors.primary
+                              .withValues(alpha: isDark ? 0.15 : 0.08)
                           : Colors.transparent,
                       leading: Container(
                         width: 38,
@@ -398,7 +436,9 @@ class SettingsScreen extends ConsumerWidget {
                         decoration: BoxDecoration(
                           color: isSelected
                               ? AppColors.primary
-                              : (isDark ? AppColors.darkBackground : const Color(0xFFF1F5F9)),
+                              : (isDark
+                                  ? AppColors.darkBackground
+                                  : const Color(0xFFF1F5F9)),
                           borderRadius: BorderRadius.circular(10),
                         ),
                         child: Icon(
@@ -411,7 +451,8 @@ class SettingsScreen extends ConsumerWidget {
                         title,
                         style: TextStyle(
                           fontSize: 14,
-                          fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
+                          fontWeight:
+                              isSelected ? FontWeight.w700 : FontWeight.w600,
                           color: isSelected ? AppColors.primary : foreground,
                         ),
                       ),
@@ -420,7 +461,8 @@ class SettingsScreen extends ConsumerWidget {
                         style: TextStyle(fontSize: 12, color: muted),
                       ),
                       trailing: isSelected
-                          ? const Icon(Icons.check_circle_rounded, color: AppColors.primary, size: 22)
+                          ? const Icon(Icons.check_circle_rounded,
+                              color: AppColors.primary, size: 22)
                           : null,
                       onTap: () async {
                         Navigator.pop(ctx);
@@ -428,9 +470,11 @@ class SettingsScreen extends ConsumerWidget {
                           try {
                             await ref
                                 .read(generalSettingsProvider.notifier)
-                                .updateGeneral(defaultTransactionVisibility: key);
+                                .updateGeneral(
+                                    defaultTransactionVisibility: key);
                             if (context.mounted) {
-                              AppToast.success(context, 'Đã cập nhật quyền riêng tư mặc định: $title');
+                              AppToast.success(context,
+                                  'Đã cập nhật quyền riêng tư mặc định: $title');
                             }
                           } catch (e) {
                             if (context.mounted) {
@@ -457,7 +501,8 @@ class SettingsScreen extends ConsumerWidget {
   ) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final surface = isDark ? AppColors.darkSurface : Colors.white;
-    final foreground = isDark ? AppColors.darkForeground : AppColors.lightForeground;
+    final foreground =
+        isDark ? AppColors.darkForeground : AppColors.lightForeground;
     final muted = isDark ? AppColors.darkMuted : AppColors.lightMuted;
     final border = isDark ? AppColors.darkBorder : AppColors.lightBorder;
 
@@ -465,7 +510,8 @@ class SettingsScreen extends ConsumerWidget {
       {
         'id': 'gemini-1.5-flash',
         'name': 'Gemini 1.5 Flash (Mặc định)',
-        'desc': 'Tối ưu tốc độ cao, nhận diện hóa đơn cực nhanh & miễn phí hạn mức',
+        'desc':
+            'Tối ưu tốc độ cao, nhận diện hóa đơn cực nhanh & miễn phí hạn mức',
       },
       {
         'id': 'gemini-2.0-flash',
@@ -475,7 +521,8 @@ class SettingsScreen extends ConsumerWidget {
       {
         'id': 'gemini-1.5-pro',
         'name': 'Gemini 1.5 Pro (Chuyên sâu)',
-        'desc': 'Khả năng tư duy logic và phân tích xu hướng tài chính chuyên sâu',
+        'desc':
+            'Khả năng tư duy logic và phân tích xu hướng tài chính chuyên sâu',
       },
     ];
 
@@ -508,17 +555,22 @@ class SettingsScreen extends ConsumerWidget {
                   padding: const EdgeInsets.fromLTRB(20, 4, 20, 10),
                   child: Row(
                     children: [
-                      const Icon(Icons.auto_awesome_rounded, color: AppColors.primary, size: 20),
+                      const Icon(Icons.auto_awesome_rounded,
+                          color: AppColors.primary, size: 20),
                       const SizedBox(width: 8),
-                      Text(
-                        'Chọn mô hình Google Gemini',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w700,
-                          color: foreground,
+                      Expanded(
+                        child: Text(
+                          'Chọn mô hình Google Gemini',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700,
+                            color: foreground,
+                          ),
                         ),
                       ),
-                      const Spacer(),
+                      const SizedBox(width: 8),
                       IconButton(
                         icon: Icon(Icons.close_rounded, size: 20, color: muted),
                         onPressed: () => Navigator.pop(ctx),
@@ -531,25 +583,31 @@ class SettingsScreen extends ConsumerWidget {
                   physics: const NeverScrollableScrollPhysics(),
                   padding: const EdgeInsets.fromLTRB(16, 4, 16, 20),
                   itemCount: models.length,
-                  separatorBuilder: (_, __) => Divider(height: 1, color: border),
+                  separatorBuilder: (_, __) =>
+                      Divider(height: 1, color: border),
                   itemBuilder: (c, i) {
                     final item = models[i];
                     final modelId = item['id']!;
                     final modelName = item['name']!;
                     final modelDesc = item['desc']!;
-                    final isSelected = (currentModel == null && i == 0) || currentModel == modelId;
+                    final isSelected = (currentModel == null && i == 0) ||
+                        currentModel == modelId;
 
                     return ListTile(
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 6),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12)),
                       tileColor: isSelected
-                          ? AppColors.primary.withValues(alpha: isDark ? 0.15 : 0.08)
+                          ? AppColors.primary
+                              .withValues(alpha: isDark ? 0.15 : 0.08)
                           : Colors.transparent,
                       title: Text(
                         modelName,
                         style: TextStyle(
                           fontSize: 14,
-                          fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
+                          fontWeight:
+                              isSelected ? FontWeight.w700 : FontWeight.w600,
                           color: isSelected ? AppColors.primary : foreground,
                         ),
                       ),
@@ -558,7 +616,8 @@ class SettingsScreen extends ConsumerWidget {
                         style: TextStyle(fontSize: 12, color: muted),
                       ),
                       trailing: isSelected
-                          ? const Icon(Icons.check_circle_rounded, color: AppColors.primary, size: 22)
+                          ? const Icon(Icons.check_circle_rounded,
+                              color: AppColors.primary, size: 22)
                           : null,
                       onTap: () async {
                         Navigator.pop(ctx);
@@ -568,7 +627,8 @@ class SettingsScreen extends ConsumerWidget {
                                 .read(aiSettingsProvider.notifier)
                                 .updateAiSettings(model: modelId);
                             if (context.mounted) {
-                              AppToast.success(context, 'Đã chọn mô hình: $modelId');
+                              AppToast.success(
+                                  context, 'Đã chọn mô hình: $modelId');
                             }
                           } catch (e) {
                             if (context.mounted) {
@@ -595,7 +655,8 @@ class SettingsScreen extends ConsumerWidget {
   ) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final surface = isDark ? AppColors.darkSurface : Colors.white;
-    final foreground = isDark ? AppColors.darkForeground : AppColors.lightForeground;
+    final foreground =
+        isDark ? AppColors.darkForeground : AppColors.lightForeground;
     final muted = isDark ? AppColors.darkMuted : AppColors.lightMuted;
     final border = isDark ? AppColors.darkBorder : AppColors.lightBorder;
 
@@ -617,7 +678,8 @@ class SettingsScreen extends ConsumerWidget {
               child: Container(
                 decoration: BoxDecoration(
                   color: surface,
-                  borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+                  borderRadius:
+                      const BorderRadius.vertical(top: Radius.circular(24)),
                 ),
                 child: SafeArea(
                   top: false,
@@ -645,7 +707,8 @@ class SettingsScreen extends ConsumerWidget {
                               width: 36,
                               height: 36,
                               decoration: BoxDecoration(
-                                color: const Color(0xFF0284C7).withValues(alpha: 0.15),
+                                color: const Color(0xFF0284C7)
+                                    .withValues(alpha: 0.15),
                                 borderRadius: BorderRadius.circular(10),
                               ),
                               child: const Icon(
@@ -669,13 +732,15 @@ class SettingsScreen extends ConsumerWidget {
                                   ),
                                   Text(
                                     'Dành cho: Google Gemini API (Miễn phí 100%)',
-                                    style: TextStyle(fontSize: 12, color: muted),
+                                    style:
+                                        TextStyle(fontSize: 12, color: muted),
                                   ),
                                 ],
                               ),
                             ),
                             IconButton(
-                              icon: Icon(Icons.close_rounded, size: 20, color: muted),
+                              icon: Icon(Icons.close_rounded,
+                                  size: 20, color: muted),
                               onPressed: () => Navigator.pop(ctx),
                             ),
                           ],
@@ -684,7 +749,9 @@ class SettingsScreen extends ConsumerWidget {
                         Container(
                           padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
-                            color: isDark ? AppColors.darkBackground : const Color(0xFFF8FAFC),
+                            color: isDark
+                                ? AppColors.darkBackground
+                                : const Color(0xFFF8FAFC),
                             borderRadius: BorderRadius.circular(12),
                             border: Border.all(color: border),
                           ),
@@ -696,14 +763,17 @@ class SettingsScreen extends ConsumerWidget {
                                   const Icon(Icons.lightbulb_outline_rounded,
                                       size: 16, color: AppColors.primary),
                                   const SizedBox(width: 6),
-                                  Text(
+                                  Flexible(
+                                      child: Text(
                                     'Cách lấy Google Gemini API Key miễn phí:',
                                     style: TextStyle(
                                       fontSize: 12.5,
                                       fontWeight: FontWeight.w700,
                                       color: foreground,
                                     ),
-                                  ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  )),
                                 ],
                               ),
                               const SizedBox(height: 6),
@@ -734,13 +804,19 @@ class SettingsScreen extends ConsumerWidget {
                           controller: keyCtrl,
                           obscureText: obscure,
                           autofocus: true,
-                          style: TextStyle(fontSize: 13.5, color: foreground, fontFamily: 'monospace'),
+                          style: TextStyle(
+                              fontSize: 13.5,
+                              color: foreground,
+                              fontFamily: 'monospace'),
                           decoration: InputDecoration(
                             hintText: 'AIzaSy...',
                             hintStyle: TextStyle(fontSize: 13, color: muted),
                             filled: true,
-                            fillColor: isDark ? AppColors.darkBackground : const Color(0xFFF1F5F9),
-                            contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                            fillColor: isDark
+                                ? AppColors.darkBackground
+                                : const Color(0xFFF1F5F9),
+                            contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 14, vertical: 12),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(14),
                               borderSide: BorderSide(color: border),
@@ -751,22 +827,27 @@ class SettingsScreen extends ConsumerWidget {
                             ),
                             focusedBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(14),
-                              borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
+                              borderSide: const BorderSide(
+                                  color: AppColors.primary, width: 1.5),
                             ),
                             suffixIcon: IconButton(
                               icon: Icon(
-                                obscure ? Icons.visibility_off_rounded : Icons.visibility_rounded,
+                                obscure
+                                    ? Icons.visibility_off_rounded
+                                    : Icons.visibility_rounded,
                                 size: 18,
                                 color: muted,
                               ),
-                              onPressed: () => setModalState(() => obscure = !obscure),
+                              onPressed: () =>
+                                  setModalState(() => obscure = !obscure),
                             ),
                           ),
                         ),
                         const SizedBox(height: 12),
                         Row(
                           children: [
-                            const Icon(Icons.shield_outlined, size: 14, color: AppColors.success),
+                            const Icon(Icons.shield_outlined,
+                                size: 14, color: AppColors.success),
                             const SizedBox(width: 6),
                             Expanded(
                               child: Text(
@@ -785,24 +866,28 @@ class SettingsScreen extends ConsumerWidget {
                               backgroundColor: AppColors.primary,
                               foregroundColor: Colors.white,
                               elevation: 0,
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(14)),
                             ),
                             onPressed: isSaving
                                 ? null
                                 : () async {
                                     final val = keyCtrl.text.trim();
                                     if (val.isEmpty) {
-                                      AppToast.warning(context, 'Vui lòng nhập API Key');
+                                      AppToast.warning(
+                                          context, 'Vui lòng nhập API Key');
                                       return;
                                     }
                                     setModalState(() => isSaving = true);
                                     try {
                                       await ref
                                           .read(aiSettingsProvider.notifier)
-                                          .updateAiSettings(provider: 'GEMINI', apiKey: val);
+                                          .updateAiSettings(
+                                              provider: 'GEMINI', apiKey: val);
                                       if (context.mounted) {
                                         Navigator.pop(ctx);
-                                        AppToast.success(context, 'Đã lưu Google Gemini API Key thành công!');
+                                        AppToast.success(context,
+                                            'Đã lưu Google Gemini API Key thành công!');
                                       }
                                     } catch (e) {
                                       setModalState(() => isSaving = false);
@@ -815,11 +900,14 @@ class SettingsScreen extends ConsumerWidget {
                                 ? const SizedBox(
                                     width: 20,
                                     height: 20,
-                                    child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                                    child: CircularProgressIndicator(
+                                        color: Colors.white, strokeWidth: 2),
                                   )
                                 : const Text(
                                     'Lưu Gemini API Key',
-                                    style: TextStyle(fontSize: 14.5, fontWeight: FontWeight.w700),
+                                    style: TextStyle(
+                                        fontSize: 14.5,
+                                        fontWeight: FontWeight.w700),
                                   ),
                           ),
                         ),
@@ -838,7 +926,8 @@ class SettingsScreen extends ConsumerWidget {
   void _showTextDialog(BuildContext context, String title, String content) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final surface = isDark ? AppColors.darkSurface : Colors.white;
-    final foreground = isDark ? AppColors.darkForeground : AppColors.lightForeground;
+    final foreground =
+        isDark ? AppColors.darkForeground : AppColors.lightForeground;
     final muted = isDark ? AppColors.darkMuted : AppColors.lightMuted;
     final border = isDark ? AppColors.darkBorder : AppColors.lightBorder;
 
@@ -847,7 +936,8 @@ class SettingsScreen extends ConsumerWidget {
       builder: (ctx) => AlertDialog(
         backgroundColor: surface,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: Text(title, style: TextStyle(fontWeight: FontWeight.w700, color: foreground)),
+        title: Text(title,
+            style: TextStyle(fontWeight: FontWeight.w700, color: foreground)),
         content: SingleChildScrollView(
           child: Text(
             content,
@@ -857,7 +947,9 @@ class SettingsScreen extends ConsumerWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('Đã hiểu', style: TextStyle(fontWeight: FontWeight.w700, color: AppColors.primary)),
+            child: const Text('Đã hiểu',
+                style: TextStyle(
+                    fontWeight: FontWeight.w700, color: AppColors.primary)),
           ),
         ],
       ),
@@ -869,7 +961,8 @@ class SettingsScreen extends ConsumerWidget {
     final l10n = AppLocalizations.of(context);
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final bg = isDark ? AppColors.darkBackground : AppColors.lightBackground;
-    final foreground = isDark ? AppColors.darkForeground : AppColors.lightForeground;
+    final foreground =
+        isDark ? AppColors.darkForeground : AppColors.lightForeground;
     final muted = isDark ? AppColors.darkMuted : AppColors.lightMuted;
     final border = isDark ? AppColors.darkBorder : AppColors.lightBorder;
 
@@ -880,7 +973,8 @@ class SettingsScreen extends ConsumerWidget {
       backgroundColor: bg,
       appBar: PageHeader.subPage(
         title: l10n?.settingsTitle ?? 'Cài đặt chung',
-        subtitle: l10n?.settingsSubtitle ?? 'Tiền tệ, ngôn ngữ, AI & hiển thị giao dịch',
+        subtitle: l10n?.settingsSubtitle ??
+            'Tiền tệ, ngôn ngữ, AI & hiển thị giao dịch',
         onBack: () => Navigator.of(context).pop(),
       ),
       body: settingsAsync.when(
@@ -893,11 +987,15 @@ class SettingsScreen extends ConsumerWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(Icons.error_outline_rounded, size: 48, color: AppColors.danger.withValues(alpha: 0.8)),
+                Icon(Icons.error_outline_rounded,
+                    size: 48, color: AppColors.danger.withValues(alpha: 0.8)),
                 const SizedBox(height: 12),
                 Text(
                   'Không thể tải cài đặt chung',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: foreground),
+                  style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700,
+                      color: foreground),
                 ),
                 const SizedBox(height: 6),
                 Text(
@@ -913,7 +1011,8 @@ class SettingsScreen extends ConsumerWidget {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
                     foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12)),
                   ),
                 ),
               ],
@@ -925,11 +1024,18 @@ class SettingsScreen extends ConsumerWidget {
 
           final currencyMatch = supportedCurrencies.firstWhere(
             (c) => c['code'] == settings.defaultCurrency,
-            orElse: () => {'code': settings.defaultCurrency, 'name': 'Tiền tệ', 'symbol': settings.defaultCurrency},
+            orElse: () => {
+              'code': settings.defaultCurrency,
+              'name': 'Tiền tệ',
+              'symbol': settings.defaultCurrency
+            },
           );
 
-          final langLabel = settings.language.toLowerCase() == 'en' ? 'English (US)' : 'Tiếng Việt';
-          final langFlag = settings.language.toLowerCase() == 'en' ? '🇺🇸' : '🇻🇳';
+          final langLabel = settings.language.toLowerCase() == 'en'
+              ? 'English (US)'
+              : 'Tiếng Việt';
+          final langFlag =
+              settings.language.toLowerCase() == 'en' ? '🇺🇸' : '🇻🇳';
 
           final visLabel = settings.defaultTransactionVisibility == 'FRIENDS'
               ? 'Bạn bè (Friends)'
@@ -946,7 +1052,8 @@ class SettingsScreen extends ConsumerWidget {
                 child: Column(
                   children: [
                     InkWell(
-                      onTap: () => _showCurrencyPicker(context, ref, settings.defaultCurrency),
+                      onTap: () => _showCurrencyPicker(
+                          context, ref, settings.defaultCurrency),
                       borderRadius: BorderRadius.circular(10),
                       child: Padding(
                         padding: const EdgeInsets.symmetric(vertical: 4),
@@ -963,7 +1070,8 @@ class SettingsScreen extends ConsumerWidget {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    l10n?.settingsCurrency ?? 'Đơn vị tiền tệ chính',
+                                    l10n?.settingsCurrency ??
+                                        'Đơn vị tiền tệ chính',
                                     style: TextStyle(
                                       fontSize: 14,
                                       fontWeight: FontWeight.w600,
@@ -975,34 +1083,42 @@ class SettingsScreen extends ConsumerWidget {
                                     settings.language.toLowerCase() == 'en'
                                         ? 'Base currency displayed on wallets, budgets & reports'
                                         : 'Đơn vị gốc hiển thị trên ví, ngân sách & báo cáo',
-                                    style: TextStyle(fontSize: 12, color: muted),
+                                    style:
+                                        TextStyle(fontSize: 12, color: muted),
                                   ),
                                 ],
                               ),
                             ),
                             const SizedBox(width: 8),
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 10, vertical: 5),
                               decoration: BoxDecoration(
-                                color: AppColors.primary.withValues(alpha: isDark ? 0.2 : 0.1),
+                                color: AppColors.primary
+                                    .withValues(alpha: isDark ? 0.2 : 0.1),
                                 borderRadius: BorderRadius.circular(8),
                                 border: Border.all(
-                                  color: AppColors.primary.withValues(alpha: 0.3),
+                                  color:
+                                      AppColors.primary.withValues(alpha: 0.3),
                                 ),
                               ),
                               child: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  Text(
+                                  Flexible(
+                                      child: Text(
                                     '${currencyMatch['code']} (${currencyMatch['symbol']})',
                                     style: const TextStyle(
                                       fontSize: 12.5,
                                       fontWeight: FontWeight.w700,
                                       color: AppColors.primary,
                                     ),
-                                  ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  )),
                                   const SizedBox(width: 4),
-                                  const Icon(Icons.arrow_drop_down_rounded, size: 18, color: AppColors.primary),
+                                  const Icon(Icons.arrow_drop_down_rounded,
+                                      size: 18, color: AppColors.primary),
                                 ],
                               ),
                             ),
@@ -1012,7 +1128,8 @@ class SettingsScreen extends ConsumerWidget {
                     ),
                     const Divider(height: 18),
                     InkWell(
-                      onTap: () => _showLanguagePicker(context, ref, settings.language),
+                      onTap: () =>
+                          _showLanguagePicker(context, ref, settings.language),
                       borderRadius: BorderRadius.circular(10),
                       child: Padding(
                         padding: const EdgeInsets.symmetric(vertical: 4),
@@ -1029,7 +1146,8 @@ class SettingsScreen extends ConsumerWidget {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    l10n?.settingsLanguage ?? 'Ngôn ngữ hiển thị',
+                                    l10n?.settingsLanguage ??
+                                        'Ngôn ngữ hiển thị',
                                     style: TextStyle(
                                       fontSize: 14,
                                       fontWeight: FontWeight.w600,
@@ -1041,35 +1159,47 @@ class SettingsScreen extends ConsumerWidget {
                                     settings.language.toLowerCase() == 'en'
                                         ? 'Language for all Finora interface screens'
                                         : 'Ngôn ngữ toàn bộ giao diện Finora',
-                                    style: TextStyle(fontSize: 12, color: muted),
+                                    style:
+                                        TextStyle(fontSize: 12, color: muted),
                                   ),
                                 ],
                               ),
                             ),
                             const SizedBox(width: 8),
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                              decoration: BoxDecoration(
-                                color: isDark ? AppColors.darkBackground : const Color(0xFFF1F5F9),
-                                borderRadius: BorderRadius.circular(8),
-                                border: Border.all(color: border),
-                              ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Text(langFlag, style: const TextStyle(fontSize: 13)),
-                                  const SizedBox(width: 5),
-                                  Text(
-                                    langLabel,
-                                    style: TextStyle(
-                                      fontSize: 12.5,
-                                      fontWeight: FontWeight.w600,
-                                      color: foreground,
+                            Flexible(
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 10, vertical: 5),
+                                decoration: BoxDecoration(
+                                  color: isDark
+                                      ? AppColors.darkBackground
+                                      : const Color(0xFFF1F5F9),
+                                  borderRadius: BorderRadius.circular(8),
+                                  border: Border.all(color: border),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text(langFlag,
+                                        style: const TextStyle(fontSize: 13)),
+                                    const SizedBox(width: 5),
+                                    Flexible(
+                                      child: Text(
+                                        langLabel,
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: TextStyle(
+                                          fontSize: 12.5,
+                                          fontWeight: FontWeight.w600,
+                                          color: foreground,
+                                        ),
+                                      ),
                                     ),
-                                  ),
-                                  const SizedBox(width: 4),
-                                  Icon(Icons.arrow_drop_down_rounded, size: 18, color: muted),
-                                ],
+                                    const SizedBox(width: 4),
+                                    Icon(Icons.arrow_drop_down_rounded,
+                                        size: 18, color: muted),
+                                  ],
+                                ),
                               ),
                             ),
                           ],
@@ -1082,17 +1212,21 @@ class SettingsScreen extends ConsumerWidget {
 
               // ── 2. CẤU HÌNH MÔ HÌNH AI & API KEY (GOOGLE GEMINI) ──
               FormCard(
-                title: l10n?.settingsAiConfig ?? 'Mô hình AI & API Key (Google Gemini)',
+                title: l10n?.settingsAiConfig ??
+                    'Mô hình AI & API Key (Google Gemini)',
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // Provider Badge (Google Gemini Only)
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 10),
                       decoration: BoxDecoration(
-                        color: AppColors.primary.withValues(alpha: isDark ? 0.18 : 0.08),
+                        color: AppColors.primary
+                            .withValues(alpha: isDark ? 0.18 : 0.08),
                         borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: AppColors.primary.withValues(alpha: 0.25)),
+                        border: Border.all(
+                            color: AppColors.primary.withValues(alpha: 0.25)),
                       ),
                       child: Row(
                         children: [
@@ -1133,9 +1267,11 @@ class SettingsScreen extends ConsumerWidget {
                             ),
                           ),
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3.5),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 8, vertical: 3.5),
                             decoration: BoxDecoration(
-                              color: const Color(0xFF10B981).withValues(alpha: 0.15),
+                              color: const Color(0xFF10B981)
+                                  .withValues(alpha: 0.15),
                               borderRadius: BorderRadius.circular(6),
                             ),
                             child: const Text(
@@ -1184,13 +1320,18 @@ class SettingsScreen extends ConsumerWidget {
                                   ),
                                   const SizedBox(height: 2),
                                   Text(
-                                    aiSettings.model ?? 'gemini-1.5-flash (Mặc định)',
-                                    style: const TextStyle(fontSize: 12, color: AppColors.primary, fontWeight: FontWeight.w600),
+                                    aiSettings.model ??
+                                        'gemini-1.5-flash (Mặc định)',
+                                    style: const TextStyle(
+                                        fontSize: 12,
+                                        color: AppColors.primary,
+                                        fontWeight: FontWeight.w600),
                                   ),
                                 ],
                               ),
                             ),
-                            Icon(Icons.arrow_drop_down_rounded, size: 20, color: muted),
+                            Icon(Icons.arrow_drop_down_rounded,
+                                size: 20, color: muted),
                           ],
                         ),
                       ),
@@ -1202,8 +1343,11 @@ class SettingsScreen extends ConsumerWidget {
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
                         color: aiSettings.hasCustomApiKey
-                            ? const Color(0xFF10B981).withValues(alpha: isDark ? 0.12 : 0.08)
-                            : (isDark ? AppColors.darkBackground : const Color(0xFFF8FAFC)),
+                            ? const Color(0xFF10B981)
+                                .withValues(alpha: isDark ? 0.12 : 0.08)
+                            : (isDark
+                                ? AppColors.darkBackground
+                                : const Color(0xFFF8FAFC)),
                         borderRadius: BorderRadius.circular(14),
                         border: Border.all(
                           color: aiSettings.hasCustomApiKey
@@ -1217,9 +1361,13 @@ class SettingsScreen extends ConsumerWidget {
                           Row(
                             children: [
                               Icon(
-                                aiSettings.hasCustomApiKey ? Icons.verified_rounded : Icons.cloud_done_rounded,
+                                aiSettings.hasCustomApiKey
+                                    ? Icons.verified_rounded
+                                    : Icons.cloud_done_rounded,
                                 size: 18,
-                                color: aiSettings.hasCustomApiKey ? const Color(0xFF10B981) : muted,
+                                color: aiSettings.hasCustomApiKey
+                                    ? const Color(0xFF10B981)
+                                    : muted,
                               ),
                               const SizedBox(width: 8),
                               Expanded(
@@ -1230,18 +1378,24 @@ class SettingsScreen extends ConsumerWidget {
                                   style: TextStyle(
                                     fontSize: 13,
                                     fontWeight: FontWeight.w700,
-                                    color: aiSettings.hasCustomApiKey ? const Color(0xFF10B981) : foreground,
+                                    color: aiSettings.hasCustomApiKey
+                                        ? const Color(0xFF10B981)
+                                        : foreground,
                                   ),
                                 ),
                               ),
                             ],
                           ),
-                          if (aiSettings.hasCustomApiKey && aiSettings.maskedApiKey != null) ...[
+                          if (aiSettings.hasCustomApiKey &&
+                              aiSettings.maskedApiKey != null) ...[
                             const SizedBox(height: 6),
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 8, vertical: 4),
                               decoration: BoxDecoration(
-                                color: isDark ? AppColors.darkSurface : Colors.white,
+                                color: isDark
+                                    ? AppColors.darkSurface
+                                    : Colors.white,
                                 borderRadius: BorderRadius.circular(6),
                                 border: Border.all(color: border),
                               ),
@@ -1259,7 +1413,8 @@ class SettingsScreen extends ConsumerWidget {
                             const SizedBox(height: 4),
                             Text(
                               'Nhập API Key cá nhân để thoải mái hỏi đáp AI và phân tích hoá đơn không giới hạn số lượt mỗi ngày.',
-                              style: TextStyle(fontSize: 11.5, color: muted, height: 1.35),
+                              style: TextStyle(
+                                  fontSize: 11.5, color: muted, height: 1.35),
                             ),
                           ],
                           const SizedBox(height: 10),
@@ -1273,18 +1428,29 @@ class SettingsScreen extends ConsumerWidget {
                                     aiSettings.maskedApiKey,
                                   ),
                                   icon: Icon(
-                                    aiSettings.hasCustomApiKey ? Icons.edit_rounded : Icons.add_rounded,
+                                    aiSettings.hasCustomApiKey
+                                        ? Icons.edit_rounded
+                                        : Icons.add_rounded,
                                     size: 15,
                                     color: AppColors.primary,
                                   ),
                                   label: Text(
-                                    aiSettings.hasCustomApiKey ? 'Đổi API Key' : 'Thêm API Key riêng',
-                                    style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w700, color: AppColors.primary),
+                                    aiSettings.hasCustomApiKey
+                                        ? 'Đổi API Key'
+                                        : 'Thêm API Key riêng',
+                                    style: const TextStyle(
+                                        fontSize: 12.5,
+                                        fontWeight: FontWeight.w700,
+                                        color: AppColors.primary),
                                   ),
                                   style: OutlinedButton.styleFrom(
-                                    padding: const EdgeInsets.symmetric(vertical: 8),
-                                    side: const BorderSide(color: AppColors.primary),
-                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                    padding:
+                                        const EdgeInsets.symmetric(vertical: 8),
+                                    side: const BorderSide(
+                                        color: AppColors.primary),
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(10)),
                                   ),
                                 ),
                               ),
@@ -1305,20 +1471,27 @@ class SettingsScreen extends ConsumerWidget {
                                             .read(aiSettingsProvider.notifier)
                                             .deleteApiKey();
                                         if (context.mounted) {
-                                          AppToast.success(context, 'Đã chuyển về dùng API Key mặc định');
+                                          AppToast.success(context,
+                                              'Đã chuyển về dùng API Key mặc định');
                                         }
                                       } catch (e) {
-                                        if (context.mounted) AppToast.error(context, e);
+                                        if (context.mounted)
+                                          AppToast.error(context, e);
                                       }
                                     }
                                   },
-                                  icon: const Icon(Icons.delete_outline_rounded, size: 15, color: AppColors.danger),
+                                  icon: const Icon(Icons.delete_outline_rounded,
+                                      size: 15, color: AppColors.danger),
                                   label: const Text(
                                     'Xóa Key',
-                                    style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600, color: AppColors.danger),
+                                    style: TextStyle(
+                                        fontSize: 12.5,
+                                        fontWeight: FontWeight.w600,
+                                        color: AppColors.danger),
                                   ),
                                   style: TextButton.styleFrom(
-                                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 10, vertical: 8),
                                   ),
                                 ),
                               ],
@@ -1344,7 +1517,8 @@ class SettingsScreen extends ConsumerWidget {
                         isDark: isDark,
                       ),
                       title: Text(
-                        l10n?.settingsDefaultAmountHidden ?? 'Mặc định ẩn số tiền',
+                        l10n?.settingsDefaultAmountHidden ??
+                            'Mặc định ẩn số tiền',
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
@@ -1360,7 +1534,8 @@ class SettingsScreen extends ConsumerWidget {
                       value: settings.defaultAmountHidden,
                       onChanged: (val) async {
                         try {
-                          await notifier.updateGeneral(defaultAmountHidden: val);
+                          await notifier.updateGeneral(
+                              defaultAmountHidden: val);
                         } catch (e) {
                           if (context.mounted) {
                             AppToast.error(context, e);
@@ -1370,7 +1545,8 @@ class SettingsScreen extends ConsumerWidget {
                     ),
                     const Divider(height: 18),
                     InkWell(
-                      onTap: () => _showVisibilityPicker(context, ref, settings.defaultTransactionVisibility),
+                      onTap: () => _showVisibilityPicker(
+                          context, ref, settings.defaultTransactionVisibility),
                       borderRadius: BorderRadius.circular(10),
                       child: Padding(
                         padding: const EdgeInsets.symmetric(vertical: 4),
@@ -1387,7 +1563,8 @@ class SettingsScreen extends ConsumerWidget {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    l10n?.settingsDefaultVisibility ?? 'Quyền riêng tư bài đăng mặc định',
+                                    l10n?.settingsDefaultVisibility ??
+                                        'Quyền riêng tư bài đăng mặc định',
                                     style: TextStyle(
                                       fontSize: 14,
                                       fontWeight: FontWeight.w600,
@@ -1397,32 +1574,40 @@ class SettingsScreen extends ConsumerWidget {
                                   const SizedBox(height: 2),
                                   Text(
                                     'Phạm vi chia sẻ khi ghi chép giao dịch khoảnh khắc',
-                                    style: TextStyle(fontSize: 12, color: muted),
+                                    style:
+                                        TextStyle(fontSize: 12, color: muted),
                                   ),
                                 ],
                               ),
                             ),
                             const SizedBox(width: 8),
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 10, vertical: 5),
                               decoration: BoxDecoration(
-                                color: isDark ? AppColors.darkBackground : const Color(0xFFF1F5F9),
+                                color: isDark
+                                    ? AppColors.darkBackground
+                                    : const Color(0xFFF1F5F9),
                                 borderRadius: BorderRadius.circular(8),
                                 border: Border.all(color: border),
                               ),
                               child: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  Text(
+                                  Flexible(
+                                      child: Text(
                                     visLabel,
                                     style: TextStyle(
                                       fontSize: 12,
                                       fontWeight: FontWeight.w600,
                                       color: foreground,
                                     ),
-                                  ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  )),
                                   const SizedBox(width: 4),
-                                  Icon(Icons.arrow_drop_down_rounded, size: 18, color: muted),
+                                  Icon(Icons.arrow_drop_down_rounded,
+                                      size: 18, color: muted),
                                 ],
                               ),
                             ),
@@ -1436,21 +1621,31 @@ class SettingsScreen extends ConsumerWidget {
 
               // ── 4. DỮ LIỆU & BỘ NHỚ ĐỆM ──
               FormCard(
-                title: settings.language.toLowerCase() == 'en' ? 'Data & Cache' : 'Dữ liệu & Bộ nhớ',
+                title: settings.language.toLowerCase() == 'en'
+                    ? 'Data & Cache'
+                    : 'Dữ liệu & Bộ nhớ',
                 child: InkWell(
                   onTap: () async {
                     final confirmed = await showConfirmDialog(
                       context,
-                      title: settings.language.toLowerCase() == 'en' ? 'Clear Image Cache?' : 'Xóa bộ nhớ đệm?',
+                      title: settings.language.toLowerCase() == 'en'
+                          ? 'Clear Image Cache?'
+                          : 'Xóa bộ nhớ đệm?',
                       message: settings.language.toLowerCase() == 'en'
                           ? 'This will free up local storage for receipt and avatar images. Your financial data is completely safe.'
                           : 'Hành động này sẽ giải phóng dung lượng ảnh hóa đơn, ảnh đại diện đã tải tạm thời. Dữ liệu tài chính của bạn hoàn toàn an toàn.',
-                      confirmText: settings.language.toLowerCase() == 'en' ? 'Clear Now' : 'Xóa ngay',
+                      confirmText: settings.language.toLowerCase() == 'en'
+                          ? 'Clear Now'
+                          : 'Xóa ngay',
                     );
                     if (confirmed == true && context.mounted) {
                       PaintingBinding.instance.imageCache.clear();
                       PaintingBinding.instance.imageCache.clearLiveImages();
-                      AppToast.success(context, settings.language.toLowerCase() == 'en' ? 'Image cache cleared!' : 'Đã giải phóng bộ nhớ đệm thành công!');
+                      AppToast.success(
+                          context,
+                          settings.language.toLowerCase() == 'en'
+                              ? 'Image cache cleared!'
+                              : 'Đã giải phóng bộ nhớ đệm thành công!');
                     }
                   },
                   borderRadius: BorderRadius.circular(10),
@@ -1469,7 +1664,8 @@ class SettingsScreen extends ConsumerWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                l10n?.settingsClearCache ?? 'Xóa bộ nhớ đệm (Clear Cache)',
+                                l10n?.settingsClearCache ??
+                                    'Xóa bộ nhớ đệm (Clear Cache)',
                                 style: TextStyle(
                                   fontSize: 14,
                                   fontWeight: FontWeight.w600,
@@ -1486,7 +1682,8 @@ class SettingsScreen extends ConsumerWidget {
                             ],
                           ),
                         ),
-                        Icon(Icons.chevron_right_rounded, color: muted, size: 20),
+                        Icon(Icons.chevron_right_rounded,
+                            color: muted, size: 20),
                       ],
                     ),
                   ),
@@ -1529,9 +1726,11 @@ class SettingsScreen extends ConsumerWidget {
                             ),
                           ),
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 8, vertical: 3),
                             decoration: BoxDecoration(
-                              color: const Color(0xFF10B981).withValues(alpha: 0.15),
+                              color: const Color(0xFF10B981)
+                                  .withValues(alpha: 0.15),
                               borderRadius: BorderRadius.circular(6),
                             ),
                             child: const Text(
@@ -1552,10 +1751,10 @@ class SettingsScreen extends ConsumerWidget {
                         context,
                         'Chính sách bảo mật',
                         'Finora cam kết bảo vệ dữ liệu cá nhân và tài chính của người dùng theo tiêu chuẩn an toàn cao nhất.\n\n'
-                        '1. Thu thập dữ liệu: Dữ liệu giao dịch, ví và ngân sách chỉ được dùng để phân tích tài chính cho chính bạn.\n'
-                        '2. Mã hóa: Mật khẩu và mã PIN được mã hóa 1 chiều bằng thuật toán an toàn bcrypt.\n'
-                        '3. Chia sẻ dữ liệu: Finora không bao giờ bán thông tin cá nhân hoặc lịch sử chi tiêu cho bên thứ ba.\n'
-                        '4. Quyền riêng tư: Bạn có toàn quyền thiết lập chế độ riêng tư hoặc xóa tài khoản vĩnh viễn bất kỳ lúc nào.',
+                            '1. Thu thập dữ liệu: Dữ liệu giao dịch, ví và ngân sách chỉ được dùng để phân tích tài chính cho chính bạn.\n'
+                            '2. Mã hóa: Mật khẩu và mã PIN được mã hóa 1 chiều bằng thuật toán an toàn bcrypt.\n'
+                            '3. Chia sẻ dữ liệu: Finora không bao giờ bán thông tin cá nhân hoặc lịch sử chi tiêu cho bên thứ ba.\n'
+                            '4. Quyền riêng tư: Bạn có toàn quyền thiết lập chế độ riêng tư hoặc xóa tài khoản vĩnh viễn bất kỳ lúc nào.',
                       ),
                       borderRadius: BorderRadius.circular(10),
                       child: Padding(
@@ -1570,7 +1769,8 @@ class SettingsScreen extends ConsumerWidget {
                             const SizedBox(width: 12),
                             Expanded(
                               child: Text(
-                                l10n?.settingsPrivacyPolicy ?? 'Chính sách bảo mật dữ liệu',
+                                l10n?.settingsPrivacyPolicy ??
+                                    'Chính sách bảo mật dữ liệu',
                                 style: TextStyle(
                                   fontSize: 14,
                                   fontWeight: FontWeight.w600,
@@ -1578,7 +1778,8 @@ class SettingsScreen extends ConsumerWidget {
                                 ),
                               ),
                             ),
-                            Icon(Icons.chevron_right_rounded, color: muted, size: 20),
+                            Icon(Icons.chevron_right_rounded,
+                                color: muted, size: 20),
                           ],
                         ),
                       ),
@@ -1614,7 +1815,8 @@ class SettingsScreen extends ConsumerWidget {
                                 ),
                               ),
                             ),
-                            Icon(Icons.chevron_right_rounded, color: muted, size: 20),
+                            Icon(Icons.chevron_right_rounded,
+                                color: muted, size: 20),
                           ],
                         ),
                       ),

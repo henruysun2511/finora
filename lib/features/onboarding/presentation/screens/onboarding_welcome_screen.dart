@@ -192,13 +192,16 @@ class OnboardingWelcomeScreen extends StatelessWidget {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Text(
+                              Flexible(
+                                  child: Text(
                                 'Bắt đầu ngay',
                                 style: GoogleFonts.inter(
                                   fontSize: 15,
                                   fontWeight: FontWeight.w700,
                                 ),
-                              ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              )),
                               const SizedBox(width: 8),
                               const LucideIcon(
                                 name: LucideIcons.arrowUpRight,
@@ -212,8 +215,11 @@ class OnboardingWelcomeScreen extends StatelessWidget {
                       const SizedBox(height: 16),
 
                       // Link Đăng nhập
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
+                      Wrap(
+                        alignment: WrapAlignment.center,
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        spacing: 0,
+                        runSpacing: 2,
                         children: [
                           Text(
                             'Đã có tài khoản? ',

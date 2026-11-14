@@ -193,7 +193,8 @@ class _PostCardState extends State<PostCard>
                               controller.clear();
                             });
                           },
-                          icon: const LucideIcon(name: 'send', size: 18, color: AppColors.primary),
+                          icon: const LucideIcon(
+                              name: 'send', size: 18, color: AppColors.primary),
                         ),
                       ],
                     ),
@@ -375,7 +376,8 @@ class _PostCardState extends State<PostCard>
                           size: 19,
                         ),
                         const SizedBox(width: 7),
-                        Text(
+                        Flexible(
+                            child: Text(
                           'THÀNH TỰU TIẾT KIỆM',
                           style: GoogleFonts.inter(
                             fontSize: 10,
@@ -385,7 +387,9 @@ class _PostCardState extends State<PostCard>
                                 ? const Color(0xFFE5D6FF)
                                 : const Color(0xFF7957B8),
                           ),
-                        ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        )),
                       ],
                     ),
                     const SizedBox(height: 11),

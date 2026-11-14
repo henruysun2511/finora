@@ -47,7 +47,8 @@ class BudgetPeriodFilterTabs extends StatelessWidget {
                         : (isDark ? AppColors.darkMuted : AppColors.lightMuted),
                   ),
                   const SizedBox(width: 4),
-                  Text(
+                  Flexible(
+                      child: Text(
                     tab.$2,
                     style: TextStyle(
                       fontSize: 13,
@@ -59,7 +60,9 @@ class BudgetPeriodFilterTabs extends StatelessWidget {
                               ? AppColors.darkForeground
                               : AppColors.lightForeground),
                     ),
-                  ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  )),
                 ],
               ),
               selected: isSelected,

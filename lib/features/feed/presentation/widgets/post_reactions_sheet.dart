@@ -111,14 +111,17 @@ class _PostReactionsSheetState extends State<PostReactionsSheet> {
               padding: const EdgeInsets.fromLTRB(20, 16, 20, 12),
               child: Row(
                 children: [
-                  Text(
-                    'Danh sách tương tác',
-                    style: theme.textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w700,
-                      color: foreground,
+                  Expanded(
+                    child: Text(
+                      'Danh sách tương tác',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w700,
+                        color: foreground,
+                      ),
                     ),
                   ),
-                  const Spacer(),
                   if (!_isLoading && _reactions.isNotEmpty)
                     Container(
                       padding: const EdgeInsets.symmetric(

@@ -78,22 +78,29 @@ class MascotPersonaSheet extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Row(
-                    children: [
-                      const Icon(Icons.auto_awesome_rounded,
-                          color: Color(0xFFF59E0B), size: 20),
-                      const SizedBox(width: 8),
-                      Text(
-                        'AI MASCOT ĐỒNG HÀNH',
-                        style: GoogleFonts.inter(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w800,
-                          letterSpacing: 0.8,
-                          color: const Color(0xFFF59E0B),
+                  Expanded(
+                    child: Row(
+                      children: [
+                        const Icon(Icons.auto_awesome_rounded,
+                            color: Color(0xFFF59E0B), size: 20),
+                        const SizedBox(width: 8),
+                        Flexible(
+                          child: Text(
+                            'AI MASCOT ĐỒNG HÀNH',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: GoogleFonts.inter(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w800,
+                              letterSpacing: 0.8,
+                              color: const Color(0xFFF59E0B),
+                            ),
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
+                  const SizedBox(width: 8),
                   IconButton(
                     onPressed: () => Navigator.pop(context),
                     icon: const Icon(Icons.close_rounded, size: 20),

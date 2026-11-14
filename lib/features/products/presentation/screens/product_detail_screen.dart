@@ -154,7 +154,10 @@ class _DetailBody extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
+              Wrap(
+                spacing: 8,
+                runSpacing: 6,
+                crossAxisAlignment: WrapCrossAlignment.center,
                 children: [
                   Container(
                     padding: const EdgeInsets.symmetric(
@@ -174,7 +177,6 @@ class _DetailBody extends StatelessWidget {
                       ),
                     ),
                   ),
-                  const SizedBox(width: 8),
                   Container(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 8,
@@ -211,14 +213,17 @@ class _DetailBody extends StatelessWidget {
               const SizedBox(height: 8),
               Row(
                 children: [
-                  Text(
+                  Flexible(
+                      child: Text(
                     CurrencyFormatter.formatVnd(product.price),
                     style: const TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.w800,
                       color: AppColors.orange,
                     ),
-                  ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  )),
                   const SizedBox(width: 12),
                   StockBadge(product: product),
                 ],
@@ -257,11 +262,16 @@ class _DetailBody extends StatelessWidget {
                 value: product.sku.isNotEmpty ? product.sku : 'Chưa có SKU',
               ),
               const Divider(height: 18),
-              _InfoRow(label: 'Số lượng tồn kho', value: '${product.stock} đơn vị'),
+              _InfoRow(
+                  label: 'Số lượng tồn kho', value: '${product.stock} đơn vị'),
               const Divider(height: 18),
-              _InfoRow(label: 'Ngày tạo', value: dateFormat.format(product.createdAt)),
+              _InfoRow(
+                  label: 'Ngày tạo',
+                  value: dateFormat.format(product.createdAt)),
               const Divider(height: 18),
-              _InfoRow(label: 'Cập nhật', value: dateFormat.format(product.updatedAt)),
+              _InfoRow(
+                  label: 'Cập nhật',
+                  value: dateFormat.format(product.updatedAt)),
             ],
           ),
         ),
@@ -326,14 +336,19 @@ class _InfoRow extends StatelessWidget {
             color: isDark ? AppColors.darkMuted : AppColors.lightMuted,
           ),
         ),
-        Text(
-          value,
-          style: TextStyle(
-            fontWeight: FontWeight.w600,
-            fontSize: 13,
-            color: isDark
-                ? AppColors.darkForeground
-                : AppColors.lightForeground,
+        const SizedBox(width: 12),
+        Flexible(
+          child: Text(
+            value,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            textAlign: TextAlign.end,
+            style: TextStyle(
+              fontWeight: FontWeight.w600,
+              fontSize: 13,
+              color:
+                  isDark ? AppColors.darkForeground : AppColors.lightForeground,
+            ),
           ),
         ),
       ],

@@ -52,7 +52,11 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
   ];
 
   final List<Map<String, dynamic>> _iconOptions = [
-    {'key': 'bank', 'icon': Icons.account_balance_rounded, 'label': 'Ngân hàng'},
+    {
+      'key': 'bank',
+      'icon': Icons.account_balance_rounded,
+      'label': 'Ngân hàng'
+    },
     {
       'key': 'wallet',
       'icon': Icons.account_balance_wallet_rounded,
@@ -546,8 +550,10 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
                               ),
                             ),
                             items: const [
-                              DropdownMenuItem(value: 'VND', child: Text('₫ VND')),
-                              DropdownMenuItem(value: 'USD', child: Text('\$ USD')),
+                              DropdownMenuItem(
+                                  value: 'VND', child: Text('₫ VND')),
+                              DropdownMenuItem(
+                                  value: 'USD', child: Text('\$ USD')),
                             ],
                             onChanged: (val) {
                               if (val != null) {
@@ -595,7 +601,8 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
                                     horizontal: 12, vertical: 8),
                                 decoration: BoxDecoration(
                                   color: isSel
-                                      ? AppColors.primary.withValues(alpha: 0.15)
+                                      ? AppColors.primary
+                                          .withValues(alpha: 0.15)
                                       : (isDark
                                           ? AppColors.darkBackground
                                           : const Color(0xFFF1F5F9)),
@@ -620,7 +627,8 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
                                               : AppColors.lightMuted),
                                     ),
                                     const SizedBox(width: 6),
-                                    Text(
+                                    Flexible(
+                                        child: Text(
                                       opt['label'] as String,
                                       style: GoogleFonts.inter(
                                         fontSize: 12,
@@ -633,7 +641,9 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
                                                 ? AppColors.darkForeground
                                                 : AppColors.lightForeground),
                                       ),
-                                    ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    )),
                                   ],
                                 ),
                               ),
@@ -656,10 +666,10 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
                     const SizedBox(height: 8),
                     Row(
                       children: _colors.map((c) {
-                        final isSel = c.toLowerCase() ==
-                            _selectedColor.toLowerCase();
-                        final colorVal = Color(
-                            int.parse('0xFF${c.replaceAll('#', '')}'));
+                        final isSel =
+                            c.toLowerCase() == _selectedColor.toLowerCase();
+                        final colorVal =
+                            Color(int.parse('0xFF${c.replaceAll('#', '')}'));
                         return GestureDetector(
                           onTap: () => setState(() => _selectedColor = c),
                           child: Container(
@@ -670,16 +680,14 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
                               color: colorVal,
                               shape: BoxShape.circle,
                               border: Border.all(
-                                color: isSel
-                                    ? Colors.white
-                                    : Colors.transparent,
+                                color:
+                                    isSel ? Colors.white : Colors.transparent,
                                 width: 2.5,
                               ),
                               boxShadow: isSel
                                   ? [
                                       BoxShadow(
-                                        color:
-                                            colorVal.withValues(alpha: 0.5),
+                                        color: colorVal.withValues(alpha: 0.5),
                                         blurRadius: 8,
                                         offset: const Offset(0, 2),
                                       ),

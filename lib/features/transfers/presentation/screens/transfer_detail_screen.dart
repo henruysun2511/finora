@@ -216,25 +216,32 @@ class TransferDetailScreen extends ConsumerWidget {
                                 : AppColors.lightMuted,
                           ),
                         ),
-                        Row(
-                          children: [
-                            Text(
-                              transfer.id.length > 12
-                                  ? '${transfer.id.substring(0, 8)}...'
-                                  : transfer.id,
-                              style: GoogleFonts.inter(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w700,
+                        Flexible(
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Flexible(
+                                child: Text(
+                                  transfer.id.length > 12
+                                      ? '${transfer.id.substring(0, 8)}...'
+                                      : transfer.id,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: GoogleFonts.inter(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w700,
+                                    color: AppColors.primary,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 4),
+                              const Icon(
+                                Icons.copy_rounded,
+                                size: 14,
                                 color: AppColors.primary,
                               ),
-                            ),
-                            const SizedBox(width: 4),
-                            const Icon(
-                              Icons.copy_rounded,
-                              size: 14,
-                              color: AppColors.primary,
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ],
                     ),
@@ -263,14 +270,20 @@ class TransferDetailScreen extends ConsumerWidget {
             color: isDark ? AppColors.darkMuted : AppColors.lightMuted,
           ),
         ),
-        Text(
-          value,
-          style: GoogleFonts.inter(
-            fontSize: 13.5,
-            fontWeight: FontWeight.w700,
-            color: isDark
-                ? AppColors.darkForeground
-                : AppColors.lightForeground,
+        const SizedBox(width: 12),
+        Flexible(
+          child: Text(
+            value,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            textAlign: TextAlign.end,
+            style: GoogleFonts.inter(
+              fontSize: 13.5,
+              fontWeight: FontWeight.w700,
+              color: isDark
+                  ? AppColors.darkForeground
+                  : AppColors.lightForeground,
+            ),
           ),
         ),
       ],

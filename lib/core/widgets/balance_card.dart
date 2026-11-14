@@ -106,7 +106,8 @@ class _BalanceCardState extends State<BalanceCard> {
                             ),
                             const SizedBox(width: 8),
                             InkWell(
-                              onTap: () => setState(() => _isHidden = !_isHidden),
+                              onTap: () =>
+                                  setState(() => _isHidden = !_isHidden),
                               borderRadius: BorderRadius.circular(12),
                               child: Padding(
                                 padding: const EdgeInsets.all(4),
@@ -137,12 +138,20 @@ class _BalanceCardState extends State<BalanceCard> {
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            const Text('👑', style: TextStyle(fontSize: 11)),
+                            Flexible(
+                                child: const Text('👑',
+                                    style: TextStyle(fontSize: 11),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis)),
                             const SizedBox(width: 4),
-                            Text(
+                            Flexible(
+                                child: Text(
                               widget.tierTitle,
-                              style: AppTextStyles.labelSmall(color: Colors.white),
-                            ),
+                              style:
+                                  AppTextStyles.labelSmall(color: Colors.white),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            )),
                           ],
                         ),
                       ),
@@ -158,7 +167,8 @@ class _BalanceCardState extends State<BalanceCard> {
                       _isHidden
                           ? '•••••••• ₫'
                           : CurrencyFormatter.format(widget.netWorth),
-                      style: AppTextStyles.amountHero(color: Colors.white).copyWith(
+                      style: AppTextStyles.amountHero(color: Colors.white)
+                          .copyWith(
                         fontSize: 33,
                         letterSpacing: -1.2,
                       ),
@@ -207,8 +217,11 @@ class _BalanceCardState extends State<BalanceCard> {
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
                                       style: AppTextStyles.bodySmall(
-                                        color: Colors.white.withValues(alpha: 0.75),
-                                      ).copyWith(fontSize: 10.5, fontWeight: FontWeight.w600),
+                                        color: Colors.white
+                                            .withValues(alpha: 0.75),
+                                      ).copyWith(
+                                          fontSize: 10.5,
+                                          fontWeight: FontWeight.w600),
                                     ),
                                     const SizedBox(height: 1),
                                     FittedBox(
@@ -219,8 +232,11 @@ class _BalanceCardState extends State<BalanceCard> {
                                             ? '••••••'
                                             : '+${CurrencyFormatter.format(widget.monthlyIncome)}',
                                         maxLines: 1,
-                                        style: AppTextStyles.titleSmall(color: Colors.white)
-                                            .copyWith(fontSize: 13.5, fontWeight: FontWeight.w800),
+                                        style: AppTextStyles.titleSmall(
+                                                color: Colors.white)
+                                            .copyWith(
+                                                fontSize: 13.5,
+                                                fontWeight: FontWeight.w800),
                                       ),
                                     ),
                                   ],
@@ -259,8 +275,11 @@ class _BalanceCardState extends State<BalanceCard> {
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
                                       style: AppTextStyles.bodySmall(
-                                        color: Colors.white.withValues(alpha: 0.75),
-                                      ).copyWith(fontSize: 10.5, fontWeight: FontWeight.w600),
+                                        color: Colors.white
+                                            .withValues(alpha: 0.75),
+                                      ).copyWith(
+                                          fontSize: 10.5,
+                                          fontWeight: FontWeight.w600),
                                     ),
                                     const SizedBox(height: 1),
                                     FittedBox(
@@ -271,8 +290,11 @@ class _BalanceCardState extends State<BalanceCard> {
                                             ? '••••••'
                                             : '-${CurrencyFormatter.format(widget.monthlyExpense)}',
                                         maxLines: 1,
-                                        style: AppTextStyles.titleSmall(color: Colors.white)
-                                            .copyWith(fontSize: 13.5, fontWeight: FontWeight.w800),
+                                        style: AppTextStyles.titleSmall(
+                                                color: Colors.white)
+                                            .copyWith(
+                                                fontSize: 13.5,
+                                                fontWeight: FontWeight.w800),
                                       ),
                                     ),
                                   ],

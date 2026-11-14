@@ -80,7 +80,8 @@ class MonthStatBanner extends StatelessWidget {
                             ),
                           ),
                           const SizedBox(width: 6),
-                          Text(
+                          Flexible(
+                              child: Text(
                             'TỔNG THU',
                             style: GoogleFonts.inter(
                               fontSize: 10.5,
@@ -88,7 +89,9 @@ class MonthStatBanner extends StatelessWidget {
                               color: muted,
                               letterSpacing: 0.6,
                             ),
-                          ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          )),
                         ],
                       ),
                       const SizedBox(height: 6),
@@ -135,7 +138,8 @@ class MonthStatBanner extends StatelessWidget {
                             ),
                           ),
                           const SizedBox(width: 6),
-                          Text(
+                          Flexible(
+                              child: Text(
                             'TỔNG CHI',
                             style: GoogleFonts.inter(
                               fontSize: 10.5,
@@ -143,7 +147,9 @@ class MonthStatBanner extends StatelessWidget {
                               color: muted,
                               letterSpacing: 0.6,
                             ),
-                          ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          )),
                         ],
                       ),
                       const SizedBox(height: 6),
@@ -172,14 +178,19 @@ class MonthStatBanner extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                'Thặng dư ròng tháng:',
-                style: GoogleFonts.inter(
-                  fontSize: 12.5,
-                  fontWeight: FontWeight.w600,
-                  color: muted,
+              Expanded(
+                child: Text(
+                  'Thặng dư ròng tháng:',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: GoogleFonts.inter(
+                    fontSize: 12.5,
+                    fontWeight: FontWeight.w600,
+                    color: muted,
+                  ),
                 ),
               ),
+              const SizedBox(width: 8),
               Text(
                 '${isNetPositive ? '+' : '-'}₫ ${_formatCurrency(netAmount.abs())}',
                 style: GoogleFonts.outfit(
@@ -195,4 +206,3 @@ class MonthStatBanner extends StatelessWidget {
     );
   }
 }
-

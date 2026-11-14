@@ -1,6 +1,6 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 
-import '../../transfers/presentation/screens/transfer_form_screen.dart';
+import '../../../transfers/presentation/screens/transfer_form_screen.dart';
 
 /// Legacy screen wrapper delegating to [TransferFormScreen]
 class TransferScreen extends StatelessWidget {

@@ -36,12 +36,18 @@ class TransactionDetailBalanceCard extends StatelessWidget {
               color: muted,
             ),
           ),
-          Text(
-            '₫ $formatted',
-            style: GoogleFonts.outfit(
-              fontSize: 15,
-              fontWeight: FontWeight.w800,
-              color: foreground,
+          const SizedBox(width: 12),
+          Flexible(
+            child: Text(
+              '₫ $formatted',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.end,
+              style: GoogleFonts.outfit(
+                fontSize: 15,
+                fontWeight: FontWeight.w800,
+                color: foreground,
+              ),
             ),
           ),
         ],

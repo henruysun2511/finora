@@ -50,7 +50,9 @@ import '../../features/recurring_transaction/presentation/screens/recurring_tran
 import '../../features/transactions/presentation/screens/scan_receipt_screen.dart';
 import '../../features/transactions/presentation/screens/receipt_capture_screen.dart';
 import '../../features/transactions/presentation/screens/transaction_detail_screen.dart';
+import '../../features/transactions/presentation/screens/transaction_success_screen.dart';
 import '../../features/transactions/presentation/screens/transactions_screen.dart';
+import '../../features/transactions/domain/models/transaction_item.dart';
 import '../../features/accounts/domain/models/account_model.dart';
 import '../../features/accounts/presentation/screens/account_detail_screen.dart';
 import '../../features/accounts/presentation/screens/adjust_balance_screen.dart';
@@ -298,6 +300,17 @@ GoRouter appRouter(AppRouterRef ref) {
       ),
       GoRoute(
         parentNavigatorKey: _rootNavigatorKey,
+        path: RoutePaths.transactionSuccess,
+        name: RouteNames.transactionSuccess,
+        builder: (context, state) {
+          final tx = state.extra is TransactionItem
+              ? state.extra as TransactionItem
+              : null;
+          return TransactionSuccessScreen(transaction: tx);
+        },
+      ),
+      GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
         path: RoutePaths.transactionDetail,
         name: RouteNames.transactionDetail,
         builder: (context, state) {
@@ -486,6 +499,20 @@ GoRouter appRouter(AppRouterRef ref) {
           final id = state.pathParameters['id'] ?? '';
           return SplitExpenseDetailScreen(splitId: id);
         },
+      ),
+      // Alias hỗ trợ các thông báo điều hướng từ /splits/:id
+      GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
+        path: '/splits/:id',
+        builder: (context, state) {
+          final id = state.pathParameters['id'] ?? '';
+          return SplitExpenseDetailScreen(splitId: id);
+        },
+      ),
+      GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
+        path: '/splits',
+        builder: (context, state) => const SplitExpensesScreen(),
       ),
 
       // ==========================================

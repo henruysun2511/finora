@@ -63,7 +63,8 @@ class LoanDetailHeroBanner extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(
+              Flexible(
+                  child: Text(
                 loan.counterpartyName,
                 textAlign: TextAlign.center,
                 style: GoogleFonts.inter(
@@ -71,7 +72,9 @@ class LoanDetailHeroBanner extends StatelessWidget {
                   fontWeight: FontWeight.w900,
                   color: Colors.white,
                 ),
-              ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              )),
               if (loan.isLinkedToFriend) ...[
                 const SizedBox(width: 6),
                 const Icon(Icons.star_rounded, color: Colors.amber, size: 18),
@@ -114,7 +117,8 @@ class LoanDetailHeroBanner extends StatelessWidget {
                   size: 14,
                 ),
                 const SizedBox(width: 6),
-                Text(
+                Flexible(
+                    child: Text(
                   loanStatus == LoanStatus.overdue
                       ? 'Quá hạn ${loan.overdueDays ?? 0} ngày'
                       : dueText,
@@ -123,7 +127,9 @@ class LoanDetailHeroBanner extends StatelessWidget {
                     fontWeight: FontWeight.w700,
                     color: Colors.white,
                   ),
-                ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                )),
               ],
             ),
           ),

@@ -420,7 +420,9 @@ class _BudgetFormScreenState extends ConsumerState<BudgetFormScreen> {
       backgroundColor:
           isDark ? AppColors.darkBackground : AppColors.lightBackground,
       appBar: PageHeader.subPage(
-        title: widget.isEditing ? 'Chỉnh sửa ngân sách' : 'Thiết lập ngân sách mới',
+        title: widget.isEditing
+            ? 'Chỉnh sửa ngân sách'
+            : 'Thiết lập ngân sách mới',
       ),
       body: Form(
         key: _formKey,
@@ -434,8 +436,8 @@ class _BudgetFormScreenState extends ConsumerState<BudgetFormScreen> {
                 decoration: BoxDecoration(
                   color: AppColors.danger.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(10),
-                  border:
-                      Border.all(color: AppColors.danger.withValues(alpha: 0.3)),
+                  border: Border.all(
+                      color: AppColors.danger.withValues(alpha: 0.3)),
                 ),
                 child: Row(
                   children: [
@@ -613,10 +615,13 @@ class _BudgetFormScreenState extends ConsumerState<BudgetFormScreen> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
+                    Flexible(
+                        child: Text(
                       DateFormat('dd/MM/yyyy').format(_startDate),
                       style: GoogleFonts.inter(fontSize: 15),
-                    ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    )),
                     const Icon(Icons.calendar_today_rounded, size: 18),
                   ],
                 ),
@@ -647,7 +652,8 @@ class _BudgetFormScreenState extends ConsumerState<BudgetFormScreen> {
                     'Tự động cộng dồn số tiền chưa dùng hết của kỳ trước sang kỳ tiếp theo, hoặc trừ bớt nếu bạn chi tiêu vượt quá hạn mức.',
                     style: GoogleFonts.inter(
                       fontSize: 12,
-                      color: isDark ? AppColors.darkMuted : AppColors.lightMuted,
+                      color:
+                          isDark ? AppColors.darkMuted : AppColors.lightMuted,
                       height: 1.4,
                     ),
                   ),
@@ -663,9 +669,8 @@ class _BudgetFormScreenState extends ConsumerState<BudgetFormScreen> {
               width: double.infinity,
               height: 50,
               child: ElevatedButton(
-                onPressed: formState.isSubmitting
-                    ? null
-                    : () => _submit(activeId),
+                onPressed:
+                    formState.isSubmitting ? null : () => _submit(activeId),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primary,
                   foregroundColor: Colors.white,

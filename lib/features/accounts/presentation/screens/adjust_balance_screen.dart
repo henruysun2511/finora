@@ -91,9 +91,7 @@ class _AdjustBalanceScreenState extends ConsumerState<AdjustBalanceScreen> {
 
     try {
       final key = _generateIdempotencyKey();
-      await ref
-          .read(accountDetailActionsProvider(account.id))
-          .adjustBalance(
+      await ref.read(accountDetailActionsProvider(account.id)).adjustBalance(
             walletId: account.walletId,
             direction: _direction,
             amount: amount,
@@ -309,7 +307,8 @@ class _AdjustBalanceScreenState extends ConsumerState<AdjustBalanceScreen> {
                                             : AppColors.success,
                                   ),
                                   const SizedBox(width: 8),
-                                  Text(
+                                  Flexible(
+                                      child: Text(
                                     'TĂNG (+)',
                                     style: GoogleFonts.inter(
                                       fontSize: 13.5,
@@ -319,7 +318,9 @@ class _AdjustBalanceScreenState extends ConsumerState<AdjustBalanceScreen> {
                                           ? Colors.white
                                           : AppColors.success,
                                     ),
-                                  ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  )),
                                 ],
                               ),
                             ),
@@ -364,7 +365,8 @@ class _AdjustBalanceScreenState extends ConsumerState<AdjustBalanceScreen> {
                                             : AppColors.danger,
                                   ),
                                   const SizedBox(width: 8),
-                                  Text(
+                                  Flexible(
+                                      child: Text(
                                     'GIẢM (-)',
                                     style: GoogleFonts.inter(
                                       fontSize: 13.5,
@@ -374,7 +376,9 @@ class _AdjustBalanceScreenState extends ConsumerState<AdjustBalanceScreen> {
                                           ? Colors.white
                                           : AppColors.danger,
                                     ),
-                                  ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  )),
                                 ],
                               ),
                             ),
@@ -469,14 +473,20 @@ class _AdjustBalanceScreenState extends ConsumerState<AdjustBalanceScreen> {
                                       : AppColors.lightMuted,
                                 ),
                               ),
-                              Text(
-                                CurrencyFormatter.format(
-                                  account.balance,
-                                  currency: account.currency,
-                                ),
-                                style: GoogleFonts.inter(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w600,
+                              const SizedBox(width: 12),
+                              Flexible(
+                                child: Text(
+                                  CurrencyFormatter.format(
+                                    account.balance,
+                                    currency: account.currency,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  textAlign: TextAlign.end,
+                                  style: GoogleFonts.inter(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w600,
+                                  ),
                                 ),
                               ),
                             ],
@@ -494,14 +504,21 @@ class _AdjustBalanceScreenState extends ConsumerState<AdjustBalanceScreen> {
                                       : AppColors.lightMuted,
                                 ),
                               ),
-                              Text(
-                                '${_direction == BalanceDirection.increase ? "+" : "-"}${CurrencyFormatter.format(_enteredAmount, currency: account.currency)}',
-                                style: GoogleFonts.inter(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w700,
-                                  color: _direction == BalanceDirection.increase
-                                      ? AppColors.success
-                                      : AppColors.danger,
+                              const SizedBox(width: 12),
+                              Flexible(
+                                child: Text(
+                                  '${_direction == BalanceDirection.increase ? "+" : "-"}${CurrencyFormatter.format(_enteredAmount, currency: account.currency)}',
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  textAlign: TextAlign.end,
+                                  style: GoogleFonts.inter(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w700,
+                                    color:
+                                        _direction == BalanceDirection.increase
+                                            ? AppColors.success
+                                            : AppColors.danger,
+                                  ),
                                 ),
                               ),
                             ],
@@ -525,17 +542,23 @@ class _AdjustBalanceScreenState extends ConsumerState<AdjustBalanceScreen> {
                                       : AppColors.lightForeground,
                                 ),
                               ),
-                              Text(
-                                CurrencyFormatter.format(
-                                  newBalance,
-                                  currency: account.currency,
-                                ),
-                                style: GoogleFonts.outfit(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w900,
-                                  color: isNegative
-                                      ? AppColors.danger
-                                      : AppColors.primary,
+                              const SizedBox(width: 12),
+                              Flexible(
+                                child: Text(
+                                  CurrencyFormatter.format(
+                                    newBalance,
+                                    currency: account.currency,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  textAlign: TextAlign.end,
+                                  style: GoogleFonts.outfit(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w900,
+                                    color: isNegative
+                                        ? AppColors.danger
+                                        : AppColors.primary,
+                                  ),
                                 ),
                               ),
                             ],
@@ -558,7 +581,8 @@ class _AdjustBalanceScreenState extends ConsumerState<AdjustBalanceScreen> {
                       controller: _reasonController,
                       decoration: InputDecoration(
                         labelText: 'Lý do điều chỉnh (* Bắt buộc)',
-                        hintText: 'VD: Đối chiếu số dư SMS, đếm lại tiền mặt...',
+                        hintText:
+                            'VD: Đối chiếu số dư SMS, đếm lại tiền mặt...',
                         filled: true,
                         fillColor: isDark
                             ? AppColors.darkBackground
@@ -675,14 +699,17 @@ class _AdjustBalanceScreenState extends ConsumerState<AdjustBalanceScreen> {
                           const Icon(Icons.check_rounded,
                               size: 20, color: Colors.white),
                           const SizedBox(width: 8),
-                          Text(
+                          Flexible(
+                              child: Text(
                             'Xác nhận điều chỉnh số dư',
                             style: GoogleFonts.inter(
                               fontSize: 15,
                               fontWeight: FontWeight.w700,
                               color: Colors.white,
                             ),
-                          ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          )),
                         ],
                       ),
               ),
@@ -694,4 +721,3 @@ class _AdjustBalanceScreenState extends ConsumerState<AdjustBalanceScreen> {
     );
   }
 }
-

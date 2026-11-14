@@ -34,13 +34,16 @@ class ConvertPreviewCard extends StatelessWidget {
                 child: CircularProgressIndicator(strokeWidth: 2),
               ),
               const SizedBox(width: 10),
-              Text(
+              Flexible(
+                  child: Text(
                 'Đang cập nhật tỷ giá thực...',
                 style: GoogleFonts.inter(
                   fontSize: 12,
                   color: isDark ? AppColors.darkMuted : AppColors.lightMuted,
                 ),
-              ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              )),
             ],
           ),
         ),
@@ -72,8 +75,11 @@ class ConvertPreviewCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          Wrap(
+            alignment: WrapAlignment.spaceBetween,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            spacing: 8,
+            runSpacing: 4,
             children: [
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
@@ -93,14 +99,17 @@ class ConvertPreviewCard extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(width: 5),
-                    Text(
+                    Flexible(
+                        child: Text(
                       badgeText,
                       style: GoogleFonts.inter(
                         fontSize: 10.5,
                         fontWeight: FontWeight.w700,
                         color: badgeColor,
                       ),
-                    ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    )),
                   ],
                 ),
               ),
@@ -118,24 +127,28 @@ class ConvertPreviewCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: isDark
-                  ? AppColors.darkBackground
-                  : const Color(0xFFF1F5F9),
+              color:
+                  isDark ? AppColors.darkBackground : const Color(0xFFF1F5F9),
               borderRadius: BorderRadius.circular(14),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  'Dự kiến tài khoản đích nhận:',
-                  style: GoogleFonts.inter(
-                    fontSize: 12.5,
-                    fontWeight: FontWeight.w500,
-                    color: isDark
-                        ? AppColors.darkForeground
-                        : AppColors.lightForeground,
+                Expanded(
+                  child: Text(
+                    'Dự kiến tài khoản đích nhận:',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: GoogleFonts.inter(
+                      fontSize: 12.5,
+                      fontWeight: FontWeight.w500,
+                      color: isDark
+                          ? AppColors.darkForeground
+                          : AppColors.lightForeground,
+                    ),
                   ),
                 ),
+                const SizedBox(width: 8),
                 Text(
                   CurrencyFormatter.format(
                     prev.toAmount,

@@ -46,7 +46,8 @@ class WalletsOverviewScreen extends ConsumerWidget {
         dynamicOverview != null && dynamicOverview.items.isNotEmpty;
 
     return Scaffold(
-      backgroundColor: isDark ? AppColors.darkBackground : AppColors.lightBackground,
+      backgroundColor:
+          isDark ? AppColors.darkBackground : AppColors.lightBackground,
       body: RefreshIndicator(
         onRefresh: () async {
           await ref.refresh(walletsOverviewProvider.future);
@@ -96,7 +97,8 @@ class WalletsOverviewScreen extends ConsumerWidget {
                           ),
                         ),
                       ),
-                    ] else if (overviewAsync.hasError && dynamicOverview == null) ...[
+                    ] else if (overviewAsync.hasError &&
+                        dynamicOverview == null) ...[
                       _buildErrorState(context, isDark, ref),
                     ] else if (!hasRealWallets) ...[
                       _buildEmptyState(context, isDark),
@@ -273,19 +275,24 @@ class WalletsOverviewScreen extends ConsumerWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Icon(
-                      isHidden ? Icons.visibility_rounded : Icons.visibility_off_rounded,
+                      isHidden
+                          ? Icons.visibility_rounded
+                          : Icons.visibility_off_rounded,
                       size: 14,
                       color: Colors.white.withValues(alpha: 0.85),
                     ),
                     const SizedBox(width: 5),
-                    Text(
+                    Flexible(
+                        child: Text(
                       isHidden ? 'Hiện' : 'Ẩn',
                       style: GoogleFonts.inter(
                         fontSize: 11.5,
                         fontWeight: FontWeight.w700,
                         color: Colors.white.withValues(alpha: 0.85),
                       ),
-                    ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    )),
                   ],
                 ),
               ),
@@ -298,7 +305,9 @@ class WalletsOverviewScreen extends ConsumerWidget {
             fit: BoxFit.scaleDown,
             alignment: Alignment.centerLeft,
             child: Text(
-              isHidden ? '••••••••' : CurrencyFormatter.format(totalNetWorth, currency: currency),
+              isHidden
+                  ? '••••••••'
+                  : CurrencyFormatter.format(totalNetWorth, currency: currency),
               style: GoogleFonts.outfit(
                 fontSize: 34,
                 fontWeight: FontWeight.w900,
@@ -314,7 +323,8 @@ class WalletsOverviewScreen extends ConsumerWidget {
             children: [
               Expanded(
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                   decoration: BoxDecoration(
                     color: Colors.white.withValues(alpha: 0.14),
                     borderRadius: BorderRadius.circular(16),
@@ -336,7 +346,10 @@ class WalletsOverviewScreen extends ConsumerWidget {
                       ),
                       const SizedBox(height: 3),
                       Text(
-                        isHidden ? '••••••' : CurrencyFormatter.format(totalSavings, currency: currency),
+                        isHidden
+                            ? '••••••'
+                            : CurrencyFormatter.format(totalSavings,
+                                currency: currency),
                         style: GoogleFonts.outfit(
                           fontSize: 15,
                           fontWeight: FontWeight.w900,
@@ -350,7 +363,8 @@ class WalletsOverviewScreen extends ConsumerWidget {
               const SizedBox(width: 10),
               Expanded(
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                   decoration: BoxDecoration(
                     color: Colors.white.withValues(alpha: 0.14),
                     borderRadius: BorderRadius.circular(16),
@@ -372,7 +386,10 @@ class WalletsOverviewScreen extends ConsumerWidget {
                       ),
                       const SizedBox(height: 3),
                       Text(
-                        isHidden ? '••••••' : CurrencyFormatter.format(totalAvailable, currency: currency),
+                        isHidden
+                            ? '••••••'
+                            : CurrencyFormatter.format(totalAvailable,
+                                currency: currency),
                         style: GoogleFonts.outfit(
                           fontSize: 15,
                           fontWeight: FontWeight.w900,
@@ -405,7 +422,8 @@ class WalletsOverviewScreen extends ConsumerWidget {
           _filterChip(
             ref,
             isDark,
-            label: 'Tất cả (${overview?.countForTab(WalletFilterTab.all) ?? 0})',
+            label:
+                'Tất cả (${overview?.countForTab(WalletFilterTab.all) ?? 0})',
             tab: WalletFilterTab.all,
             isSelected: currentFilter == WalletFilterTab.all,
           ),
@@ -413,7 +431,8 @@ class WalletsOverviewScreen extends ConsumerWidget {
           _filterChip(
             ref,
             isDark,
-            label: 'Cá nhân (${overview?.countForTab(WalletFilterTab.personal) ?? 0})',
+            label:
+                'Cá nhân (${overview?.countForTab(WalletFilterTab.personal) ?? 0})',
             tab: WalletFilterTab.personal,
             isSelected: currentFilter == WalletFilterTab.personal,
           ),
@@ -421,7 +440,8 @@ class WalletsOverviewScreen extends ConsumerWidget {
           _filterChip(
             ref,
             isDark,
-            label: 'Ví chung (${overview?.countForTab(WalletFilterTab.shared) ?? 0})',
+            label:
+                'Ví chung (${overview?.countForTab(WalletFilterTab.shared) ?? 0})',
             tab: WalletFilterTab.shared,
             isSelected: currentFilter == WalletFilterTab.shared,
           ),
@@ -553,14 +573,16 @@ class WalletsOverviewScreen extends ConsumerWidget {
       ),
       child: Column(
         children: [
-          const Icon(Icons.cloud_off_rounded, size: 40, color: AppColors.danger),
+          const Icon(Icons.cloud_off_rounded,
+              size: 40, color: AppColors.danger),
           const SizedBox(height: 12),
           Text(
             'Không thể kết nối tới máy chủ',
             style: GoogleFonts.inter(
               fontSize: 15,
               fontWeight: FontWeight.w800,
-              color: isDark ? AppColors.darkForeground : AppColors.lightForeground,
+              color:
+                  isDark ? AppColors.darkForeground : AppColors.lightForeground,
             ),
           ),
           const SizedBox(height: 6),
@@ -610,7 +632,8 @@ class WalletsOverviewScreen extends ConsumerWidget {
         border: Border.all(color: borderColor),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF0F172A).withValues(alpha: isDark ? 0.3 : 0.05),
+            color:
+                const Color(0xFF0F172A).withValues(alpha: isDark ? 0.3 : 0.05),
             blurRadius: 16,
             offset: const Offset(0, 4),
           ),
@@ -676,8 +699,8 @@ class WalletsOverviewScreen extends ConsumerWidget {
                                 padding: const EdgeInsets.symmetric(
                                     horizontal: 6, vertical: 2),
                                 decoration: BoxDecoration(
-                                  color: AppColors.primary
-                                      .withValues(alpha: 0.12),
+                                  color:
+                                      AppColors.primary.withValues(alpha: 0.12),
                                   borderRadius: BorderRadius.circular(6),
                                 ),
                                 child: Text(
@@ -700,7 +723,9 @@ class WalletsOverviewScreen extends ConsumerWidget {
                           style: GoogleFonts.inter(
                             fontSize: 11,
                             fontWeight: FontWeight.w600,
-                            color: isDark ? AppColors.darkMuted : AppColors.lightMuted,
+                            color: isDark
+                                ? AppColors.darkMuted
+                                : AppColors.lightMuted,
                           ),
                         ),
                       ],
@@ -754,7 +779,8 @@ class WalletsOverviewScreen extends ConsumerWidget {
                         currency: acc.currency),
                 borderColor: borderColor,
                 isDark: isDark,
-                onTap: () => context.push(RoutePaths.accountDetailWithId(acc.id)),
+                onTap: () =>
+                    context.push(RoutePaths.accountDetailWithId(acc.id)),
               );
             }),
           // Nút thêm nguồn tiền cho riêng ví này
@@ -793,7 +819,9 @@ class WalletsOverviewScreen extends ConsumerWidget {
               ),
             ),
             const SizedBox(width: 9),
-            Icon(icon, size: 15, color: isDark ? AppColors.darkMuted : AppColors.lightMuted),
+            Icon(icon,
+                size: 15,
+                color: isDark ? AppColors.darkMuted : AppColors.lightMuted),
             const SizedBox(width: 7),
             Expanded(
               child: Text(
@@ -803,8 +831,9 @@ class WalletsOverviewScreen extends ConsumerWidget {
                 style: GoogleFonts.inter(
                   fontSize: 13,
                   fontWeight: FontWeight.w700,
-                  color:
-                      isDark ? AppColors.darkForeground : AppColors.lightForeground,
+                  color: isDark
+                      ? AppColors.darkForeground
+                      : AppColors.lightForeground,
                 ),
               ),
             ),
@@ -814,8 +843,9 @@ class WalletsOverviewScreen extends ConsumerWidget {
               style: GoogleFonts.outfit(
                 fontSize: 13,
                 fontWeight: FontWeight.w800,
-                color:
-                    isDark ? AppColors.darkForeground : AppColors.lightForeground,
+                color: isDark
+                    ? AppColors.darkForeground
+                    : AppColors.lightForeground,
               ),
             ),
           ],
@@ -831,7 +861,8 @@ class WalletsOverviewScreen extends ConsumerWidget {
     bool isDark,
   ) {
     return InkWell(
-      onTap: () => context.push('${RoutePaths.createAccount}?walletId=$walletId'),
+      onTap: () =>
+          context.push('${RoutePaths.createAccount}?walletId=$walletId'),
       borderRadius: const BorderRadius.vertical(bottom: Radius.circular(22)),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -839,7 +870,8 @@ class WalletsOverviewScreen extends ConsumerWidget {
           color: isDark
               ? Colors.white.withValues(alpha: 0.02)
               : AppColors.primary.withValues(alpha: 0.04),
-          borderRadius: const BorderRadius.vertical(bottom: Radius.circular(22)),
+          borderRadius:
+              const BorderRadius.vertical(bottom: Radius.circular(22)),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -850,14 +882,17 @@ class WalletsOverviewScreen extends ConsumerWidget {
               color: AppColors.primary,
             ),
             const SizedBox(width: 8),
-            Text(
+            Flexible(
+                child: Text(
               'Thêm nguồn tiền vào ví này',
               style: GoogleFonts.inter(
                 fontSize: 12.5,
                 fontWeight: FontWeight.w700,
                 color: AppColors.primary,
               ),
-            ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            )),
           ],
         ),
       ),
@@ -875,8 +910,8 @@ class WalletsOverviewScreen extends ConsumerWidget {
 
     final net = summary?.netPosition ?? 0.0;
     final lent = summary?.totalLent ?? 0.0;
-    final borrowed = (summary?.totalBorrowed ?? 0.0) +
-        (summary?.totalInstallment ?? 0.0);
+    final borrowed =
+        (summary?.totalBorrowed ?? 0.0) + (summary?.totalInstallment ?? 0.0);
 
     final isPositive = net >= 0;
     final netPrefix = isPositive ? '+' : '-';
@@ -963,7 +998,9 @@ class WalletsOverviewScreen extends ConsumerWidget {
                     fit: BoxFit.scaleDown,
                     alignment: Alignment.centerRight,
                     child: Text(
-                      isHidden ? '••••••' : '+${CurrencyFormatter.format(lent)}',
+                      isHidden
+                          ? '••••••'
+                          : '+${CurrencyFormatter.format(lent)}',
                       style: GoogleFonts.inter(
                         fontSize: 13.5,
                         fontWeight: FontWeight.w800,
@@ -987,7 +1024,9 @@ class WalletsOverviewScreen extends ConsumerWidget {
                     fit: BoxFit.scaleDown,
                     alignment: Alignment.centerRight,
                     child: Text(
-                      isHidden ? '••••••' : '-${CurrencyFormatter.format(borrowed)}',
+                      isHidden
+                          ? '••••••'
+                          : '-${CurrencyFormatter.format(borrowed)}',
                       style: GoogleFonts.inter(
                         fontSize: 13.5,
                         fontWeight: FontWeight.w800,
@@ -1003,5 +1042,4 @@ class WalletsOverviewScreen extends ConsumerWidget {
       ),
     );
   }
-
 }

@@ -152,11 +152,12 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
                   ),
                 ),
               ),
-              data: (friends) {
+              data: (state) {
+                final friends = state.friends;
                 final filtered = friends.where((f) {
                   if (_searchQuery.isEmpty) return true;
                   return f.fullName.toLowerCase().contains(_searchQuery) ||
-                      f.email.toLowerCase().contains(_searchQuery);
+                      (f.email ?? '').toLowerCase().contains(_searchQuery);
                 }).toList();
 
                 if (filtered.isEmpty) {
@@ -286,7 +287,7 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
                                   ),
                                   const SizedBox(height: 2),
                                   Text(
-                                    friend.email,
+                                    friend.email ?? '',
                                     style: GoogleFonts.inter(
                                       fontSize: 12,
                                       color: muted,

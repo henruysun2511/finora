@@ -56,8 +56,11 @@ class RecurringTransactionDetailScreen extends ConsumerWidget {
                         .read(recurringTransactionDetailProvider(id).notifier)
                         .togglePause();
                     if (context.mounted) {
-                      AppToast.success(context,
-                          item.isPaused ? 'Đã tiếp tục quy tắc' : 'Đã tạm dừng quy tắc');
+                      AppToast.success(
+                          context,
+                          item.isPaused
+                              ? 'Đã tiếp tục quy tắc'
+                              : 'Đã tạm dừng quy tắc');
                     }
                   } else if (val == 'execute') {
                     _executeNow(context, ref);
@@ -74,7 +77,10 @@ class RecurringTransactionDetailScreen extends ConsumerWidget {
                         children: [
                           Icon(Icons.edit_outlined, size: 20),
                           SizedBox(width: 10),
-                          Text('Chỉnh sửa'),
+                          Flexible(
+                              child: Text('Chỉnh sửa',
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis)),
                         ],
                       ),
                     ),
@@ -89,7 +95,11 @@ class RecurringTransactionDetailScreen extends ConsumerWidget {
                             size: 20,
                           ),
                           const SizedBox(width: 10),
-                          Text(item.isPaused ? 'Tiếp tục' : 'Tạm dừng'),
+                          Flexible(
+                              child: Text(
+                                  item.isPaused ? 'Tiếp tục' : 'Tạm dừng',
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis)),
                         ],
                       ),
                     ),
@@ -97,9 +107,13 @@ class RecurringTransactionDetailScreen extends ConsumerWidget {
                       value: 'execute',
                       child: Row(
                         children: [
-                          Icon(Icons.bolt_rounded, size: 20, color: AppColors.primary),
+                          Icon(Icons.bolt_rounded,
+                              size: 20, color: AppColors.primary),
                           SizedBox(width: 10),
-                          Text('Chạy ngay'),
+                          Flexible(
+                              child: Text('Chạy ngay',
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis)),
                         ],
                       ),
                     ),
@@ -111,8 +125,11 @@ class RecurringTransactionDetailScreen extends ConsumerWidget {
                           Icon(Icons.delete_outline_rounded,
                               size: 20, color: AppColors.danger),
                           SizedBox(width: 10),
-                          Text('Xóa quy tắc',
-                              style: TextStyle(color: AppColors.danger)),
+                          Flexible(
+                              child: Text('Xóa quy tắc',
+                                  style: TextStyle(color: AppColors.danger),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis)),
                         ],
                       ),
                     ),
@@ -144,8 +161,7 @@ class RecurringTransactionDetailScreen extends ConsumerWidget {
         ),
         data: (item) {
           final isExpense = item.type == TransactionType.expense;
-          final amountColor =
-              isExpense ? AppColors.danger : AppColors.success;
+          final amountColor = isExpense ? AppColors.danger : AppColors.success;
           final amountPrefix = isExpense ? '- ' : '+ ';
 
           return ListView(
@@ -158,7 +174,8 @@ class RecurringTransactionDetailScreen extends ConsumerWidget {
                   color: isDark ? AppColors.darkSurface : Colors.white,
                   borderRadius: BorderRadius.circular(18),
                   border: Border.all(
-                    color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
+                    color:
+                        isDark ? AppColors.darkBorder : AppColors.lightBorder,
                   ),
                 ),
                 child: Column(
@@ -166,7 +183,8 @@ class RecurringTransactionDetailScreen extends ConsumerWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Container(
+                        Flexible(
+                            child: Container(
                           padding: const EdgeInsets.symmetric(
                               horizontal: 10, vertical: 4),
                           decoration: BoxDecoration(
@@ -185,25 +203,29 @@ class RecurringTransactionDetailScreen extends ConsumerWidget {
                                     ? Icons.pause_circle_rounded
                                     : Icons.play_circle_fill_rounded,
                                 size: 14,
-                                color: item.isPaused
-                                    ? muted
-                                    : AppColors.primary,
+                                color:
+                                    item.isPaused ? muted : AppColors.primary,
                               ),
                               const SizedBox(width: 4),
-                              Text(
-                                item.isPaused ? 'Đang tạm dừng' : 'Đang hoạt động',
+                              Flexible(
+                                  child: Text(
+                                item.isPaused
+                                    ? 'Đang tạm dừng'
+                                    : 'Đang hoạt động',
                                 style: TextStyle(
                                   fontSize: 12,
                                   fontWeight: FontWeight.w600,
-                                  color: item.isPaused
-                                      ? muted
-                                      : AppColors.primary,
+                                  color:
+                                      item.isPaused ? muted : AppColors.primary,
                                 ),
-                              ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              )),
                             ],
                           ),
-                        ),
-                        Container(
+                        )),
+                        Flexible(
+                            child: Container(
                           padding: const EdgeInsets.symmetric(
                               horizontal: 10, vertical: 4),
                           decoration: BoxDecoration(
@@ -220,7 +242,7 @@ class RecurringTransactionDetailScreen extends ConsumerWidget {
                               color: fg,
                             ),
                           ),
-                        ),
+                        )),
                       ],
                     ),
                     const SizedBox(height: 16),
@@ -589,21 +611,29 @@ class _InfoRow extends StatelessWidget {
       children: [
         Icon(icon, size: 18, color: muted),
         const SizedBox(width: 10),
-        Text(
-          label,
-          style: TextStyle(fontSize: 13, color: muted),
+        Expanded(
+          child: Text(
+            label,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(fontSize: 13, color: muted),
+          ),
         ),
-        const Spacer(),
-        Text(
-          value,
-          style: TextStyle(
-            fontSize: 13,
-            fontWeight: FontWeight.w600,
-            color: fg,
+        const SizedBox(width: 8),
+        Flexible(
+          child: Text(
+            value,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            textAlign: TextAlign.end,
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              color: fg,
+            ),
           ),
         ),
       ],
     );
   }
 }
-

@@ -102,14 +102,19 @@ class _CurrencyPickerBottomSheetState extends State<CurrencyPickerBottomSheet> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  widget.title,
-                  style: GoogleFonts.inter(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w700,
-                    color: foreground,
+                Expanded(
+                  child: Text(
+                    widget.title,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: GoogleFonts.inter(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                      color: foreground,
+                    ),
                   ),
                 ),
+                const SizedBox(width: 8),
                 IconButton(
                   onPressed: () => Navigator.of(context).pop(),
                   icon: Icon(Icons.close_rounded, color: muted),
@@ -214,12 +219,16 @@ class _CurrencyPickerBottomSheetState extends State<CurrencyPickerBottomSheet> {
                                   children: [
                                     Row(
                                       children: [
-                                        Text(
-                                          item.code,
-                                          style: GoogleFonts.inter(
-                                            fontSize: 15,
-                                            fontWeight: FontWeight.w700,
-                                            color: foreground,
+                                        Flexible(
+                                          child: Text(
+                                            item.code,
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: GoogleFonts.inter(
+                                              fontSize: 15,
+                                              fontWeight: FontWeight.w700,
+                                              color: foreground,
+                                            ),
                                           ),
                                         ),
                                         const SizedBox(width: 8),

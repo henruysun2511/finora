@@ -23,7 +23,8 @@ class OnboardingWalletScreen extends ConsumerStatefulWidget {
       _OnboardingWalletScreenState();
 }
 
-class _OnboardingWalletScreenState extends ConsumerState<OnboardingWalletScreen> {
+class _OnboardingWalletScreenState
+    extends ConsumerState<OnboardingWalletScreen> {
   late final TextEditingController _walletNameController;
   late final TextEditingController _balanceController;
 
@@ -277,7 +278,8 @@ class _OnboardingWalletScreenState extends ConsumerState<OnboardingWalletScreen>
                                 hintText: '0',
                               ),
                               onChanged: (text) {
-                                final clean = text.replaceAll(RegExp(r'[^0-9]'), '');
+                                final clean =
+                                    text.replaceAll(RegExp(r'[^0-9]'), '');
                                 final num = double.tryParse(clean) ?? 0;
                                 setState(() {
                                   _balance = num;
@@ -311,7 +313,8 @@ class _OnboardingWalletScreenState extends ConsumerState<OnboardingWalletScreen>
                         vertical: 12,
                       ),
                       decoration: BoxDecoration(
-                        color: mascotColor.withValues(alpha: isDark ? 0.18 : 0.08),
+                        color:
+                            mascotColor.withValues(alpha: isDark ? 0.18 : 0.08),
                         borderRadius: BorderRadius.circular(14),
                         border: Border.all(
                           color: mascotColor.withValues(alpha: 0.4),
@@ -364,9 +367,8 @@ class _OnboardingWalletScreenState extends ConsumerState<OnboardingWalletScreen>
                     : AppColors.lightBackground,
                 border: Border(
                   top: BorderSide(
-                    color: isDark
-                        ? AppColors.darkBorder
-                        : AppColors.lightBorder,
+                    color:
+                        isDark ? AppColors.darkBorder : AppColors.lightBorder,
                     width: 0.8,
                   ),
                 ),
@@ -392,13 +394,16 @@ class _OnboardingWalletScreenState extends ConsumerState<OnboardingWalletScreen>
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Text(
+                          Flexible(
+                              child: Text(
                             'Tiếp tục',
                             style: GoogleFonts.inter(
                               fontSize: 15,
                               fontWeight: FontWeight.w700,
                             ),
-                          ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          )),
                           const SizedBox(width: 8),
                           const LucideIcon(
                             name: LucideIcons.arrowUpRight,
@@ -492,7 +497,8 @@ class _OnboardingWalletScreenState extends ConsumerState<OnboardingWalletScreen>
                     style: GoogleFonts.inter(
                       fontSize: 10.5,
                       fontWeight: FontWeight.w500,
-                      color: isDark ? AppColors.darkMuted : AppColors.lightMuted,
+                      color:
+                          isDark ? AppColors.darkMuted : AppColors.lightMuted,
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -525,9 +531,7 @@ class _OnboardingWalletScreenState extends ConsumerState<OnboardingWalletScreen>
         fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
         color: isSelected
             ? Colors.white
-            : (isDark
-                ? AppColors.darkForeground
-                : AppColors.lightForeground),
+            : (isDark ? AppColors.darkForeground : AppColors.lightForeground),
       ),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),

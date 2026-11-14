@@ -185,7 +185,8 @@ class FeedPostCard extends StatelessWidget {
 
     final cardBg = dark ? AppColors.darkSurface : Colors.white;
     final border = dark ? AppColors.darkBorder : AppColors.lightBorder;
-    final foreground = dark ? AppColors.darkForeground : AppColors.lightForeground;
+    final foreground =
+        dark ? AppColors.darkForeground : AppColors.lightForeground;
     final muted = dark ? AppColors.darkMuted : AppColors.lightMuted;
     final isPos = post.amount != null && post.amount! > 0;
 
@@ -197,7 +198,8 @@ class FeedPostCard extends StatelessWidget {
         border: Border.all(color: border),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF0F172A).withValues(alpha: dark ? 0.25 : 0.05),
+            color:
+                const Color(0xFF0F172A).withValues(alpha: dark ? 0.25 : 0.05),
             blurRadius: 18,
             offset: const Offset(0, 4),
           ),
@@ -248,116 +250,131 @@ class FeedPostCard extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       // User Chip (.lf-user-chip)
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(99),
-                        child: BackdropFilter(
-                          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                          child: Container(
-                            padding: const EdgeInsets.fromLTRB(5, 5, 14, 5),
-                            decoration: BoxDecoration(
-                              color: Colors.black.withValues(alpha: 0.45),
-                              borderRadius: BorderRadius.circular(99),
-                              border: Border.all(
-                                color: Colors.white.withValues(alpha: 0.18),
+                      Flexible(
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(99),
+                          child: BackdropFilter(
+                            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                            child: Container(
+                              padding: const EdgeInsets.fromLTRB(5, 5, 14, 5),
+                              decoration: BoxDecoration(
+                                color: Colors.black.withValues(alpha: 0.45),
+                                borderRadius: BorderRadius.circular(99),
+                                border: Border.all(
+                                  color: Colors.white.withValues(alpha: 0.18),
+                                ),
                               ),
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Container(
-                                  width: 34,
-                                  height: 34,
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    gradient: _getAvatarGradient(
-                                      post.author.displayName,
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Container(
+                                    width: 34,
+                                    height: 34,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      gradient: _getAvatarGradient(
+                                        post.author.displayName,
+                                      ),
+                                      image: post.author.avatar != null
+                                          ? DecorationImage(
+                                              image: NetworkImage(
+                                                  post.author.avatar!),
+                                              fit: BoxFit.cover,
+                                            )
+                                          : null,
                                     ),
-                                    image: post.author.avatar != null
-                                        ? DecorationImage(
-                                            image: NetworkImage(
-                                                post.author.avatar!),
-                                            fit: BoxFit.cover,
+                                    alignment: Alignment.center,
+                                    child: post.author.avatar == null
+                                        ? Text(
+                                            post.author.initials,
+                                            style: const TextStyle(
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.w900,
+                                              fontSize: 13,
+                                            ),
                                           )
                                         : null,
                                   ),
-                                  alignment: Alignment.center,
-                                  child: post.author.avatar == null
-                                      ? Text(
-                                          post.author.initials,
+                                  const SizedBox(width: 10),
+                                  Flexible(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Text(
+                                          post.author.displayName,
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
                                           style: const TextStyle(
                                             color: Colors.white,
-                                            fontWeight: FontWeight.w900,
+                                            fontWeight: FontWeight.w800,
                                             fontSize: 13,
                                           ),
-                                        )
-                                      : null,
-                                ),
-                                const SizedBox(width: 10),
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Text(
-                                      post.author.displayName,
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.w800,
-                                        fontSize: 13,
-                                      ),
-                                    ),
-                                    Row(
-                                      children: [
-                                        LucideIcon(
-                                          name: 'clock',
-                                          size: 10.5,
-                                          color: Colors.white
-                                              .withValues(alpha: 0.72),
-                                          strokeWidth: 2.0,
                                         ),
-                                        const SizedBox(width: 4),
-                                        Text(
-                                          _formatTimeAgo(post.transactionDate),
-                                          style: TextStyle(
-                                            color: Colors.white
-                                                .withValues(alpha: 0.72),
-                                            fontWeight: FontWeight.w600,
-                                            fontSize: 10.5,
-                                          ),
-                                        ),
-                                        if (post.locationName != null) ...[
-                                          const SizedBox(width: 6),
-                                          LucideIcon(
-                                            name: 'map-pin',
-                                            size: 10.5,
-                                            color: Colors.white
-                                                .withValues(alpha: 0.72),
-                                            strokeWidth: 2.0,
-                                          ),
-                                          const SizedBox(width: 3),
-                                          ConstrainedBox(
-                                            constraints: const BoxConstraints(
-                                                maxWidth: 120),
-                                            child: Text(
-                                              post.locationName!,
+                                        Row(
+                                          children: [
+                                            LucideIcon(
+                                              name: 'clock',
+                                              size: 10.5,
+                                              color: Colors.white
+                                                  .withValues(alpha: 0.72),
+                                              strokeWidth: 2.0,
+                                            ),
+                                            const SizedBox(width: 4),
+                                            Flexible(
+                                                child: Text(
+                                              _formatTimeAgo(
+                                                  post.transactionDate),
                                               style: TextStyle(
                                                 color: Colors.white
                                                     .withValues(alpha: 0.72),
                                                 fontWeight: FontWeight.w600,
                                                 fontSize: 10.5,
                                               ),
+                                              maxLines: 1,
                                               overflow: TextOverflow.ellipsis,
-                                            ),
-                                          ),
-                                        ],
+                                            )),
+                                            if (post.locationName != null) ...[
+                                              const SizedBox(width: 6),
+                                              LucideIcon(
+                                                name: 'map-pin',
+                                                size: 10.5,
+                                                color: Colors.white
+                                                    .withValues(alpha: 0.72),
+                                                strokeWidth: 2.0,
+                                              ),
+                                              const SizedBox(width: 3),
+                                              ConstrainedBox(
+                                                constraints:
+                                                    const BoxConstraints(
+                                                        maxWidth: 120),
+                                                child: Text(
+                                                  post.locationName!,
+                                                  style: TextStyle(
+                                                    color: Colors.white
+                                                        .withValues(
+                                                            alpha: 0.72),
+                                                    fontWeight: FontWeight.w600,
+                                                    fontSize: 10.5,
+                                                  ),
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                ),
+                                              ),
+                                            ],
+                                          ],
+                                        ),
                                       ],
                                     ),
-                                  ],
-                                ),
-                              ],
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         ),
                       ),
+                      const SizedBox(width: 8),
 
                       // More Button (.lf-more-btn)
                       ClipOval(
@@ -468,14 +485,17 @@ class FeedPostCard extends StatelessWidget {
                                         color: Colors.white,
                                       ),
                                       const SizedBox(width: 4),
-                                      Text(
+                                      Flexible(
+                                          child: Text(
                                         post.category!.name,
                                         style: const TextStyle(
                                           fontSize: 12,
                                           fontWeight: FontWeight.w800,
                                           color: Colors.white,
                                         ),
-                                      ),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      )),
                                     ],
                                   ),
                                 ),
@@ -527,12 +547,16 @@ class FeedPostCard extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(vertical: 4),
                       child: Row(
                         children: [
-                          Text(
-                            'Xem danh sách tương tác',
-                            style: TextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w600,
-                              color: muted,
+                          Flexible(
+                            child: Text(
+                              'Xem danh sách tương tác',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                                color: muted,
+                              ),
                             ),
                           ),
                           const SizedBox(width: 6),
@@ -702,14 +726,17 @@ class FeedPostCard extends StatelessWidget {
                           color: foreground,
                         ),
                         const SizedBox(width: 6),
-                        Text(
+                        Flexible(
+                            child: Text(
                           'Nhắn tin',
                           style: TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w800,
                             color: foreground,
                           ),
-                        ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        )),
                       ],
                     ),
                   ),
@@ -740,14 +767,17 @@ class FeedPostCard extends StatelessWidget {
                           color: foreground,
                         ),
                         const SizedBox(width: 6),
-                        Text(
+                        Flexible(
+                            child: Text(
                           'Chia sẻ',
                           style: TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w800,
                             color: foreground,
                           ),
-                        ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        )),
                       ],
                     ),
                   ),
@@ -774,7 +804,11 @@ class FeedPostCard extends StatelessWidget {
         pName.contains('cơm') ||
         pName.contains('lẩu')) {
       return (
-        gradient: const [Color(0xFF9A3412), Color(0xFFEA580C), Color(0xFFF59E0B)],
+        gradient: const [
+          Color(0xFF9A3412),
+          Color(0xFFEA580C),
+          Color(0xFFF59E0B)
+        ],
         icon: 'utensils',
         label: 'Ăn uống',
       );
@@ -788,7 +822,11 @@ class FeedPostCard extends StatelessWidget {
         pName.contains('trà sữa') ||
         pName.contains('brew')) {
       return (
-        gradient: const [Color(0xFF78350F), Color(0xFF92400E), Color(0xFFD97706)],
+        gradient: const [
+          Color(0xFF78350F),
+          Color(0xFF92400E),
+          Color(0xFFD97706)
+        ],
         icon: 'coffee',
         label: 'Cà phê & Đồ uống',
       );
@@ -803,7 +841,11 @@ class FeedPostCard extends StatelessWidget {
         pName.contains('thưởng') ||
         pName.contains('tiền')) {
       return (
-        gradient: const [Color(0xFF065F46), Color(0xFF059669), Color(0xFF10B981)],
+        gradient: const [
+          Color(0xFF065F46),
+          Color(0xFF059669),
+          Color(0xFF10B981)
+        ],
         icon: 'banknote',
         label: 'Thu nhập & Tiết kiệm',
       );
@@ -818,7 +860,11 @@ class FeedPostCard extends StatelessWidget {
         pName.contains('vé máy bay') ||
         pName.contains('tour')) {
       return (
-        gradient: const [Color(0xFF0369A1), Color(0xFF0284C7), Color(0xFF06B6D4)],
+        gradient: const [
+          Color(0xFF0369A1),
+          Color(0xFF0284C7),
+          Color(0xFF06B6D4)
+        ],
         icon: 'plane',
         label: 'Du lịch & Trải nghiệm',
       );
@@ -833,7 +879,11 @@ class FeedPostCard extends StatelessWidget {
         pName.contains('shopee') ||
         pName.contains('quần áo')) {
       return (
-        gradient: const [Color(0xFF9D174D), Color(0xFFDB2777), Color(0xFFEC4899)],
+        gradient: const [
+          Color(0xFF9D174D),
+          Color(0xFFDB2777),
+          Color(0xFFEC4899)
+        ],
         icon: 'shopping-bag',
         label: 'Mua sắm',
       );
@@ -848,7 +898,11 @@ class FeedPostCard extends StatelessWidget {
         pName.contains('yoga') ||
         pName.contains('chạy bộ')) {
       return (
-        gradient: const [Color(0xFF5B21B6), Color(0xFF7C3AED), Color(0xFF8B5CF6)],
+        gradient: const [
+          Color(0xFF5B21B6),
+          Color(0xFF7C3AED),
+          Color(0xFF8B5CF6)
+        ],
         icon: 'dumbbell',
         label: 'Thể thao & Sức khỏe',
       );
@@ -863,7 +917,11 @@ class FeedPostCard extends StatelessWidget {
         pName.contains('wifi') ||
         pName.contains('hóa đơn')) {
       return (
-        gradient: const [Color(0xFF92400E), Color(0xFFD97706), Color(0xFFF59E0B)],
+        gradient: const [
+          Color(0xFF92400E),
+          Color(0xFFD97706),
+          Color(0xFFF59E0B)
+        ],
         icon: 'zap',
         label: 'Hóa đơn & Tiện ích',
       );
@@ -876,7 +934,11 @@ class FeedPostCard extends StatelessWidget {
         pName.contains('game') ||
         pName.contains('karaoke')) {
       return (
-        gradient: const [Color(0xFF4C1D95), Color(0xFF6B21A8), Color(0xFF9333EA)],
+        gradient: const [
+          Color(0xFF4C1D95),
+          Color(0xFF6B21A8),
+          Color(0xFF9333EA)
+        ],
         icon: 'gamepad-2',
         label: 'Giải trí',
       );
@@ -890,7 +952,11 @@ class FeedPostCard extends StatelessWidget {
         pName.contains('grab') ||
         pName.contains('taxi')) {
       return (
-        gradient: const [Color(0xFF155E75), Color(0xFF0891B2), Color(0xFF06B6D4)],
+        gradient: const [
+          Color(0xFF155E75),
+          Color(0xFF0891B2),
+          Color(0xFF06B6D4)
+        ],
         icon: 'car',
         label: 'Di chuyển',
       );

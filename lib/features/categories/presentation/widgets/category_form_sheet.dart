@@ -141,17 +141,22 @@ class _CategoryFormSheetState extends ConsumerState<CategoryFormSheet> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      isEditing ? 'Sửa danh mục' : 'Thêm danh mục mới',
-                      style: GoogleFonts.inter(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w900,
-                        letterSpacing: -0.4,
-                        color: isDark
-                            ? AppColors.darkForeground
-                            : AppColors.lightForeground,
+                    Expanded(
+                      child: Text(
+                        isEditing ? 'Sửa danh mục' : 'Thêm danh mục mới',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: GoogleFonts.inter(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w900,
+                          letterSpacing: -0.4,
+                          color: isDark
+                              ? AppColors.darkForeground
+                              : AppColors.lightForeground,
+                        ),
                       ),
                     ),
+                    const SizedBox(width: 8),
                     IconButton(
                       icon: const Icon(Icons.close_rounded),
                       onPressed: () => Navigator.pop(context),

@@ -18,12 +18,30 @@ class FriendCard extends StatelessWidget {
 
   LinearGradient _avatarGradient(String seed) {
     final gradients = [
-      const LinearGradient(colors: [Color(0xFFF59E0B), Color(0xFFEA580C)], begin: Alignment.topLeft, end: Alignment.bottomRight),
-      const LinearGradient(colors: [Color(0xFF0072D6), Color(0xFF0284C7)], begin: Alignment.topLeft, end: Alignment.bottomRight),
-      const LinearGradient(colors: [Color(0xFF10B981), Color(0xFF059669)], begin: Alignment.topLeft, end: Alignment.bottomRight),
-      const LinearGradient(colors: [Color(0xFFEC4899), Color(0xFFDB2777)], begin: Alignment.topLeft, end: Alignment.bottomRight),
-      const LinearGradient(colors: [Color(0xFF8B5CF6), Color(0xFF6366F1)], begin: Alignment.topLeft, end: Alignment.bottomRight),
-      const LinearGradient(colors: [Color(0xFF06B6D4), Color(0xFF0284C7)], begin: Alignment.topLeft, end: Alignment.bottomRight),
+      const LinearGradient(
+          colors: [Color(0xFFF59E0B), Color(0xFFEA580C)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight),
+      const LinearGradient(
+          colors: [Color(0xFF0072D6), Color(0xFF0284C7)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight),
+      const LinearGradient(
+          colors: [Color(0xFF10B981), Color(0xFF059669)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight),
+      const LinearGradient(
+          colors: [Color(0xFFEC4899), Color(0xFFDB2777)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight),
+      const LinearGradient(
+          colors: [Color(0xFF8B5CF6), Color(0xFF6366F1)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight),
+      const LinearGradient(
+          colors: [Color(0xFF06B6D4), Color(0xFF0284C7)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight),
     ];
     return gradients[seed.hashCode.abs() % gradients.length];
   }
@@ -41,7 +59,8 @@ class FriendCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final surface = isDark ? AppColors.darkSurface : Colors.white;
-    final foreground = isDark ? AppColors.darkForeground : AppColors.lightForeground;
+    final foreground =
+        isDark ? AppColors.darkForeground : AppColors.lightForeground;
     final muted = isDark ? AppColors.darkMuted : AppColors.lightMuted;
     final border = isDark ? AppColors.darkBorder : AppColors.lightBorder;
 
@@ -54,7 +73,8 @@ class FriendCard extends StatelessWidget {
           border: Border.all(color: border),
         ),
         child: ListTile(
-          contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
+          contentPadding:
+              const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
           leading: Container(
             width: 44,
             height: 44,
@@ -104,25 +124,31 @@ class FriendCard extends StatelessWidget {
                 tooltip: 'Nhắn tin',
                 onPressed: onChat,
               ),
-              PopupMenuButton<String>(
+              Flexible(
+                  child: PopupMenuButton<String>(
                 icon: Icon(Icons.more_vert_rounded, size: 20, color: muted),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14)),
                 color: surface,
                 itemBuilder: (_) => [
                   const PopupMenuItem(
                     value: 'unfriend',
                     child: Row(
                       children: [
-                        Icon(Icons.person_remove_rounded, size: 18, color: AppColors.danger),
+                        Icon(Icons.person_remove_rounded,
+                            size: 18, color: AppColors.danger),
                         SizedBox(width: 10),
-                        Text(
+                        Flexible(
+                            child: Text(
                           'Hủy kết bạn',
                           style: TextStyle(
                             color: AppColors.danger,
                             fontWeight: FontWeight.w600,
                             fontSize: 14,
                           ),
-                        ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        )),
                       ],
                     ),
                   ),
@@ -131,16 +157,20 @@ class FriendCard extends StatelessWidget {
                       value: 'block',
                       child: Row(
                         children: [
-                          Icon(Icons.block_rounded, size: 18, color: AppColors.danger),
+                          Icon(Icons.block_rounded,
+                              size: 18, color: AppColors.danger),
                           SizedBox(width: 10),
-                          Text(
+                          Flexible(
+                              child: Text(
                             'Chặn người này',
                             style: TextStyle(
                               color: AppColors.danger,
                               fontWeight: FontWeight.w600,
                               fontSize: 14,
                             ),
-                          ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          )),
                         ],
                       ),
                     ),
@@ -149,7 +179,7 @@ class FriendCard extends StatelessWidget {
                   if (val == 'unfriend') onUnfriend();
                   if (val == 'block') onBlock?.call();
                 },
-              ),
+              )),
             ],
           ),
         ),

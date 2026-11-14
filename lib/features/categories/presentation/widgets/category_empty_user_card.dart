@@ -75,14 +75,17 @@ class CategoryEmptyUserCard extends StatelessWidget {
                       color: Colors.white,
                     ),
                     const SizedBox(width: 4),
-                    Text(
+                    Flexible(
+                        child: Text(
                       'Thêm mới',
                       style: GoogleFonts.inter(
                         fontSize: 12.5,
                         fontWeight: FontWeight.w700,
                         color: Colors.white,
                       ),
-                    ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    )),
                   ],
                 ),
               ),

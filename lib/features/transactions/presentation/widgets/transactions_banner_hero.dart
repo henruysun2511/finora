@@ -18,8 +18,8 @@ class TransactionsBannerHero extends StatelessWidget {
       0,
       (acc, day) => acc + day.transactions.length,
     );
-    final formattedNet = NumberFormat('#,###', 'vi_VN')
-        .format(summary.netAmount.abs().round());
+    final formattedNet =
+        NumberFormat('#,###', 'vi_VN').format(summary.netAmount.abs().round());
     final formattedIncome =
         NumberFormat('#,###', 'vi_VN').format(summary.totalIncome.round());
     final formattedExpense =
@@ -31,15 +31,20 @@ class TransactionsBannerHero extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              'THẶNG DƯ RÒNG THÁNG',
-              style: GoogleFonts.inter(
-                fontSize: 11,
-                fontWeight: FontWeight.w800,
-                letterSpacing: 0.8,
-                color: Colors.white.withValues(alpha: 0.85),
+            Expanded(
+              child: Text(
+                'THẶNG DƯ RÒNG THÁNG',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: GoogleFonts.inter(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 0.8,
+                  color: Colors.white.withValues(alpha: 0.85),
+                ),
               ),
             ),
+            const SizedBox(width: 8),
             Container(
               padding: const EdgeInsets.symmetric(
                 horizontal: 10,
@@ -135,7 +140,8 @@ class FrostedStatBox extends StatelessWidget {
                 color: valueColor,
               ),
               const SizedBox(width: 4),
-              Text(
+              Flexible(
+                  child: Text(
                 label,
                 style: GoogleFonts.inter(
                   fontSize: 10,
@@ -143,7 +149,9 @@ class FrostedStatBox extends StatelessWidget {
                   letterSpacing: 0.5,
                   color: Colors.white.withValues(alpha: 0.85),
                 ),
-              ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              )),
             ],
           ),
           const SizedBox(height: 5),

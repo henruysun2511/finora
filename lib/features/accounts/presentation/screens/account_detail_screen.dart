@@ -99,8 +99,9 @@ class _AccountDetailScreenState extends ConsumerState<AccountDetailScreen> {
     final account = detailAsync.valueOrNull?.account;
     final recentTxs = detailAsync.valueOrNull?.recentTransactions ?? [];
 
-    final subtitle =
-        account != null ? '${account.name} · ${account.type.displayName}' : 'Quản lý thông tin & số dư nguồn tiền';
+    final subtitle = account != null
+        ? '${account.name} · ${account.type.displayName}'
+        : 'Quản lý thông tin & số dư nguồn tiền';
 
     return Scaffold(
       backgroundColor:
@@ -389,12 +390,16 @@ class _AccountDetailScreenState extends ConsumerState<AccountDetailScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(
-                typeLabel,
-                style: GoogleFonts.inter(
-                  fontSize: 12.5,
-                  fontWeight: FontWeight.w600,
-                  color: isDark ? AppColors.darkMuted : AppColors.lightMuted,
+              Flexible(
+                child: Text(
+                  typeLabel,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: GoogleFonts.inter(
+                    fontSize: 12.5,
+                    fontWeight: FontWeight.w600,
+                    color: isDark ? AppColors.darkMuted : AppColors.lightMuted,
+                  ),
                 ),
               ),
               if (cardLast4 != null) ...[
@@ -424,9 +429,8 @@ class _AccountDetailScreenState extends ConsumerState<AccountDetailScreen> {
             width: double.infinity,
             padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
             decoration: BoxDecoration(
-              color: isDark
-                  ? AppColors.darkBackground
-                  : AppColors.lightBackground,
+              color:
+                  isDark ? AppColors.darkBackground : AppColors.lightBackground,
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
                 color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
@@ -474,14 +478,17 @@ class _AccountDetailScreenState extends ConsumerState<AccountDetailScreen> {
                 const Icon(Icons.check_circle_rounded,
                     color: AppColors.success, size: 14),
                 const SizedBox(width: 6),
-                Text(
+                Flexible(
+                    child: Text(
                   'Đang hoạt động',
                   style: GoogleFonts.inter(
                     fontSize: 11.5,
                     fontWeight: FontWeight.w800,
                     color: AppColors.success,
                   ),
-                ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                )),
               ],
             ),
           ),

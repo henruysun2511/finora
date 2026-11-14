@@ -134,7 +134,7 @@ class _AccountPickerSheetState extends ConsumerState<AccountPickerSheet> {
 
     // Chỉ hiển thị ví còn tài khoản khả dụng
     final availableWallets =
-        walletItems.where((item) => item.accounts.any(_isSelectable)).toList();
+        walletItems.where((item) => item.allAccounts.any(_isSelectable)).toList();
 
     // Ví đã chọn không còn khả dụng thì quay về "Tất cả ví"
     final effectiveWalletId = availableWallets
@@ -263,7 +263,8 @@ class _AccountPickerSheetState extends ConsumerState<AccountPickerSheet> {
                         item.wallet.id != effectiveWalletId) {
                       continue;
                     }
-                    final accounts = item.accounts.where(_isSelectable).toList();
+                    final accounts =
+                        item.allAccounts.where(_isSelectable).toList();
                     if (accounts.isEmpty) continue;
                     if (effectiveWalletId == null) {
                       entries.add(_PickerEntry.wallet(item.wallet));

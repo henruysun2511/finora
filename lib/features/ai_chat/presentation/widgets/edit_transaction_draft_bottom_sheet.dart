@@ -149,7 +149,8 @@ class _EditTransactionDraftBottomSheetState
   @override
   void initState() {
     super.initState();
-    _type = widget.initialType?.toUpperCase() == 'INCOME' ? 'INCOME' : 'EXPENSE';
+    _type =
+        widget.initialType?.toUpperCase() == 'INCOME' ? 'INCOME' : 'EXPENSE';
     _nameController = TextEditingController(text: widget.initialName);
     _amountController =
         TextEditingController(text: widget.initialAmount.toStringAsFixed(0));
@@ -359,46 +360,54 @@ class _EditTransactionDraftBottomSheetState
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF0072D5).withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: const Icon(
-                        Icons.edit_note_rounded,
-                        color: Color(0xFF0072D5),
-                        size: 22,
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Sửa giao dịch nháp',
-                          style: GoogleFonts.inter(
-                            fontSize: 17,
-                            fontWeight: FontWeight.w800,
-                            color: isDark
-                                ? AppColors.darkForeground
-                                : AppColors.lightForeground,
-                          ),
+                Expanded(
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF0072D5).withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(10),
                         ),
-                        Text(
-                          'Chuẩn hóa đầy đủ các trường trước khi ghi sổ',
-                          style: GoogleFonts.inter(
-                            fontSize: 11.5,
-                            color: isDark
-                                ? AppColors.darkMuted
-                                : AppColors.lightMuted,
-                          ),
+                        child: const Icon(
+                          Icons.edit_note_rounded,
+                          color: Color(0xFF0072D5),
+                          size: 22,
                         ),
-                      ],
-                    ),
-                  ],
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Sửa giao dịch nháp',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: GoogleFonts.inter(
+                                fontSize: 17,
+                                fontWeight: FontWeight.w800,
+                                color: isDark
+                                    ? AppColors.darkForeground
+                                    : AppColors.lightForeground,
+                              ),
+                            ),
+                            Text(
+                              'Chuẩn hóa đầy đủ các trường trước khi ghi sổ',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: GoogleFonts.inter(
+                                fontSize: 11.5,
+                                color: isDark
+                                    ? AppColors.darkMuted
+                                    : AppColors.lightMuted,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
                 IconButton(
                   onPressed: () => Navigator.pop(context),
@@ -412,7 +421,8 @@ class _EditTransactionDraftBottomSheetState
             Container(
               padding: const EdgeInsets.all(4),
               decoration: BoxDecoration(
-                color: isDark ? const Color(0xFF0F172A) : const Color(0xFFF1F5F9),
+                color:
+                    isDark ? const Color(0xFF0F172A) : const Color(0xFFF1F5F9),
                 borderRadius: BorderRadius.circular(14),
               ),
               child: Row(
@@ -432,7 +442,9 @@ class _EditTransactionDraftBottomSheetState
                         padding: const EdgeInsets.symmetric(vertical: 9),
                         decoration: BoxDecoration(
                           color: isExpense
-                              ? (isDark ? const Color(0xFF1E293B) : Colors.white)
+                              ? (isDark
+                                  ? const Color(0xFF1E293B)
+                                  : Colors.white)
                               : Colors.transparent,
                           borderRadius: BorderRadius.circular(10),
                           boxShadow: isExpense
@@ -457,7 +469,8 @@ class _EditTransactionDraftBottomSheetState
                                   : Colors.grey,
                             ),
                             const SizedBox(width: 6),
-                            Text(
+                            Flexible(
+                                child: Text(
                               'Khoản chi tiêu',
                               style: GoogleFonts.inter(
                                 fontSize: 13,
@@ -468,7 +481,9 @@ class _EditTransactionDraftBottomSheetState
                                         ? const Color(0xFF94A3B8)
                                         : const Color(0xFF64748B)),
                               ),
-                            ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            )),
                           ],
                         ),
                       ),
@@ -489,7 +504,9 @@ class _EditTransactionDraftBottomSheetState
                         padding: const EdgeInsets.symmetric(vertical: 9),
                         decoration: BoxDecoration(
                           color: !isExpense
-                              ? (isDark ? const Color(0xFF1E293B) : Colors.white)
+                              ? (isDark
+                                  ? const Color(0xFF1E293B)
+                                  : Colors.white)
                               : Colors.transparent,
                           borderRadius: BorderRadius.circular(10),
                           boxShadow: !isExpense
@@ -514,7 +531,8 @@ class _EditTransactionDraftBottomSheetState
                                   : Colors.grey,
                             ),
                             const SizedBox(width: 6),
-                            Text(
+                            Flexible(
+                                child: Text(
                               'Khoản thu nhập',
                               style: GoogleFonts.inter(
                                 fontSize: 13,
@@ -525,7 +543,9 @@ class _EditTransactionDraftBottomSheetState
                                         ? const Color(0xFF94A3B8)
                                         : const Color(0xFF64748B)),
                               ),
-                            ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            )),
                           ],
                         ),
                       ),
@@ -542,7 +562,8 @@ class _EditTransactionDraftBottomSheetState
               style: GoogleFonts.inter(
                 fontSize: 13,
                 fontWeight: FontWeight.w700,
-                color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                color:
+                    isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
               ),
             ),
             const SizedBox(height: 6),
@@ -578,7 +599,8 @@ class _EditTransactionDraftBottomSheetState
               style: GoogleFonts.inter(
                 fontSize: 13,
                 fontWeight: FontWeight.w700,
-                color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                color:
+                    isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
               ),
             ),
             const SizedBox(height: 6),
@@ -668,7 +690,8 @@ class _EditTransactionDraftBottomSheetState
                           return DropdownMenuItem(value: c, child: Text(c));
                         }).toList(),
                         onChanged: (val) {
-                          if (val != null) setState(() => _selectedCategory = val);
+                          if (val != null)
+                            setState(() => _selectedCategory = val);
                         },
                       ),
                     ],
@@ -722,7 +745,8 @@ class _EditTransactionDraftBottomSheetState
                           return DropdownMenuItem(value: a, child: Text(a));
                         }).toList(),
                         onChanged: (val) {
-                          if (val != null) setState(() => _selectedAccount = val);
+                          if (val != null)
+                            setState(() => _selectedAccount = val);
                         },
                       ),
                     ],
@@ -772,14 +796,17 @@ class _EditTransactionDraftBottomSheetState
                               const Icon(Icons.calendar_today_rounded,
                                   size: 16, color: Color(0xFF0072D5)),
                               const SizedBox(width: 8),
-                              Text(
+                              Flexible(
+                                  child: Text(
                                 DateFormat('dd/MM/yyyy').format(_selectedDate),
                                 style: GoogleFonts.inter(
                                   fontSize: 13,
                                   fontWeight: FontWeight.w600,
                                   color: isDark ? Colors.white : Colors.black87,
                                 ),
-                              ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              )),
                             ],
                           ),
                         ),
@@ -840,7 +867,8 @@ class _EditTransactionDraftBottomSheetState
               style: GoogleFonts.inter(
                 fontSize: 13,
                 fontWeight: FontWeight.w700,
-                color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                color:
+                    isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
               ),
             ),
             const SizedBox(height: 6),
@@ -875,7 +903,8 @@ class _EditTransactionDraftBottomSheetState
               style: GoogleFonts.inter(
                 fontSize: 13,
                 fontWeight: FontWeight.w700,
-                color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                color:
+                    isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
               ),
             ),
             const SizedBox(height: 6),
@@ -883,10 +912,14 @@ class _EditTransactionDraftBottomSheetState
               Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
+                  color: isDark
+                      ? const Color(0xFF0F172A)
+                      : const Color(0xFFF8FAFC),
                   borderRadius: BorderRadius.circular(14),
                   border: Border.all(
-                    color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+                    color: isDark
+                        ? const Color(0xFF334155)
+                        : const Color(0xFFE2E8F0),
                   ),
                 ),
                 child: Row(
@@ -902,13 +935,18 @@ class _EditTransactionDraftBottomSheetState
                               width: 64,
                               height: 64,
                               child: _localPhotoBytes != null
-                                  ? Image.memory(_localPhotoBytes!, fit: BoxFit.cover)
+                                  ? Image.memory(_localPhotoBytes!,
+                                      fit: BoxFit.cover)
                                   : Image.network(
                                       _photoUrl!,
                                       fit: BoxFit.cover,
-                                      errorBuilder: (ctx, err, stack) => Container(
-                                        color: Colors.grey.withValues(alpha: 0.2),
-                                        child: const Icon(Icons.broken_image_rounded, size: 28),
+                                      errorBuilder: (ctx, err, stack) =>
+                                          Container(
+                                        color:
+                                            Colors.grey.withValues(alpha: 0.2),
+                                        child: const Icon(
+                                            Icons.broken_image_rounded,
+                                            size: 28),
                                       ),
                                     ),
                             ),
@@ -923,7 +961,8 @@ class _EditTransactionDraftBottomSheetState
                                     height: 22,
                                     child: CircularProgressIndicator(
                                       strokeWidth: 2.5,
-                                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                      valueColor: AlwaysStoppedAnimation<Color>(
+                                          Colors.white),
                                     ),
                                   ),
                                 ),
@@ -949,7 +988,8 @@ class _EditTransactionDraftBottomSheetState
                                     : const Color(0xFF10B981),
                               ),
                               const SizedBox(width: 5),
-                              Text(
+                              Flexible(
+                                  child: Text(
                                 _isUploadingPhoto
                                     ? 'Đang tải lên Cloudinary...'
                                     : 'Đã đính kèm ảnh',
@@ -958,7 +998,9 @@ class _EditTransactionDraftBottomSheetState
                                   fontWeight: FontWeight.w700,
                                   color: isDark ? Colors.white : Colors.black87,
                                 ),
-                              ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              )),
                             ],
                           ),
                           const SizedBox(height: 3),
@@ -966,14 +1008,17 @@ class _EditTransactionDraftBottomSheetState
                             'Chạm vào ảnh để phóng to xem chi tiết',
                             style: GoogleFonts.inter(
                               fontSize: 11,
-                              color: isDark ? AppColors.darkMuted : AppColors.lightMuted,
+                              color: isDark
+                                  ? AppColors.darkMuted
+                                  : AppColors.lightMuted,
                             ),
                           ),
                         ],
                       ),
                     ),
                     IconButton(
-                      icon: const Icon(Icons.delete_outline_rounded, color: Color(0xFFEF4444)),
+                      icon: const Icon(Icons.delete_outline_rounded,
+                          color: Color(0xFFEF4444)),
                       tooltip: 'Xóa ảnh này',
                       onPressed: _isUploadingPhoto ? null : _removePhoto,
                     ),
@@ -982,12 +1027,17 @@ class _EditTransactionDraftBottomSheetState
               )
             else
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                 decoration: BoxDecoration(
-                  color: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
+                  color: isDark
+                      ? const Color(0xFF0F172A)
+                      : const Color(0xFFF8FAFC),
                   borderRadius: BorderRadius.circular(14),
                   border: Border.all(
-                    color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+                    color: isDark
+                        ? const Color(0xFF334155)
+                        : const Color(0xFFE2E8F0),
                   ),
                 ),
                 child: Row(
@@ -997,7 +1047,9 @@ class _EditTransactionDraftBottomSheetState
                         'Đính kèm hóa đơn / chứng từ',
                         style: GoogleFonts.inter(
                           fontSize: 12,
-                          color: isDark ? AppColors.darkMuted : AppColors.lightMuted,
+                          color: isDark
+                              ? AppColors.darkMuted
+                              : AppColors.lightMuted,
                         ),
                       ),
                     ),
@@ -1007,24 +1059,30 @@ class _EditTransactionDraftBottomSheetState
                       onTap: () => _pickAndUploadReceipt(ImageSource.camera),
                       borderRadius: BorderRadius.circular(10),
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 10, vertical: 7),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF0072D5).withValues(alpha: 0.12),
+                          color:
+                              const Color(0xFF0072D5).withValues(alpha: 0.12),
                           borderRadius: BorderRadius.circular(10),
                         ),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            const Icon(Icons.camera_alt_rounded, size: 15, color: Color(0xFF0072D5)),
+                            const Icon(Icons.camera_alt_rounded,
+                                size: 15, color: Color(0xFF0072D5)),
                             const SizedBox(width: 4),
-                            Text(
+                            Flexible(
+                                child: Text(
                               'Chụp',
                               style: GoogleFonts.inter(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w700,
                                 color: const Color(0xFF0072D5),
                               ),
-                            ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            )),
                           ],
                         ),
                       ),
@@ -1035,9 +1093,12 @@ class _EditTransactionDraftBottomSheetState
                       onTap: () => _pickAndUploadReceipt(ImageSource.gallery),
                       borderRadius: BorderRadius.circular(10),
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 10, vertical: 7),
                         decoration: BoxDecoration(
-                          color: isDark ? const Color(0xFF1E293B) : const Color(0xFFE2E8F0),
+                          color: isDark
+                              ? const Color(0xFF1E293B)
+                              : const Color(0xFFE2E8F0),
                           borderRadius: BorderRadius.circular(10),
                         ),
                         child: Row(
@@ -1046,17 +1107,24 @@ class _EditTransactionDraftBottomSheetState
                             Icon(
                               Icons.photo_library_rounded,
                               size: 15,
-                              color: isDark ? Colors.white70 : const Color(0xFF475569),
+                              color: isDark
+                                  ? Colors.white70
+                                  : const Color(0xFF475569),
                             ),
                             const SizedBox(width: 4),
-                            Text(
+                            Flexible(
+                                child: Text(
                               'Thư viện',
                               style: GoogleFonts.inter(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w700,
-                                color: isDark ? Colors.white70 : const Color(0xFF475569),
+                                color: isDark
+                                    ? Colors.white70
+                                    : const Color(0xFF475569),
                               ),
-                            ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            )),
                           ],
                         ),
                       ),
@@ -1068,7 +1136,8 @@ class _EditTransactionDraftBottomSheetState
 
             // 8. Cài đặt bổ sung / Nâng cao (Expandable Toggle)
             InkWell(
-              onTap: () => setState(() => _showAdvancedOptions = !_showAdvancedOptions),
+              onTap: () =>
+                  setState(() => _showAdvancedOptions = !_showAdvancedOptions),
               borderRadius: BorderRadius.circular(10),
               child: Padding(
                 padding: const EdgeInsets.symmetric(vertical: 6),
@@ -1082,14 +1151,17 @@ class _EditTransactionDraftBottomSheetState
                       color: const Color(0xFF0072D5),
                     ),
                     const SizedBox(width: 4),
-                    Text(
+                    Flexible(
+                        child: Text(
                       'Tùy chọn nâng cao (Ví chia sẻ & Báo cáo)',
                       style: GoogleFonts.inter(
                         fontSize: 12.5,
                         fontWeight: FontWeight.w700,
                         color: const Color(0xFF0072D5),
                       ),
-                    ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    )),
                   ],
                 ),
               ),
@@ -1116,30 +1188,37 @@ class _EditTransactionDraftBottomSheetState
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Quyền hiển thị',
-                              style: GoogleFonts.inter(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w600,
-                                color: isDark
-                                    ? AppColors.darkForeground
-                                    : AppColors.lightForeground,
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Quyền hiển thị',
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: GoogleFonts.inter(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w600,
+                                  color: isDark
+                                      ? AppColors.darkForeground
+                                      : AppColors.lightForeground,
+                                ),
                               ),
-                            ),
-                            Text(
-                              'Riêng tư hoặc chia sẻ cùng thành viên ví',
-                              style: GoogleFonts.inter(
-                                fontSize: 11,
-                                color: isDark
-                                    ? AppColors.darkMuted
-                                    : AppColors.lightMuted,
+                              Text(
+                                'Riêng tư hoặc chia sẻ cùng thành viên ví',
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: GoogleFonts.inter(
+                                  fontSize: 11,
+                                  color: isDark
+                                      ? AppColors.darkMuted
+                                      : AppColors.lightMuted,
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
+                        const SizedBox(width: 8),
                         DropdownButton<String>(
                           value: _visibility,
                           underline: const SizedBox(),
@@ -1201,7 +1280,8 @@ class _EditTransactionDraftBottomSheetState
                         Switch(
                           value: _amountHidden,
                           activeTrackColor: const Color(0xFF0072D5),
-                          onChanged: (val) => setState(() => _amountHidden = val),
+                          onChanged: (val) =>
+                              setState(() => _amountHidden = val),
                         ),
                       ],
                     ),

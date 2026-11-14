@@ -34,7 +34,8 @@ class SharedWalletsScreen extends ConsumerStatefulWidget {
 }
 
 class _SharedWalletsScreenState extends ConsumerState<SharedWalletsScreen> {
-  int _activeTabIndex = 0; // 0: Nguồn tiền, 1: Thành viên, 2: Giao dịch, 3: Cài đặt
+  int _activeTabIndex =
+      0; // 0: Nguồn tiền, 1: Thành viên, 2: Giao dịch, 3: Cài đặt
   String? _selectedWalletId;
   String? _selectedMemberFilterUserId;
 
@@ -237,9 +238,7 @@ class _SharedWalletsScreenState extends ConsumerState<SharedWalletsScreen> {
           decoration: BoxDecoration(
             color: isSelected
                 ? AppColors.primary.withValues(alpha: 0.15)
-                : (isDark
-                    ? AppColors.darkBackground
-                    : const Color(0xFFF1F5F9)),
+                : (isDark ? AppColors.darkBackground : const Color(0xFFF1F5F9)),
             borderRadius: BorderRadius.circular(14),
           ),
           child: Icon(
@@ -274,7 +273,7 @@ class _SharedWalletsScreenState extends ConsumerState<SharedWalletsScreen> {
         onTap: onTap,
       ),
     );
-}
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -528,13 +527,15 @@ class _SharedWalletsScreenState extends ConsumerState<SharedWalletsScreen> {
                             : () async {
                                 try {
                                   await ref
-                                      .read(walletDetailActionsProvider(walletId))
+                                      .read(
+                                          walletDetailActionsProvider(walletId))
                                       .rejectInvite();
                                   await ref
                                       .read(notificationListProvider.notifier)
                                       .markAsRead(invite.id);
                                   if (context.mounted) {
-                                    AppToast.info(context, 'Đã từ chối lời mời');
+                                    AppToast.info(
+                                        context, 'Đã từ chối lời mời');
                                   }
                                 } catch (e) {
                                   if (context.mounted) {
@@ -573,7 +574,8 @@ class _SharedWalletsScreenState extends ConsumerState<SharedWalletsScreen> {
                             : () async {
                                 try {
                                   await ref
-                                      .read(walletDetailActionsProvider(walletId))
+                                      .read(
+                                          walletDetailActionsProvider(walletId))
                                       .acceptInvite();
                                   await ref
                                       .read(notificationListProvider.notifier)
@@ -675,14 +677,17 @@ class _SharedWalletsScreenState extends ConsumerState<SharedWalletsScreen> {
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Text(
+                      Flexible(
+                          child: Text(
                         title,
                         style: GoogleFonts.inter(
                           fontSize: 12,
                           fontWeight: FontWeight.w800,
                           color: Colors.white,
                         ),
-                      ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      )),
                       const SizedBox(width: 5),
                       const Icon(
                         Icons.keyboard_arrow_down_rounded,
@@ -739,7 +744,8 @@ class _SharedWalletsScreenState extends ConsumerState<SharedWalletsScreen> {
         ),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF0F172A).withValues(alpha: isDark ? 0.3 : 0.08),
+            color:
+                const Color(0xFF0F172A).withValues(alpha: isDark ? 0.3 : 0.08),
             blurRadius: 20,
             offset: const Offset(0, 6),
           ),
@@ -820,9 +826,8 @@ class _SharedWalletsScreenState extends ConsumerState<SharedWalletsScreen> {
               style: GoogleFonts.inter(
                 fontSize: 11.5,
                 fontWeight: FontWeight.w800,
-                color: isDark
-                    ? AppColors.darkForeground
-                    : const Color(0xFF0F172A),
+                color:
+                    isDark ? AppColors.darkForeground : const Color(0xFF0F172A),
               ),
             ),
           ],
@@ -944,17 +949,22 @@ class _SharedWalletsScreenState extends ConsumerState<SharedWalletsScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                'Tài khoản nguồn tiền (${accounts.length})',
-                style: GoogleFonts.inter(
-                  fontSize: 14.5,
-                  fontWeight: FontWeight.w900,
-                  letterSpacing: -0.3,
-                  color: isDark
-                      ? AppColors.darkForeground
-                      : AppColors.lightForeground,
+              Expanded(
+                child: Text(
+                  'Tài khoản nguồn tiền (${accounts.length})',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: GoogleFonts.inter(
+                    fontSize: 14.5,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: -0.3,
+                    color: isDark
+                        ? AppColors.darkForeground
+                        : AppColors.lightForeground,
+                  ),
                 ),
               ),
+              const SizedBox(width: 8),
               if (canManage)
                 GestureDetector(
                   onTap: () => context.push(
@@ -1008,7 +1018,8 @@ class _SharedWalletsScreenState extends ConsumerState<SharedWalletsScreen> {
                         : 'Quỹ hiện chưa có tài khoản nguồn tiền nào.',
                     textAlign: TextAlign.center,
                     style: GoogleFonts.inter(
-                      color: isDark ? AppColors.darkMuted : AppColors.lightMuted,
+                      color:
+                          isDark ? AppColors.darkMuted : AppColors.lightMuted,
                       fontSize: 12,
                     ),
                   ),
@@ -1051,72 +1062,74 @@ class _SharedWalletsScreenState extends ConsumerState<SharedWalletsScreen> {
                 return Material(
                   color: Colors.transparent,
                   child: ListTile(
-                  contentPadding: const EdgeInsets.symmetric(vertical: 4),
-                  onTap: () =>
-                      context.push(RoutePaths.accountDetailWithId(acc.id)),
-                  leading: Container(
-                    width: 42,
-                    height: 42,
-                    decoration: BoxDecoration(
-                      color: acc.displayColor.withValues(alpha: 0.12),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Icon(
-                      acc.displayIcon,
-                      color: acc.displayColor,
-                      size: 22,
-                    ),
-                  ),
-                  title: Text(
-                    acc.name,
-                    style: GoogleFonts.inter(
-                      fontSize: 13.5,
-                      fontWeight: FontWeight.w700,
-                      color: isDark
-                          ? AppColors.darkForeground
-                          : AppColors.lightForeground,
-                    ),
-                  ),
-                  subtitle: Text(
-                    acc.maskedNumber.isNotEmpty
-                        ? '${acc.maskedNumber} · ${acc.type.displayName}'
-                        : acc.type.displayName,
-                    style: GoogleFonts.inter(
-                      fontSize: 11,
-                      color: isDark
-                          ? AppColors.darkMuted
-                          : AppColors.lightMuted,
-                    ),
-                  ),
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        CurrencyFormatter.format(
-                          acc.balance,
-                          currency: acc.currency,
-                        ),
-                        style: GoogleFonts.outfit(
-                          fontSize: 13.5,
-                          fontWeight: FontWeight.w800,
-                          color: isDark
-                              ? AppColors.darkForeground
-                              : AppColors.lightForeground,
-                        ),
+                    contentPadding: const EdgeInsets.symmetric(vertical: 4),
+                    onTap: () =>
+                        context.push(RoutePaths.accountDetailWithId(acc.id)),
+                    leading: Container(
+                      width: 42,
+                      height: 42,
+                      decoration: BoxDecoration(
+                        color: acc.displayColor.withValues(alpha: 0.12),
+                        borderRadius: BorderRadius.circular(12),
                       ),
-                      const SizedBox(width: 4),
-                      Icon(
-                        Icons.chevron_right_rounded,
-                        size: 18,
+                      child: Icon(
+                        acc.displayIcon,
+                        color: acc.displayColor,
+                        size: 22,
+                      ),
+                    ),
+                    title: Text(
+                      acc.name,
+                      style: GoogleFonts.inter(
+                        fontSize: 13.5,
+                        fontWeight: FontWeight.w700,
                         color: isDark
-                            ? AppColors.darkMuted
-                            : AppColors.lightMuted,
+                            ? AppColors.darkForeground
+                            : AppColors.lightForeground,
                       ),
-                    ],
+                    ),
+                    subtitle: Text(
+                      acc.maskedNumber.isNotEmpty
+                          ? '${acc.maskedNumber} · ${acc.type.displayName}'
+                          : acc.type.displayName,
+                      style: GoogleFonts.inter(
+                        fontSize: 11,
+                        color:
+                            isDark ? AppColors.darkMuted : AppColors.lightMuted,
+                      ),
+                    ),
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Flexible(
+                            child: Text(
+                          CurrencyFormatter.format(
+                            acc.balance,
+                            currency: acc.currency,
+                          ),
+                          style: GoogleFonts.outfit(
+                            fontSize: 13.5,
+                            fontWeight: FontWeight.w800,
+                            color: isDark
+                                ? AppColors.darkForeground
+                                : AppColors.lightForeground,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        )),
+                        const SizedBox(width: 4),
+                        Icon(
+                          Icons.chevron_right_rounded,
+                          size: 18,
+                          color: isDark
+                              ? AppColors.darkMuted
+                              : AppColors.lightMuted,
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-              );
-            },
+                );
+              },
             ),
         ],
       ),
@@ -1152,23 +1165,28 @@ class _SharedWalletsScreenState extends ConsumerState<SharedWalletsScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    'Thành viên quỹ (${members.length})',
-                    style: GoogleFonts.inter(
-                      fontSize: 14.5,
-                      fontWeight: FontWeight.w900,
-                      letterSpacing: -0.3,
-                      color: isDark
-                          ? AppColors.darkForeground
-                          : AppColors.lightForeground,
+                  Expanded(
+                    child: Text(
+                      'Thành viên quỹ (${members.length})',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: GoogleFonts.inter(
+                        fontSize: 14.5,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: -0.3,
+                        color: isDark
+                            ? AppColors.darkForeground
+                            : AppColors.lightForeground,
+                      ),
                     ),
                   ),
+                  const SizedBox(width: 8),
                   GestureDetector(
                     onTap: () {
                       showDialog(
                         context: context,
-                        builder: (ctx) =>
-                            InviteMemberDialog(walletId: selectedItem.wallet.id),
+                        builder: (ctx) => InviteMemberDialog(
+                            walletId: selectedItem.wallet.id),
                       );
                     },
                     child: Text(
@@ -1190,7 +1208,8 @@ class _SharedWalletsScreenState extends ConsumerState<SharedWalletsScreen> {
                     'Chưa có thành viên nào khác trong quỹ này.',
                     textAlign: TextAlign.center,
                     style: GoogleFonts.inter(
-                      color: isDark ? AppColors.darkMuted : AppColors.lightMuted,
+                      color:
+                          isDark ? AppColors.darkMuted : AppColors.lightMuted,
                       fontSize: 13,
                     ),
                   ),
@@ -1219,8 +1238,9 @@ class _SharedWalletsScreenState extends ConsumerState<SharedWalletsScreen> {
                       children: [
                         CircleAvatar(
                           radius: 18,
-                          backgroundColor:
-                              isOwner ? AppColors.primary : Colors.grey.shade400,
+                          backgroundColor: isOwner
+                              ? AppColors.primary
+                              : Colors.grey.shade400,
                           child: Text(
                             member.fullName.isNotEmpty
                                 ? member.fullName[0].toUpperCase()
@@ -1288,7 +1308,8 @@ class _SharedWalletsScreenState extends ConsumerState<SharedWalletsScreen> {
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(16),
                             ),
-                            color: isDark ? AppColors.darkSurface : Colors.white,
+                            color:
+                                isDark ? AppColors.darkSurface : Colors.white,
                             onSelected: (val) {
                               if (val == 'MAKE_EDITOR') {
                                 _changeRole(
@@ -1429,17 +1450,22 @@ class _SharedWalletsScreenState extends ConsumerState<SharedWalletsScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    'Tỷ trọng đóng góp chi tiêu',
-                    style: GoogleFonts.inter(
-                      fontSize: 14.5,
-                      fontWeight: FontWeight.w900,
-                      letterSpacing: -0.3,
-                      color: isDark
-                          ? AppColors.darkForeground
-                          : AppColors.lightForeground,
+                  Expanded(
+                    child: Text(
+                      'Tỷ trọng đóng góp chi tiêu',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: GoogleFonts.inter(
+                        fontSize: 14.5,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: -0.3,
+                        color: isDark
+                            ? AppColors.darkForeground
+                            : AppColors.lightForeground,
+                      ),
                     ),
                   ),
+                  const SizedBox(width: 8),
                   Text(
                     CurrencyFormatter.format(
                       dashboard.totalSpent,
@@ -1469,7 +1495,8 @@ class _SharedWalletsScreenState extends ConsumerState<SharedWalletsScreen> {
                     'Chưa có thành viên nào phát sinh chi tiêu trong quỹ này.',
                     textAlign: TextAlign.center,
                     style: GoogleFonts.inter(
-                      color: isDark ? AppColors.darkMuted : AppColors.lightMuted,
+                      color:
+                          isDark ? AppColors.darkMuted : AppColors.lightMuted,
                       fontSize: 12.5,
                     ),
                   ),
@@ -1589,27 +1616,34 @@ class _SharedWalletsScreenState extends ConsumerState<SharedWalletsScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Row(
-                    children: [
-                      const Icon(
-                        Icons.swap_horizontal_circle_outlined,
-                        size: 18,
-                        color: AppColors.primary,
-                      ),
-                      const SizedBox(width: 8),
-                      Text(
-                        'Ma trận nợ & Quyết toán',
-                        style: GoogleFonts.inter(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w900,
-                          letterSpacing: -0.3,
-                          color: isDark
-                              ? AppColors.darkForeground
-                              : AppColors.lightForeground,
+                  Expanded(
+                    child: Row(
+                      children: [
+                        const Icon(
+                          Icons.swap_horizontal_circle_outlined,
+                          size: 18,
+                          color: AppColors.primary,
                         ),
-                      ),
-                    ],
+                        const SizedBox(width: 8),
+                        Flexible(
+                          child: Text(
+                            'Ma trận nợ & Quyết toán',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: GoogleFonts.inter(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w900,
+                              letterSpacing: -0.3,
+                              color: isDark
+                                  ? AppColors.darkForeground
+                                  : AppColors.lightForeground,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
+                  const SizedBox(width: 8),
                   Container(
                     padding:
                         const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
@@ -1716,14 +1750,18 @@ class _SharedWalletsScreenState extends ConsumerState<SharedWalletsScreen> {
                             children: [
                               Row(
                                 children: [
-                                  Text(
-                                    s.fromUserName,
-                                    style: GoogleFonts.inter(
-                                      fontSize: 12.5,
-                                      fontWeight: FontWeight.w800,
-                                      color: isDark
-                                          ? AppColors.darkForeground
-                                          : AppColors.lightForeground,
+                                  Flexible(
+                                    child: Text(
+                                      s.fromUserName,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: GoogleFonts.inter(
+                                        fontSize: 12.5,
+                                        fontWeight: FontWeight.w800,
+                                        color: isDark
+                                            ? AppColors.darkForeground
+                                            : AppColors.lightForeground,
+                                      ),
                                     ),
                                   ),
                                   const Padding(
@@ -1735,14 +1773,18 @@ class _SharedWalletsScreenState extends ConsumerState<SharedWalletsScreen> {
                                       color: AppColors.primary,
                                     ),
                                   ),
-                                  Text(
-                                    s.toUserName,
-                                    style: GoogleFonts.inter(
-                                      fontSize: 12.5,
-                                      fontWeight: FontWeight.w800,
-                                      color: isDark
-                                          ? AppColors.darkForeground
-                                          : AppColors.lightForeground,
+                                  Flexible(
+                                    child: Text(
+                                      s.toUserName,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: GoogleFonts.inter(
+                                        fontSize: 12.5,
+                                        fontWeight: FontWeight.w800,
+                                        color: isDark
+                                            ? AppColors.darkForeground
+                                            : AppColors.lightForeground,
+                                      ),
                                     ),
                                   ),
                                 ],
@@ -1789,8 +1831,8 @@ class _SharedWalletsScreenState extends ConsumerState<SharedWalletsScreen> {
                                   vertical: 4,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: AppColors.primary
-                                      .withValues(alpha: 0.12),
+                                  color:
+                                      AppColors.primary.withValues(alpha: 0.12),
                                   borderRadius: BorderRadius.circular(8),
                                 ),
                                 child: Text(
@@ -1824,8 +1866,7 @@ class _SharedWalletsScreenState extends ConsumerState<SharedWalletsScreen> {
   ) {
     final txsAsync =
         ref.watch(walletTransactionsProvider(selectedItem.wallet.id));
-    final detailAsync =
-        ref.watch(walletDetailProvider(selectedItem.wallet.id));
+    final detailAsync = ref.watch(walletDetailProvider(selectedItem.wallet.id));
     final members = detailAsync.valueOrNull?.members ?? [];
     final currentUser = ref.watch(authNotifierProvider).valueOrNull;
 
@@ -1888,23 +1929,29 @@ class _SharedWalletsScreenState extends ConsumerState<SharedWalletsScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    'Lịch sử thu chi',
-                    style: GoogleFonts.inter(
-                      fontSize: 14.5,
-                      fontWeight: FontWeight.w900,
-                      letterSpacing: -0.3,
-                      color: isDark
-                          ? AppColors.darkForeground
-                          : AppColors.lightForeground,
+                  Expanded(
+                    child: Text(
+                      'Lịch sử thu chi',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: GoogleFonts.inter(
+                        fontSize: 14.5,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: -0.3,
+                        color: isDark
+                            ? AppColors.darkForeground
+                            : AppColors.lightForeground,
+                      ),
                     ),
                   ),
+                  const SizedBox(width: 8),
                   Text(
                     '${filteredTxs.length}/${txs.length} giao dịch',
                     style: GoogleFonts.inter(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
-                      color: isDark ? AppColors.darkMuted : AppColors.lightMuted,
+                      color:
+                          isDark ? AppColors.darkMuted : AppColors.lightMuted,
                     ),
                   ),
                 ],
@@ -1941,8 +1988,7 @@ class _SharedWalletsScreenState extends ConsumerState<SharedWalletsScreen> {
                         padding: const EdgeInsets.only(left: 8),
                         child: _memberFilterChip(
                           label: m.fullName,
-                          isSelected:
-                              _selectedMemberFilterUserId == m.userId,
+                          isSelected: _selectedMemberFilterUserId == m.userId,
                           isDark: isDark,
                           onSelected: () => setState(
                               () => _selectedMemberFilterUserId = m.userId),
@@ -1996,59 +2042,59 @@ class _SharedWalletsScreenState extends ConsumerState<SharedWalletsScreen> {
                       Material(
                         color: Colors.transparent,
                         child: ListTile(
-                        contentPadding: EdgeInsets.zero,
-                        leading: Container(
-                          width: 38,
-                          height: 38,
-                          decoration: BoxDecoration(
-                            color: (isIncome
-                                    ? AppColors.success
-                                    : AppColors.danger)
-                                .withValues(alpha: 0.12),
-                            borderRadius: BorderRadius.circular(12),
+                          contentPadding: EdgeInsets.zero,
+                          leading: Container(
+                            width: 38,
+                            height: 38,
+                            decoration: BoxDecoration(
+                              color: (isIncome
+                                      ? AppColors.success
+                                      : AppColors.danger)
+                                  .withValues(alpha: 0.12),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Icon(
+                              isIncome
+                                  ? Icons.arrow_downward_rounded
+                                  : Icons.arrow_upward_rounded,
+                              color: isIncome
+                                  ? AppColors.success
+                                  : AppColors.danger,
+                              size: 18,
+                            ),
                           ),
-                          child: Icon(
-                            isIncome
-                                ? Icons.arrow_downward_rounded
-                                : Icons.arrow_upward_rounded,
-                            color: isIncome
-                                ? AppColors.success
-                                : AppColors.danger,
-                            size: 18,
+                          title: Text(
+                            tx.title,
+                            style: GoogleFonts.inter(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w800,
+                              color: isDark
+                                  ? AppColors.darkForeground
+                                  : AppColors.lightForeground,
+                            ),
                           ),
-                        ),
-                        title: Text(
-                          tx.title,
-                          style: GoogleFonts.inter(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w800,
-                            color: isDark
-                                ? AppColors.darkForeground
-                                : AppColors.lightForeground,
+                          subtitle: Text(
+                            '${tx.transactionDate.day}/${tx.transactionDate.month}/${tx.transactionDate.year}${creator != null ? ' · Bởi ${creator.fullName}' : ''}',
+                            style: GoogleFonts.inter(
+                              fontSize: 11,
+                              color: isDark
+                                  ? AppColors.darkMuted
+                                  : AppColors.lightMuted,
+                            ),
                           ),
-                        ),
-                        subtitle: Text(
-                          '${tx.transactionDate.day}/${tx.transactionDate.month}/${tx.transactionDate.year}${creator != null ? ' · Bởi ${creator.fullName}' : ''}',
-                          style: GoogleFonts.inter(
-                            fontSize: 11,
-                            color: isDark
-                                ? AppColors.darkMuted
-                                : AppColors.lightMuted,
-                          ),
-                        ),
-                        trailing: Text(
-                          '${isIncome ? '+' : '-'}${CurrencyFormatter.format(tx.amount)}',
-                          style: GoogleFonts.outfit(
-                            fontSize: 13.5,
-                            fontWeight: FontWeight.w900,
-                            color: isIncome
-                                ? AppColors.success
-                                : AppColors.danger,
+                          trailing: Text(
+                            '${isIncome ? '+' : '-'}${CurrencyFormatter.format(tx.amount)}',
+                            style: GoogleFonts.outfit(
+                              fontSize: 13.5,
+                              fontWeight: FontWeight.w900,
+                              color: isIncome
+                                  ? AppColors.success
+                                  : AppColors.danger,
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                    if (!isLast)
+                      if (!isLast)
                         Divider(
                           height: 1,
                           color: isDark
@@ -2084,9 +2130,7 @@ class _SharedWalletsScreenState extends ConsumerState<SharedWalletsScreen> {
         fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
         color: isSelected
             ? Colors.white
-            : (isDark
-                ? AppColors.darkForeground
-                : AppColors.lightForeground),
+            : (isDark ? AppColors.darkForeground : AppColors.lightForeground),
       ),
       side: BorderSide(
         color: isSelected
@@ -2109,12 +2153,10 @@ class _SharedWalletsScreenState extends ConsumerState<SharedWalletsScreen> {
   ) {
     final isCurrentOwner =
         selectedItem.wallet.currentUserRole == WalletMemberRole.owner;
-    final detailAsync =
-        ref.watch(walletDetailProvider(selectedItem.wallet.id));
-    final otherMembers = detailAsync.valueOrNull?.members
-            .where((m) => !m.isOwner)
-            .toList() ??
-        [];
+    final detailAsync = ref.watch(walletDetailProvider(selectedItem.wallet.id));
+    final otherMembers =
+        detailAsync.valueOrNull?.members.where((m) => !m.isOwner).toList() ??
+            [];
 
     return FormCard(
       title: 'Cài đặt quỹ nhóm',
@@ -2247,7 +2289,8 @@ class _SharedWalletsScreenState extends ConsumerState<SharedWalletsScreen> {
             // 4. Tự rời khỏi quỹ nhóm (Editor / Viewer)
             ListTile(
               contentPadding: EdgeInsets.zero,
-              leading: const Icon(Icons.logout_rounded, color: AppColors.danger),
+              leading:
+                  const Icon(Icons.logout_rounded, color: AppColors.danger),
               title: Text(
                 'Rời khỏi quỹ nhóm này',
                 style: GoogleFonts.inter(
@@ -2456,8 +2499,7 @@ class _SharedWalletsScreenState extends ConsumerState<SharedWalletsScreen> {
           ),
           actions: [
             TextButton(
-                onPressed: () => Navigator.pop(ctx),
-                child: const Text('HỦY')),
+                onPressed: () => Navigator.pop(ctx), child: const Text('HỦY')),
             TextButton(
               onPressed: () async {
                 if (selectedNewOwnerId == null) {
@@ -2468,13 +2510,12 @@ class _SharedWalletsScreenState extends ConsumerState<SharedWalletsScreen> {
                 Navigator.pop(ctx);
                 try {
                   await ref
-                      .read(walletDetailActionsProvider(
-                          selectedItem.wallet.id))
+                      .read(walletDetailActionsProvider(selectedItem.wallet.id))
                       .transferOwnership(selectedNewOwnerId!);
                   ref.invalidate(walletsOverviewProvider);
                   if (mounted) {
-                    AppToast.success(context,
-                        'Chuyển giao quyền chủ sở hữu thành công!');
+                    AppToast.success(
+                        context, 'Chuyển giao quyền chủ sở hữu thành công!');
                   }
                 } catch (e) {
                   if (mounted) AppToast.error(context, e.toString());
@@ -2501,16 +2542,14 @@ class _SharedWalletsScreenState extends ConsumerState<SharedWalletsScreen> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        shape:
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: const Text('Rời khỏi quỹ nhóm?'),
         content: Text(
           'Bạn có chắc chắn muốn rời khỏi quỹ "${selectedItem.wallet.name}" không? Bạn sẽ cần được mời lại nếu muốn tham gia tiếp.',
         ),
         actions: [
           TextButton(
-              onPressed: () => Navigator.pop(ctx),
-              child: const Text('HỦY')),
+              onPressed: () => Navigator.pop(ctx), child: const Text('HỦY')),
           TextButton(
             onPressed: () async {
               Navigator.pop(ctx);

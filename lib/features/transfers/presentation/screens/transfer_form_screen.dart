@@ -47,7 +47,8 @@ class _TransferFormScreenState extends ConsumerState<TransferFormScreen> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) => _initAccountsFromProps());
+    WidgetsBinding.instance
+        .addPostFrameCallback((_) => _initAccountsFromProps());
   }
 
   @override
@@ -64,7 +65,7 @@ class _TransferFormScreenState extends ConsumerState<TransferFormScreen> {
 
     final allAccounts = <AccountModel>[];
     for (final item in overview.items) {
-      allAccounts.addAll(item.accounts);
+      allAccounts.addAll(item.allAccounts);
     }
 
     if (widget.fromAccountId != null) {
@@ -80,14 +81,15 @@ class _TransferFormScreenState extends ConsumerState<TransferFormScreen> {
             (i) => i?.wallet.id == widget.fromWalletId,
             orElse: () => null,
           );
-      if (walletItem != null && walletItem.accounts.isNotEmpty) {
-        setState(() => _fromAccount = walletItem.accounts.first);
+      if (walletItem != null && walletItem.allAccounts.isNotEmpty) {
+        setState(() => _fromAccount = walletItem.allAccounts.first);
       }
     }
   }
 
   void _onAmountChanged(String val) {
-    final parsed = double.tryParse(val.replaceAll(RegExp(r'[^0-9.]'), '')) ?? 0.0;
+    final parsed =
+        double.tryParse(val.replaceAll(RegExp(r'[^0-9.]'), '')) ?? 0.0;
     _debounceTimer?.cancel();
     _debounceTimer = Timer(const Duration(milliseconds: 300), () {
       if (mounted) {
@@ -169,7 +171,8 @@ class _TransferFormScreenState extends ConsumerState<TransferFormScreen> {
     // Convert preview state (if currencies differ)
     final isCrossCurrency = _fromAccount != null &&
         _toAccount != null &&
-        _fromAccount!.currency.toUpperCase() != _toAccount!.currency.toUpperCase();
+        _fromAccount!.currency.toUpperCase() !=
+            _toAccount!.currency.toUpperCase();
 
     final previewAsync = isCrossCurrency && _amount > 0
         ? ref.watch(
@@ -278,7 +281,8 @@ class _TransferFormScreenState extends ConsumerState<TransferFormScreen> {
                 children: [
                   TextField(
                     controller: _amountController,
-                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                    keyboardType:
+                        const TextInputType.numberWithOptions(decimal: true),
                     style: GoogleFonts.inter(
                       fontSize: 26,
                       fontWeight: FontWeight.w900,
@@ -312,19 +316,25 @@ class _TransferFormScreenState extends ConsumerState<TransferFormScreen> {
                                 : AppColors.lightMuted,
                           ),
                         ),
-                        Text(
-                          CurrencyFormatter.format(
-                            _fromAccount!.balance,
-                            currency: _fromAccount!.currency,
-                          ),
-                          style: GoogleFonts.inter(
-                            fontSize: 12.5,
-                            fontWeight: FontWeight.w700,
-                            color: _fromAccount!.balance < _amount
-                                ? AppColors.danger
-                                : (isDark
-                                    ? AppColors.darkForeground
-                                    : AppColors.lightForeground),
+                        const SizedBox(width: 12),
+                        Flexible(
+                          child: Text(
+                            CurrencyFormatter.format(
+                              _fromAccount!.balance,
+                              currency: _fromAccount!.currency,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            textAlign: TextAlign.end,
+                            style: GoogleFonts.inter(
+                              fontSize: 12.5,
+                              fontWeight: FontWeight.w700,
+                              color: _fromAccount!.balance < _amount
+                                  ? AppColors.danger
+                                  : (isDark
+                                      ? AppColors.darkForeground
+                                      : AppColors.lightForeground),
+                            ),
                           ),
                         ),
                       ],
@@ -371,9 +381,8 @@ class _TransferFormScreenState extends ConsumerState<TransferFormScreen> {
                       hintText: 'Thêm ghi chú chuyển tiền (tùy chọn)...',
                       hintStyle: GoogleFonts.inter(
                         fontSize: 13,
-                        color: isDark
-                            ? AppColors.darkMuted
-                            : AppColors.lightMuted,
+                        color:
+                            isDark ? AppColors.darkMuted : AppColors.lightMuted,
                       ),
                       filled: true,
                       fillColor: isDark
@@ -478,7 +487,8 @@ class _TransferFormScreenState extends ConsumerState<TransferFormScreen> {
                             size: 22,
                           ),
                           const SizedBox(width: 8),
-                          Text(
+                          Flexible(
+                              child: Text(
                             'XÁC NHẬN CHUYỂN TIỀN',
                             style: GoogleFonts.inter(
                               fontSize: 14.5,
@@ -486,7 +496,9 @@ class _TransferFormScreenState extends ConsumerState<TransferFormScreen> {
                               color: Colors.white,
                               letterSpacing: 0.5,
                             ),
-                          ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          )),
                         ],
                       ),
               ),
@@ -509,9 +521,7 @@ class _TransferFormScreenState extends ConsumerState<TransferFormScreen> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
         decoration: BoxDecoration(
-          color: isDark
-              ? AppColors.darkBackground
-              : const Color(0xFFF8FAFC),
+          color: isDark ? AppColors.darkBackground : const Color(0xFFF8FAFC),
           borderRadius: BorderRadius.circular(14),
           border: Border.all(
             color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
@@ -542,7 +552,8 @@ class _TransferFormScreenState extends ConsumerState<TransferFormScreen> {
                     style: GoogleFonts.inter(
                       fontSize: 10,
                       fontWeight: FontWeight.w800,
-                      color: isDark ? AppColors.darkMuted : AppColors.lightMuted,
+                      color:
+                          isDark ? AppColors.darkMuted : AppColors.lightMuted,
                       letterSpacing: 0.5,
                     ),
                   ),
@@ -557,7 +568,9 @@ class _TransferFormScreenState extends ConsumerState<TransferFormScreen> {
                           ? (isDark
                               ? AppColors.darkForeground
                               : AppColors.lightForeground)
-                          : (isDark ? AppColors.darkMuted : AppColors.lightMuted),
+                          : (isDark
+                              ? AppColors.darkMuted
+                              : AppColors.lightMuted),
                     ),
                   ),
                 ],

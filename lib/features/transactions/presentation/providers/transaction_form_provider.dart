@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../settings/presentation/providers/user_settings_provider.dart';
 import '../../domain/models/create_transaction_input.dart';
 import '../../domain/models/transaction_enums.dart';
+import '../../domain/models/transaction_item.dart';
 import 'transaction_form_state.dart';
 import 'transaction_list_provider.dart';
 import 'transaction_providers.dart';
@@ -140,31 +141,31 @@ class TransactionFormNotifier extends StateNotifier<TransactionFormState> {
     }
   }
 
-  Future<bool> submit() async {
+  Future<TransactionItem?> submit() async {
     if (state.amount <= 0) {
       state = state.copyWith(errorMessage: 'Vui lòng nhập số tiền lớn hơn 0');
-      return false;
+      return null;
     }
 
     if (state.accountId == null || state.accountId!.isEmpty) {
       state = state.copyWith(errorMessage: 'Vui lòng chọn tài khoản nguồn');
-      return false;
+      return null;
     }
 
     if (state.type == TransactionType.transfer) {
       if (state.toAccountId == null || state.toAccountId!.isEmpty) {
         state = state.copyWith(errorMessage: 'Vui lòng chọn tài khoản đích');
-        return false;
+        return null;
       }
       if (state.accountId == state.toAccountId) {
         state = state.copyWith(
             errorMessage: 'Tài khoản nhận không được trùng tài khoản chuyển');
-        return false;
+        return null;
       }
     } else {
       if (state.categoryId == null || state.categoryId!.isEmpty) {
         state = state.copyWith(errorMessage: 'Vui lòng chọn danh mục thu/chi');
-        return false;
+        return null;
       }
     }
 
@@ -195,23 +196,45 @@ class TransactionFormNotifier extends StateNotifier<TransactionFormState> {
         photoUrl: state.photoUrl,
       );
 
+      TransactionItem createdItem;
       if (state.type == TransactionType.transfer) {
         await repo.createTransfer(input);
+        createdItem = TransactionItem(
+          id: 'transfer-${DateTime.now().millisecondsSinceEpoch}',
+          accountId: state.accountId!,
+          accountName: state.accountName,
+          toAccountId: state.toAccountId,
+          type: TransactionType.transfer,
+          amount: state.amount,
+          currency: 'VND',
+          name: txName ?? 'Chuyển khoản nội bộ',
+          note: state.note,
+          locationName: state.locationName,
+          transactionDate: state.transactionDate ?? DateTime.now(),
+          createdAt: DateTime.now(),
+        );
       } else {
-        await repo.createTransaction(input);
+        final res = await repo.createTransaction(input);
+        // Bổ sung thông tin danh mục và tài khoản từ form nếu backend chỉ trả id
+        createdItem = res.copyWith(
+          accountName: res.accountName ?? state.accountName,
+          categoryName: res.categoryName ?? state.categoryName,
+          categoryIcon: res.categoryIcon ?? state.categoryIcon,
+          categoryColor: res.categoryColor ?? state.categoryColor,
+        );
       }
 
       // Làm mới danh sách giao dịch
       _ref.read(dailyGridProvider.notifier).refresh();
 
       state = state.copyWith(isLoading: false);
-      return true;
+      return createdItem;
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
         errorMessage: e.toString().replaceAll('Exception: ', ''),
       );
-      return false;
+      return null;
     }
   }
 }

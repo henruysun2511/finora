@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../messages/presentation/screens/conversations_screen.dart';
+import '../../../messages/presentation/screens/messages_screen.dart';
 
 /// Màn hình Tin nhắn P2P / Locket Chat
 /// Được kết nối trực tiếp với module messages chuẩn Clean Architecture.
@@ -9,6 +9,6 @@ class SocialChatScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const ConversationsScreen();
+    return const MessagesScreen();
   }
 }

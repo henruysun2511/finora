@@ -55,8 +55,11 @@ class DailyTransactionGroupCard extends StatelessWidget {
           // Header Ngày
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            child: Wrap(
+              alignment: WrapAlignment.spaceBetween,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              spacing: 8,
+              runSpacing: 4,
               children: [
                 Text(
                   _formatDateHeader(group.date, group.dayOfWeek),
@@ -68,25 +71,34 @@ class DailyTransactionGroupCard extends StatelessWidget {
                   ),
                 ),
                 Row(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
                     if (group.totalIncome > 0) ...[
-                      Text(
-                        '+₫ ${_formatCurrency(group.totalIncome)}',
-                        style: GoogleFonts.inter(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w700,
-                          color: AppColors.success,
+                      Flexible(
+                        child: Text(
+                          '+₫ ${_formatCurrency(group.totalIncome)}',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: GoogleFonts.inter(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.success,
+                          ),
                         ),
                       ),
                       const SizedBox(width: 8),
                     ],
                     if (group.totalExpense > 0)
-                      Text(
-                        '-₫ ${_formatCurrency(group.totalExpense)}',
-                        style: GoogleFonts.inter(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w700,
-                          color: AppColors.danger,
+                      Flexible(
+                        child: Text(
+                          '-₫ ${_formatCurrency(group.totalExpense)}',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: GoogleFonts.inter(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.danger,
+                          ),
                         ),
                       ),
                     if (group.totalIncome == 0 && group.totalExpense == 0)
