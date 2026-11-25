@@ -33,9 +33,12 @@ class Rule503020StackedChartWidget extends StatelessWidget {
     final totalPct = (needs.percentage + wants.percentage + savings.percentage);
     final safeTotalPct = totalPct > 0 ? totalPct : 100.0;
 
-    final needsFlex = ((needs.percentage / safeTotalPct) * 1000).toInt().clamp(50, 1000);
-    final wantsFlex = ((wants.percentage / safeTotalPct) * 1000).toInt().clamp(50, 1000);
-    final savingsFlex = ((savings.percentage / safeTotalPct) * 1000).toInt().clamp(50, 1000);
+    final needsFlex =
+        ((needs.percentage / safeTotalPct) * 1000).toInt().clamp(50, 1000);
+    final wantsFlex =
+        ((wants.percentage / safeTotalPct) * 1000).toInt().clamp(50, 1000);
+    final savingsFlex =
+        ((savings.percentage / safeTotalPct) * 1000).toInt().clamp(50, 1000);
 
     return Container(
       padding: const EdgeInsets.all(18),
@@ -61,34 +64,44 @@ class Rule503020StackedChartWidget extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(6),
-                    decoration: BoxDecoration(
-                      color: AppColors.primary.withValues(alpha: 0.12),
-                      shape: BoxShape.circle,
+              Expanded(
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(6),
+                      decoration: BoxDecoration(
+                        color: AppColors.primary.withValues(alpha: 0.12),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const LucideIcon(
+                          name: 'layers', size: 16, color: AppColors.primary),
                     ),
-                    child: const LucideIcon(name: 'layers', size: 16, color: AppColors.primary),
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    'QUY TẮC CÂN ĐỐI 50 / 30 / 20',
-                    style: GoogleFonts.inter(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: 0.8,
-                      color: AppColors.primary,
+                    const SizedBox(width: 8),
+                    Flexible(
+                      child: Text(
+                        'QUY TẮC CÂN ĐỐI 50 / 30 / 20',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: GoogleFonts.inter(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: 0.8,
+                          color: AppColors.primary,
+                        ),
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
+              const SizedBox(width: 8),
               Text(
                 'Tổng: ${CurrencyFormatter.formatCompact(totalAmount)}',
                 style: GoogleFonts.inter(
                   fontSize: 11.5,
                   fontWeight: FontWeight.w700,
-                  color: isDark ? AppColors.darkForeground : AppColors.lightForeground,
+                  color: isDark
+                      ? AppColors.darkForeground
+                      : AppColors.lightForeground,
                 ),
               ),
             ],
@@ -162,29 +175,36 @@ class Rule503020StackedChartWidget extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                'Thiết yếu (chuẩn 50%)',
-                style: GoogleFonts.inter(
-                  fontSize: 10,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.primary,
-                ),
-              ),
-              Text(
-                'Mong muốn (chuẩn 30%)',
-                style: GoogleFonts.inter(
-                  fontSize: 10,
-                  fontWeight: FontWeight.w600,
-                  color: const Color(0xFFF59E0B),
-                ),
-              ),
-              Text(
-                'Tích lũy (chuẩn 20%)',
-                style: GoogleFonts.inter(
-                  fontSize: 10,
-                  fontWeight: FontWeight.w600,
-                  color: const Color(0xFF10B981),
-                ),
+              Wrap(
+                alignment: WrapAlignment.spaceBetween,
+                spacing: 8,
+                runSpacing: 2,
+                children: [
+                  Text(
+                    'Thiết yếu (chuẩn 50%)',
+                    style: GoogleFonts.inter(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.primary,
+                    ),
+                  ),
+                  Text(
+                    'Mong muốn (chuẩn 30%)',
+                    style: GoogleFonts.inter(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w600,
+                      color: const Color(0xFFF59E0B),
+                    ),
+                  ),
+                  Text(
+                    'Tích lũy (chuẩn 20%)',
+                    style: GoogleFonts.inter(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w600,
+                      color: const Color(0xFF10B981),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
@@ -272,18 +292,25 @@ class _CategoryPillarCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
+              Flexible(
+                  child: Text(
                 title,
                 style: GoogleFonts.inter(
                   fontSize: 10.5,
                   fontWeight: FontWeight.w700,
                   color: color,
                 ),
-              ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              )),
               Icon(
-                isCompliant ? Icons.check_circle_rounded : Icons.warning_rounded,
+                isCompliant
+                    ? Icons.check_circle_rounded
+                    : Icons.warning_rounded,
                 size: 13,
-                color: isCompliant ? const Color(0xFF10B981) : const Color(0xFFEF4444),
+                color: isCompliant
+                    ? const Color(0xFF10B981)
+                    : const Color(0xFFEF4444),
               ),
             ],
           ),
@@ -304,7 +331,8 @@ class _CategoryPillarCard extends StatelessWidget {
             style: GoogleFonts.inter(
               fontSize: 10.5,
               fontWeight: FontWeight.w600,
-              color: isDark ? AppColors.darkForeground : AppColors.lightForeground,
+              color:
+                  isDark ? AppColors.darkForeground : AppColors.lightForeground,
             ),
           ),
           const SizedBox(height: 2),
@@ -320,4 +348,3 @@ class _CategoryPillarCard extends StatelessWidget {
     );
   }
 }
-

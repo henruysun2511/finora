@@ -68,8 +68,7 @@ class _CreateAccountSheetState extends ConsumerState<CreateAccountSheet> {
       return;
     }
 
-    final initBalance =
-        double.tryParse(
+    final initBalance = double.tryParse(
           _initialBalanceController.text.replaceAll(RegExp(r'[^0-9.]'), ''),
         ) ??
         0.0;
@@ -144,9 +143,8 @@ class _CreateAccountSheetState extends ConsumerState<CreateAccountSheet> {
                   width: 40,
                   height: 4,
                   decoration: BoxDecoration(
-                    color: isDark
-                        ? AppColors.darkBorder
-                        : const Color(0xFFCBD5E1),
+                    color:
+                        isDark ? AppColors.darkBorder : const Color(0xFFCBD5E1),
                     borderRadius: BorderRadius.circular(99),
                   ),
                 ),
@@ -169,14 +167,18 @@ class _CreateAccountSheetState extends ConsumerState<CreateAccountSheet> {
                     ),
                   ),
                   const SizedBox(width: 12),
-                  Text(
-                    'Thêm tài khoản mới',
-                    style: GoogleFonts.inter(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w700,
-                      color: isDark
-                          ? AppColors.darkForeground
-                          : AppColors.lightForeground,
+                  Expanded(
+                    child: Text(
+                      'Thêm tài khoản mới',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: GoogleFonts.inter(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
+                        color: isDark
+                            ? AppColors.darkForeground
+                            : AppColors.lightForeground,
+                      ),
                     ),
                   ),
                 ],
@@ -240,7 +242,13 @@ class _CreateAccountSheetState extends ConsumerState<CreateAccountSheet> {
                         children: [
                           Text(w.wallet.icon ?? '💼'),
                           const SizedBox(width: 8),
-                          Text(w.wallet.name),
+                          Flexible(
+                            child: Text(
+                              w.wallet.name,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
                         ],
                       ),
                     );
@@ -279,7 +287,9 @@ class _CreateAccountSheetState extends ConsumerState<CreateAccountSheet> {
                           color: isSel ? Colors.white : t.defaultColor,
                         ),
                         const SizedBox(width: 6),
-                        Text(t.displayName),
+                        Flexible(
+                            child: Text(t.displayName,
+                                maxLines: 1, overflow: TextOverflow.ellipsis)),
                       ],
                     ),
                     selected: isSel,
@@ -372,7 +382,8 @@ class _CreateAccountSheetState extends ConsumerState<CreateAccountSheet> {
                   labelText: 'Số dư ban đầu (*)',
                   hintText: '5000000',
                   suffixText: _selectedCurrency,
-                  helperText: 'Số dư tại thời điểm bắt đầu theo dõi trên Finora',
+                  helperText:
+                      'Số dư tại thời điểm bắt đầu theo dõi trên Finora',
                   filled: true,
                   fillColor: isDark
                       ? const Color(0xFF1E293B)
@@ -404,7 +415,8 @@ class _CreateAccountSheetState extends ConsumerState<CreateAccountSheet> {
                   ),
                 ),
                 items: const [
-                  DropdownMenuItem(value: 'VND', child: Text('VND - Đồng Việt Nam')),
+                  DropdownMenuItem(
+                      value: 'VND', child: Text('VND - Đồng Việt Nam')),
                   DropdownMenuItem(value: 'USD', child: Text('USD - Đô la Mỹ')),
                 ],
                 onChanged: (val) {
@@ -443,9 +455,8 @@ class _CreateAccountSheetState extends ConsumerState<CreateAccountSheet> {
                                   : const Color(0xFFF1F5F9)),
                           borderRadius: BorderRadius.circular(10),
                           border: Border.all(
-                            color: isSel
-                                ? AppColors.primary
-                                : Colors.transparent,
+                            color:
+                                isSel ? AppColors.primary : Colors.transparent,
                             width: 2,
                           ),
                         ),
@@ -521,4 +532,3 @@ class _CreateAccountSheetState extends ConsumerState<CreateAccountSheet> {
     );
   }
 }
-

@@ -53,7 +53,8 @@ class ForgotPasswordStepIndicator extends StatelessWidget {
         return Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Container(
+            Flexible(
+                child: Container(
               width: 24,
               height: 24,
               decoration: BoxDecoration(
@@ -78,9 +79,10 @@ class ForgotPasswordStepIndicator extends StatelessWidget {
                         ),
                       ),
               ),
-            ),
+            )),
             const SizedBox(width: 4),
-            Text(
+            Flexible(
+                child: Text(
               steps[stepIdx],
               style: GoogleFonts.inter(
                 fontSize: 11,
@@ -91,11 +93,12 @@ class ForgotPasswordStepIndicator extends StatelessWidget {
                         : AppColors.lightForeground)
                     : (isDark ? AppColors.darkMuted : AppColors.lightMuted),
               ),
-            ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            )),
           ],
         );
       }),
     );
   }
 }
-

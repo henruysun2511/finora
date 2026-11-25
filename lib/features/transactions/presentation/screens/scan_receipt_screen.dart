@@ -84,7 +84,8 @@ class _ScanReceiptScreenState extends ConsumerState<ScanReceiptScreen> {
           style: GoogleFonts.inter(
             fontWeight: FontWeight.w800,
             fontSize: 18,
-            color: isDark ? AppColors.darkForeground : AppColors.lightForeground,
+            color:
+                isDark ? AppColors.darkForeground : AppColors.lightForeground,
           ),
         ),
         centerTitle: true,
@@ -112,7 +113,8 @@ class _ScanReceiptScreenState extends ConsumerState<ScanReceiptScreen> {
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.08),
+                      color:
+                          Colors.black.withValues(alpha: isDark ? 0.3 : 0.08),
                       blurRadius: 16,
                       offset: const Offset(0, 6),
                     ),
@@ -133,7 +135,8 @@ class _ScanReceiptScreenState extends ConsumerState<ScanReceiptScreen> {
                   const Icon(Icons.check_circle_rounded,
                       size: 16, color: Color(0xFF10B981)),
                   const SizedBox(width: 6),
-                  Text(
+                  Flexible(
+                      child: Text(
                     _selectedImageName ?? 'Đã chọn ảnh hóa đơn',
                     style: GoogleFonts.inter(
                       fontSize: 13,
@@ -142,7 +145,9 @@ class _ScanReceiptScreenState extends ConsumerState<ScanReceiptScreen> {
                           ? AppColors.darkForeground
                           : AppColors.lightForeground,
                     ),
-                  ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  )),
                 ],
               ),
               const SizedBox(height: 20),
@@ -201,12 +206,14 @@ class _ScanReceiptScreenState extends ConsumerState<ScanReceiptScreen> {
               // Placeholder Box
               Container(
                 width: double.infinity,
-                padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 20),
+                padding:
+                    const EdgeInsets.symmetric(vertical: 40, horizontal: 20),
                 decoration: BoxDecoration(
                   color: isDark ? const Color(0xFF1E293B) : Colors.white,
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(
-                    color: isDark ? AppColors.darkBorder : const Color(0xFFE2E8F0),
+                    color:
+                        isDark ? AppColors.darkBorder : const Color(0xFFE2E8F0),
                     width: 1.5,
                   ),
                 ),
@@ -242,7 +249,8 @@ class _ScanReceiptScreenState extends ConsumerState<ScanReceiptScreen> {
                       textAlign: TextAlign.center,
                       style: GoogleFonts.inter(
                         fontSize: 13,
-                        color: isDark ? AppColors.darkMuted : AppColors.lightMuted,
+                        color:
+                            isDark ? AppColors.darkMuted : AppColors.lightMuted,
                         height: 1.4,
                       ),
                     ),
@@ -293,7 +301,8 @@ class _ScanReceiptScreenState extends ConsumerState<ScanReceiptScreen> {
                     ),
                   ),
                   style: OutlinedButton.styleFrom(
-                    side: const BorderSide(color: Color(0xFF0072D5), width: 1.5),
+                    side:
+                        const BorderSide(color: Color(0xFF0072D5), width: 1.5),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(14),
                     ),

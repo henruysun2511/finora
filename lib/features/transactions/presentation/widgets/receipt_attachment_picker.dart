@@ -223,14 +223,17 @@ class _ReceiptAttachmentPickerState
               ),
             ),
             const SizedBox(width: 12),
-            Text(
+            Flexible(
+                child: Text(
               'Đang tải ảnh hóa đơn lên máy chủ...',
               style: GoogleFonts.inter(
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
                 color: AppColors.primary,
               ),
-            ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            )),
           ],
         ),
       );
@@ -329,14 +332,17 @@ class _ReceiptAttachmentPickerState
                 size: 20,
               ),
               const SizedBox(width: 10),
-              Text(
+              Flexible(
+                  child: Text(
                 'Đính kèm ảnh hóa đơn / chứng từ',
                 style: GoogleFonts.inter(
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
                   color: AppColors.primary,
                 ),
-              ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              )),
             ],
           ),
         ),

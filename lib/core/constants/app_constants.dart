@@ -9,4 +9,5 @@ class AppConstants {
   static const String keyIsFirstLaunch = 'finora_first_launch';
   static const String keyThemeMode = 'finora_theme_mode';
   static const String keyCachedUser = 'finora_cached_user';
+  static const String keyLastSeenMascotTier = 'finora_last_seen_mascot_tier';
 }

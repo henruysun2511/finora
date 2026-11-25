@@ -20,11 +20,11 @@ enum WalletMemberRole {
   String toServerString() {
     switch (this) {
       case WalletMemberRole.owner:
-        return 'OWNER';
+        return 'owner';
       case WalletMemberRole.editor:
-        return 'EDITOR';
+        return 'editor';
       case WalletMemberRole.viewer:
-        return 'VIEWER';
+        return 'viewer';
     }
   }
 

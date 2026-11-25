@@ -283,7 +283,8 @@ class _CreateWalletSheetState extends ConsumerState<CreateWalletSheet> {
                     ),
                     Switch(
                       value: _isShared,
-                      activeColor: AppColors.primary,
+                      activeColor: Colors.white,
+                      activeTrackColor: AppColors.primary,
                       onChanged: (val) => setState(() => _isShared = val),
                     ),
                   ],

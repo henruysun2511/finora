@@ -8,7 +8,8 @@ import '../../../../app/theme/app_colors.dart';
 import '../../../../core/services/voice_recorder_service.dart';
 
 class VoiceRecordingModal extends StatefulWidget {
-  final void Function(List<int> bytes, String filename, {String? promptHint}) onSendVoice;
+  final void Function(List<int> bytes, String filename, {String? promptHint})
+      onSendVoice;
   final ValueChanged<String> onSelectSample;
 
   const VoiceRecordingModal({
@@ -107,19 +108,22 @@ class _VoiceRecordingModalState extends State<VoiceRecordingModal>
 
         if (bytes != null && bytes.isNotEmpty) {
           const ext = kIsWeb ? 'webm' : 'm4a';
-          final filename = 'voice_${DateTime.now().millisecondsSinceEpoch}.$ext';
+          final filename =
+              'voice_${DateTime.now().millisecondsSinceEpoch}.$ext';
           if (mounted) {
             Navigator.pop(context);
             widget.onSendVoice(
               bytes,
               filename,
-              promptHint: '🎤 Ghi âm giọng nói chi tiêu (${_formatDuration(_seconds)})',
+              promptHint:
+                  '🎤 Ghi âm giọng nói chi tiêu (${_formatDuration(_seconds)})',
             );
           }
         } else {
           setState(() {
             _isProcessing = false;
-            _errorMessage = 'Đoạn ghi âm quá ngắn hoặc không có dữ liệu âm thanh.';
+            _errorMessage =
+                'Đoạn ghi âm quá ngắn hoặc không có dữ liệu âm thanh.';
           });
         }
       } catch (e) {
@@ -200,11 +204,15 @@ class _VoiceRecordingModalState extends State<VoiceRecordingModal>
 
               // Tiêu đề
               Text(
-                _isRecording ? 'Đang lắng nghe bạn nói...' : 'Nhập liệu bằng giọng nói',
+                _isRecording
+                    ? 'Đang lắng nghe bạn nói...'
+                    : 'Nhập liệu bằng giọng nói',
                 style: GoogleFonts.inter(
                   fontSize: 17,
                   fontWeight: FontWeight.w800,
-                  color: isDark ? AppColors.darkForeground : AppColors.lightForeground,
+                  color: isDark
+                      ? AppColors.darkForeground
+                      : AppColors.lightForeground,
                 ),
               ),
               const SizedBox(height: 6),
@@ -224,7 +232,8 @@ class _VoiceRecordingModalState extends State<VoiceRecordingModal>
               // Timer đếm giây khi đang ghi âm
               if (_isRecording) ...[
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 5),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 14, vertical: 5),
                   decoration: BoxDecoration(
                     color: const Color(0xFFEF4444).withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(20),
@@ -245,14 +254,17 @@ class _VoiceRecordingModalState extends State<VoiceRecordingModal>
                         ),
                       ),
                       const SizedBox(width: 8),
-                      Text(
+                      Flexible(
+                          child: Text(
                         _formatDuration(_seconds),
                         style: GoogleFonts.inter(
                           fontSize: 14,
                           fontWeight: FontWeight.w700,
                           color: const Color(0xFFEF4444),
                         ),
-                      ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      )),
                     ],
                   ),
                 ),
@@ -262,11 +274,13 @@ class _VoiceRecordingModalState extends State<VoiceRecordingModal>
               // Thông báo lỗi nếu có
               if (_errorMessage != null) ...[
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                   decoration: BoxDecoration(
                     color: Colors.red.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(10),
-                    border: Border.all(color: Colors.red.withValues(alpha: 0.3)),
+                    border:
+                        Border.all(color: Colors.red.withValues(alpha: 0.3)),
                   ),
                   child: Text(
                     _errorMessage!,
@@ -307,7 +321,8 @@ class _VoiceRecordingModalState extends State<VoiceRecordingModal>
                               color: (_isRecording
                                       ? const Color(0xFFEF4444)
                                       : const Color(0xFF0072D5))
-                                  .withValues(alpha: _isRecording ? 0.45 : 0.35),
+                                  .withValues(
+                                      alpha: _isRecording ? 0.45 : 0.35),
                               blurRadius: _isRecording ? 24 : 16,
                               offset: const Offset(0, 6),
                             ),
@@ -346,7 +361,9 @@ class _VoiceRecordingModalState extends State<VoiceRecordingModal>
                 style: GoogleFonts.inter(
                   fontSize: 12.5,
                   fontWeight: FontWeight.w600,
-                  color: _isRecording ? const Color(0xFFEF4444) : AppColors.primary,
+                  color: _isRecording
+                      ? const Color(0xFFEF4444)
+                      : AppColors.primary,
                 ),
               ),
 
@@ -355,7 +372,8 @@ class _VoiceRecordingModalState extends State<VoiceRecordingModal>
                 const SizedBox(height: 10),
                 TextButton.icon(
                   onPressed: _cancelRecording,
-                  icon: const Icon(Icons.close_rounded, size: 16, color: Colors.grey),
+                  icon: const Icon(Icons.close_rounded,
+                      size: 16, color: Colors.grey),
                   label: Text(
                     'Hủy ghi âm',
                     style: GoogleFonts.inter(
@@ -450,14 +468,16 @@ class _VoiceRecordingModalState extends State<VoiceRecordingModal>
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return ActionChip(
-      avatar: const Icon(Icons.record_voice_over_rounded, size: 14, color: Color(0xFF0072D5)),
+      avatar: const Icon(Icons.record_voice_over_rounded,
+          size: 14, color: Color(0xFF0072D5)),
       label: Text(text),
       labelStyle: GoogleFonts.inter(
         fontSize: 11.5,
         fontWeight: FontWeight.w600,
         color: isDark ? AppColors.darkForeground : AppColors.lightForeground,
       ),
-      backgroundColor: isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9),
+      backgroundColor:
+          isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9),
       side: BorderSide(
         color: isDark ? const Color(0xFF334155) : const Color(0xFFCBD5E1),
       ),

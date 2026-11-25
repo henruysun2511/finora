@@ -87,8 +87,7 @@ class _HomeCategoryBreakdownCardState
                 isDark: isDark,
                 month: _selectedMonth.month,
                 year: _selectedMonth.year,
-                totalExpense:
-                    data.totalAmount > 0 ? data.totalAmount : 8300000,
+                totalExpense: data.totalAmount > 0 ? data.totalAmount : 8300000,
                 items: data.categories.isNotEmpty
                     ? data.categories.take(5).toList()
                     : _mockCategories(),
@@ -164,31 +163,35 @@ class _HomeCategoryBreakdownCardState
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Cơ cấu Chi tiêu',
-                  style: GoogleFonts.inter(
-                    fontSize: 15.5,
-                    fontWeight: FontWeight.w900,
-                    letterSpacing: -0.3,
-                    color: isDark
-                        ? AppColors.darkForeground
-                        : AppColors.lightForeground,
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Cơ cấu Chi tiêu',
+                    style: GoogleFonts.inter(
+                      fontSize: 15.5,
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: -0.3,
+                      color: isDark
+                          ? AppColors.darkForeground
+                          : AppColors.lightForeground,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  'Phân bổ 5 nhóm danh mục tháng $month',
-                  style: GoogleFonts.inter(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w600,
-                    color: isDark ? AppColors.darkMuted : AppColors.lightMuted,
+                  const SizedBox(height: 2),
+                  Text(
+                    'Phân bổ 5 nhóm danh mục tháng $month',
+                    style: GoogleFonts.inter(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                      color:
+                          isDark ? AppColors.darkMuted : AppColors.lightMuted,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
+            const SizedBox(width: 8),
             // Nút bộ lọc chọn tháng tương tác
             GestureDetector(
               onTap: () => _showMonthPicker(context, isDark),
@@ -202,22 +205,24 @@ class _HomeCategoryBreakdownCardState
                       : const Color(0xFFEFF6FF),
                   borderRadius: BorderRadius.circular(10),
                   border: Border.all(
-                    color: isDark
-                        ? AppColors.darkBorder
-                        : const Color(0xFFBFDBFE),
+                    color:
+                        isDark ? AppColors.darkBorder : const Color(0xFFBFDBFE),
                   ),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text(
+                    Flexible(
+                        child: Text(
                       'Tháng $month',
                       style: GoogleFonts.inter(
                         fontSize: 11,
                         fontWeight: FontWeight.w800,
                         color: AppColors.primary,
                       ),
-                    ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    )),
                     const SizedBox(width: 4),
                     const Icon(
                       Icons.keyboard_arrow_down_rounded,
@@ -319,18 +324,23 @@ class _HomeCategoryBreakdownCardState
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Text(
-                                      cat.name,
-                                      style: GoogleFonts.inter(
-                                        fontSize: 11.5,
-                                        fontWeight: isSelected
-                                            ? FontWeight.w800
-                                            : FontWeight.w600,
-                                        color: isDark
-                                            ? AppColors.darkForeground
-                                            : AppColors.lightForeground,
+                                    Expanded(
+                                      child: Text(
+                                        cat.name,
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: GoogleFonts.inter(
+                                          fontSize: 11.5,
+                                          fontWeight: isSelected
+                                              ? FontWeight.w800
+                                              : FontWeight.w600,
+                                          color: isDark
+                                              ? AppColors.darkForeground
+                                              : AppColors.lightForeground,
+                                        ),
                                       ),
                                     ),
+                                    const SizedBox(width: 6),
                                     Text(
                                       '${cat.percentage.toStringAsFixed(0)}% · ${CurrencyFormatter.formatCompact(cat.amount)}',
                                       style: GoogleFonts.inter(
@@ -347,12 +357,14 @@ class _HomeCategoryBreakdownCardState
                                 ClipRRect(
                                   borderRadius: BorderRadius.circular(99),
                                   child: LinearProgressIndicator(
-                                    value: (cat.percentage / 100).clamp(0.02, 1.0),
+                                    value:
+                                        (cat.percentage / 100).clamp(0.02, 1.0),
                                     minHeight: 4,
                                     backgroundColor: isDark
                                         ? const Color(0xFF1E293B)
                                         : const Color(0xFFF1F5F9),
-                                    valueColor: AlwaysStoppedAnimation<Color>(color),
+                                    valueColor:
+                                        AlwaysStoppedAnimation<Color>(color),
                                   ),
                                 ),
                               ],
@@ -433,8 +445,7 @@ class _HomeCategoryBreakdownCardState
         return Container(
           decoration: BoxDecoration(
             color: isDark ? AppColors.darkSurface : Colors.white,
-            borderRadius:
-                const BorderRadius.vertical(top: Radius.circular(24)),
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
           ),
           padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
           child: Column(
@@ -447,9 +458,8 @@ class _HomeCategoryBreakdownCardState
                   width: 36,
                   height: 4,
                   decoration: BoxDecoration(
-                    color: isDark
-                        ? AppColors.darkBorder
-                        : AppColors.lightBorder,
+                    color:
+                        isDark ? AppColors.darkBorder : AppColors.lightBorder,
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
@@ -458,13 +468,15 @@ class _HomeCategoryBreakdownCardState
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    'CHỌN THÁNG XEM CƠ CẤU CHI TIÊU',
-                    style: GoogleFonts.inter(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: 0.6,
-                      color: AppColors.primary,
+                  Expanded(
+                    child: Text(
+                      'CHỌN THÁNG XEM CƠ CẤU CHI TIÊU',
+                      style: GoogleFonts.inter(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: 0.6,
+                        color: AppColors.primary,
+                      ),
                     ),
                   ),
                   GestureDetector(
@@ -472,9 +484,8 @@ class _HomeCategoryBreakdownCardState
                     child: Icon(
                       Icons.close_rounded,
                       size: 20,
-                      color: isDark
-                          ? AppColors.darkMuted
-                          : AppColors.lightMuted,
+                      color:
+                          isDark ? AppColors.darkMuted : AppColors.lightMuted,
                     ),
                   ),
                 ],
@@ -527,9 +538,8 @@ class _HomeCategoryBreakdownCardState
                           'Tháng ${m.month}/${m.year}',
                           style: GoogleFonts.inter(
                             fontSize: 12,
-                            fontWeight: isSelected
-                                ? FontWeight.w800
-                                : FontWeight.w600,
+                            fontWeight:
+                                isSelected ? FontWeight.w800 : FontWeight.w600,
                             color: isSelected
                                 ? Colors.white
                                 : (isDark
@@ -613,4 +623,3 @@ class _DonutChartPainter extends CustomPainter {
         oldDelegate.isDark != isDark;
   }
 }
-

@@ -93,14 +93,18 @@ class MascotProfileDetailPanel extends StatelessWidget {
                       children: [
                         Row(
                           children: [
-                            Text(
-                              mascot.name,
-                              style: GoogleFonts.inter(
-                                fontSize: 22,
-                                fontWeight: FontWeight.w900,
-                                color: isDark
-                                    ? AppColors.darkForeground
-                                    : AppColors.lightForeground,
+                            Flexible(
+                              child: Text(
+                                mascot.name,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: GoogleFonts.inter(
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.w900,
+                                  color: isDark
+                                      ? AppColors.darkForeground
+                                      : AppColors.lightForeground,
+                                ),
                               ),
                             ),
                             if (isCurrentCompanion) ...[
@@ -233,7 +237,8 @@ class MascotProfileDetailPanel extends StatelessWidget {
           children: [
             LucideIcon(name: icon, size: 14, color: accentColor),
             const SizedBox(width: 6),
-            Text(
+            Flexible(
+                child: Text(
               title,
               style: GoogleFonts.inter(
                 fontSize: 11,
@@ -241,7 +246,9 @@ class MascotProfileDetailPanel extends StatelessWidget {
                 letterSpacing: 0.6,
                 color: isDark ? AppColors.darkMuted : AppColors.lightMuted,
               ),
-            ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            )),
           ],
         ),
         const SizedBox(height: 5),
@@ -285,4 +292,3 @@ class MascotProfileDetailPanel extends StatelessWidget {
     );
   }
 }
-

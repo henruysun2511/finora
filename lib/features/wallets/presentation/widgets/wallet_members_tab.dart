@@ -96,15 +96,20 @@ class WalletMembersTab extends ConsumerWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                'THÀNH VIÊN VÍ DÙNG CHUNG (${members.length})',
-                style: GoogleFonts.inter(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: 0.8,
-                  color: isDark ? AppColors.darkMuted : AppColors.lightMuted,
+              Expanded(
+                child: Text(
+                  'THÀNH VIÊN VÍ DÙNG CHUNG (${members.length})',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: GoogleFonts.inter(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 0.8,
+                    color: isDark ? AppColors.darkMuted : AppColors.lightMuted,
+                  ),
                 ),
               ),
+              const SizedBox(width: 8),
               if (isOwner)
                 ElevatedButton.icon(
                   onPressed: () => _openInviteDialog(context),
@@ -142,9 +147,8 @@ class WalletMembersTab extends ConsumerWidget {
                 color: isDark ? AppColors.darkSurface : Colors.white,
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(
-                  color: isDark
-                      ? AppColors.darkBorder
-                      : const Color(0xFFE2E8F0),
+                  color:
+                      isDark ? AppColors.darkBorder : const Color(0xFFE2E8F0),
                 ),
               ),
               child: Row(
@@ -216,14 +220,17 @@ class WalletMembersTab extends ConsumerWidget {
                       children: [
                         Icon(m.role.icon, size: 12, color: m.role.badgeColor),
                         const SizedBox(width: 4),
-                        Text(
+                        Flexible(
+                            child: Text(
                           m.role.displayName,
                           style: GoogleFonts.inter(
                             fontSize: 11,
                             fontWeight: FontWeight.w700,
                             color: m.role.badgeColor,
                           ),
-                        ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        )),
                       ],
                     ),
                   ),
@@ -285,9 +292,7 @@ class WalletMembersTab extends ConsumerWidget {
           Container(
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
-              color: isDark
-                  ? const Color(0xFF1E293B)
-                  : const Color(0xFFF8FAFC),
+              color: isDark ? const Color(0xFF1E293B) : const Color(0xFFF8FAFC),
               borderRadius: BorderRadius.circular(14),
               border: Border.all(
                 color: isDark ? AppColors.darkBorder : const Color(0xFFE2E8F0),
@@ -304,7 +309,8 @@ class WalletMembersTab extends ConsumerWidget {
                       color: AppColors.primary,
                     ),
                     const SizedBox(width: 6),
-                    Text(
+                    Flexible(
+                        child: Text(
                       'Chú thích quyền hạn thành viên:',
                       style: GoogleFonts.inter(
                         fontSize: 12,
@@ -313,7 +319,9 @@ class WalletMembersTab extends ConsumerWidget {
                             ? AppColors.darkForeground
                             : AppColors.lightForeground,
                       ),
-                    ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    )),
                   ],
                 ),
                 const SizedBox(height: 8),
@@ -335,4 +343,3 @@ class WalletMembersTab extends ConsumerWidget {
     );
   }
 }
-

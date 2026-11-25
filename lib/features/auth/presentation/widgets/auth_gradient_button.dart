@@ -57,7 +57,8 @@ class AuthGradientButton extends StatelessWidget {
                 : Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text(
+                      Flexible(
+                          child: Text(
                         label,
                         style: GoogleFonts.inter(
                           fontSize: 14,
@@ -65,7 +66,9 @@ class AuthGradientButton extends StatelessWidget {
                           letterSpacing: 0.5,
                           color: Colors.white,
                         ),
-                      ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      )),
                       const SizedBox(width: 8),
                       Icon(icon, color: Colors.white, size: 18),
                     ],
@@ -76,4 +79,3 @@ class AuthGradientButton extends StatelessWidget {
     );
   }
 }
-

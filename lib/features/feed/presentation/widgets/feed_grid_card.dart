@@ -176,14 +176,17 @@ class FeedGridCard extends StatelessWidget {
                             ),
                             const SizedBox(width: 3),
                           ],
-                          Text(
+                          Flexible(
+                              child: Text(
                             post.category!.name,
                             style: GoogleFonts.inter(
                               fontSize: 8.5,
                               fontWeight: FontWeight.w700,
                               color: Colors.white,
                             ),
-                          ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          )),
                         ],
                       ),
                     ),
@@ -253,11 +256,14 @@ class FeedGridCard extends StatelessWidget {
                               style: GoogleFonts.inter(
                                 fontSize: 9,
                                 fontWeight: FontWeight.w700,
-                                color: post.isAmountHidden || post.amount == null
-                                    ? Colors.white70
-                                    : (post.amount! > 0
-                                        ? const Color(0xFF34D399) // Emerald green
-                                        : const Color(0xFFFDE047)), // Yellow/Gold
+                                color:
+                                    post.isAmountHidden || post.amount == null
+                                        ? Colors.white70
+                                        : (post.amount! > 0
+                                            ? const Color(
+                                                0xFF34D399) // Emerald green
+                                            : const Color(
+                                                0xFFFDE047)), // Yellow/Gold
                               ),
                             ),
                           ),
@@ -273,14 +279,17 @@ class FeedGridCard extends StatelessWidget {
                                   color: Color(0xFFF43F5E),
                                 ),
                                 const SizedBox(width: 2),
-                                Text(
+                                Flexible(
+                                    child: Text(
                                   '${post.reactionsCount}',
                                   style: GoogleFonts.inter(
                                     fontSize: 8.5,
                                     fontWeight: FontWeight.w700,
                                     color: Colors.white,
                                   ),
-                                ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                )),
                               ],
                             ),
                         ],
@@ -298,8 +307,7 @@ class FeedGridCard extends StatelessWidget {
                               color: AppColors.primary,
                               image: post.author.avatar != null
                                   ? DecorationImage(
-                                      image:
-                                          NetworkImage(post.author.avatar!),
+                                      image: NetworkImage(post.author.avatar!),
                                       fit: BoxFit.cover,
                                     )
                                   : null,

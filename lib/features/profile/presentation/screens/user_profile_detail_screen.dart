@@ -158,7 +158,9 @@ class _UserProfileDetailScreenState
                           color: AppColors.primary,
                           shape: BoxShape.circle,
                           border: Border.all(
-                            color: isDark ? AppColors.darkBackground : Colors.white,
+                            color: isDark
+                                ? AppColors.darkBackground
+                                : Colors.white,
                             width: 2.5,
                           ),
                           boxShadow: [
@@ -210,7 +212,8 @@ class _UserProfileDetailScreenState
                               color: AppColors.success,
                             ),
                             const SizedBox(width: 4),
-                            Text(
+                            Flexible(
+                                child: Text(
                               'Tài khoản đã kích hoạt',
                               style: TextStyle(
                                 fontSize: 11.5,
@@ -219,7 +222,9 @@ class _UserProfileDetailScreenState
                                     ? const Color(0xFF4ADE80)
                                     : const Color(0xFF16A34A),
                               ),
-                            ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            )),
                           ],
                         ),
                       ),
@@ -244,8 +249,8 @@ class _UserProfileDetailScreenState
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black
-                            .withValues(alpha: isDark ? 0.2 : 0.03),
+                        color:
+                            Colors.black.withValues(alpha: isDark ? 0.2 : 0.03),
                         blurRadius: 10,
                         offset: const Offset(0, 3),
                       ),
@@ -284,8 +289,8 @@ class _UserProfileDetailScreenState
                 ),
                 const SizedBox(height: 10),
                 Container(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 18, vertical: 8),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
                   decoration: BoxDecoration(
                     color: isDark ? AppColors.darkSurface : Colors.white,
                     borderRadius: BorderRadius.circular(AppColors.radiusLg),
@@ -295,8 +300,8 @@ class _UserProfileDetailScreenState
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black
-                            .withValues(alpha: isDark ? 0.2 : 0.03),
+                        color:
+                            Colors.black.withValues(alpha: isDark ? 0.2 : 0.03),
                         blurRadius: 10,
                         offset: const Offset(0, 3),
                       ),
@@ -317,7 +322,8 @@ class _UserProfileDetailScreenState
                       ),
                       ProfileInfoRow(
                         label: 'Tên đăng nhập',
-                        value: user?.username ?? (user?.email.split('@').first ?? '---'),
+                        value: user?.username ??
+                            (user?.email.split('@').first ?? '---'),
                         icon: Icons.alternate_email_rounded,
                       ),
                       Divider(

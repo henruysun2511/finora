@@ -180,7 +180,8 @@ class _OnboardingProfileScreenState
                             child: _buildSegButton(
                               label: '🇻🇳 Tiếng Việt',
                               isActive: _selectedLanguage == 'vi',
-                              onTap: () => setState(() => _selectedLanguage = 'vi'),
+                              onTap: () =>
+                                  setState(() => _selectedLanguage = 'vi'),
                               isDark: isDark,
                             ),
                           ),
@@ -188,7 +189,8 @@ class _OnboardingProfileScreenState
                             child: _buildSegButton(
                               label: '🇬🇧 English',
                               isActive: _selectedLanguage == 'en',
-                              onTap: () => setState(() => _selectedLanguage = 'en'),
+                              onTap: () =>
+                                  setState(() => _selectedLanguage = 'en'),
                               isDark: isDark,
                             ),
                           ),
@@ -217,7 +219,8 @@ class _OnboardingProfileScreenState
                             code: 'VND (₫)',
                             label: 'Đồng Việt Nam',
                             isSelected: _selectedCurrency == 'VND',
-                            onTap: () => setState(() => _selectedCurrency = 'VND'),
+                            onTap: () =>
+                                setState(() => _selectedCurrency = 'VND'),
                             isDark: isDark,
                           ),
                         ),
@@ -228,7 +231,8 @@ class _OnboardingProfileScreenState
                             code: 'USD (\$)',
                             label: 'Đô la Mỹ',
                             isSelected: _selectedCurrency == 'USD',
-                            onTap: () => setState(() => _selectedCurrency = 'USD'),
+                            onTap: () =>
+                                setState(() => _selectedCurrency = 'USD'),
                             isDark: isDark,
                           ),
                         ),
@@ -260,9 +264,8 @@ class _OnboardingProfileScreenState
                     : AppColors.lightBackground,
                 border: Border(
                   top: BorderSide(
-                    color: isDark
-                        ? AppColors.darkBorder
-                        : AppColors.lightBorder,
+                    color:
+                        isDark ? AppColors.darkBorder : AppColors.lightBorder,
                     width: 0.8,
                   ),
                 ),
@@ -288,13 +291,16 @@ class _OnboardingProfileScreenState
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Text(
+                          Flexible(
+                              child: Text(
                             'Tiếp tục',
                             style: GoogleFonts.inter(
                               fontSize: 15,
                               fontWeight: FontWeight.w700,
                             ),
-                          ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          )),
                           const SizedBox(width: 8),
                           const LucideIcon(
                             name: LucideIcons.arrowUpRight,
@@ -326,9 +332,7 @@ class _OnboardingProfileScreenState
         duration: const Duration(milliseconds: 180),
         padding: const EdgeInsets.symmetric(vertical: 10),
         decoration: BoxDecoration(
-          color: isActive
-              ? AppColors.primary
-              : Colors.transparent,
+          color: isActive ? AppColors.primary : Colors.transparent,
           borderRadius: BorderRadius.circular(10),
           boxShadow: isActive
               ? [
@@ -433,9 +437,7 @@ class _OnboardingProfileScreenState
         fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
         color: isSelected
             ? Colors.white
-            : (isDark
-                ? AppColors.darkForeground
-                : AppColors.lightForeground),
+            : (isDark ? AppColors.darkForeground : AppColors.lightForeground),
       ),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),

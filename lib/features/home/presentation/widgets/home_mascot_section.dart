@@ -157,7 +157,8 @@ class _MascotPreviewCard extends StatelessWidget {
                             ),
                           ),
                           const SizedBox(width: 4),
-                          Text(
+                          Flexible(
+                              child: Text(
                             'ĐANG DÙNG',
                             style: GoogleFonts.inter(
                               fontSize: 9,
@@ -165,7 +166,9 @@ class _MascotPreviewCard extends StatelessWidget {
                               color: tierColor,
                               letterSpacing: 0.3,
                             ),
-                          ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          )),
                         ],
                       ),
                     )
@@ -175,9 +178,8 @@ class _MascotPreviewCard extends StatelessWidget {
                       style: GoogleFonts.inter(
                         fontSize: 10,
                         fontWeight: FontWeight.w700,
-                        color: isDark
-                            ? AppColors.darkMuted
-                            : AppColors.lightMuted,
+                        color:
+                            isDark ? AppColors.darkMuted : AppColors.lightMuted,
                       ),
                     ),
                 ],
@@ -219,9 +221,8 @@ class _MascotPreviewCard extends StatelessWidget {
                     style: GoogleFonts.inter(
                       fontSize: 10,
                       fontWeight: FontWeight.w500,
-                      color: isDark
-                          ? AppColors.darkMuted
-                          : AppColors.lightMuted,
+                      color:
+                          isDark ? AppColors.darkMuted : AppColors.lightMuted,
                     ),
                   ),
                   const SizedBox(height: 4),
@@ -257,4 +258,3 @@ class _MascotPreviewCard extends StatelessWidget {
     );
   }
 }
-

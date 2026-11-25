@@ -5,10 +5,15 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../app/router/route_names.dart';
 import '../../../../app/theme/app_colors.dart';
+import '../../../../core/storage/local_storage.dart';
+import '../../../../core/widgets/mascot/mascot_registry.dart';
 import '../../../../core/widgets/mascot_banner.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
 import '../../../dashboard/domain/models/dashboard_overview_model.dart';
 import '../../../dashboard/presentation/providers/dashboard_providers.dart';
+import '../../../mascot/domain/models/current_mascot.dart';
+import '../../../mascot/presentation/providers/current_mascot_provider.dart';
+import '../../../mascot/presentation/widgets/mascot_level_up_dialog.dart';
 import '../../../wallets/presentation/providers/wallets_overview_provider.dart';
 import '../widgets/home_accounts_section.dart';
 import '../widgets/home_budget_health_card.dart';
@@ -29,6 +34,38 @@ class HomeScreen extends ConsumerWidget {
     final user = ref.watch(authNotifierProvider).valueOrNull;
     final overviewAsync = ref.watch(dashboardOverviewProvider);
 
+    // Lắng nghe sự kiện thăng hạng Linh vật AI tự động
+    ref.listen<AsyncValue<CurrentMascot>>(currentMascotProvider, (prev, next) {
+      final cur = next.valueOrNull;
+      if (cur == null) return;
+
+      final storage = ref.read(localStorageProvider);
+      final lastSeen = storage.getLastSeenMascotTier();
+
+      if (lastSeen == null) {
+        // Lần đầu ghi nhận mốc linh vật hiện tại
+        storage.setLastSeenMascotTier(cur.mascot.tierName);
+      } else if (lastSeen.toLowerCase() != cur.mascot.tierName.toLowerCase()) {
+        final lastTierData = MascotRegistry.get(lastSeen);
+        final curTierData = MascotRegistry.get(cur.mascot.tierName);
+
+        // Chỉ chúc mừng khi thăng hạng (min net worth cao hơn)
+        if (curTierData.min > lastTierData.min) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (context.mounted) {
+              MascotLevelUpDialog.show(
+                context,
+                tierName: cur.mascot.tierName,
+                previousTierName: lastSeen,
+                netWorth: cur.netWorth,
+              );
+            }
+          });
+        }
+        storage.setLastSeenMascotTier(cur.mascot.tierName);
+      }
+    });
+
     return Scaffold(
       backgroundColor:
           isDark ? AppColors.darkBackground : AppColors.lightBackground,
@@ -43,6 +80,24 @@ class HomeScreen extends ConsumerWidget {
             ref.invalidate(dashboardDebtsProvider);
             ref.invalidate(dashboardCalendarProvider);
             ref.invalidate(walletsOverviewProvider);
+
+            // Kiểm tra và đồng bộ tiến hóa linh vật từ backend
+            final evolution =
+                await ref.read(currentMascotProvider.notifier).syncEvolution();
+            if (evolution != null &&
+                evolution.evolved &&
+                (evolution.isLevelUp ?? true)) {
+              if (context.mounted) {
+                MascotLevelUpDialog.show(
+                  context,
+                  tierName: evolution.currentMascot.tierName,
+                  previousTierName: evolution.previousMascot?.tierName,
+                  customMessage: evolution.message,
+                  netWorth: evolution.netWorth,
+                );
+              }
+            }
+
             await Future.delayed(const Duration(milliseconds: 600));
           },
           child: SingleChildScrollView(

@@ -41,13 +41,17 @@ class SmartDailyBudgetCard extends StatelessWidget {
             children: [
               const Text('💡', style: TextStyle(fontSize: 18)),
               const SizedBox(width: 8),
-              Text(
-                'TRỢ LÝ THÔNG MINH (SMART DAILY BUDGET)',
-                style: GoogleFonts.inter(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.primary,
-                  letterSpacing: 0.5,
+              Expanded(
+                child: Text(
+                  'TRỢ LÝ THÔNG MINH (SMART DAILY BUDGET)',
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: GoogleFonts.inter(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.primary,
+                    letterSpacing: 0.5,
+                  ),
                 ),
               ),
             ],

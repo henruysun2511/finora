@@ -31,7 +31,8 @@ class ReportPeriodSelector extends StatelessWidget {
   String _formatPeriodTitle() {
     switch (selectedPeriod) {
       case ReportPeriod.week:
-        final startOfWeek = targetDate.subtract(Duration(days: targetDate.weekday - 1));
+        final startOfWeek =
+            targetDate.subtract(Duration(days: targetDate.weekday - 1));
         final endOfWeek = startOfWeek.add(const Duration(days: 6));
         return 'Tuần ${DateFormat('dd/MM').format(startOfWeek)} - ${DateFormat('dd/MM/yyyy').format(endOfWeek)}';
       case ReportPeriod.month:
@@ -93,28 +94,37 @@ class ReportPeriodSelector extends StatelessWidget {
                   icon: LucideIcon(
                     name: 'chevron-left',
                     size: 20,
-                    color: isDark ? AppColors.darkForeground : AppColors.lightForeground,
+                    color: isDark
+                        ? AppColors.darkForeground
+                        : AppColors.lightForeground,
                   ),
                   onPressed: onPrevious,
                   tooltip: 'Kỳ trước',
                   padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
+                  constraints:
+                      const BoxConstraints(minWidth: 36, minHeight: 36),
                 ),
-                GestureDetector(
+                Flexible(
+                    child: GestureDetector(
                   onTap: selectedPeriod == ReportPeriod.custom
                       ? () => _pickCustomRange(context)
                       : null,
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Text(
+                      Flexible(
+                          child: Text(
                         _formatPeriodTitle(),
                         style: GoogleFonts.inter(
                           fontSize: 15,
                           fontWeight: FontWeight.w700,
-                          color: isDark ? AppColors.darkForeground : AppColors.lightForeground,
+                          color: isDark
+                              ? AppColors.darkForeground
+                              : AppColors.lightForeground,
                         ),
-                      ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      )),
                       if (selectedPeriod == ReportPeriod.custom) ...[
                         const SizedBox(width: 6),
                         const LucideIcon(
@@ -125,17 +135,20 @@ class ReportPeriodSelector extends StatelessWidget {
                       ],
                     ],
                   ),
-                ),
+                )),
                 IconButton(
                   icon: LucideIcon(
                     name: 'chevron-right',
                     size: 20,
-                    color: isDark ? AppColors.darkForeground : AppColors.lightForeground,
+                    color: isDark
+                        ? AppColors.darkForeground
+                        : AppColors.lightForeground,
                   ),
                   onPressed: onNext,
                   tooltip: 'Kỳ sau',
                   padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
+                  constraints:
+                      const BoxConstraints(minWidth: 36, minHeight: 36),
                 ),
               ],
             ),
@@ -156,13 +169,16 @@ class ReportPeriodSelector extends StatelessWidget {
                   selected: isSelected,
                   showCheckmark: false,
                   selectedColor: AppColors.primary,
-                  backgroundColor: isDark ? AppColors.darkSurface : Colors.white,
+                  backgroundColor:
+                      isDark ? AppColors.darkSurface : Colors.white,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                     side: BorderSide(
                       color: isSelected
                           ? AppColors.primary
-                          : (isDark ? AppColors.darkBorder : AppColors.lightBorder),
+                          : (isDark
+                              ? AppColors.darkBorder
+                              : AppColors.lightBorder),
                     ),
                   ),
                   labelStyle: GoogleFonts.inter(
@@ -170,9 +186,12 @@ class ReportPeriodSelector extends StatelessWidget {
                     fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
                     color: isSelected
                         ? Colors.white
-                        : (isDark ? AppColors.darkForeground : AppColors.lightForeground),
+                        : (isDark
+                            ? AppColors.darkForeground
+                            : AppColors.lightForeground),
                   ),
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   onSelected: (val) {
                     if (val) {
                       if (period == ReportPeriod.custom) {

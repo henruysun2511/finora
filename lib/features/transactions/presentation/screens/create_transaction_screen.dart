@@ -9,6 +9,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 
+import '../../../../app/router/route_names.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/constants/api_constants.dart';
 import '../../../../core/network/dio_client.dart';
@@ -26,7 +27,14 @@ import '../widgets/transaction_type_toggle.dart';
 import 'receipt_capture_screen.dart';
 
 class CreateTransactionScreen extends ConsumerStatefulWidget {
-  const CreateTransactionScreen({super.key});
+  final String? initialWalletId;
+  final String? initialType;
+
+  const CreateTransactionScreen({
+    super.key,
+    this.initialWalletId,
+    this.initialType,
+  });
 
   @override
   ConsumerState<CreateTransactionScreen> createState() =>
@@ -58,6 +66,24 @@ class _CreateTransactionScreenState
     if (formState.amount > 0) {
       _amountController.text = _formatNumber(formState.amount);
     }
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final notifier = ref.read(transactionFormProvider.notifier);
+      if (widget.initialType == 'income') {
+        notifier.setType(TransactionType.income);
+      } else if (widget.initialType == 'expense') {
+        notifier.setType(TransactionType.expense);
+      }
+      if (widget.initialWalletId != null) {
+        final accounts = ref.read(accountsListProvider).valueOrNull ?? [];
+        final walletAcc = accounts
+            .where((a) => a.walletId == widget.initialWalletId)
+            .firstOrNull;
+        if (walletAcc != null) {
+          notifier.setAccount(id: walletAcc.id, name: walletAcc.name);
+        }
+      }
+    });
   }
 
   @override
@@ -140,17 +166,14 @@ class _CreateTransactionScreenState
       return;
     }
 
-    final success =
-        await ref.read(transactionFormProvider.notifier).submit();
+    final createdTx = await ref.read(transactionFormProvider.notifier).submit();
     if (!mounted) return;
 
-    if (success) {
-      AppToast.show(
-        context,
-        message: 'Đã lưu giao dịch thành công!',
-        type: ToastType.success,
+    if (createdTx != null) {
+      context.pushReplacement(
+        RoutePaths.transactionSuccess,
+        extra: createdTx,
       );
-      context.pop(true);
     } else {
       final err = ref.read(transactionFormProvider).errorMessage;
       AppToast.show(
@@ -207,8 +230,7 @@ class _CreateTransactionScreenState
           remoteUrl = data['data']['secureUrl']?.toString() ??
               data['data']['url']?.toString();
         } else {
-          remoteUrl =
-              data['secureUrl']?.toString() ?? data['url']?.toString();
+          remoteUrl = data['secureUrl']?.toString() ?? data['url']?.toString();
         }
       }
 
@@ -297,15 +319,20 @@ class _CreateTransactionScreenState
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
-                        'SỐ TIỀN GIAO DỊCH (*)',
-                        style: GoogleFonts.inter(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w800,
-                          color: AppColors.primary,
-                          letterSpacing: 0.5,
+                      Expanded(
+                        child: Text(
+                          'SỐ TIỀN GIAO DỊCH (*)',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: GoogleFonts.inter(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w800,
+                            color: AppColors.primary,
+                            letterSpacing: 0.5,
+                          ),
                         ),
                       ),
+                      const SizedBox(width: 8),
                       Text(
                         'VND (₫)',
                         style: GoogleFonts.inter(
@@ -594,9 +621,7 @@ class _CreateTransactionScreenState
                       ),
                     ),
                   ),
-
                   const SizedBox(height: 12),
-
                   InkWell(
                     onTap: _pickDate,
                     borderRadius: BorderRadius.circular(12),
@@ -648,9 +673,7 @@ class _CreateTransactionScreenState
                       ),
                     ),
                   ),
-
                   const SizedBox(height: 12),
-
                   TextFormField(
                     controller: _locationController,
                     onChanged: notifier.setLocationName,
@@ -677,9 +700,7 @@ class _CreateTransactionScreenState
                       ),
                     ),
                   ),
-
                   const SizedBox(height: 12),
-
                   TextFormField(
                     controller: _noteController,
                     onChanged: notifier.setNote,
@@ -693,7 +714,8 @@ class _CreateTransactionScreenState
                       ),
                       labelText: 'Ghi chú chi tiết',
                       labelStyle: GoogleFonts.inter(fontSize: 13, color: muted),
-                      hintText: 'Thêm ghi chú để dễ dàng tra cứu lại sau này...',
+                      hintText:
+                          'Thêm ghi chú để dễ dàng tra cứu lại sau này...',
                       hintStyle: GoogleFonts.inter(
                         fontSize: 13,
                         color: muted.withValues(alpha: 0.6),
@@ -734,7 +756,8 @@ class _CreateTransactionScreenState
                       color: AppColors.primary,
                     ),
                     const SizedBox(width: 6),
-                    Text(
+                    Flexible(
+                        child: Text(
                       _showAdvancedOptions
                           ? 'Thu gọn cài đặt nâng cao'
                           : 'Cài đặt nâng cao & Riêng tư (Báo cáo, Ví chia sẻ)',
@@ -743,7 +766,9 @@ class _CreateTransactionScreenState
                         fontWeight: FontWeight.w700,
                         color: AppColors.primary,
                       ),
-                    ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    )),
                   ],
                 ),
               ),
@@ -758,7 +783,8 @@ class _CreateTransactionScreenState
                     SwitchListTile(
                       contentPadding: EdgeInsets.zero,
                       value: formState.excludeFromReport,
-                      activeColor: AppColors.primary,
+                      activeColor: Colors.white,
+                      activeTrackColor: AppColors.primary,
                       title: Text(
                         'Không tính vào báo cáo',
                         style: GoogleFonts.inter(
@@ -777,7 +803,8 @@ class _CreateTransactionScreenState
                     SwitchListTile(
                       contentPadding: EdgeInsets.zero,
                       value: formState.amountHidden,
-                      activeColor: AppColors.primary,
+                      activeColor: Colors.white,
+                      activeTrackColor: AppColors.primary,
                       title: Text(
                         'Ẩn số tiền trong ví chia sẻ',
                         style: GoogleFonts.inter(
@@ -796,7 +823,8 @@ class _CreateTransactionScreenState
                     SwitchListTile(
                       contentPadding: EdgeInsets.zero,
                       value: formState.visibility == 'FRIENDS',
-                      activeColor: AppColors.primary,
+                      activeColor: Colors.white,
+                      activeTrackColor: AppColors.primary,
                       title: Text(
                         'Chia sẻ lên Bảng tin & Ví chung',
                         style: GoogleFonts.inter(
@@ -849,13 +877,16 @@ class _CreateTransactionScreenState
                         children: [
                           const Icon(Icons.check_circle_rounded, size: 20),
                           const SizedBox(width: 8),
-                          Text(
+                          Flexible(
+                              child: Text(
                             'Lưu giao dịch ✓',
                             style: GoogleFonts.inter(
                               fontSize: 15,
                               fontWeight: FontWeight.w700,
                             ),
-                          ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          )),
                         ],
                       ),
               ),

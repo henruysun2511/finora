@@ -69,14 +69,17 @@ class _SwapCurrencyButtonState extends State<SwapCurrencyButton> {
                   ),
                 ),
                 const SizedBox(width: 8),
-                Text(
+                Flexible(
+                    child: Text(
                   'Đảo chiều tiền',
                   style: GoogleFonts.inter(
                     fontSize: 12,
                     fontWeight: FontWeight.w700,
                     color: AppColors.primary,
                   ),
-                ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                )),
               ],
             ),
           ),
@@ -85,4 +88,3 @@ class _SwapCurrencyButtonState extends State<SwapCurrencyButton> {
     );
   }
 }
-

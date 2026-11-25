@@ -120,14 +120,19 @@ class BudgetOverviewCard extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      'Đã dùng: ${currencyFormatter.format(summary.totalSpent)} (${summary.percentage.toStringAsFixed(0)}%)',
-                      style: GoogleFonts.inter(
-                        fontSize: 11.5,
-                        fontWeight: FontWeight.w700,
-                        color: Colors.white.withValues(alpha: 0.85),
+                    Expanded(
+                      child: Text(
+                        'Đã dùng: ${currencyFormatter.format(summary.totalSpent)} (${summary.percentage.toStringAsFixed(0)}%)',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: GoogleFonts.inter(
+                          fontSize: 11.5,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.white.withValues(alpha: 0.85),
+                        ),
                       ),
                     ),
+                    const SizedBox(width: 8),
                     Text(
                       'Còn: ${currencyFormatter.format(summary.totalRemaining)}',
                       style: GoogleFonts.inter(

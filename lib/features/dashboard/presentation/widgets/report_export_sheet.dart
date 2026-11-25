@@ -80,25 +80,31 @@ class ReportExportSheet extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 12),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Xuất Báo cáo Tài chính',
-                    style: GoogleFonts.inter(
-                      fontSize: 17,
-                      fontWeight: FontWeight.w700,
-                      color: isDark ? AppColors.darkForeground : AppColors.lightForeground,
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Xuất Báo cáo Tài chính',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: GoogleFonts.inter(
+                        fontSize: 17,
+                        fontWeight: FontWeight.w700,
+                        color: isDark ? AppColors.darkForeground : AppColors.lightForeground,
+                      ),
                     ),
-                  ),
-                  Text(
-                    'Chọn định dạng báo cáo cho kỳ ${data.period.label.toLowerCase()}',
-                    style: GoogleFonts.inter(
-                      fontSize: 12,
-                      color: isDark ? AppColors.darkMuted : AppColors.lightMuted,
+                    Text(
+                      'Chọn định dạng báo cáo cho kỳ ${data.period.label.toLowerCase()}',
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: GoogleFonts.inter(
+                        fontSize: 12,
+                        color: isDark ? AppColors.darkMuted : AppColors.lightMuted,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ],
           ),

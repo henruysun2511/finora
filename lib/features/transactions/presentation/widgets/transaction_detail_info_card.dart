@@ -92,12 +92,16 @@ class TransactionDetailInfoCard extends StatelessWidget {
                       size: 20,
                     ),
                     const SizedBox(width: 6),
-                    Text(
-                      item.categoryName ?? 'Chi tiêu chung',
-                      style: GoogleFonts.inter(
-                        fontSize: 13.5,
-                        fontWeight: FontWeight.w700,
-                        color: foreground,
+                    Flexible(
+                      child: Text(
+                        item.categoryName ?? 'Chi tiêu chung',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: GoogleFonts.inter(
+                          fontSize: 13.5,
+                          fontWeight: FontWeight.w700,
+                          color: foreground,
+                        ),
                       ),
                     ),
                   ],
@@ -298,14 +302,17 @@ class TransactionDetailInfoCard extends StatelessWidget {
                 foreground: foreground,
                 muted: muted,
                 valueWidget: InkWell(
-                  onTap: () => _copyToClipboard(context, item.id, 'mã giao dịch'),
+                  onTap: () =>
+                      _copyToClipboard(context, item.id, 'mã giao dịch'),
                   borderRadius: BorderRadius.circular(6),
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Text(
+                        Flexible(
+                            child: Text(
                           item.id.length > 12
                               ? '${item.id.substring(0, 8)}...${item.id.substring(item.id.length - 4)}'
                               : item.id,
@@ -314,7 +321,9 @@ class TransactionDetailInfoCard extends StatelessWidget {
                             fontWeight: FontWeight.w700,
                             color: AppColors.primary,
                           ),
-                        ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        )),
                         const SizedBox(width: 4),
                         const Icon(
                           Icons.copy_rounded,
@@ -388,8 +397,13 @@ class TransactionDetailInfoCard extends StatelessWidget {
             color: muted,
           ),
         ),
-        const Spacer(),
-        valueWidget,
+        const SizedBox(width: 12),
+        Expanded(
+          child: Align(
+            alignment: Alignment.centerRight,
+            child: valueWidget,
+          ),
+        ),
       ],
     );
   }

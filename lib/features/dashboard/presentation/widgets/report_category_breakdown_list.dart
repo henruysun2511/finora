@@ -22,10 +22,12 @@ class ReportCategoryBreakdownList extends StatefulWidget {
   });
 
   @override
-  State<ReportCategoryBreakdownList> createState() => _ReportCategoryBreakdownListState();
+  State<ReportCategoryBreakdownList> createState() =>
+      _ReportCategoryBreakdownListState();
 }
 
-class _ReportCategoryBreakdownListState extends State<ReportCategoryBreakdownList> {
+class _ReportCategoryBreakdownListState
+    extends State<ReportCategoryBreakdownList> {
   final Map<String, GlobalKey> _itemKeys = {};
 
   @override
@@ -99,15 +101,20 @@ class _ReportCategoryBreakdownListState extends State<ReportCategoryBreakdownLis
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                'CHI TIẾT TỪNG DANH MỤC',
-                style: GoogleFonts.inter(
-                  fontSize: 11.5,
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: 0.7,
-                  color: isDark ? AppColors.darkMuted : AppColors.lightMuted,
+              Expanded(
+                child: Text(
+                  'CHI TIẾT TỪNG DANH MỤC',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: GoogleFonts.inter(
+                    fontSize: 11.5,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 0.7,
+                    color: isDark ? AppColors.darkMuted : AppColors.lightMuted,
+                  ),
                 ),
               ),
+              const SizedBox(width: 8),
               Text(
                 '${widget.categories.length} nhóm chi',
                 style: GoogleFonts.inter(
@@ -143,14 +150,17 @@ class _ReportCategoryBreakdownListState extends State<ReportCategoryBreakdownLis
                     border: Border.all(
                       color: isSelected
                           ? catColor
-                          : (isDark ? AppColors.darkBorder : AppColors.lightBorder),
+                          : (isDark
+                              ? AppColors.darkBorder
+                              : AppColors.lightBorder),
                       width: isSelected ? 2.0 : 1.0,
                     ),
                     boxShadow: [
                       BoxShadow(
                         color: isSelected
                             ? catColor.withValues(alpha: 0.15)
-                            : Colors.black.withValues(alpha: isDark ? 0.2 : 0.02),
+                            : Colors.black
+                                .withValues(alpha: isDark ? 0.2 : 0.02),
                         blurRadius: isSelected ? 12 : 6,
                         offset: const Offset(0, 2),
                       ),
@@ -248,7 +258,8 @@ class _ReportCategoryBreakdownListState extends State<ReportCategoryBreakdownLis
                                   ),
                                 ),
                                 const SizedBox(width: 5),
-                                Text(
+                                Flexible(
+                                    child: Text(
                                   '${sub.name}: ',
                                   style: GoogleFonts.inter(
                                     fontSize: 11.5,
@@ -257,8 +268,11 @@ class _ReportCategoryBreakdownListState extends State<ReportCategoryBreakdownLis
                                         : AppColors.lightMuted,
                                     fontWeight: FontWeight.w500,
                                   ),
-                                ),
-                                Text(
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                )),
+                                Flexible(
+                                    child: Text(
                                   _formatCompact(sub.amount),
                                   style: GoogleFonts.inter(
                                     fontSize: 11.5,
@@ -267,7 +281,9 @@ class _ReportCategoryBreakdownListState extends State<ReportCategoryBreakdownLis
                                         ? AppColors.darkForeground
                                         : AppColors.lightForeground,
                                   ),
-                                ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                )),
                               ],
                             );
                           }).toList(),
@@ -289,14 +305,17 @@ class _ReportCategoryBreakdownListState extends State<ReportCategoryBreakdownLis
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Text(
+                                Flexible(
+                                    child: Text(
                                   'Xem tất cả giao dịch nhóm "${cat.name}"',
                                   style: GoogleFonts.inter(
                                     fontSize: 12,
                                     fontWeight: FontWeight.w600,
                                     color: AppColors.primary,
                                   ),
-                                ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                )),
                                 const SizedBox(width: 4),
                                 const LucideIcon(
                                   name: 'arrow-right',

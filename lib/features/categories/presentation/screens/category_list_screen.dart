@@ -52,9 +52,7 @@ class CategoryListScreen extends ConsumerWidget {
     );
 
     if (confirmed == true && context.mounted) {
-      await ref
-          .read(categoryListProvider.notifier)
-          .deleteCategory(category.id);
+      await ref.read(categoryListProvider.notifier).deleteCategory(category.id);
       if (context.mounted) {
         AppToast.show(
           context,
@@ -93,14 +91,17 @@ class CategoryListScreen extends ConsumerWidget {
                 color: Colors.white,
               ),
               const SizedBox(width: 4),
-              Text(
+              Flexible(
+                  child: Text(
                 'Thêm mới',
                 style: GoogleFonts.inter(
                   fontSize: 12.5,
                   fontWeight: FontWeight.w700,
                   color: Colors.white,
                 ),
-              ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              )),
             ],
           ),
         ),
@@ -176,7 +177,8 @@ class CategoryListScreen extends ConsumerWidget {
                         else
                           CategoryGroupCard(
                             items: userCategories,
-                            onTapCategory: (cat) => _openEditSheet(context, cat),
+                            onTapCategory: (cat) =>
+                                _openEditSheet(context, cat),
                             onDeleteCategory: (cat) =>
                                 _confirmDelete(context, ref, cat),
                           ),
@@ -191,7 +193,8 @@ class CategoryListScreen extends ConsumerWidget {
                           ),
                           CategoryGroupCard(
                             items: systemCategories,
-                            onTapCategory: (cat) => _openEditSheet(context, cat),
+                            onTapCategory: (cat) =>
+                                _openEditSheet(context, cat),
                             onDeleteCategory: (cat) =>
                                 _confirmDelete(context, ref, cat),
                           ),

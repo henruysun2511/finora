@@ -131,23 +131,30 @@ class BudgetDetailScreen extends ConsumerWidget {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Row(
-                            children: [
-                              CategoryIcon(
-                                icon: b.categoryIcon,
-                                colorHex: b.categoryColor,
-                                size: 36,
-                              ),
-                              const SizedBox(width: 10),
-                              Text(
-                                b.categoryName ?? 'Chi tiêu chung',
-                                style: GoogleFonts.inter(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w700,
+                          Expanded(
+                            child: Row(
+                              children: [
+                                CategoryIcon(
+                                  icon: b.categoryIcon,
+                                  colorHex: b.categoryColor,
+                                  size: 36,
                                 ),
-                              ),
-                            ],
+                                const SizedBox(width: 10),
+                                Flexible(
+                                  child: Text(
+                                    b.categoryName ?? 'Chi tiêu chung',
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: GoogleFonts.inter(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
+                          const SizedBox(width: 8),
                           Container(
                             padding: const EdgeInsets.symmetric(
                               horizontal: 10,
@@ -178,49 +185,58 @@ class BudgetDetailScreen extends ConsumerWidget {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Đã chi tiêu',
-                                style: GoogleFonts.inter(
-                                  color: isDark
-                                      ? AppColors.darkMuted
-                                      : AppColors.lightMuted,
-                                  fontSize: 12,
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Đã chi tiêu',
+                                  style: GoogleFonts.inter(
+                                    color: isDark
+                                        ? AppColors.darkMuted
+                                        : AppColors.lightMuted,
+                                    fontSize: 12,
+                                  ),
                                 ),
-                              ),
-                              const SizedBox(height: 2),
-                              Text(
-                                currencyFormatter.format(spentAmount),
-                                style: GoogleFonts.inter(
-                                  fontWeight: FontWeight.w700,
-                                  fontSize: 15,
+                                const SizedBox(height: 2),
+                                Text(
+                                  currencyFormatter.format(spentAmount),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: GoogleFonts.inter(
+                                    fontWeight: FontWeight.w700,
+                                    fontSize: 15,
+                                  ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              Text(
-                                'Hạn mức khả dụng',
-                                style: GoogleFonts.inter(
-                                  color: isDark
-                                      ? AppColors.darkMuted
-                                      : AppColors.lightMuted,
-                                  fontSize: 12,
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                Text(
+                                  'Hạn mức khả dụng',
+                                  style: GoogleFonts.inter(
+                                    color: isDark
+                                        ? AppColors.darkMuted
+                                        : AppColors.lightMuted,
+                                    fontSize: 12,
+                                  ),
                                 ),
-                              ),
-                              const SizedBox(height: 2),
-                              Text(
-                                currencyFormatter.format(effectiveLimit),
-                                style: GoogleFonts.inter(
-                                  fontWeight: FontWeight.w700,
-                                  fontSize: 15,
+                                const SizedBox(height: 2),
+                                Text(
+                                  currencyFormatter.format(effectiveLimit),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: GoogleFonts.inter(
+                                    fontWeight: FontWeight.w700,
+                                    fontSize: 15,
+                                  ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         ],
                       ),
@@ -239,15 +255,21 @@ class BudgetDetailScreen extends ConsumerWidget {
                               fontSize: 13,
                             ),
                           ),
-                          Text(
-                            (b.rolloverAmount >= 0 ? '+' : '') +
-                                currencyFormatter.format(b.rolloverAmount),
-                            style: GoogleFonts.inter(
-                              fontWeight: FontWeight.w600,
-                              color: b.rolloverAmount >= 0
-                                  ? AppColors.success
-                                  : AppColors.danger,
-                              fontSize: 13,
+                          const SizedBox(width: 12),
+                          Flexible(
+                            child: Text(
+                              (b.rolloverAmount >= 0 ? '+' : '') +
+                                  currencyFormatter.format(b.rolloverAmount),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              textAlign: TextAlign.end,
+                              style: GoogleFonts.inter(
+                                fontWeight: FontWeight.w600,
+                                color: b.rolloverAmount >= 0
+                                    ? AppColors.success
+                                    : AppColors.danger,
+                                fontSize: 13,
+                              ),
                             ),
                           ),
                         ],
@@ -265,14 +287,20 @@ class BudgetDetailScreen extends ConsumerWidget {
                               fontSize: 13,
                             ),
                           ),
-                          Text(
-                            currencyFormatter.format(remainingAmount),
-                            style: GoogleFonts.inter(
-                              fontWeight: FontWeight.w800,
-                              color: remainingAmount < 0
-                                  ? AppColors.danger
-                                  : AppColors.primary,
-                              fontSize: 15,
+                          const SizedBox(width: 12),
+                          Flexible(
+                            child: Text(
+                              currencyFormatter.format(remainingAmount),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              textAlign: TextAlign.end,
+                              style: GoogleFonts.inter(
+                                fontWeight: FontWeight.w800,
+                                color: remainingAmount < 0
+                                    ? AppColors.danger
+                                    : AppColors.primary,
+                                fontSize: 15,
+                              ),
                             ),
                           ),
                         ],

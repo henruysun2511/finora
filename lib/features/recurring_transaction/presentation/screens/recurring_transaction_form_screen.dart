@@ -24,9 +24,8 @@ final _accountsForFormProvider =
   final dio = ref.watch(dioProvider);
   final res = await dio.get(ApiConstants.accounts);
   final data = res.data['data'];
-  final List items = data is Map
-      ? (data['items'] ?? data['data'] ?? [])
-      : (data ?? []);
+  final List items =
+      data is Map ? (data['items'] ?? data['data'] ?? []) : (data ?? []);
   return items
       .map<Map<String, String>>((e) => {
             'id': e['id']?.toString() ?? '',
@@ -42,9 +41,8 @@ final _categoriesForFormProvider =
   final dio = ref.watch(dioProvider);
   final res = await dio.get(ApiConstants.categories);
   final data = res.data['data'];
-  final List items = data is Map
-      ? (data['items'] ?? data['data'] ?? [])
-      : (data ?? []);
+  final List items =
+      data is Map ? (data['items'] ?? data['data'] ?? []) : (data ?? []);
   return items
       .map<Map<String, String>>((e) => {
             'id': e['id']?.toString() ?? '',
@@ -354,8 +352,7 @@ class _RecurringTransactionFormScreenState
                       );
                     }).toList(),
                     onChanged: (val) {
-                      final found =
-                          accounts.firstWhere((e) => e['id'] == val);
+                      final found = accounts.firstWhere((e) => e['id'] == val);
                       setState(() {
                         _selectedAccountId = val;
                         _selectedWalletId = found['walletId'];
@@ -433,15 +430,16 @@ class _RecurringTransactionFormScreenState
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text('Ngày bắt đầu',
-                                    style: TextStyle(
-                                        fontSize: 11, color: muted)),
+                                    style:
+                                        TextStyle(fontSize: 11, color: muted)),
                                 const SizedBox(height: 4),
                                 Row(
                                   children: [
                                     Icon(Icons.calendar_today_rounded,
                                         size: 14, color: AppColors.primary),
                                     const SizedBox(width: 6),
-                                    Text(
+                                    Flexible(
+                                        child: Text(
                                       DateFormat('dd/MM/yyyy')
                                           .format(_startDate),
                                       style: TextStyle(
@@ -449,7 +447,9 @@ class _RecurringTransactionFormScreenState
                                         fontWeight: FontWeight.w600,
                                         fontSize: 13,
                                       ),
-                                    ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    )),
                                   ],
                                 ),
                               ],
@@ -481,9 +481,14 @@ class _RecurringTransactionFormScreenState
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Text('Ngày kết thúc',
-                                        style: TextStyle(
-                                            fontSize: 11, color: muted)),
+                                    Expanded(
+                                      child: Text('Ngày kết thúc',
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: TextStyle(
+                                              fontSize: 11, color: muted)),
+                                    ),
+                                    const SizedBox(width: 8),
                                     if (_endDate != null)
                                       GestureDetector(
                                         onTap: () =>
@@ -499,7 +504,8 @@ class _RecurringTransactionFormScreenState
                                     Icon(Icons.event_busy_rounded,
                                         size: 14, color: muted),
                                     const SizedBox(width: 6),
-                                    Text(
+                                    Flexible(
+                                        child: Text(
                                       _endDate == null
                                           ? 'Vô thời hạn'
                                           : DateFormat('dd/MM/yyyy')
@@ -509,7 +515,9 @@ class _RecurringTransactionFormScreenState
                                         fontWeight: FontWeight.w600,
                                         fontSize: 13,
                                       ),
-                                    ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    )),
                                   ],
                                 ),
                               ],
@@ -561,8 +569,7 @@ class _RecurringTransactionFormScreenState
                               style: TextStyle(color: muted, fontSize: 12),
                             ),
                             value: _isPaused,
-                            onChanged: (val) =>
-                                setState(() => _isPaused = val),
+                            onChanged: (val) => setState(() => _isPaused = val),
                           ),
                       ],
                     ),
@@ -637,7 +644,8 @@ class _RecurringTransactionFormScreenState
             ),
             const SizedBox(width: 6),
           ],
-          Text(
+          Flexible(
+              child: Text(
             label,
             style: TextStyle(
               color: selected
@@ -648,7 +656,9 @@ class _RecurringTransactionFormScreenState
               fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
               fontSize: 13,
             ),
-          ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          )),
         ],
       ),
       selected: selected,
@@ -693,8 +703,7 @@ class _RecurringTransactionFormScreenState
       focusedBorder: border.copyWith(
         borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
       ),
-      contentPadding:
-          const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
     );
   }
 }

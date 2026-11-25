@@ -92,13 +92,16 @@ class RecentTransactionsSection extends ConsumerWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      'Số tiền giao dịch',
-                      style: GoogleFonts.inter(
-                        fontSize: 13,
-                        color: isDark ? AppColors.darkMuted : AppColors.lightMuted,
+                    Expanded(
+                      child: Text(
+                        'Số tiền giao dịch',
+                        style: GoogleFonts.inter(
+                          fontSize: 13,
+                          color: isDark ? AppColors.darkMuted : AppColors.lightMuted,
+                        ),
                       ),
                     ),
+                    const SizedBox(width: 8),
                     Text(
                       '${isIncome ? '+' : '-'}${CurrencyFormatter.format(tx.amount)}',
                       style: GoogleFonts.outfit(

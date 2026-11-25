@@ -214,25 +214,32 @@ class _DashboardHeroBanner extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Row(
-                  children: [
-                    const LucideIcon(
-                      name: 'wallet',
-                      color: Colors.white70,
-                      size: 14,
-                    ),
-                    const SizedBox(width: 6),
-                    Text(
-                      'TỔNG TÀI SẢN RÒNG (NET WORTH)',
-                      style: GoogleFonts.inter(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w800,
-                        letterSpacing: 0.8,
-                        color: Colors.white.withValues(alpha: 0.85),
+                Expanded(
+                  child: Row(
+                    children: [
+                      const LucideIcon(
+                        name: 'wallet',
+                        color: Colors.white70,
+                        size: 14,
                       ),
-                    ),
-                  ],
+                      const SizedBox(width: 6),
+                      Flexible(
+                        child: Text(
+                          'TỔNG TÀI SẢN RÒNG (NET WORTH)',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: GoogleFonts.inter(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: 0.8,
+                            color: Colors.white.withValues(alpha: 0.85),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
+                const SizedBox(width: 8),
                 Container(
                   padding:
                       const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
@@ -847,14 +854,17 @@ class _CategoryBreakdownTab extends ConsumerWidget {
                       trailing: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Text(
+                          Flexible(
+                              child: Text(
                             '${CurrencyFormatter.formatCompact(c.amount)} (${c.percentage.toStringAsFixed(1)}%)',
                             style: GoogleFonts.inter(
                               fontSize: 12,
                               fontWeight: FontWeight.w700,
                               color: AppColors.primary,
                             ),
-                          ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          )),
                           const SizedBox(width: 4),
                           const LucideIcon(
                             name: 'chevron-down',
@@ -869,15 +879,20 @@ class _CategoryBreakdownTab extends ConsumerWidget {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text(
-                                sub.name,
-                                style: GoogleFonts.inter(
-                                  fontSize: 12.5,
-                                  color: isDark
-                                      ? AppColors.darkMuted
-                                      : AppColors.lightMuted,
+                              Expanded(
+                                child: Text(
+                                  sub.name,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: GoogleFonts.inter(
+                                    fontSize: 12.5,
+                                    color: isDark
+                                        ? AppColors.darkMuted
+                                        : AppColors.lightMuted,
+                                  ),
                                 ),
                               ),
+                              const SizedBox(width: 8),
                               Text(
                                 CurrencyFormatter.format(sub.amount),
                                 style: GoogleFonts.inter(
@@ -981,16 +996,21 @@ class _RuleRow extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              label,
-              style: GoogleFonts.inter(
-                fontSize: 12.5,
-                fontWeight: FontWeight.w700,
-                color: isDark
-                    ? AppColors.darkForeground
-                    : AppColors.lightForeground,
+            Expanded(
+              child: Text(
+                label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: GoogleFonts.inter(
+                  fontSize: 12.5,
+                  fontWeight: FontWeight.w700,
+                  color: isDark
+                      ? AppColors.darkForeground
+                      : AppColors.lightForeground,
+                ),
               ),
             ),
+            const SizedBox(width: 8),
             Text(
               '${actualPct.toStringAsFixed(1)}% ($target)',
               style: GoogleFonts.inter(
@@ -1091,15 +1111,20 @@ class _BudgetHealthTab extends ConsumerWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
-                          'DỰ BÁO TỐC ĐỘ TIÊU TIỀN (BURN-RATE)',
-                          style: GoogleFonts.inter(
-                            fontSize: 10.5,
-                            fontWeight: FontWeight.w800,
-                            letterSpacing: 0.8,
-                            color: Colors.white70,
+                        Expanded(
+                          child: Text(
+                            'DỰ BÁO TỐC ĐỘ TIÊU TIỀN (BURN-RATE)',
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: GoogleFonts.inter(
+                              fontSize: 10.5,
+                              fontWeight: FontWeight.w800,
+                              letterSpacing: 0.8,
+                              color: Colors.white70,
+                            ),
                           ),
                         ),
+                        const SizedBox(width: 8),
                         Container(
                           padding: const EdgeInsets.symmetric(
                             horizontal: 8,
@@ -1110,9 +1135,7 @@ class _BudgetHealthTab extends ConsumerWidget {
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Text(
-                            br.willOverspend
-                                ? 'Cảnh báo vượt chi'
-                                : 'An toàn',
+                            br.willOverspend ? 'Cảnh báo vượt chi' : 'An toàn',
                             style: GoogleFonts.inter(
                               fontSize: 10,
                               fontWeight: FontWeight.w700,
@@ -1258,15 +1281,20 @@ class _BudgetHealthTab extends ConsumerWidget {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text(
-                                'Đã chi: ${CurrencyFormatter.formatCompact(item.spentAmount)} / ${CurrencyFormatter.formatCompact(item.limitAmount)}',
-                                style: GoogleFonts.inter(
-                                  fontSize: 10.5,
-                                  color: isDark
-                                      ? AppColors.darkMuted
-                                      : AppColors.lightMuted,
+                              Expanded(
+                                child: Text(
+                                  'Đã chi: ${CurrencyFormatter.formatCompact(item.spentAmount)} / ${CurrencyFormatter.formatCompact(item.limitAmount)}',
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: GoogleFonts.inter(
+                                    fontSize: 10.5,
+                                    color: isDark
+                                        ? AppColors.darkMuted
+                                        : AppColors.lightMuted,
+                                  ),
                                 ),
                               ),
+                              const SizedBox(width: 8),
                               Text(
                                 item.remainingAmount > 0
                                     ? 'Còn: ${CurrencyFormatter.formatCompact(item.remainingAmount)}'
@@ -1335,8 +1363,8 @@ class _DebtsTab extends ConsumerWidget {
                     child: _MetricCard(
                       isDark: isDark,
                       label: 'Phải trả',
-                      value: CurrencyFormatter.formatCompact(
-                          debts.totalPayables),
+                      value:
+                          CurrencyFormatter.formatCompact(debts.totalPayables),
                       color: AppColors.danger,
                       icon: 'arrow-up-right',
                     ),
@@ -1550,16 +1578,21 @@ class _DebtsTab extends ConsumerWidget {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Text(
-                                  inst.counterpartyName,
-                                  style: GoogleFonts.inter(
-                                    fontSize: 13.5,
-                                    fontWeight: FontWeight.w700,
-                                    color: isDark
-                                        ? AppColors.darkForeground
-                                        : AppColors.lightForeground,
+                                Expanded(
+                                  child: Text(
+                                    inst.counterpartyName,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: GoogleFonts.inter(
+                                      fontSize: 13.5,
+                                      fontWeight: FontWeight.w700,
+                                      color: isDark
+                                          ? AppColors.darkForeground
+                                          : AppColors.lightForeground,
+                                    ),
                                   ),
                                 ),
+                                const SizedBox(width: 8),
                                 Text(
                                   '${inst.progressPercentage.toStringAsFixed(0)}%',
                                   style: GoogleFonts.inter(
@@ -1581,9 +1614,8 @@ class _DebtsTab extends ConsumerWidget {
                               ),
                               child: FractionallySizedBox(
                                 alignment: Alignment.centerLeft,
-                                widthFactor:
-                                    (inst.progressPercentage / 100.0)
-                                        .clamp(0.0, 1.0),
+                                widthFactor: (inst.progressPercentage / 100.0)
+                                    .clamp(0.0, 1.0),
                                 child: Container(
                                   decoration: BoxDecoration(
                                     color: AppColors.primary,
@@ -1594,18 +1626,22 @@ class _DebtsTab extends ConsumerWidget {
                             ),
                             const SizedBox(height: 6),
                             Row(
-                              mainAxisAlignment:
-                                  MainAxisAlignment.spaceBetween,
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Text(
-                                  'Đã trả: ${CurrencyFormatter.formatCompact(inst.paidAmount)} / ${CurrencyFormatter.formatCompact(inst.totalPrincipal)}',
-                                  style: GoogleFonts.inter(
-                                    fontSize: 11,
-                                    color: isDark
-                                        ? AppColors.darkMuted
-                                        : AppColors.lightMuted,
+                                Expanded(
+                                  child: Text(
+                                    'Đã trả: ${CurrencyFormatter.formatCompact(inst.paidAmount)} / ${CurrencyFormatter.formatCompact(inst.totalPrincipal)}',
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: GoogleFonts.inter(
+                                      fontSize: 11,
+                                      color: isDark
+                                          ? AppColors.darkMuted
+                                          : AppColors.lightMuted,
+                                    ),
                                   ),
                                 ),
+                                const SizedBox(width: 8),
                                 if (inst.nextDueDate != null)
                                   Text(
                                     'Kỳ tới: ${inst.nextDueDate}',
@@ -1677,15 +1713,20 @@ class _CalendarTab extends ConsumerWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
-                          'DỰ PHÓNG HÓA ĐƠN 30 NGÀY TỚI',
-                          style: GoogleFonts.inter(
-                            fontSize: 10.5,
-                            fontWeight: FontWeight.w800,
-                            letterSpacing: 0.8,
-                            color: Colors.white70,
+                        Expanded(
+                          child: Text(
+                            'DỰ PHÓNG HÓA ĐƠN 30 NGÀY TỚI',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: GoogleFonts.inter(
+                              fontSize: 10.5,
+                              fontWeight: FontWeight.w800,
+                              letterSpacing: 0.8,
+                              color: Colors.white70,
+                            ),
                           ),
                         ),
+                        const SizedBox(width: 8),
                         Container(
                           padding: const EdgeInsets.symmetric(
                             horizontal: 8,

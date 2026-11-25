@@ -152,12 +152,16 @@ class TransactionAccountSelector extends StatelessWidget {
                         const SizedBox(height: 3),
                         Row(
                           children: [
-                            Text(
-                              acc.typeLabel,
-                              style: GoogleFonts.inter(
-                                fontSize: 11,
-                                fontWeight: FontWeight.w500,
-                                color: muted,
+                            Flexible(
+                              child: Text(
+                                acc.typeLabel,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: GoogleFonts.inter(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w500,
+                                  color: muted,
+                                ),
                               ),
                             ),
                             const SizedBox(width: 6),

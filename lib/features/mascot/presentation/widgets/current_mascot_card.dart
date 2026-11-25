@@ -61,7 +61,8 @@ class CurrentMascotCard extends StatelessWidget {
                         Colors.white,
                       ],
               ),
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(21)),
+              borderRadius:
+                  const BorderRadius.vertical(top: Radius.circular(21)),
             ),
             child: Row(
               children: [
@@ -114,7 +115,9 @@ class CurrentMascotCard extends StatelessWidget {
                         style: GoogleFonts.inter(
                           fontSize: 12.5,
                           fontWeight: FontWeight.w600,
-                          color: isDark ? AppColors.darkMuted : AppColors.lightMuted,
+                          color: isDark
+                              ? AppColors.darkMuted
+                              : AppColors.lightMuted,
                         ),
                       ),
                     ],
@@ -130,9 +133,8 @@ class CurrentMascotCard extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.all(14),
               decoration: BoxDecoration(
-                color: isDark
-                    ? const Color(0xFF1E293B)
-                    : const Color(0xFFF8FAFC),
+                color:
+                    isDark ? const Color(0xFF1E293B) : const Color(0xFFF8FAFC),
                 borderRadius: BorderRadius.circular(14),
                 border: Border.all(
                   color: isDark
@@ -206,14 +208,17 @@ class CurrentMascotCard extends StatelessWidget {
                               color: Colors.white,
                             ),
                             const SizedBox(width: 8),
-                            Text(
+                            Flexible(
+                                child: Text(
                               'Kiểm tra & Đồng bộ tiến hóa',
                               style: GoogleFonts.inter(
                                 fontSize: 13.5,
                                 fontWeight: FontWeight.w700,
                                 color: Colors.white,
                               ),
-                            ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            )),
                           ],
                         ),
                 ),
@@ -225,4 +230,3 @@ class CurrentMascotCard extends StatelessWidget {
     );
   }
 }
-

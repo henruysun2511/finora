@@ -134,11 +134,14 @@ class ChatBubble extends StatelessWidget {
                 // Text bubble
                 if (message.textContent.isNotEmpty)
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 12),
                     decoration: BoxDecoration(
                       color: isDark ? const Color(0xFF1E293B) : Colors.white,
                       border: Border.all(
-                        color: isDark ? AppColors.darkBorder : const Color(0xFFE2E8F0),
+                        color: isDark
+                            ? AppColors.darkBorder
+                            : const Color(0xFFE2E8F0),
                         width: 1,
                       ),
                       borderRadius: const BorderRadius.only(
@@ -149,7 +152,8 @@ class ChatBubble extends StatelessWidget {
                       ),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.04),
+                          color: Colors.black
+                              .withValues(alpha: isDark ? 0.2 : 0.04),
                           blurRadius: 8,
                           offset: const Offset(0, 2),
                         ),
@@ -209,7 +213,8 @@ class ChatBubble extends StatelessWidget {
                             : null;
 
                         return InkWell(
-                          onTap: () => onSelectClarifyAction?.call(intent ?? label),
+                          onTap: () =>
+                              onSelectClarifyAction?.call(intent ?? label),
                           borderRadius: BorderRadius.circular(20),
                           child: Container(
                             padding: const EdgeInsets.symmetric(
@@ -220,7 +225,8 @@ class ChatBubble extends StatelessWidget {
                                   : const Color(0xFFEFF6FF),
                               borderRadius: BorderRadius.circular(20),
                               border: Border.all(
-                                color: const Color(0xFF0072D5).withValues(alpha: 0.4),
+                                color: const Color(0xFF0072D5)
+                                    .withValues(alpha: 0.4),
                               ),
                             ),
                             child: Text(
@@ -422,14 +428,17 @@ class ChatBubble extends StatelessWidget {
                             color: Colors.white,
                           ),
                           const SizedBox(width: 4),
-                          Text(
+                          Flexible(
+                              child: Text(
                             'Hóa đơn',
                             style: GoogleFonts.inter(
                               fontSize: 11,
                               fontWeight: FontWeight.w600,
                               color: Colors.white,
                             ),
-                          ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          )),
                         ],
                       ),
                     ),
@@ -481,7 +490,19 @@ class ChatBubble extends StatelessWidget {
   Widget _buildUserAudioBubble(BuildContext context) {
     // Generate simulated waveform heights for realistic visual feedback
     const waveform = [
-      8.0, 14.0, 22.0, 12.0, 26.0, 18.0, 10.0, 24.0, 16.0, 12.0, 20.0, 14.0, 8.0
+      8.0,
+      14.0,
+      22.0,
+      12.0,
+      26.0,
+      18.0,
+      10.0,
+      24.0,
+      16.0,
+      12.0,
+      20.0,
+      14.0,
+      8.0
     ];
 
     final hasTranscript = message.textContent.isNotEmpty &&
@@ -681,7 +702,8 @@ class ChatBubble extends StatelessWidget {
         color: isDark ? const Color(0xFF2D1618) : const Color(0xFFFFF1F2),
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
-          color: const Color(0xFFF43F5E).withValues(alpha: isDark ? 0.35 : 0.25),
+          color:
+              const Color(0xFFF43F5E).withValues(alpha: isDark ? 0.35 : 0.25),
           width: 1,
         ),
       ),
@@ -753,7 +775,8 @@ class ChatBubble extends StatelessWidget {
                               : AppColors.lightForeground,
                         ),
                         const SizedBox(width: 4),
-                        Text(
+                        Flexible(
+                            child: Text(
                           'Nhập tay',
                           style: GoogleFonts.inter(
                             fontSize: 11.5,
@@ -762,7 +785,9 @@ class ChatBubble extends StatelessWidget {
                                 ? AppColors.darkForeground
                                 : AppColors.lightForeground,
                           ),
-                        ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        )),
                       ],
                     ),
                   ),
@@ -794,14 +819,17 @@ class ChatBubble extends StatelessWidget {
                         color: Color(0xFFE11D48),
                       ),
                       const SizedBox(width: 4),
-                      Text(
+                      Flexible(
+                          child: Text(
                         'Thử lại',
                         style: GoogleFonts.inter(
                           fontSize: 11.5,
                           fontWeight: FontWeight.w700,
                           color: const Color(0xFFE11D48),
                         ),
-                      ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      )),
                     ],
                   ),
                 ),

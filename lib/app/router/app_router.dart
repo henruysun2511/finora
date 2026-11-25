@@ -35,6 +35,7 @@ import '../../features/mascot/presentation/screens/mascot_settings_screen.dart';
 import '../../features/mascot/presentation/screens/mascot_showcase_screen.dart';
 import '../../features/categories/presentation/screens/category_list_screen.dart';
 import '../../features/settings/presentation/screens/notification_settings_screen.dart';
+import '../../features/settings/presentation/screens/quick_actions_settings_screen.dart';
 import '../../features/settings/presentation/screens/security_settings_screen.dart';
 import '../../features/settings/presentation/screens/settings_screen.dart';
 import '../../features/friends/presentation/screens/friends_list_screen.dart';
@@ -50,14 +51,21 @@ import '../../features/recurring_transaction/presentation/screens/recurring_tran
 import '../../features/transactions/presentation/screens/scan_receipt_screen.dart';
 import '../../features/transactions/presentation/screens/receipt_capture_screen.dart';
 import '../../features/transactions/presentation/screens/transaction_detail_screen.dart';
+import '../../features/transactions/presentation/screens/transaction_success_screen.dart';
 import '../../features/transactions/presentation/screens/transactions_screen.dart';
+import '../../features/transactions/domain/models/transaction_item.dart';
+import '../../features/accounts/domain/models/account_model.dart';
 import '../../features/accounts/presentation/screens/account_detail_screen.dart';
+import '../../features/accounts/presentation/screens/adjust_balance_screen.dart';
 import '../../features/wallets/presentation/screens/create_account_screen.dart';
 import '../../features/wallets/presentation/screens/create_wallet_screen.dart';
 import '../../features/wallets/presentation/screens/shared_wallets_screen.dart';
-import '../../features/wallets/presentation/screens/transfer_screen.dart';
 import '../../features/wallets/presentation/screens/wallet_detail_screen.dart';
 import '../../features/wallets/presentation/screens/wallets_overview_screen.dart';
+import '../../features/transfers/domain/models/transfer.dart';
+import '../../features/transfers/presentation/screens/transfer_form_screen.dart';
+import '../../features/transfers/presentation/screens/transfer_detail_screen.dart';
+import '../../features/transfers/presentation/screens/transfer_history_screen.dart';
 import 'route_names.dart';
 import 'scaffold_with_nav_bar.dart';
 
@@ -247,7 +255,14 @@ GoRouter appRouter(AppRouterRef ref) {
         parentNavigatorKey: _rootNavigatorKey,
         path: RoutePaths.createTransaction,
         name: RouteNames.createTransaction,
-        builder: (context, state) => const CreateTransactionScreen(),
+        builder: (context, state) {
+          final walletId = state.uri.queryParameters['walletId'];
+          final type = state.uri.queryParameters['type'];
+          return CreateTransactionScreen(
+            initialWalletId: walletId,
+            initialType: type,
+          );
+        },
       ),
       GoRoute(
         parentNavigatorKey: _rootNavigatorKey,
@@ -286,6 +301,17 @@ GoRouter appRouter(AppRouterRef ref) {
       ),
       GoRoute(
         parentNavigatorKey: _rootNavigatorKey,
+        path: RoutePaths.transactionSuccess,
+        name: RouteNames.transactionSuccess,
+        builder: (context, state) {
+          final tx = state.extra is TransactionItem
+              ? state.extra as TransactionItem
+              : null;
+          return TransactionSuccessScreen(transaction: tx);
+        },
+      ),
+      GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
         path: RoutePaths.transactionDetail,
         name: RouteNames.transactionDetail,
         builder: (context, state) {
@@ -305,13 +331,16 @@ GoRouter appRouter(AppRouterRef ref) {
         parentNavigatorKey: _rootNavigatorKey,
         path: RoutePaths.createWallet,
         name: RouteNames.createWallet,
-        builder: (context, state) => const CreateWalletScreen(),
+        builder: (context, state) {
+          final isShared = state.uri.queryParameters['isShared'] == 'true';
+          return CreateWalletScreen(isShared: isShared);
+        },
       ),
       GoRoute(
         parentNavigatorKey: _rootNavigatorKey,
         path: RoutePaths.createSharedWallet,
         name: RouteNames.createSharedWallet,
-        builder: (context, state) => const CreateWalletScreen(),
+        builder: (context, state) => const CreateWalletScreen(isShared: true),
       ),
       GoRoute(
         parentNavigatorKey: _rootNavigatorKey,
@@ -333,9 +362,53 @@ GoRouter appRouter(AppRouterRef ref) {
       ),
       GoRoute(
         parentNavigatorKey: _rootNavigatorKey,
+        path: RoutePaths.adjustBalance,
+        name: RouteNames.adjustBalance,
+        builder: (context, state) {
+          final id = state.pathParameters['id'] ?? '';
+          final extraAccount =
+              state.extra is AccountModel ? state.extra as AccountModel : null;
+          return AdjustBalanceScreen(
+            accountId: id,
+            initialAccount: extraAccount,
+          );
+        },
+      ),
+      GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
         path: RoutePaths.transfer,
         name: RouteNames.transfer,
-        builder: (context, state) => const TransferScreen(),
+        builder: (context, state) {
+          final fromAccountId = state.uri.queryParameters['fromAccountId'];
+          final fromWalletId = state.uri.queryParameters['fromWalletId'];
+          return TransferFormScreen(
+            fromAccountId: fromAccountId,
+            fromWalletId: fromWalletId,
+          );
+        },
+      ),
+      GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
+        path: RoutePaths.transferHistory,
+        name: RouteNames.transferHistory,
+        builder: (context, state) {
+          final accountId = state.uri.queryParameters['accountId'];
+          return TransferHistoryScreen(accountIdFilter: accountId);
+        },
+      ),
+      GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
+        path: RoutePaths.transferDetail,
+        name: RouteNames.transferDetail,
+        builder: (context, state) {
+          final id = state.pathParameters['id'] ?? '';
+          final extraTransfer =
+              state.extra is Transfer ? state.extra as Transfer : null;
+          return TransferDetailScreen(
+            transferId: id,
+            initialTransfer: extraTransfer,
+          );
+        },
       ),
 
       // ==========================================
@@ -428,6 +501,20 @@ GoRouter appRouter(AppRouterRef ref) {
           return SplitExpenseDetailScreen(splitId: id);
         },
       ),
+      // Alias hỗ trợ các thông báo điều hướng từ /splits/:id
+      GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
+        path: '/splits/:id',
+        builder: (context, state) {
+          final id = state.pathParameters['id'] ?? '';
+          return SplitExpenseDetailScreen(splitId: id);
+        },
+      ),
+      GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
+        path: '/splits',
+        builder: (context, state) => const SplitExpensesScreen(),
+      ),
 
       // ==========================================
       // 8. PHÂN HỆ BÁO CÁO & PHÂN TÍCH (Reports)
@@ -493,6 +580,13 @@ GoRouter appRouter(AppRouterRef ref) {
         path: RoutePaths.settings,
         name: RouteNames.settings,
         builder: (context, state) => const SettingsScreen(),
+        routes: [
+          GoRoute(
+            parentNavigatorKey: _rootNavigatorKey,
+            path: 'quick-actions',
+            builder: (context, state) => const QuickActionsSettingsScreen(),
+          ),
+        ],
       ),
       GoRoute(
         parentNavigatorKey: _rootNavigatorKey,
@@ -526,6 +620,17 @@ GoRouter appRouter(AppRouterRef ref) {
         path: RoutePaths.notificationSettings,
         name: RouteNames.notificationSettings,
         builder: (context, state) => const NotificationSettingsScreen(),
+      ),
+      GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
+        path: RoutePaths.quickActionsSettings,
+        name: RouteNames.quickActionsSettings,
+        builder: (context, state) => const QuickActionsSettingsScreen(),
+      ),
+      GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
+        path: '/quick-actions',
+        builder: (context, state) => const QuickActionsSettingsScreen(),
       ),
 
       // ==========================================

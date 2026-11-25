@@ -23,7 +23,8 @@ class ChatBarChartCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final functionName = payload['functionName'] as String? ?? '';
-    final isComparison = functionName == 'COMPARE_PERIODS' || payload.containsKey('delta');
+    final isComparison =
+        functionName == 'COMPARE_PERIODS' || payload.containsKey('delta');
 
     return Container(
       width: double.infinity,
@@ -70,32 +71,41 @@ class ChatBarChartCard extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(6),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF0072D5).withValues(alpha: 0.12),
-                    borderRadius: BorderRadius.circular(8),
+            Expanded(
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(6),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF0072D5).withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const Icon(
+                      Icons.compare_arrows_rounded,
+                      size: 16,
+                      color: Color(0xFF0072D5),
+                    ),
                   ),
-                  child: const Icon(
-                    Icons.compare_arrows_rounded,
-                    size: 16,
-                    color: Color(0xFF0072D5),
+                  const SizedBox(width: 8),
+                  Flexible(
+                    child: Text(
+                      'SO SÁNH CHI TIÊU',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: GoogleFonts.inter(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: 0.6,
+                        color: isDark
+                            ? const Color(0xFF94A3B8)
+                            : const Color(0xFF64748B),
+                      ),
+                    ),
                   ),
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  'SO SÁNH CHI TIÊU',
-                  style: GoogleFonts.inter(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: 0.6,
-                    color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
-                  ),
-                ),
-              ],
+                ],
+              ),
             ),
+            const SizedBox(width: 8),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
               decoration: BoxDecoration(
@@ -123,7 +133,8 @@ class ChatBarChartCard extends StatelessWidget {
                             : Colors.grey,
                   ),
                   const SizedBox(width: 4),
-                  Text(
+                  Flexible(
+                      child: Text(
                     deltaPercent != null
                         ? '${isUp ? '+' : ''}$deltaPercent%'
                         : 'Không đổi',
@@ -136,7 +147,9 @@ class ChatBarChartCard extends StatelessWidget {
                               ? const Color(0xFF10B981)
                               : Colors.grey,
                     ),
-                  ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  )),
                 ],
               ),
             ),
@@ -152,10 +165,14 @@ class ChatBarChartCard extends StatelessWidget {
               child: Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
+                  color: isDark
+                      ? const Color(0xFF0F172A)
+                      : const Color(0xFFF8FAFC),
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
-                    color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+                    color: isDark
+                        ? const Color(0xFF334155)
+                        : const Color(0xFFE2E8F0),
                   ),
                 ),
                 child: Column(
@@ -166,7 +183,9 @@ class ChatBarChartCard extends StatelessWidget {
                       style: GoogleFonts.inter(
                         fontSize: 11.5,
                         fontWeight: FontWeight.w600,
-                        color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                        color: isDark
+                            ? const Color(0xFF94A3B8)
+                            : const Color(0xFF64748B),
                       ),
                     ),
                     const SizedBox(height: 4),
@@ -175,7 +194,9 @@ class ChatBarChartCard extends StatelessWidget {
                       style: GoogleFonts.outfit(
                         fontSize: 15,
                         fontWeight: FontWeight.w800,
-                        color: isDark ? AppColors.darkForeground : AppColors.lightForeground,
+                        color: isDark
+                            ? AppColors.darkForeground
+                            : AppColors.lightForeground,
                       ),
                     ),
                   ],
@@ -234,20 +255,28 @@ class ChatBarChartCard extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                isUp ? 'Chi nhiều hơn kỳ trước' : 'Tiết kiệm hơn kỳ trước',
-                style: GoogleFonts.inter(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                  color: isUp ? const Color(0xFFEF4444) : const Color(0xFF10B981),
+              Expanded(
+                child: Text(
+                  isUp ? 'Chi nhiều hơn kỳ trước' : 'Tiết kiệm hơn kỳ trước',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: GoogleFonts.inter(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: isUp
+                        ? const Color(0xFFEF4444)
+                        : const Color(0xFF10B981),
+                  ),
                 ),
               ),
+              const SizedBox(width: 8),
               Text(
                 '${isUp ? '+' : '-'}${_formatCurrency(delta.abs())}',
                 style: GoogleFonts.outfit(
                   fontSize: 13,
                   fontWeight: FontWeight.w800,
-                  color: isUp ? const Color(0xFFEF4444) : const Color(0xFF10B981),
+                  color:
+                      isUp ? const Color(0xFFEF4444) : const Color(0xFF10B981),
                 ),
               ),
             ],
@@ -278,20 +307,29 @@ class ChatBarChartCard extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    catLabel,
-                    style: GoogleFonts.inter(
-                      fontSize: 12.5,
-                      fontWeight: FontWeight.w600,
-                      color: isDark ? AppColors.darkForeground : AppColors.lightForeground,
+                  Expanded(
+                    child: Text(
+                      catLabel,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: GoogleFonts.inter(
+                        fontSize: 12.5,
+                        fontWeight: FontWeight.w600,
+                        color: isDark
+                            ? AppColors.darkForeground
+                            : AppColors.lightForeground,
+                      ),
                     ),
                   ),
+                  const SizedBox(width: 8),
                   Text(
                     '${isCatUp ? '+' : ''}${_formatCurrency(catDelta)}',
                     style: GoogleFonts.inter(
                       fontSize: 12,
                       fontWeight: FontWeight.w700,
-                      color: isCatUp ? const Color(0xFFEF4444) : const Color(0xFF10B981),
+                      color: isCatUp
+                          ? const Color(0xFFEF4444)
+                          : const Color(0xFF10B981),
                     ),
                   ),
                 ],
@@ -326,18 +364,22 @@ class ChatBarChartCard extends StatelessWidget {
       iconColor = const Color(0xFF10B981);
     }
 
-    final items = rawData.map((item) {
-      if (item is Map<String, dynamic>) {
-        return {
-          'label': item['label']?.toString() ?? 'Khác',
-          'value': (item['value'] as num?)?.toDouble() ?? 0.0,
-          'percentage': (item['percentage'] as num?)?.toDouble() ?? 0.0,
-        };
-      }
-      return {'label': 'Khác', 'value': 0.0, 'percentage': 0.0};
-    }).where((item) => (item['value'] as double) > 0).toList();
+    final items = rawData
+        .map((item) {
+          if (item is Map<String, dynamic>) {
+            return {
+              'label': item['label']?.toString() ?? 'Khác',
+              'value': (item['value'] as num?)?.toDouble() ?? 0.0,
+              'percentage': (item['percentage'] as num?)?.toDouble() ?? 0.0,
+            };
+          }
+          return {'label': 'Khác', 'value': 0.0, 'percentage': 0.0};
+        })
+        .where((item) => (item['value'] as double) > 0)
+        .toList();
 
-    final maxVal = items.fold(0.0, (m, i) => (i['value'] as double) > m ? (i['value'] as double) : m);
+    final maxVal = items.fold(
+        0.0, (m, i) => (i['value'] as double) > m ? (i['value'] as double) : m);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -346,36 +388,46 @@ class ChatBarChartCard extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(6),
-                  decoration: BoxDecoration(
-                    color: iconColor.withValues(alpha: 0.12),
-                    borderRadius: BorderRadius.circular(8),
+            Expanded(
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(6),
+                    decoration: BoxDecoration(
+                      color: iconColor.withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Icon(
+                      cardIcon,
+                      size: 16,
+                      color: iconColor,
+                    ),
                   ),
-                  child: Icon(
-                    cardIcon,
-                    size: 16,
-                    color: iconColor,
+                  const SizedBox(width: 8),
+                  Flexible(
+                    child: Text(
+                      cardTitle,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: GoogleFonts.inter(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: 0.6,
+                        color: isDark
+                            ? const Color(0xFF94A3B8)
+                            : const Color(0xFF64748B),
+                      ),
+                    ),
                   ),
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  cardTitle,
-                  style: GoogleFonts.inter(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: 0.6,
-                    color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
-                  ),
-                ),
-              ],
+                ],
+              ),
             ),
+            const SizedBox(width: 8),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
               decoration: BoxDecoration(
-                color: isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9),
+                color:
+                    isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9),
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Text(
@@ -437,14 +489,21 @@ class ChatBarChartCard extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      label,
-                      style: GoogleFonts.inter(
-                        fontSize: 12.5,
-                        fontWeight: FontWeight.w600,
-                        color: isDark ? AppColors.darkForeground : AppColors.lightForeground,
+                    Expanded(
+                      child: Text(
+                        label,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: GoogleFonts.inter(
+                          fontSize: 12.5,
+                          fontWeight: FontWeight.w600,
+                          color: isDark
+                              ? AppColors.darkForeground
+                              : AppColors.lightForeground,
+                        ),
                       ),
                     ),
+                    const SizedBox(width: 8),
                     Row(
                       children: [
                         Text(
@@ -452,7 +511,9 @@ class ChatBarChartCard extends StatelessWidget {
                           style: GoogleFonts.inter(
                             fontSize: 11.5,
                             fontWeight: FontWeight.w600,
-                            color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                            color: isDark
+                                ? const Color(0xFF94A3B8)
+                                : const Color(0xFF64748B),
                           ),
                         ),
                         Text(
@@ -473,7 +534,9 @@ class ChatBarChartCard extends StatelessWidget {
                   child: LinearProgressIndicator(
                     value: ratio,
                     minHeight: 7,
-                    backgroundColor: isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9),
+                    backgroundColor: isDark
+                        ? const Color(0xFF334155)
+                        : const Color(0xFFF1F5F9),
                     valueColor: AlwaysStoppedAnimation<Color>(barColor),
                   ),
                 ),

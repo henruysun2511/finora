@@ -50,6 +50,8 @@ class BannerHeader extends StatelessWidget {
     required Widget icon,
     required VoidCallback onTap,
     String? tooltip,
+    Color? backgroundColor,
+    BoxBorder? border,
   }) {
     Widget btn = Material(
       color: Colors.transparent,
@@ -60,7 +62,37 @@ class BannerHeader extends StatelessWidget {
           width: 36,
           height: 36,
           decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.18),
+            color: backgroundColor ?? Colors.white.withValues(alpha: 0.18),
+            borderRadius: BorderRadius.circular(12),
+            border: border,
+          ),
+          alignment: Alignment.center,
+          child: icon,
+        ),
+      ),
+    );
+    if (tooltip != null) {
+      btn = Tooltip(message: tooltip, child: btn);
+    }
+    return btn;
+  }
+
+  /// Nút bấm màu xanh dương thương hiệu hệ thống (AppColors.primary) không outline
+  static Widget primaryButton({
+    required Widget icon,
+    required VoidCallback onTap,
+    String? tooltip,
+  }) {
+    Widget btn = Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(12),
+        child: Container(
+          width: 36,
+          height: 36,
+          decoration: BoxDecoration(
+            color: AppColors.primary,
             borderRadius: BorderRadius.circular(12),
           ),
           alignment: Alignment.center,

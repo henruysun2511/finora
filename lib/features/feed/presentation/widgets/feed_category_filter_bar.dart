@@ -47,7 +47,9 @@ class FeedCategoryFilterBar extends StatelessWidget {
                     strokeWidth: 2.2,
                   ),
                   const SizedBox(width: 6),
-                  Text(cat.label),
+                  Flexible(
+                      child: Text(cat.label,
+                          maxLines: 1, overflow: TextOverflow.ellipsis)),
                 ],
               ),
               selected: isSelected,

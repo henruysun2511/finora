@@ -158,7 +158,8 @@ class _OnboardingMascotScreenState
                                           : Colors.grey,
                                     ),
                                     const SizedBox(width: 4),
-                                    Text(
+                                    Flexible(
+                                        child: Text(
                                       isAssigned
                                           ? 'Trợ lý chỉ định theo số dư'
                                           : 'Xem trước cấp bậc',
@@ -169,7 +170,9 @@ class _OnboardingMascotScreenState
                                             ? mascotColor
                                             : Colors.grey,
                                       ),
-                                    ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    )),
                                   ],
                                 ),
                               ),
@@ -328,7 +331,8 @@ class _OnboardingMascotScreenState
                               onTap: () => setState(() => _selectedTone = tone),
                               child: AnimatedContainer(
                                 duration: const Duration(milliseconds: 180),
-                                padding: const EdgeInsets.symmetric(vertical: 10),
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 10),
                                 decoration: BoxDecoration(
                                   color: isSelected
                                       ? AppColors.primary
@@ -381,17 +385,22 @@ class _OnboardingMascotScreenState
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
-                          'BẢN ĐỒ TIẾN HÓA 7 CẤP BẬC',
-                          style: GoogleFonts.inter(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w800,
-                            color: isDark
-                                ? AppColors.darkMuted
-                                : const Color(0xFF64748B),
-                            letterSpacing: 0.5,
+                        Expanded(
+                          child: Text(
+                            'BẢN ĐỒ TIẾN HÓA 7 CẤP BẬC',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: GoogleFonts.inter(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w800,
+                              color: isDark
+                                  ? AppColors.darkMuted
+                                  : const Color(0xFF64748B),
+                              letterSpacing: 0.5,
+                            ),
                           ),
                         ),
+                        const SizedBox(width: 8),
                         if (!isAssigned)
                           GestureDetector(
                             onTap: () {
@@ -519,9 +528,8 @@ class _OnboardingMascotScreenState
                     : AppColors.lightBackground,
                 border: Border(
                   top: BorderSide(
-                    color: isDark
-                        ? AppColors.darkBorder
-                        : AppColors.lightBorder,
+                    color:
+                        isDark ? AppColors.darkBorder : AppColors.lightBorder,
                     width: 0.8,
                   ),
                 ),
@@ -547,13 +555,16 @@ class _OnboardingMascotScreenState
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Text(
+                          Flexible(
+                              child: Text(
                             'Kích hoạt ${_assignedMascot.name} & Tiếp tục',
                             style: GoogleFonts.inter(
                               fontSize: 15,
                               fontWeight: FontWeight.w700,
                             ),
-                          ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          )),
                           const SizedBox(width: 8),
                           const LucideIcon(
                             name: LucideIcons.arrowUpRight,

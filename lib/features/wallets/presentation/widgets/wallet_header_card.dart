@@ -52,15 +52,20 @@ class WalletHeaderCard extends ConsumerWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                'TỔNG TÀI SẢN KHẢ DỤNG',
-                style: GoogleFonts.inter(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: 0.8,
-                  color: Colors.white.withValues(alpha: 0.85),
+              Expanded(
+                child: Text(
+                  'TỔNG TÀI SẢN KHẢ DỤNG',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: GoogleFonts.inter(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 0.8,
+                    color: Colors.white.withValues(alpha: 0.85),
+                  ),
                 ),
               ),
+              const SizedBox(width: 8),
               InkWell(
                 onTap: () {
                   ref.read(isBalanceHiddenProvider.notifier).state = !isHidden;
@@ -86,14 +91,17 @@ class WalletHeaderCard extends ConsumerWidget {
                         size: 15,
                       ),
                       const SizedBox(width: 5),
-                      Text(
+                      Flexible(
+                          child: Text(
                         isHidden ? 'Hiện số' : 'Ẩn số',
                         style: GoogleFonts.inter(
                           fontSize: 11,
                           fontWeight: FontWeight.w600,
                           color: Colors.white,
                         ),
-                      ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      )),
                     ],
                   ),
                 ),
@@ -150,9 +158,9 @@ class WalletHeaderCard extends ConsumerWidget {
                             isHidden
                                 ? '••••••'
                                 : CurrencyFormatter.format(
-                                  totalCashAndBank,
-                                  currency: currency,
-                                ),
+                                    totalCashAndBank,
+                                    currency: currency,
+                                  ),
                             style: GoogleFonts.inter(
                               fontSize: 13,
                               fontWeight: FontWeight.w700,
@@ -202,9 +210,9 @@ class WalletHeaderCard extends ConsumerWidget {
                             isHidden
                                 ? '••••••'
                                 : CurrencyFormatter.format(
-                                  totalCreditDebt,
-                                  currency: currency,
-                                ),
+                                    totalCreditDebt,
+                                    currency: currency,
+                                  ),
                             style: GoogleFonts.inter(
                               fontSize: 13,
                               fontWeight: FontWeight.w700,
@@ -226,4 +234,3 @@ class WalletHeaderCard extends ConsumerWidget {
     );
   }
 }
-

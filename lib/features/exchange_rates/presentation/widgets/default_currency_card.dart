@@ -89,12 +89,16 @@ class DefaultCurrencyCard extends ConsumerWidget {
                   children: [
                     Row(
                       children: [
-                        Text(
-                          '${currentItem.code} - ${currentItem.name}',
-                          style: GoogleFonts.inter(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w700,
-                            color: foreground,
+                        Flexible(
+                          child: Text(
+                            '${currentItem.code} - ${currentItem.name}',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: GoogleFonts.inter(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w700,
+                              color: foreground,
+                            ),
                           ),
                         ),
                         const SizedBox(width: 6),
@@ -141,14 +145,17 @@ class DefaultCurrencyCard extends ConsumerWidget {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text(
+                    Flexible(
+                        child: Text(
                       'Đổi',
                       style: GoogleFonts.inter(
                         fontSize: 12,
                         fontWeight: FontWeight.w700,
                         color: AppColors.primary,
                       ),
-                    ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    )),
                     const SizedBox(width: 2),
                     const Icon(
                       Icons.chevron_right_rounded,

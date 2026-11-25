@@ -85,11 +85,15 @@ class MascotBanner extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      name,
-                      style: AppTextStyles.labelSmall(
-                        color: isDark ? const Color(0xFF93C5FD) : const Color(0xFF1E40AF),
-                      ).copyWith(fontWeight: FontWeight.w800, fontSize: 11),
+                    Expanded(
+                      child: Text(
+                        name,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: AppTextStyles.labelSmall(
+                          color: isDark ? const Color(0xFF93C5FD) : const Color(0xFF1E40AF),
+                        ).copyWith(fontWeight: FontWeight.w800, fontSize: 11),
+                      ),
                     ),
                     if (actionText != null)
                       GestureDetector(

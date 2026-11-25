@@ -126,8 +126,7 @@ class _ReceiptCaptureScreenState extends ConsumerState<ReceiptCaptureScreen>
           remoteUrl = data['data']['secureUrl']?.toString() ??
               data['data']['url']?.toString();
         } else {
-          remoteUrl =
-              data['secureUrl']?.toString() ?? data['url']?.toString();
+          remoteUrl = data['secureUrl']?.toString() ?? data['url']?.toString();
         }
       }
 
@@ -151,7 +150,8 @@ class _ReceiptCaptureScreenState extends ConsumerState<ReceiptCaptureScreen>
             'data:image/jpeg;base64,${base64Encode(_capturedBytes!)}';
         AppToast.show(
           context,
-          message: 'Máy chủ Cloudinary (404). Đã lưu ảnh xem trước để tiếp tục!',
+          message:
+              'Máy chủ Cloudinary (404). Đã lưu ảnh xem trước để tiếp tục!',
           type: ToastType.warning,
         );
         Navigator.of(context).pop(fallbackUrl);
@@ -462,14 +462,17 @@ class _ReceiptCaptureScreenState extends ConsumerState<ReceiptCaptureScreen>
                   color: Color(0xFF34D399),
                 ),
                 const SizedBox(width: 6),
-                Text(
+                Flexible(
+                    child: Text(
                   'Đã chụp xong chứng từ',
                   style: GoogleFonts.inter(
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
                     color: Colors.white,
                   ),
-                ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                )),
               ],
             ),
           )
@@ -514,7 +517,8 @@ class _ReceiptCaptureScreenState extends ConsumerState<ReceiptCaptureScreen>
                 decoration: BoxDecoration(
                   color: Colors.white.withValues(alpha: 0.14),
                   shape: BoxShape.circle,
-                  border: Border.all(color: Colors.white.withValues(alpha: 0.25)),
+                  border:
+                      Border.all(color: Colors.white.withValues(alpha: 0.25)),
                 ),
                 child: const Icon(
                   Icons.photo_library_rounded,
@@ -575,7 +579,8 @@ class _ReceiptCaptureScreenState extends ConsumerState<ReceiptCaptureScreen>
                 decoration: BoxDecoration(
                   color: Colors.white.withValues(alpha: 0.14),
                   shape: BoxShape.circle,
-                  border: Border.all(color: Colors.white.withValues(alpha: 0.25)),
+                  border:
+                      Border.all(color: Colors.white.withValues(alpha: 0.25)),
                 ),
                 child: const Icon(
                   Icons.flip_camera_ios_rounded,
@@ -623,7 +628,8 @@ class _ReceiptCaptureScreenState extends ConsumerState<ReceiptCaptureScreen>
                 decoration: BoxDecoration(
                   color: Colors.white.withValues(alpha: 0.14),
                   shape: BoxShape.circle,
-                  border: Border.all(color: Colors.white.withValues(alpha: 0.25)),
+                  border:
+                      Border.all(color: Colors.white.withValues(alpha: 0.25)),
                 ),
                 child: const Icon(
                   Icons.refresh_rounded,
@@ -716,7 +722,8 @@ class _ReceiptCaptureScreenState extends ConsumerState<ReceiptCaptureScreen>
                 decoration: BoxDecoration(
                   color: Colors.white.withValues(alpha: 0.14),
                   shape: BoxShape.circle,
-                  border: Border.all(color: Colors.white.withValues(alpha: 0.25)),
+                  border:
+                      Border.all(color: Colors.white.withValues(alpha: 0.25)),
                 ),
                 child: const Icon(
                   Icons.close_rounded,
@@ -740,4 +747,3 @@ class _ReceiptCaptureScreenState extends ConsumerState<ReceiptCaptureScreen>
     );
   }
 }
-

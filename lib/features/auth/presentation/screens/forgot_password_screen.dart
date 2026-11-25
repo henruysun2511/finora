@@ -132,8 +132,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
   // ── Xử lý Gửi lại mã OTP ───────────────────────────────────────────────
   Future<void> _handleResendOtp() async {
     context.hideKeyboard();
-    final success =
-        await ref.read(forgotPasswordProvider.notifier).resendOtp();
+    final success = await ref.read(forgotPasswordProvider.notifier).resendOtp();
 
     if (success && mounted) {
       final expiresIn = ref.read(forgotPasswordProvider).expiresIn;
@@ -169,7 +168,8 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
 
     if (success && mounted) {
       _countdownTimer?.cancel();
-      AppToast.success(context, 'Xác thực OTP thành công! Vui lòng đặt mật khẩu mới');
+      AppToast.success(
+          context, 'Xác thực OTP thành công! Vui lòng đặt mật khẩu mới');
     }
   }
 
@@ -186,9 +186,8 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
       return;
     }
 
-    final success = await ref
-        .read(forgotPasswordProvider.notifier)
-        .resetPassword(newPass);
+    final success =
+        await ref.read(forgotPasswordProvider.notifier).resetPassword(newPass);
 
     if (success && mounted) {
       AppToast.success(context, 'Đặt lại mật khẩu thành công!');
@@ -355,8 +354,8 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                                       ),
                                     ],
                                   ),
-                                  padding: const EdgeInsets.fromLTRB(
-                                      24, 26, 24, 30),
+                                  padding:
+                                      const EdgeInsets.fromLTRB(24, 26, 24, 30),
                                   child: Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.stretch,
@@ -638,7 +637,8 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                     : const Color(0xFFD97706),
               ),
               const SizedBox(width: 8),
-              Text(
+              Flexible(
+                  child: Text(
                 isExpired
                     ? 'Mã xác thực đã hết hạn sau 30 giây'
                     : 'Mã còn hiệu lực trong: ${_secondsRemaining}s',
@@ -649,7 +649,9 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                       ? const Color(0xFFEF4444)
                       : const Color(0xFFD97706),
                 ),
-              ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              )),
             ],
           ),
         ),
@@ -679,7 +681,8 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
         // Nút Gửi lại mã OTP
         Center(
           child: TextButton.icon(
-            onPressed: (isExpired && !state.isLoading) ? _handleResendOtp : null,
+            onPressed:
+                (isExpired && !state.isLoading) ? _handleResendOtp : null,
             icon: const Icon(Icons.refresh_rounded, size: 16),
             label: Text(
               isExpired

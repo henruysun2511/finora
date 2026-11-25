@@ -28,9 +28,22 @@ class ReportOverviewNotifier extends AutoDisposeNotifier<ReportOverviewState> {
     state = state.copyWith(isLoading: true, clearError: true);
     try {
       final repo = ref.read(dashboardRepositoryProvider);
-      final periodParam = state.period == ReportPeriod.week
-          ? 'DAY_7'
-          : (state.period == ReportPeriod.year ? 'MONTH_12' : 'DAY_30');
+      final String periodParam;
+      switch (state.period) {
+        case ReportPeriod.week:
+          periodParam = 'WEEK';
+          break;
+        case ReportPeriod.quarter:
+          periodParam = 'QUARTER';
+          break;
+        case ReportPeriod.year:
+          periodParam = 'YEAR';
+          break;
+        case ReportPeriod.month:
+        default:
+          periodParam = 'MONTH';
+          break;
+      }
 
       final monthParam =
           '${state.targetDate.year}-${state.targetDate.month.toString().padLeft(2, '0')}';

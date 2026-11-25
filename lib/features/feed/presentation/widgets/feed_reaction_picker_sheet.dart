@@ -112,15 +112,19 @@ class _FeedReactionPickerSheetState
                     ),
                   ),
                   const SizedBox(width: 10),
-                  Text(
-                    'Chọn biểu tượng tương tác',
-                    style: theme.textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w800,
-                      fontSize: 16,
-                      color: foreground,
+                  Expanded(
+                    child: Text(
+                      'Chọn biểu tượng tương tác',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w800,
+                        fontSize: 16,
+                        color: foreground,
+                      ),
                     ),
                   ),
-                  const Spacer(),
+                  const SizedBox(width: 8),
                   IconButton(
                     onPressed: () => Navigator.of(context).pop(),
                     icon: LucideIcon(
@@ -140,7 +144,8 @@ class _FeedReactionPickerSheetState
 
             // ── Content ──
             iconsAsync.when(
-              data: (icons) => _buildContent(icons, isDark, foreground, muted, border),
+              data: (icons) =>
+                  _buildContent(icons, isDark, foreground, muted, border),
               loading: () => _buildContent(
                 ReactionIconsService.defaultIcons,
                 isDark,
@@ -169,7 +174,10 @@ class _FeedReactionPickerSheetState
     Color muted,
     Color border,
   ) {
-    final categories = ['Tất cả', ...{for (final item in icons) item.category}];
+    final categories = [
+      'Tất cả',
+      ...{for (final item in icons) item.category}
+    ];
 
     final filteredIcons = _selectedCategory == 'Tất cả'
         ? icons
@@ -193,11 +201,14 @@ class _FeedReactionPickerSheetState
                     selected: isSelected,
                     showCheckmark: false,
                     selectedColor: AppColors.primary,
-                    backgroundColor: isDark ? AppColors.darkSurface : Colors.white,
+                    backgroundColor:
+                        isDark ? AppColors.darkSurface : Colors.white,
                     side: BorderSide(
                       color: isSelected
                           ? AppColors.primary
-                          : (isDark ? AppColors.darkBorder : AppColors.lightBorder),
+                          : (isDark
+                              ? AppColors.darkBorder
+                              : AppColors.lightBorder),
                     ),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
@@ -208,7 +219,8 @@ class _FeedReactionPickerSheetState
                           : (isDark
                               ? AppColors.darkForeground
                               : AppColors.lightForeground),
-                      fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                      fontWeight:
+                          isSelected ? FontWeight.w700 : FontWeight.w500,
                       fontSize: 12.5,
                     ),
                     onSelected: (val) {
@@ -272,9 +284,8 @@ class _FeedReactionPickerSheetState
                           item.label,
                           style: TextStyle(
                             fontSize: 10.5,
-                            fontWeight: isSelected
-                                ? FontWeight.w800
-                                : FontWeight.w600,
+                            fontWeight:
+                                isSelected ? FontWeight.w800 : FontWeight.w600,
                             color: isSelected ? AppColors.primary : muted,
                           ),
                           maxLines: 1,
@@ -292,4 +303,3 @@ class _FeedReactionPickerSheetState
     );
   }
 }
-

@@ -27,6 +27,7 @@ class RouteNames {
   static const String transactions = 'transactions';
   static const String transactionDetail = 'transactionDetail';
   static const String createTransaction = 'createTransaction';
+  static const String transactionSuccess = 'transactionSuccess';
   static const String scanReceipt = 'scanReceipt';
   static const String captureReceipt = 'captureReceipt';
   static const String recurringTransactions = 'recurringTransactions';
@@ -40,8 +41,11 @@ class RouteNames {
   static const String sharedWallets = 'sharedWallets';
   static const String createSharedWallet = 'createSharedWallet';
   static const String accountDetail = 'accountDetail';
+  static const String adjustBalance = 'adjustBalance';
   static const String createAccount = 'createAccount';
   static const String transfer = 'transfer';
+  static const String transferHistory = 'transferHistory';
+  static const String transferDetail = 'transferDetail';
 
   // 5. Budgets (Ngân sách)
   static const String createBudget = 'createBudget';
@@ -78,6 +82,7 @@ class RouteNames {
   static const String aiPersonaSettings = 'aiPersonaSettings';
   static const String mascotShowcase = 'mascotShowcase';
   static const String notificationSettings = 'notificationSettings';
+  static const String quickActionsSettings = 'quickActionsSettings';
 
   // 11. Sample Features (CRUD Mẫu)
   static const String products = 'products';
@@ -112,7 +117,9 @@ class RoutePaths {
 
   // 3. Transactions
   static const String transactions = '/transactions';
+  static const String transactionSuccess = '/transactions/success';
   static const String transactionDetail = '/transactions/:id';
+  static String transactionDetailWithId(String id) => '/transactions/$id';
   static const String createTransaction = '/transactions/create';
   static const String scanReceipt = '/transactions/scan';
   static const String captureReceipt = '/transactions/capture';
@@ -129,8 +136,13 @@ class RoutePaths {
   static const String createSharedWallet = '/wallets/shared/create';
   static const String accountDetail = '/accounts/:id';
   static String accountDetailWithId(String id) => '/accounts/$id';
+  static const String adjustBalance = '/accounts/:id/adjust';
+  static String adjustBalanceWithId(String id) => '/accounts/$id/adjust';
   static const String createAccount = '/accounts/create';
   static const String transfer = '/transfer';
+  static const String transferHistory = '/transfers';
+  static const String transferDetail = '/transfers/:id';
+  static String transferDetailWithId(String id) => '/transfers/$id';
 
   // 5. Budgets
   static const String createBudget = '/budgets/create';
@@ -167,6 +179,7 @@ class RoutePaths {
   static const String aiPersonaSettings = '/settings/ai-persona';
   static const String mascotShowcase = '/mascots/showcase';
   static const String notificationSettings = '/settings/notifications';
+  static const String quickActionsSettings = '/settings/quick-actions';
 
   // 11. Sample Features (CRUD Mẫu)
   static const String products = '/products';

@@ -144,17 +144,22 @@ class _MascotShowcaseScreenState extends ConsumerState<MascotShowcaseScreen> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      'CHỌN LINH VẬT ĐỂ XEM CHI TIẾT',
-                      style: GoogleFonts.inter(
-                        fontSize: 11.5,
-                        fontWeight: FontWeight.w800,
-                        letterSpacing: 0.6,
-                        color: isDark
-                            ? AppColors.darkMuted
-                            : AppColors.lightMuted,
+                    Expanded(
+                      child: Text(
+                        'CHỌN LINH VẬT ĐỂ XEM CHI TIẾT',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: GoogleFonts.inter(
+                          fontSize: 11.5,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: 0.6,
+                          color: isDark
+                              ? AppColors.darkMuted
+                              : AppColors.lightMuted,
+                        ),
                       ),
                     ),
+                    const SizedBox(width: 8),
                     Text(
                       '${_mascots.length} linh vật',
                       style: GoogleFonts.inter(

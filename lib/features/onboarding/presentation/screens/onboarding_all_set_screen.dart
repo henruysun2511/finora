@@ -71,7 +71,9 @@ class _OnboardingAllSetScreenState extends ConsumerState<OnboardingAllSetScreen>
   Future<void> _onFinish() async {
     setState(() => _isLoading = true);
     try {
-      await ref.read(onboardingControllerProvider.notifier).completeOnboarding();
+      await ref
+          .read(onboardingControllerProvider.notifier)
+          .completeOnboarding();
       if (mounted) {
         context.go(RoutePaths.home);
       }
@@ -182,7 +184,8 @@ class _OnboardingAllSetScreenState extends ConsumerState<OnboardingAllSetScreen>
                             vertical: 12,
                           ),
                           decoration: BoxDecoration(
-                            color: isDark ? AppColors.darkSurface : Colors.white,
+                            color:
+                                isDark ? AppColors.darkSurface : Colors.white,
                             borderRadius: BorderRadius.circular(16),
                             border: Border.all(
                               color: isDark
@@ -266,7 +269,8 @@ class _OnboardingAllSetScreenState extends ConsumerState<OnboardingAllSetScreen>
                         Container(
                           padding: const EdgeInsets.all(18),
                           decoration: BoxDecoration(
-                            color: isDark ? AppColors.darkSurface : Colors.white,
+                            color:
+                                isDark ? AppColors.darkSurface : Colors.white,
                             borderRadius: BorderRadius.circular(18),
                             border: Border.all(
                               color: isDark
@@ -325,9 +329,7 @@ class _OnboardingAllSetScreenState extends ConsumerState<OnboardingAllSetScreen>
                 Container(
                   padding: const EdgeInsets.fromLTRB(24, 12, 24, 20),
                   decoration: BoxDecoration(
-                    color: isDark
-                        ? AppColors.darkBackground
-                        : Colors.white,
+                    color: isDark ? AppColors.darkBackground : Colors.white,
                     border: Border(
                       top: BorderSide(
                         color: isDark
@@ -367,13 +369,16 @@ class _OnboardingAllSetScreenState extends ConsumerState<OnboardingAllSetScreen>
                               : Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    Text(
+                                    Flexible(
+                                        child: Text(
                                       'Vào Finora ngay',
                                       style: GoogleFonts.inter(
                                         fontSize: 16,
                                         fontWeight: FontWeight.w700,
                                       ),
-                                    ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    )),
                                     const SizedBox(width: 8),
                                     const LucideIcon(
                                       name: LucideIcons.arrowUpRight,
@@ -482,7 +487,9 @@ class _ConfettiPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     for (final p in particles) {
       final currentY = ((p.y + progress * p.speed) % 1.2) * size.height;
-      final currentX = (p.x + math.sin(progress * math.pi * 2 + p.angle) * 0.05) * size.width;
+      final currentX =
+          (p.x + math.sin(progress * math.pi * 2 + p.angle) * 0.05) *
+              size.width;
       final paint = Paint()
         ..color = p.color
         ..style = PaintingStyle.fill;

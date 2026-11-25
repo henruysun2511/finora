@@ -42,7 +42,8 @@ class QuickAddModal extends StatelessWidget {
                   width: 40,
                   height: 4.5,
                   decoration: BoxDecoration(
-                    color: isDark ? AppColors.darkBorder : const Color(0xFFCBD5E1),
+                    color:
+                        isDark ? AppColors.darkBorder : const Color(0xFFCBD5E1),
                     borderRadius: BorderRadius.circular(99),
                   ),
                 ),
@@ -53,26 +54,36 @@ class QuickAddModal extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Thao tác nhanh',
-                        style: AppTextStyles.h3.copyWith(
-                          color: isDark ? AppColors.darkForeground : AppColors.lightForeground,
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Thao tác nhanh',
+                          style: AppTextStyles.h3.copyWith(
+                            color: isDark
+                                ? AppColors.darkForeground
+                                : AppColors.lightForeground,
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        'Chọn phương thức nhập liệu thuận tiện nhất',
-                        style: AppTextStyles.caption.copyWith(
-                          color: isDark ? AppColors.darkMuted : AppColors.lightMuted,
+                        const SizedBox(height: 2),
+                        Text(
+                          'Chọn phương thức nhập liệu thuận tiện nhất',
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: AppTextStyles.caption.copyWith(
+                            color: isDark
+                                ? AppColors.darkMuted
+                                : AppColors.lightMuted,
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
+                  const SizedBox(width: 12),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                     decoration: BoxDecoration(
                       color: AppColors.primaryLight,
                       borderRadius: BorderRadius.circular(99),
@@ -80,14 +91,18 @@ class QuickAddModal extends StatelessWidget {
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Icon(Icons.auto_awesome, size: 14, color: AppColors.primary),
+                        const Icon(Icons.auto_awesome,
+                            size: 14, color: AppColors.primary),
                         const SizedBox(width: 4),
-                        Text(
+                        Flexible(
+                            child: Text(
                           'Nora AI',
                           style: AppTextStyles.badge.copyWith(
                             color: AppColors.primary,
                           ),
-                        ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        )),
                       ],
                     ),
                   ),
@@ -288,7 +303,11 @@ class QuickAddModal extends StatelessWidget {
           children: [
             Icon(Icons.mic_rounded, color: AppColors.primary),
             SizedBox(width: 8),
-            Text('Nora Voice AI', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 17)),
+            Flexible(
+                child: Text('Nora Voice AI',
+                    style: TextStyle(fontWeight: FontWeight.w800, fontSize: 17),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis)),
           ],
         ),
         content: const Text(
@@ -298,7 +317,8 @@ class QuickAddModal extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('Đóng', style: TextStyle(fontWeight: FontWeight.bold)),
+            child: const Text('Đóng',
+                style: TextStyle(fontWeight: FontWeight.bold)),
           ),
         ],
       ),
@@ -367,7 +387,9 @@ class _QuickActionTile extends StatelessWidget {
                 title,
                 style: AppTextStyles.h4.copyWith(
                   fontSize: 13,
-                  color: isDark ? AppColors.darkForeground : AppColors.lightForeground,
+                  color: isDark
+                      ? AppColors.darkForeground
+                      : AppColors.lightForeground,
                 ),
               ),
               const SizedBox(height: 3),

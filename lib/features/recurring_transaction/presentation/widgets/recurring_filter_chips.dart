@@ -104,7 +104,8 @@ class RecurringFilterChips extends StatelessWidget {
                 : (isDark ? AppColors.darkMuted : AppColors.lightMuted),
           ),
           const SizedBox(width: 4),
-          Text(
+          Flexible(
+              child: Text(
             label,
             style: TextStyle(
               color: selected
@@ -115,7 +116,9 @@ class RecurringFilterChips extends StatelessWidget {
               fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
               fontSize: 13,
             ),
-          ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          )),
         ],
       ),
       selected: selected,

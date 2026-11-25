@@ -227,7 +227,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                               ),
                             ),
                           ),
-                          Text(
+                          Flexible(
+                              child: Text(
                             'XÁC THỰC',
                             style: GoogleFonts.inter(
                               fontSize: 12,
@@ -235,7 +236,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                               letterSpacing: 1.2,
                               color: Colors.white.withValues(alpha: 0.85),
                             ),
-                          ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          )),
                           const SizedBox(width: 36),
                         ],
                       ),
@@ -246,7 +249,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       flex: 4,
                       child: Center(
                         child: SingleChildScrollView(
-                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 20, vertical: 8),
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
@@ -258,15 +262,18 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                     width: 80,
                                     height: 80,
                                     decoration: BoxDecoration(
-                                      color: Colors.white.withValues(alpha: 0.16),
+                                      color:
+                                          Colors.white.withValues(alpha: 0.16),
                                       borderRadius: BorderRadius.circular(26),
                                       border: Border.all(
-                                        color: Colors.white.withValues(alpha: 0.28),
+                                        color: Colors.white
+                                            .withValues(alpha: 0.28),
                                         width: 1.5,
                                       ),
                                       boxShadow: [
                                         BoxShadow(
-                                          color: Colors.black.withValues(alpha: 0.22),
+                                          color: Colors.black
+                                              .withValues(alpha: 0.22),
                                           blurRadius: 36,
                                           offset: const Offset(0, 16),
                                         ),
@@ -287,10 +294,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                       decoration: BoxDecoration(
                                         shape: BoxShape.circle,
                                         color: const Color(0xFFF59E0B),
-                                        border: Border.all(color: Colors.white, width: 2),
+                                        border: Border.all(
+                                            color: Colors.white, width: 2),
                                         boxShadow: [
                                           BoxShadow(
-                                            color: Colors.black.withValues(alpha: 0.2),
+                                            color: Colors.black
+                                                .withValues(alpha: 0.2),
                                             blurRadius: 6,
                                             offset: const Offset(0, 2),
                                           ),
@@ -343,10 +352,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         width: double.infinity,
                         decoration: BoxDecoration(
                           color: isDark ? AppColors.darkSurface : Colors.white,
-                          borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
+                          borderRadius: const BorderRadius.vertical(
+                              top: Radius.circular(32)),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withValues(alpha: isDark ? 0.4 : 0.14),
+                              color: Colors.black
+                                  .withValues(alpha: isDark ? 0.4 : 0.14),
                               blurRadius: 30,
                               offset: const Offset(0, -10),
                             ),
@@ -363,7 +374,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                   fontSize: 24,
                                   fontWeight: FontWeight.w900,
                                   letterSpacing: -0.6,
-                                  color: isDark ? AppColors.darkForeground : AppColors.lightForeground,
+                                  color: isDark
+                                      ? AppColors.darkForeground
+                                      : AppColors.lightForeground,
                                 ),
                               ),
                               const SizedBox(height: 4),
@@ -372,7 +385,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                 style: GoogleFonts.inter(
                                   fontSize: 13,
                                   fontWeight: FontWeight.w500,
-                                  color: isDark ? AppColors.darkMuted : AppColors.lightMuted,
+                                  color: isDark
+                                      ? AppColors.darkMuted
+                                      : AppColors.lightMuted,
                                 ),
                               ),
                               const SizedBox(height: 20),
@@ -384,16 +399,22 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                   fontSize: 11,
                                   fontWeight: FontWeight.w800,
                                   letterSpacing: 0.6,
-                                  color: isDark ? AppColors.darkMuted : AppColors.lightMuted,
+                                  color: isDark
+                                      ? AppColors.darkMuted
+                                      : AppColors.lightMuted,
                                 ),
                               ),
                               const SizedBox(height: 6),
                               Container(
                                 decoration: BoxDecoration(
-                                  color: isDark ? AppColors.darkBackground : const Color(0xFFF8FAFC),
+                                  color: isDark
+                                      ? AppColors.darkBackground
+                                      : const Color(0xFFF8FAFC),
                                   borderRadius: BorderRadius.circular(14),
                                   border: Border.all(
-                                    color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
+                                    color: isDark
+                                        ? AppColors.darkBorder
+                                        : AppColors.lightBorder,
                                     width: 1.5,
                                   ),
                                 ),
@@ -403,20 +424,28 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                   style: GoogleFonts.inter(
                                     fontSize: 14,
                                     fontWeight: FontWeight.w600,
-                                    color: isDark ? AppColors.darkForeground : AppColors.lightForeground,
+                                    color: isDark
+                                        ? AppColors.darkForeground
+                                        : AppColors.lightForeground,
                                   ),
                                   decoration: InputDecoration(
                                     border: InputBorder.none,
-                                    contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+                                    contentPadding: const EdgeInsets.symmetric(
+                                        horizontal: 14, vertical: 14),
                                     prefixIcon: Icon(
                                       Icons.person_outline_rounded,
                                       size: 19,
-                                      color: isDark ? AppColors.darkMuted : AppColors.lightMuted,
+                                      color: isDark
+                                          ? AppColors.darkMuted
+                                          : AppColors.lightMuted,
                                     ),
                                     hintText: 'Tên đăng nhập hoặc email',
                                     hintStyle: GoogleFonts.inter(
                                       fontSize: 14,
-                                      color: isDark ? AppColors.darkMuted.withValues(alpha: 0.6) : AppColors.lightFaint,
+                                      color: isDark
+                                          ? AppColors.darkMuted
+                                              .withValues(alpha: 0.6)
+                                          : AppColors.lightFaint,
                                     ),
                                   ),
                                 ),
@@ -430,16 +459,22 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                   fontSize: 11,
                                   fontWeight: FontWeight.w800,
                                   letterSpacing: 0.6,
-                                  color: isDark ? AppColors.darkMuted : AppColors.lightMuted,
+                                  color: isDark
+                                      ? AppColors.darkMuted
+                                      : AppColors.lightMuted,
                                 ),
                               ),
                               const SizedBox(height: 6),
                               Container(
                                 decoration: BoxDecoration(
-                                  color: isDark ? AppColors.darkBackground : const Color(0xFFF8FAFC),
+                                  color: isDark
+                                      ? AppColors.darkBackground
+                                      : const Color(0xFFF8FAFC),
                                   borderRadius: BorderRadius.circular(14),
                                   border: Border.all(
-                                    color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
+                                    color: isDark
+                                        ? AppColors.darkBorder
+                                        : AppColors.lightBorder,
                                     width: 1.5,
                                   ),
                                 ),
@@ -449,32 +484,45 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                   style: GoogleFonts.inter(
                                     fontSize: 14,
                                     fontWeight: FontWeight.w600,
-                                    color: isDark ? AppColors.darkForeground : AppColors.lightForeground,
+                                    color: isDark
+                                        ? AppColors.darkForeground
+                                        : AppColors.lightForeground,
                                   ),
                                   decoration: InputDecoration(
                                     border: InputBorder.none,
-                                    contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+                                    contentPadding: const EdgeInsets.symmetric(
+                                        horizontal: 14, vertical: 14),
                                     prefixIcon: Icon(
                                       Icons.lock_outline_rounded,
                                       size: 19,
-                                      color: isDark ? AppColors.darkMuted : AppColors.lightMuted,
+                                      color: isDark
+                                          ? AppColors.darkMuted
+                                          : AppColors.lightMuted,
                                     ),
                                     suffixIcon: IconButton(
                                       icon: Icon(
-                                        _isPasswordVisible ? Icons.visibility_outlined : Icons.visibility_off_outlined,
+                                        _isPasswordVisible
+                                            ? Icons.visibility_outlined
+                                            : Icons.visibility_off_outlined,
                                         size: 20,
-                                        color: isDark ? AppColors.darkMuted : AppColors.lightMuted,
+                                        color: isDark
+                                            ? AppColors.darkMuted
+                                            : AppColors.lightMuted,
                                       ),
                                       onPressed: () {
                                         setState(() {
-                                          _isPasswordVisible = !_isPasswordVisible;
+                                          _isPasswordVisible =
+                                              !_isPasswordVisible;
                                         });
                                       },
                                     ),
                                     hintText: 'Nhập mật khẩu',
                                     hintStyle: GoogleFonts.inter(
                                       fontSize: 14,
-                                      color: isDark ? AppColors.darkMuted.withValues(alpha: 0.6) : AppColors.lightFaint,
+                                      color: isDark
+                                          ? AppColors.darkMuted
+                                              .withValues(alpha: 0.6)
+                                          : AppColors.lightFaint,
                                     ),
                                   ),
                                   onSubmitted: (_) => _handleLogin(),
@@ -484,46 +532,58 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
                               // Remember Me & Forgot Password
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
-                                  GestureDetector(
-                                    onTap: () {
-                                      setState(() {
-                                        _rememberMe = !_rememberMe;
-                                      });
-                                    },
-                                    child: Row(
-                                      children: [
-                                        SizedBox(
-                                          width: 22,
-                                          height: 22,
-                                          child: Checkbox(
-                                            value: _rememberMe,
-                                            activeColor: AppColors.primary,
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius: BorderRadius.circular(5),
+                                  Expanded(
+                                    child: GestureDetector(
+                                      onTap: () {
+                                        setState(() {
+                                          _rememberMe = !_rememberMe;
+                                        });
+                                      },
+                                      child: Row(
+                                        children: [
+                                          SizedBox(
+                                            width: 22,
+                                            height: 22,
+                                            child: Checkbox(
+                                              value: _rememberMe,
+                                              activeColor: AppColors.primary,
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(5),
+                                              ),
+                                              onChanged: (val) {
+                                                setState(() {
+                                                  _rememberMe = val ?? true;
+                                                });
+                                              },
                                             ),
-                                            onChanged: (val) {
-                                              setState(() {
-                                                _rememberMe = val ?? true;
-                                              });
-                                            },
                                           ),
-                                        ),
-                                        const SizedBox(width: 8),
-                                        Text(
-                                          'Ghi nhớ tài khoản',
-                                          style: GoogleFonts.inter(
-                                            fontSize: 12.5,
-                                            fontWeight: FontWeight.w600,
-                                            color: isDark ? AppColors.darkMuted : AppColors.lightMuted,
+                                          const SizedBox(width: 8),
+                                          Flexible(
+                                            child: Text(
+                                              'Ghi nhớ tài khoản',
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                              style: GoogleFonts.inter(
+                                                fontSize: 12.5,
+                                                fontWeight: FontWeight.w600,
+                                                color: isDark
+                                                    ? AppColors.darkMuted
+                                                    : AppColors.lightMuted,
+                                              ),
+                                            ),
                                           ),
-                                        ),
-                                      ],
+                                        ],
+                                      ),
                                     ),
                                   ),
+                                  const SizedBox(width: 8),
                                   GestureDetector(
-                                    onTap: () => context.push(RoutePaths.forgotPassword),
+                                    onTap: () =>
+                                        context.push(RoutePaths.forgotPassword),
                                     child: Text(
                                       'Quên mật khẩu?',
                                       style: GoogleFonts.inter(
@@ -552,7 +612,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                   ),
                                   boxShadow: [
                                     BoxShadow(
-                                      color: AppColors.primary.withValues(alpha: 0.38),
+                                      color: AppColors.primary
+                                          .withValues(alpha: 0.38),
                                       blurRadius: 20,
                                       offset: const Offset(0, 8),
                                     ),
@@ -574,9 +635,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                               ),
                                             )
                                           : Row(
-                                              mainAxisAlignment: MainAxisAlignment.center,
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
                                               children: [
-                                                Text(
+                                                Flexible(
+                                                    child: Text(
                                                   'Đăng nhập',
                                                   style: GoogleFonts.inter(
                                                     fontSize: 15,
@@ -584,7 +647,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                                     letterSpacing: -0.2,
                                                     color: Colors.white,
                                                   ),
-                                                ),
+                                                  maxLines: 1,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                )),
                                                 const SizedBox(width: 8),
                                                 const Icon(
                                                   Icons.arrow_outward_rounded,
@@ -600,29 +666,37 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
                               // Divider
                               Padding(
-                                padding: const EdgeInsets.symmetric(vertical: 18),
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 18),
                                 child: Row(
                                   children: [
                                     Expanded(
                                       child: Divider(
-                                        color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
+                                        color: isDark
+                                            ? AppColors.darkBorder
+                                            : AppColors.lightBorder,
                                       ),
                                     ),
                                     Padding(
-                                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 12),
                                       child: Text(
                                         'HOẶC',
                                         style: GoogleFonts.inter(
                                           fontSize: 11,
                                           fontWeight: FontWeight.w700,
                                           letterSpacing: 1.2,
-                                          color: isDark ? AppColors.darkMuted : AppColors.lightFaint,
+                                          color: isDark
+                                              ? AppColors.darkMuted
+                                              : AppColors.lightFaint,
                                         ),
                                       ),
                                     ),
                                     Expanded(
                                       child: Divider(
-                                        color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
+                                        color: isDark
+                                            ? AppColors.darkBorder
+                                            : AppColors.lightBorder,
                                       ),
                                     ),
                                   ],
@@ -634,29 +708,39 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                 onPressed:
                                     isLoading ? null : _handleGoogleSignIn,
                                 style: OutlinedButton.styleFrom(
-                                  padding: const EdgeInsets.symmetric(vertical: 14),
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 14),
                                   side: BorderSide(
-                                    color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
+                                    color: isDark
+                                        ? AppColors.darkBorder
+                                        : AppColors.lightBorder,
                                     width: 1.5,
                                   ),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(16),
                                   ),
-                                  backgroundColor: isDark ? AppColors.darkBackground : Colors.white,
+                                  backgroundColor: isDark
+                                      ? AppColors.darkBackground
+                                      : Colors.white,
                                 ),
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
                                     const _GoogleLogoIcon(size: 18),
                                     const SizedBox(width: 10),
-                                    Text(
+                                    Flexible(
+                                        child: Text(
                                       'Tiếp tục với Google',
                                       style: GoogleFonts.inter(
                                         fontSize: 14,
                                         fontWeight: FontWeight.w700,
-                                        color: isDark ? AppColors.darkForeground : AppColors.lightForeground,
+                                        color: isDark
+                                            ? AppColors.darkForeground
+                                            : AppColors.lightForeground,
                                       ),
-                                    ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    )),
                                   ],
                                 ),
                               ),
@@ -668,33 +752,43 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                 icon: Icon(
                                   Icons.explore_rounded,
                                   size: 16,
-                                  color: isDark ? AppColors.darkMuted : AppColors.lightMuted,
+                                  color: isDark
+                                      ? AppColors.darkMuted
+                                      : AppColors.lightMuted,
                                 ),
                                 label: Text(
                                   'Khám phá nhanh (Demo Mode)',
                                   style: GoogleFonts.inter(
                                     fontSize: 12.5,
                                     fontWeight: FontWeight.w700,
-                                    color: isDark ? AppColors.darkMuted : AppColors.lightMuted,
+                                    color: isDark
+                                        ? AppColors.darkMuted
+                                        : AppColors.lightMuted,
                                   ),
                                 ),
                               ),
                               const SizedBox(height: 12),
 
                               // Footer Register Link
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
+                              Wrap(
+                                alignment: WrapAlignment.center,
+                                crossAxisAlignment: WrapCrossAlignment.center,
+                                spacing: 0,
+                                runSpacing: 2,
                                 children: [
                                   Text(
                                     'Chưa có tài khoản? ',
                                     style: GoogleFonts.inter(
                                       fontSize: 13,
                                       fontWeight: FontWeight.w600,
-                                      color: isDark ? AppColors.darkMuted : AppColors.lightMuted,
+                                      color: isDark
+                                          ? AppColors.darkMuted
+                                          : AppColors.lightMuted,
                                     ),
                                   ),
                                   GestureDetector(
-                                    onTap: () => context.pushNamed(RouteNames.register),
+                                    onTap: () =>
+                                        context.pushNamed(RouteNames.register),
                                     child: Text(
                                       'Đăng ký ngay',
                                       style: GoogleFonts.inter(
@@ -754,7 +848,8 @@ class _GoogleLogoPainter extends CustomPainter {
       ..strokeWidth = strokeWidth
       ..strokeCap = StrokeCap.butt;
 
-    final rect = Rect.fromCircle(center: center, radius: radius - strokeWidth / 2);
+    final rect =
+        Rect.fromCircle(center: center, radius: radius - strokeWidth / 2);
 
     // Red (top arc)
     paint.color = const Color(0xFFEA4335);

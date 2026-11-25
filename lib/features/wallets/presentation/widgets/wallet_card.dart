@@ -114,14 +114,17 @@ class WalletCard extends ConsumerWidget {
                                         color: Color(0xFF6366F1),
                                       ),
                                       const SizedBox(width: 3),
-                                      Text(
+                                      Flexible(
+                                          child: Text(
                                         'Shared',
                                         style: GoogleFonts.inter(
                                           fontSize: 10,
                                           fontWeight: FontWeight.w600,
                                           color: const Color(0xFF6366F1),
                                         ),
-                                      ),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      )),
                                     ],
                                   ),
                                 ),
@@ -173,34 +176,39 @@ class WalletCard extends ConsumerWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Số dư khả dụng',
-                          style: GoogleFonts.inter(
-                            fontSize: 11,
-                            color: isDark
-                                ? AppColors.darkMuted
-                                : AppColors.lightMuted,
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Số dư khả dụng',
+                            style: GoogleFonts.inter(
+                              fontSize: 11,
+                              color: isDark
+                                  ? AppColors.darkMuted
+                                  : AppColors.lightMuted,
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          isHidden
-                              ? '•••••••• VND'
-                              : CurrencyFormatter.format(
-                                  balance.totalBalance,
-                                  currency: wallet.defaultCurrency,
-                                ),
-                          style: GoogleFonts.inter(
-                            fontSize: 17,
-                            fontWeight: FontWeight.w800,
-                            color: AppColors.primary,
+                          const SizedBox(height: 2),
+                          Text(
+                            isHidden
+                                ? '•••••••• VND'
+                                : CurrencyFormatter.format(
+                                    balance.totalBalance,
+                                    currency: wallet.defaultCurrency,
+                                  ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: GoogleFonts.inter(
+                              fontSize: 17,
+                              fontWeight: FontWeight.w800,
+                              color: AppColors.primary,
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
+                    const SizedBox(width: 8),
                     Row(
                       children: [
                         Text(
@@ -228,9 +236,8 @@ class WalletCard extends ConsumerWidget {
                   const SizedBox(height: 12),
                   Container(
                     height: 1,
-                    color: isDark
-                        ? AppColors.darkBorder
-                        : const Color(0xFFF1F5F9),
+                    color:
+                        isDark ? AppColors.darkBorder : const Color(0xFFF1F5F9),
                   ),
                   const SizedBox(height: 10),
                   ...accounts.map(
@@ -308,9 +315,8 @@ class _AccountPreviewTile extends StatelessWidget {
                     '••••${account.accountNumberLast4}',
                     style: GoogleFonts.inter(
                       fontSize: 11,
-                      color: isDark
-                          ? AppColors.darkMuted
-                          : AppColors.lightMuted,
+                      color:
+                          isDark ? AppColors.darkMuted : AppColors.lightMuted,
                     ),
                   ),
                 ],
@@ -329,9 +335,8 @@ class _AccountPreviewTile extends StatelessWidget {
             style: GoogleFonts.inter(
               fontSize: 12,
               fontWeight: FontWeight.w600,
-              color: isDark
-                  ? AppColors.darkForeground
-                  : AppColors.lightForeground,
+              color:
+                  isDark ? AppColors.darkForeground : AppColors.lightForeground,
             ),
           ),
         ],
@@ -339,4 +344,3 @@ class _AccountPreviewTile extends StatelessWidget {
     );
   }
 }
-

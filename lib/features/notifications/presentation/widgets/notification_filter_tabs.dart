@@ -60,7 +60,8 @@ class NotificationFilterTabs extends StatelessWidget {
       label: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(
+          Flexible(
+              child: Text(
             label,
             style: TextStyle(
               fontSize: 12.5,
@@ -71,7 +72,9 @@ class NotificationFilterTabs extends StatelessWidget {
                       ? AppColors.darkForeground
                       : AppColors.lightForeground),
             ),
-          ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          )),
           if (badgeCount != null && badgeCount > 0) ...[
             const SizedBox(width: 5),
             Container(
