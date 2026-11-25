@@ -93,6 +93,10 @@ class WalletsOverviewScreen extends ConsumerWidget {
                         _buildDynamicWalletCard(context, isDark, isHidden, item),
                         const SizedBox(height: 14),
                       ],
+                      if (!dynamicOverview.items.any((i) => i.wallet.isShared)) ...[
+                        _buildSharedWalletPromoCard(context, isDark),
+                        const SizedBox(height: 14),
+                      ],
                     ],
 
                     // THẺ 4: Net Loans Summary Card (Net Cho vay - Đi vay) từ API
@@ -412,14 +416,33 @@ class WalletsOverviewScreen extends ConsumerWidget {
     final wallet = item.wallet;
     final balance = item.balance;
     final accounts = item.accountsPreview;
+    final isShared = wallet.isShared;
     final cardBg = isDark ? AppColors.darkSurface : Colors.white;
     final borderColor = isDark ? AppColors.darkBorder : const Color(0xFFE2E8F0);
+    final cardBorder = isShared
+        ? AppColors.primary.withValues(alpha: 0.35)
+        : borderColor;
 
     return Container(
       decoration: BoxDecoration(
         color: cardBg,
+        gradient: isShared
+            ? LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: isDark
+                    ? [
+                        cardBg,
+                        AppColors.primary.withValues(alpha: 0.08),
+                      ]
+                    : [
+                        Colors.white,
+                        const Color(0xFF0072D5).withValues(alpha: 0.04),
+                      ],
+              )
+            : null,
         borderRadius: BorderRadius.circular(22),
-        border: Border.all(color: borderColor),
+        border: Border.all(color: cardBorder, width: isShared ? 1.5 : 1.0),
         boxShadow: [
           BoxShadow(
             color: const Color(0xFF0F172A).withValues(alpha: isDark ? 0.3 : 0.05),
@@ -432,7 +455,13 @@ class WalletsOverviewScreen extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           InkWell(
-            onTap: () => context.push(RoutePaths.walletDetailWithId(wallet.id)),
+            onTap: () {
+              if (wallet.isShared) {
+                context.push(RoutePaths.sharedWallets);
+              } else {
+                context.push(RoutePaths.walletDetailWithId(wallet.id));
+              }
+            },
             borderRadius: const BorderRadius.vertical(top: Radius.circular(22)),
             child: Padding(
               padding: const EdgeInsets.fromLTRB(16, 15, 16, 12),
@@ -442,11 +471,13 @@ class WalletsOverviewScreen extends ConsumerWidget {
                     width: 42,
                     height: 42,
                     decoration: BoxDecoration(
-                      color: AppColors.primary.withValues(alpha: 0.12),
+                      color: isShared
+                          ? AppColors.primary.withValues(alpha: 0.16)
+                          : AppColors.primary.withValues(alpha: 0.12),
                       borderRadius: BorderRadius.circular(14),
                     ),
                     child: Icon(
-                      wallet.isShared
+                      isShared
                           ? Icons.groups_rounded
                           : (wallet.defaultCurrency == 'USD'
                               ? Icons.flight_takeoff_rounded
@@ -460,19 +491,51 @@ class WalletsOverviewScreen extends ConsumerWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          wallet.name,
-                          style: GoogleFonts.inter(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w800,
-                            color: isDark
-                                ? AppColors.darkForeground
-                                : AppColors.lightForeground,
-                          ),
+                        Row(
+                          children: [
+                            Flexible(
+                              child: Text(
+                                wallet.name,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: GoogleFonts.inter(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w800,
+                                  color: isDark
+                                      ? AppColors.darkForeground
+                                      : AppColors.lightForeground,
+                                ),
+                              ),
+                            ),
+                            if (isShared) ...[
+                              const SizedBox(width: 6),
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 7,
+                                  vertical: 2,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: AppColors.primary,
+                                  borderRadius: BorderRadius.circular(99),
+                                ),
+                                child: const Text(
+                                  'QUỸ CHUNG',
+                                  style: TextStyle(
+                                    fontSize: 9,
+                                    fontWeight: FontWeight.w900,
+                                    color: Colors.white,
+                                    letterSpacing: 0.4,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ],
                         ),
                         const SizedBox(height: 2),
                         Text(
-                          '${wallet.defaultCurrency} · ${accounts.length} tài khoản kết nối',
+                          isShared
+                              ? '${wallet.defaultCurrency} · Quỹ nhóm chung'
+                              : '${wallet.defaultCurrency} · ${accounts.length} tài khoản kết nối',
                           style: GoogleFonts.inter(
                             fontSize: 11,
                             fontWeight: FontWeight.w600,
@@ -490,9 +553,11 @@ class WalletsOverviewScreen extends ConsumerWidget {
                     style: GoogleFonts.outfit(
                       fontSize: 16,
                       fontWeight: FontWeight.w900,
-                      color: isDark
-                          ? AppColors.darkForeground
-                          : AppColors.lightForeground,
+                      color: isShared
+                          ? AppColors.primary
+                          : (isDark
+                              ? AppColors.darkForeground
+                              : AppColors.lightForeground),
                     ),
                   ),
                 ],
@@ -729,6 +794,123 @@ class WalletsOverviewScreen extends ConsumerWidget {
               ],
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  /// Card giới thiệu Ví chung & Quỹ nhóm chuẩn 1:1 theo `screens/wallets/list.html`
+  Widget _buildSharedWalletPromoCard(BuildContext context, bool isDark) {
+    final cardBg = isDark ? AppColors.darkSurface : Colors.white;
+
+    return Container(
+      decoration: BoxDecoration(
+        color: cardBg,
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: isDark
+              ? [
+                  cardBg,
+                  AppColors.primary.withValues(alpha: 0.08),
+                ]
+              : [
+                  Colors.white,
+                  const Color(0xFF0072D5).withValues(alpha: 0.04),
+                ],
+        ),
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(
+          color: AppColors.primary.withValues(alpha: 0.28),
+          width: 1.5,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF0F172A).withValues(alpha: isDark ? 0.3 : 0.05),
+            blurRadius: 16,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: InkWell(
+        onTap: () => context.push(RoutePaths.sharedWallets),
+        borderRadius: BorderRadius.circular(22),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 15),
+          child: Row(
+            children: [
+              Container(
+                width: 42,
+                height: 42,
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withValues(alpha: 0.14),
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: const Icon(
+                  Icons.groups_rounded,
+                  color: AppColors.primary,
+                  size: 20,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Text(
+                          'Ví chung & Quỹ nhóm',
+                          style: GoogleFonts.inter(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w800,
+                            color: isDark
+                                ? AppColors.darkForeground
+                                : AppColors.lightForeground,
+                          ),
+                        ),
+                        const SizedBox(width: 6),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 7,
+                            vertical: 2,
+                          ),
+                          decoration: BoxDecoration(
+                            color: AppColors.primary,
+                            borderRadius: BorderRadius.circular(99),
+                          ),
+                          child: const Text(
+                            'MỚI',
+                            style: TextStyle(
+                              fontSize: 9,
+                              fontWeight: FontWeight.w900,
+                              color: Colors.white,
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 2),
+                    const Text(
+                      'Quản lý chi tiêu minh bạch cùng người thân, bạn bè',
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: Color(0xFF94A3B8),
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 8),
+              const Icon(
+                Icons.arrow_forward_ios_rounded,
+                size: 14,
+                color: AppColors.primary,
+              ),
+            ],
+          ),
         ),
       ),
     );

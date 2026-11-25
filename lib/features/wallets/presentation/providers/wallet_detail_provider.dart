@@ -79,11 +79,19 @@ class WalletDetailActions {
 
   Future<void> inviteMember(String email, WalletMemberRole role) async {
     final repo = _ref.read(walletRepositoryProvider);
+    // Tự động kích hoạt cờ isShared = true khi chia sẻ ví/mời thành viên
+    try {
+      await repo.updateWallet(
+        _walletId,
+        const UpdateWalletRequest(isShared: true),
+      );
+    } catch (_) {}
     await repo.inviteMember(
       _walletId,
       InviteMemberRequest(email: email, role: role),
     );
     _ref.invalidate(walletDetailProvider(_walletId));
+    _ref.invalidate(walletsOverviewProvider);
   }
 
   Future<void> updateMemberRole(String userId, WalletMemberRole role) async {

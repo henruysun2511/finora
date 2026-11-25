@@ -27,6 +27,7 @@ class _CreateWalletScreenState extends ConsumerState<CreateWalletScreen> {
   final _nameController = TextEditingController();
   final _balanceController = TextEditingController(text: '0');
   String _selectedCurrency = 'VND (₫) · Việt Nam Đồng';
+  bool _isShared = false;
   bool _isLoading = false;
 
   final List<Map<String, dynamic>> _types = [
@@ -99,6 +100,7 @@ class _CreateWalletScreenState extends ConsumerState<CreateWalletScreen> {
             CreateWalletRequest(
               name: name,
               defaultCurrency: currencyCode,
+              isShared: _isShared,
             ),
           );
 
@@ -115,14 +117,22 @@ class _CreateWalletScreenState extends ConsumerState<CreateWalletScreen> {
 
       if (mounted) {
         ref.invalidate(walletsOverviewProvider);
-        AppToast.success(
-          context,
-          'Đã thêm nguồn tiền thành công vào danh mục của bạn!',
-        );
-        if (context.canPop()) {
-          context.pop();
+        if (_isShared) {
+          AppToast.success(
+            context,
+            'Đã tạo Quỹ nhóm dùng chung thành công! Bạn có thể mời bạn bè tham gia.',
+          );
+          context.pushReplacement(RoutePaths.sharedWallets);
         } else {
-          context.go(RoutePaths.wallets);
+          AppToast.success(
+            context,
+            'Đã thêm nguồn tiền thành công vào danh mục của bạn!',
+          );
+          if (context.canPop()) {
+            context.pop();
+          } else {
+            context.go(RoutePaths.wallets);
+          }
         }
       }
     } catch (e) {
@@ -419,6 +429,92 @@ class _CreateWalletScreenState extends ConsumerState<CreateWalletScreen> {
                       if (val != null) setState(() => _selectedCurrency = val);
                     },
                   ),
+                ),
+              ],
+            ),
+          ),
+          const Divider(height: 1, color: Color(0xFFE2E8F0)),
+
+          // Field 4: Ví dùng chung & Quỹ nhóm (Chuẩn Solarn / device-preview)
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 12),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: _isShared
+                        ? AppColors.primary.withValues(alpha: 0.15)
+                        : const Color(0xFF64748B).withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Icon(
+                    Icons.groups_rounded,
+                    color: _isShared ? AppColors.primary : const Color(0xFF64748B),
+                    size: 22,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Text(
+                            'VÍ DÙNG CHUNG / QUỸ NHÓM',
+                            style: GoogleFonts.inter(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w800,
+                              color: _isShared
+                                  ? AppColors.primary
+                                  : const Color(0xFF64748B),
+                              letterSpacing: 0.8,
+                            ),
+                          ),
+                          if (_isShared) ...[
+                            const SizedBox(width: 6),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 6,
+                                vertical: 1.5,
+                              ),
+                              decoration: BoxDecoration(
+                                color: AppColors.primary,
+                                borderRadius: BorderRadius.circular(99),
+                              ),
+                              child: const Text(
+                                'BẬT',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 8.5,
+                                  fontWeight: FontWeight.w900,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
+                      const SizedBox(height: 3),
+                      Text(
+                        'Cho phép mời thành viên cùng đóng góp & quản lý chi tiêu',
+                        style: GoogleFonts.inter(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                          color: const Color(0xFF94A3B8),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Switch.adaptive(
+                  value: _isShared,
+                  activeColor: AppColors.primary,
+                  onChanged: (val) {
+                    setState(() => _isShared = val);
+                  },
                 ),
               ],
             ),
