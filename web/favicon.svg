@@ -41,3 +41,4 @@
   <circle cx="266" cy="112" r="26" fill="url(#dotGrad)" filter="url(#glow)"/>
   <circle cx="266" cy="112" r="8" fill="rgba(255,255,255,0.95)"/>
 </svg>
+

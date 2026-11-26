@@ -76,22 +76,16 @@ class _HomeCategoryBreakdownCardState
                   child: CircularProgressIndicator(color: AppColors.primary),
                 ),
               ),
-              error: (_, __) => _buildContent(
-                isDark: isDark,
-                month: _selectedMonth.month,
-                year: _selectedMonth.year,
-                totalExpense: 8300000,
-                items: _mockCategories(),
-              ),
-              data: (data) => _buildContent(
-                isDark: isDark,
-                month: _selectedMonth.month,
-                year: _selectedMonth.year,
-                totalExpense: data.totalAmount > 0 ? data.totalAmount : 8300000,
-                items: data.categories.isNotEmpty
-                    ? data.categories.take(5).toList()
-                    : _mockCategories(),
-              ),
+              error: (_, __) => _buildEmptyBreakdown(isDark),
+              data: (data) => data.categories.isEmpty
+                  ? _buildEmptyBreakdown(isDark)
+                  : _buildContent(
+                      isDark: isDark,
+                      month: _selectedMonth.month,
+                      year: _selectedMonth.year,
+                      totalExpense: data.totalAmount,
+                      items: data.categories.take(5).toList(),
+                    ),
             ),
           ),
         ),
@@ -99,49 +93,88 @@ class _HomeCategoryBreakdownCardState
     );
   }
 
-  List<CategoryBreakdownItemModel> _mockCategories() {
-    return const [
-      CategoryBreakdownItemModel(
-        id: 'cat-1',
-        name: 'Ăn uống',
-        icon: 'utensils',
-        color: '#0072D6',
-        amount: 3160000,
-        percentage: 38.0,
-      ),
-      CategoryBreakdownItemModel(
-        id: 'cat-2',
-        name: 'Mua sắm',
-        icon: 'shopping-bag',
-        color: '#F97316',
-        amount: 2080000,
-        percentage: 25.0,
-      ),
-      CategoryBreakdownItemModel(
-        id: 'cat-3',
-        name: 'Hóa đơn',
-        icon: 'receipt',
-        color: '#10B981',
-        amount: 1250000,
-        percentage: 15.0,
-      ),
-      CategoryBreakdownItemModel(
-        id: 'cat-4',
-        name: 'Di chuyển',
-        icon: 'car',
-        color: '#8B5CF6',
-        amount: 998000,
-        percentage: 12.0,
-      ),
-      CategoryBreakdownItemModel(
-        id: 'cat-5',
-        name: 'Khác & Giải trí',
-        icon: 'gamepad-2',
-        color: '#EC4899',
-        amount: 834000,
-        percentage: 10.0,
-      ),
-    ];
+  Widget _buildEmptyBreakdown(bool isDark) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'CƠ CẤU CHI TIÊU',
+                  style: GoogleFonts.inter(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 0.6,
+                    color: AppColors.primary,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  'Tháng ${_selectedMonth.month}/${_selectedMonth.year}',
+                  style: GoogleFonts.inter(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w800,
+                    color: isDark
+                        ? AppColors.darkForeground
+                        : AppColors.lightForeground,
+                  ),
+                ),
+              ],
+            ),
+            Icon(
+              Icons.chevron_right_rounded,
+              color: isDark ? AppColors.darkMuted : AppColors.lightMuted,
+            ),
+          ],
+        ),
+        const SizedBox(height: 28),
+        Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 56,
+                height: 56,
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withValues(alpha: 0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.pie_chart_outline_rounded,
+                  color: AppColors.primary,
+                  size: 28,
+                ),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                'Chưa có chi tiêu tháng này',
+                style: GoogleFonts.inter(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: isDark
+                      ? AppColors.darkForeground
+                      : AppColors.lightForeground,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                'Ghi nhận chi tiêu đầu tiên để xem phân tích danh mục',
+                style: GoogleFonts.inter(
+                  fontSize: 12,
+                  color: isDark ? AppColors.darkMuted : AppColors.lightMuted,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 20),
+      ],
+    );
   }
 
   Widget _buildContent({
@@ -151,6 +184,10 @@ class _HomeCategoryBreakdownCardState
     required double totalExpense,
     required List<CategoryBreakdownItemModel> items,
   }) {
+    if (items.isEmpty) {
+      return _buildEmptyBreakdown(isDark);
+    }
+
     final activeItem = _selectedCategoryIndex < items.length
         ? items[_selectedCategoryIndex]
         : items.first;

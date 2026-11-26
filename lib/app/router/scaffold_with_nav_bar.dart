@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:finora_mb/l10n/app_localizations.dart';
+import 'route_names.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_text_styles.dart';
 import 'quick_add_modal.dart';
@@ -85,26 +86,20 @@ class ScaffoldWithNavBar extends StatelessWidget {
                     child: FittedBox(
                       fit: BoxFit.scaleDown,
                       child: GestureDetector(
-                        onTap: () => _openQuickAddModal(context),
+                        onTap: () => context.push(RoutePaths.captureReceipt),
+                        onLongPress: () => _openQuickAddModal(context),
                         child: Container(
                           width: 52,
                           height: 52,
                           margin: const EdgeInsets.only(bottom: 4),
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
-                            gradient: const LinearGradient(
-                              colors: [
-                                AppColors.primary,
-                                AppColors.orange,
-                              ],
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                            ),
+                            color: AppColors.primary,
                             boxShadow: [
                               BoxShadow(
-                                color: AppColors.primary.withValues(alpha: 0.45),
-                                blurRadius: 20,
-                                offset: const Offset(0, 8),
+                                color: AppColors.primary.withValues(alpha: 0.4),
+                                blurRadius: 16,
+                                offset: const Offset(0, 6),
                               ),
                             ],
                           ),

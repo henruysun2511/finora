@@ -59,16 +59,16 @@ class MascotRepositoryImpl implements MascotRepository {
   }
 
   CurrentMascot _getLocalFallbackCurrentMascot() {
-    final defaultTier = _getLocalMascotTiers()[3]; // Nora
+    final defaultTier = _getLocalMascotTiers()[0]; // Ash (tier bắt đầu)
     return CurrentMascot(
-      netWorth: 12500000,
-      totalWalletBalance: 15000000,
-      totalDebt: 2500000,
+      netWorth: 0,
+      totalWalletBalance: 0,
+      totalDebt: 0,
       showMascot: true,
       mascotTone: MascotTone.balanced,
       mascotSensitivity: MascotSensitivity.anomaliesOnly,
       greeting:
-          'Khoản chi này vẫn nằm trong tầm kiểm soát của tháng. Bạn hoàn toàn có thể chi trả mà không ảnh hưởng mục tiêu chung.',
+          'Chào bạn! Hãy tạo tài khoản nguồn tiền và thêm giao dịch đầu tiên để bắt đầu hành trình quản lý tài chính.',
       mascot: defaultTier,
     );
   }

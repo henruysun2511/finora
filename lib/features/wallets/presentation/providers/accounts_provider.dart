@@ -29,41 +29,9 @@ final accountsListProvider =
         .map(AccountItemModel.fromJson)
         .toList();
 
-    if (accounts.isNotEmpty) return accounts;
-  } catch (_) {}
-
-  // Fallback danh sách tài khoản chuẩn Solarn FinTech
-  return const [
-    AccountItemModel(
-      id: 'acc-cash',
-      name: 'Tiền mặt (Ví da)',
-      type: 'cash',
-      balance: 2500000,
-      currency: 'VND',
-    ),
-    AccountItemModel(
-      id: 'acc-vcb',
-      name: 'Vietcombank Digibank',
-      type: 'bank',
-      balance: 18250000,
-      currency: 'VND',
-      accountNumberLast4: '6789',
-    ),
-    AccountItemModel(
-      id: 'acc-momo',
-      name: 'Ví điện tử MoMo',
-      type: 'ewallet',
-      balance: 850000,
-      currency: 'VND',
-    ),
-    AccountItemModel(
-      id: 'acc-tcb',
-      name: 'Techcombank Visa Debit',
-      type: 'bank',
-      balance: 5400000,
-      currency: 'VND',
-      accountNumberLast4: '3456',
-    ),
-  ];
+    return accounts;
+  } catch (_) {
+    return const [];
+  }
 });
 

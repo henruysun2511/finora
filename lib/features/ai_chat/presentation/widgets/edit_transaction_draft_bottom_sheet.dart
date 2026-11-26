@@ -9,6 +9,11 @@ import '../../../../app/theme/app_colors.dart';
 import '../../../../core/widgets/app_toast.dart';
 import '../../../../core/services/cloudinary_service.dart';
 import '../../domain/models/send_message_input.dart';
+import '../../../categories/domain/models/category.dart';
+import '../../../categories/domain/models/category_type.dart';
+import '../../../categories/presentation/providers/category_list_provider.dart';
+import '../../../wallets/domain/models/account_item_model.dart';
+import '../../../wallets/presentation/providers/accounts_provider.dart';
 
 class EditTransactionDraftBottomSheet extends ConsumerStatefulWidget {
   final String? initialType; // EXPENSE | INCOME
@@ -103,8 +108,10 @@ class _EditTransactionDraftBottomSheetState
   late final TextEditingController _amountController;
   late final TextEditingController _noteController;
   late final TextEditingController _locationController;
-  late String _selectedCategory;
-  late String _selectedAccount;
+  String? _selectedCategoryId;
+  String _selectedCategory = '';
+  String? _selectedAccountId;
+  String _selectedAccount = '';
   late DateTime _selectedDate;
   late bool _amountHidden;
   late bool _excludeFromReport;
@@ -114,7 +121,7 @@ class _EditTransactionDraftBottomSheetState
   Uint8List? _localPhotoBytes;
   bool _isUploadingPhoto = false;
 
-  // Danh mục chi tiêu phổ biến
+  // Danh mục chi tiêu phổ biến (fallback)
   static const List<String> _expenseCategories = [
     'Ăn uống & Cà phê',
     'Di chuyển & Xăng xe',
@@ -127,7 +134,7 @@ class _EditTransactionDraftBottomSheetState
     'Khác',
   ];
 
-  // Danh mục thu nhập phổ biến
+  // Danh mục thu nhập phổ biến (fallback)
   static const List<String> _incomeCategories = [
     'Lương & Thưởng',
     'Đầu tư & Sinh lời',
@@ -136,7 +143,7 @@ class _EditTransactionDraftBottomSheetState
     'Thu nhập khác',
   ];
 
-  // Tài khoản thanh toán phổ biến
+  // Tài khoản thanh toán phổ biến (fallback)
   static const List<String> _accounts = [
     'Tiền mặt',
     'Vietcombank DigiBank',
@@ -158,17 +165,10 @@ class _EditTransactionDraftBottomSheetState
     _locationController =
         TextEditingController(text: widget.initialLocation ?? '');
 
-    final currentCatList =
-        _type == 'INCOME' ? _incomeCategories : _expenseCategories;
-    _selectedCategory = widget.initialCategory != null &&
-            currentCatList.contains(widget.initialCategory)
-        ? widget.initialCategory!
-        : (widget.initialCategory ?? currentCatList.first);
-
-    _selectedAccount = widget.initialAccount != null &&
-            _accounts.contains(widget.initialAccount)
-        ? widget.initialAccount!
-        : (widget.initialAccount ?? _accounts.first);
+    _selectedCategoryId = widget.initialCategoryId;
+    _selectedCategory = widget.initialCategory ?? '';
+    _selectedAccountId = widget.initialAccountId;
+    _selectedAccount = widget.initialAccount ?? '';
 
     if (widget.initialDate != null) {
       _selectedDate = DateTime.tryParse(widget.initialDate!) ?? DateTime.now();
@@ -303,14 +303,30 @@ class _EditTransactionDraftBottomSheetState
       return;
     }
 
+    final accountsAsync = ref.read(accountsListProvider);
+    final userAccounts = accountsAsync.asData?.value ?? [];
+    final currentAcc = userAccounts.where((a) => a.id == _selectedAccountId).firstOrNull;
+    if (_type == 'EXPENSE' && currentAcc != null && currentAcc.balance < amount) {
+      final balStr = NumberFormat.currency(
+        locale: 'vi_VN',
+        symbol: '₫',
+        decimalDigits: 0,
+      ).format(currentAcc.balance).trim();
+      AppToast.error(
+        context,
+        'Số dư tài khoản ${currentAcc.name} không đủ để chi tiêu (Hiện có: $balStr, Cần: ${NumberFormat.currency(locale: 'vi_VN', symbol: '₫', decimalDigits: 0).format(amount).trim()})!',
+      );
+      return;
+    }
+
     final dateStr = DateFormat('yyyy-MM-dd').format(_selectedDate);
 
     final draft = EditTransactionDraft(
       type: _type,
       name: name,
       amount: amount,
-      accountId: widget.initialAccountId,
-      categoryId: widget.initialCategoryId,
+      accountId: _selectedAccountId,
+      categoryId: _selectedCategoryId,
       categoryName: _selectedCategory,
       accountName: _selectedAccount,
       date: dateStr,
@@ -334,7 +350,42 @@ class _EditTransactionDraftBottomSheetState
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final bottomInset = MediaQuery.of(context).viewInsets.bottom;
     final isExpense = _type == 'EXPENSE';
-    final categories = isExpense ? _expenseCategories : _incomeCategories;
+    final fallbackCategories = isExpense ? _expenseCategories : _incomeCategories;
+
+    // Lấy danh sách tài khoản thực tế của người dùng
+    final accountsAsync = ref.watch(accountsListProvider);
+    final userAccounts = accountsAsync.asData?.value ?? [];
+
+    // Lấy danh sách danh mục thực tế của người dùng
+    final categoriesAsync = ref.watch(categoryListProvider);
+    final allCategories = categoriesAsync.asData?.value ?? [];
+    final userCategories = allCategories
+        .where((c) => isExpense ? c.type == CategoryType.expense : c.type == CategoryType.income)
+        .toList();
+
+    // Tự động gán nếu chưa có accountId hoặc tên
+    if (userAccounts.isNotEmpty) {
+      if (_selectedAccountId == null || !userAccounts.any((a) => a.id == _selectedAccountId)) {
+        final matched = userAccounts.firstWhere(
+          (a) => _selectedAccount.isNotEmpty && a.name.toLowerCase() == _selectedAccount.toLowerCase(),
+          orElse: () => userAccounts.first,
+        );
+        _selectedAccountId = matched.id;
+        _selectedAccount = matched.name;
+      }
+    }
+
+    // Tự động gán nếu chưa có categoryId hoặc tên
+    if (userCategories.isNotEmpty) {
+      if (_selectedCategoryId == null || !userCategories.any((c) => c.id == _selectedCategoryId)) {
+        final matched = userCategories.firstWhere(
+          (c) => _selectedCategory.isNotEmpty && c.name.toLowerCase() == _selectedCategory.toLowerCase(),
+          orElse: () => userCategories.first,
+        );
+        _selectedCategoryId = matched.id;
+        _selectedCategory = matched.name;
+      }
+    }
 
     return Padding(
       padding: EdgeInsets.fromLTRB(20, 16, 20, 20 + bottomInset),
@@ -642,6 +693,7 @@ class _EditTransactionDraftBottomSheetState
 
             // 4. Danh mục & Tài khoản nguồn (2 cột)
             Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Expanded(
                   child: Column(
@@ -659,9 +711,14 @@ class _EditTransactionDraftBottomSheetState
                       ),
                       const SizedBox(height: 6),
                       DropdownButtonFormField<String>(
-                        initialValue: categories.contains(_selectedCategory)
-                            ? _selectedCategory
-                            : categories.first,
+                        value: _selectedCategoryId != null &&
+                                userCategories.any((c) => c.id == _selectedCategoryId)
+                            ? _selectedCategoryId
+                            : (userCategories.isNotEmpty
+                                ? userCategories.first.id
+                                : (fallbackCategories.contains(_selectedCategory)
+                                    ? _selectedCategory
+                                    : fallbackCategories.first)),
                         isExpanded: true,
                         dropdownColor:
                             isDark ? AppColors.darkSurface : Colors.white,
@@ -686,12 +743,31 @@ class _EditTransactionDraftBottomSheetState
                             ),
                           ),
                         ),
-                        items: categories.map((c) {
-                          return DropdownMenuItem(value: c, child: Text(c));
-                        }).toList(),
+                        items: userCategories.isNotEmpty
+                            ? userCategories.map((c) {
+                                return DropdownMenuItem(
+                                  value: c.id,
+                                  child: Text(
+                                    c.name,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                );
+                              }).toList()
+                            : fallbackCategories.map((c) {
+                                return DropdownMenuItem(value: c, child: Text(c));
+                              }).toList(),
                         onChanged: (val) {
-                          if (val != null)
-                            setState(() => _selectedCategory = val);
+                          if (val != null) {
+                            if (userCategories.any((c) => c.id == val)) {
+                              final cat = userCategories.firstWhere((c) => c.id == val);
+                              setState(() {
+                                _selectedCategoryId = cat.id;
+                                _selectedCategory = cat.name;
+                              });
+                            } else {
+                              setState(() => _selectedCategory = val);
+                            }
+                          }
                         },
                       ),
                     ],
@@ -714,9 +790,14 @@ class _EditTransactionDraftBottomSheetState
                       ),
                       const SizedBox(height: 6),
                       DropdownButtonFormField<String>(
-                        initialValue: _accounts.contains(_selectedAccount)
-                            ? _selectedAccount
-                            : _accounts.first,
+                        value: _selectedAccountId != null &&
+                                userAccounts.any((a) => a.id == _selectedAccountId)
+                            ? _selectedAccountId
+                            : (userAccounts.isNotEmpty
+                                ? userAccounts.first.id
+                                : (_accounts.contains(_selectedAccount)
+                                    ? _selectedAccount
+                                    : _accounts.first)),
                         isExpanded: true,
                         dropdownColor:
                             isDark ? AppColors.darkSurface : Colors.white,
@@ -741,14 +822,74 @@ class _EditTransactionDraftBottomSheetState
                             ),
                           ),
                         ),
-                        items: _accounts.map((a) {
-                          return DropdownMenuItem(value: a, child: Text(a));
-                        }).toList(),
+                        items: userAccounts.isNotEmpty
+                            ? userAccounts.map((a) {
+                                final currentAmt = double.tryParse(_amountController.text) ?? 0.0;
+                                final isLow = isExpense && a.balance < currentAmt;
+                                final balanceStr = NumberFormat.currency(
+                                  locale: 'vi_VN',
+                                  symbol: '₫',
+                                  decimalDigits: 0,
+                                ).format(a.balance).trim();
+                                return DropdownMenuItem(
+                                  value: a.id,
+                                  child: Text(
+                                    '${a.name} ($balanceStr)',
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                      color: isLow
+                                          ? const Color(0xFFEF4444)
+                                          : (isDark ? Colors.white : Colors.black87),
+                                      fontWeight: isLow ? FontWeight.w700 : FontWeight.w500,
+                                    ),
+                                  ),
+                                );
+                              }).toList()
+                            : _accounts.map((a) {
+                                return DropdownMenuItem(value: a, child: Text(a));
+                              }).toList(),
                         onChanged: (val) {
-                          if (val != null)
-                            setState(() => _selectedAccount = val);
+                          if (val != null) {
+                            if (userAccounts.any((a) => a.id == val)) {
+                              final acc = userAccounts.firstWhere((a) => a.id == val);
+                              setState(() {
+                                _selectedAccountId = acc.id;
+                                _selectedAccount = acc.name;
+                              });
+                            } else {
+                              setState(() => _selectedAccount = val);
+                            }
+                          }
                         },
                       ),
+                      // Cảnh báo số dư không đủ nếu tài khoản có balance < amount
+                      if (userAccounts.isNotEmpty) ...[
+                        Builder(
+                          builder: (context) {
+                            final curAcc = userAccounts.where((a) => a.id == _selectedAccountId).firstOrNull;
+                            final curAmt = double.tryParse(_amountController.text) ?? 0.0;
+                            if (isExpense && curAcc != null && curAcc.balance < curAmt) {
+                              final balStr = NumberFormat.currency(
+                                locale: 'vi_VN',
+                                symbol: '₫',
+                                decimalDigits: 0,
+                              ).format(curAcc.balance).trim();
+                              return Padding(
+                                padding: const EdgeInsets.only(top: 6),
+                                child: Text(
+                                  '⚠️ Số dư không đủ ($balStr)',
+                                  style: GoogleFonts.inter(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w700,
+                                    color: const Color(0xFFEF4444),
+                                  ),
+                                ),
+                              );
+                            }
+                            return const SizedBox.shrink();
+                          },
+                        ),
+                      ],
                     ],
                   ),
                 ),

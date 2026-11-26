@@ -51,13 +51,14 @@ class FeedApiService {
   }
 
   /// 5. PATCH /feed/:transactionId
-  Future<Map<String, dynamic>> updatePost(
+  Future<FeedPostResponseDto> updatePost(
       String transactionId, Map<String, dynamic> body) async {
     final res = await _dio.patch(
       ApiConstants.feedPost(transactionId),
       data: body,
     );
-    return res.data['data'] as Map<String, dynamic>? ?? {};
+    final data = res.data['data'] as Map<String, dynamic>? ?? {};
+    return FeedPostResponseDto.fromJson(data);
   }
 }
 

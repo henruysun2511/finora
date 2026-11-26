@@ -817,16 +817,12 @@ class _WalletDetailScreenState extends ConsumerState<WalletDetailScreen> {
                       width: 38,
                       height: 38,
                       decoration: BoxDecoration(
-                        color: AppColors.primary.withValues(alpha: 0.12),
+                        color: acc.displayColor.withValues(alpha: 0.14),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Icon(
-                        acc.type.isEWallet
-                            ? Icons.smartphone_rounded
-                            : (acc.type.isCash
-                                ? Icons.account_balance_wallet_rounded
-                                : Icons.account_balance_rounded),
-                        color: AppColors.primary,
+                        acc.displayIcon,
+                        color: acc.displayColor,
                         size: 20,
                       ),
                     ),

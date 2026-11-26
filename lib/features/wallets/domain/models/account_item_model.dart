@@ -41,6 +41,27 @@ class AccountItemModel {
     );
   }
 
+  Color get displayColor {
+    if (color != null && color!.isNotEmpty) {
+      try {
+        final hexStr = color!.replaceAll('#', '');
+        return Color(int.parse('0xFF$hexStr'));
+      } catch (_) {}
+    }
+    switch (type.toLowerCase()) {
+      case 'cash':
+        return const Color(0xFF10B981);
+      case 'bank':
+        return const Color(0xFF0072D6);
+      case 'ewallet':
+        return const Color(0xFFA50064);
+      case 'credit':
+        return const Color(0xFFF59E0B);
+      default:
+        return const Color(0xFF0072D6);
+    }
+  }
+
   IconData get defaultIcon {
     switch (type) {
       case 'cash':

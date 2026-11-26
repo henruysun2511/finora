@@ -27,8 +27,8 @@ class TransactionFormNotifier extends StateNotifier<TransactionFormState> {
 
     return TransactionFormState(
       transactionDate: DateTime.now(),
-      accountId: 'acc-cash',
-      accountName: 'Tiền mặt (Ví da)',
+      accountId: null,
+      accountName: null,
       amountHidden: defaultHidden,
       visibility: defaultVisibility,
     );

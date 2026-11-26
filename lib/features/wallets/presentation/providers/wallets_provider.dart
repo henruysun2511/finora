@@ -25,19 +25,9 @@ final walletsListProvider =
         .whereType<Map<String, dynamic>>()
         .map(WalletItemModel.fromJson)
         .toList();
-    if (wallets.isNotEmpty) return wallets;
-  } catch (_) {}
-
-  // Fallback an toàn nếu chưa lấy được danh sách từ API
-  return const [
-    WalletItemModel(
-      id: '11111111-1111-4111-8111-111111111111',
-      name: 'Ví Cá Nhân (VND)',
-    ),
-    WalletItemModel(
-      id: '22222222-2222-4222-8222-222222222222',
-      name: 'Ví Gia Đình (VND)',
-    ),
-  ];
+    return wallets;
+  } catch (_) {
+    return const [];
+  }
 });
 

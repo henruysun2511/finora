@@ -53,28 +53,18 @@ class HomeBudgetHealthCard extends ConsumerWidget {
               child: CircularProgressIndicator(color: AppColors.primary),
             ),
           ),
-          error: (_, __) => _buildPacingContent(
-            isDark: isDark,
-            spent: 8320000,
-            totalBudget: 13500000,
-            spendingPercent: 62,
-            timePercent: timePercent,
-            currentDay: currentDay,
-            daysInMonth: daysInMonth,
-            savingsRate: 44.5,
-            healthScore: 88,
-            statusTag: 'An toàn',
-          ),
+          error: (_, __) => _buildEmptyBudget(isDark, context),
           data: (budget) {
-            final spent = budget.totalSpent > 0 ? budget.totalSpent : 8320000.0;
-            final totalBudget = budget.totalBudgetLimit > 0
-                ? budget.totalBudgetLimit
-                : 13500000.0;
+            if (budget.totalBudgetLimit <= 0) {
+              return _buildEmptyBudget(isDark, context);
+            }
+            final spent = budget.totalSpent;
+            final totalBudget = budget.totalBudgetLimit;
             final spendPct =
                 ((spent / totalBudget) * 100).clamp(0, 150).round();
 
             final ov = overviewAsync.valueOrNull;
-            final savingsRate = ov?.monthlyCashflow.savingsRate ?? 44.5;
+            final savingsRate = ov?.monthlyCashflow.savingsRate ?? 0.0;
 
             return _buildPacingContent(
               isDark: isDark,
@@ -85,12 +75,114 @@ class HomeBudgetHealthCard extends ConsumerWidget {
               currentDay: currentDay,
               daysInMonth: daysInMonth,
               savingsRate: savingsRate,
-              healthScore: 88,
+              healthScore: (100 - spendPct).clamp(0, 100),
               statusTag: spendPct <= timePercent ? 'An toàn' : 'Cần chú ý',
             );
           },
         ),
       ),
+    );
+  }
+
+  Widget _buildEmptyBudget(bool isDark, BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Tiến độ Ngân sách & Sức khỏe',
+                    style: GoogleFonts.inter(
+                      fontSize: 15.5,
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: -0.3,
+                      color: isDark
+                          ? AppColors.darkForeground
+                          : AppColors.lightForeground,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    'So sánh tốc độ chi tiêu so với số ngày còn lại',
+                    style: GoogleFonts.inter(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                      color:
+                          isDark ? AppColors.darkMuted : AppColors.lightMuted,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Icon(
+              Icons.chevron_right_rounded,
+              color: isDark ? AppColors.darkMuted : AppColors.lightMuted,
+            ),
+          ],
+        ),
+        const SizedBox(height: 28),
+        Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 56,
+                height: 56,
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withValues(alpha: 0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.savings_outlined,
+                  color: AppColors.primary,
+                  size: 28,
+                ),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                'Chưa thiết lập ngân sách tháng này',
+                style: GoogleFonts.inter(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: isDark
+                      ? AppColors.darkForeground
+                      : AppColors.lightForeground,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                'Thiết lập hạn mức chi tiêu để kiểm soát ngân sách tốt hơn',
+                style: GoogleFonts.inter(
+                  fontSize: 12,
+                  color: isDark ? AppColors.darkMuted : AppColors.lightMuted,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 14),
+              OutlinedButton.icon(
+                onPressed: () => context.push(RoutePaths.createBudget),
+                icon: const Icon(Icons.add_rounded, size: 16),
+                label: const Text('Thiết lập ngay'),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: AppColors.primary,
+                  side: const BorderSide(color: AppColors.primary),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 12),
+      ],
     );
   }
 

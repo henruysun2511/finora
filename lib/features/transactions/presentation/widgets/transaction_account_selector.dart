@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
+import '../../../../app/router/route_names.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../wallets/domain/models/account_item_model.dart';
 
@@ -17,39 +19,6 @@ class TransactionAccountSelector extends StatelessWidget {
   final String? selectedId;
   final ValueChanged<AccountItemModel> onSelect;
 
-  static const List<AccountItemModel> defaultFallbackAccounts = [
-    AccountItemModel(
-      id: 'acc-cash',
-      name: 'Tiền mặt (Ví da)',
-      type: 'cash',
-      balance: 2500000,
-      currency: 'VND',
-    ),
-    AccountItemModel(
-      id: 'acc-vcb',
-      name: 'Vietcombank Digibank',
-      type: 'bank',
-      balance: 18250000,
-      currency: 'VND',
-      accountNumberLast4: '6789',
-    ),
-    AccountItemModel(
-      id: 'acc-momo',
-      name: 'Ví điện tử MoMo',
-      type: 'ewallet',
-      balance: 850000,
-      currency: 'VND',
-    ),
-    AccountItemModel(
-      id: 'acc-tcb',
-      name: 'Techcombank Visa Debit',
-      type: 'bank',
-      balance: 5400000,
-      currency: 'VND',
-      accountNumberLast4: '3456',
-    ),
-  ];
-
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -59,8 +28,80 @@ class TransactionAccountSelector extends StatelessWidget {
         isDark ? AppColors.darkForeground : AppColors.lightForeground;
     final muted = isDark ? AppColors.darkMuted : AppColors.lightMuted;
 
-    final displayAccounts =
-        accounts.isNotEmpty ? accounts : defaultFallbackAccounts;
+    if (accounts.isEmpty) {
+      return Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+        decoration: BoxDecoration(
+          color: isDark ? AppColors.darkSurface : const Color(0xFFF8FAFC),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: border,
+          ),
+        ),
+        child: Column(
+          children: [
+            Container(
+              width: 48,
+              height: 48,
+              decoration: BoxDecoration(
+                color: AppColors.primary.withValues(alpha: 0.1),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.account_balance_wallet_outlined,
+                size: 26,
+                color: AppColors.primary,
+              ),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              'Chưa có tài khoản nguồn tiền',
+              style: GoogleFonts.inter(
+                fontSize: 14,
+                fontWeight: FontWeight.w700,
+                color: foreground,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 6),
+            Text(
+              'Bạn cần tạo ít nhất một tài khoản (Tiền mặt, Ngân hàng, Ví điện tử...) để thực hiện giao dịch.',
+              style: GoogleFonts.inter(
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+                color: muted,
+                height: 1.4,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 16),
+            OutlinedButton.icon(
+              onPressed: () => context.push(RoutePaths.createAccount),
+              icon: const Icon(Icons.add_rounded, size: 18),
+              label: Text(
+                'Thêm tài khoản nguồn tiền',
+                style: GoogleFonts.inter(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: AppColors.primary,
+                side: const BorderSide(color: AppColors.primary, width: 1.2),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    final displayAccounts = accounts;
 
     return Column(
       children: displayAccounts.map((acc) {
@@ -77,11 +118,11 @@ class TransactionAccountSelector extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
               decoration: BoxDecoration(
                 color: isSelected
-                    ? AppColors.primary.withValues(alpha: 0.08)
+                    ? acc.displayColor.withValues(alpha: 0.08)
                     : surface,
                 borderRadius: BorderRadius.circular(14),
                 border: Border.all(
-                  color: isSelected ? AppColors.primary : border,
+                  color: isSelected ? acc.displayColor : border,
                   width: isSelected ? 1.5 : 1,
                 ),
               ),
@@ -92,16 +133,14 @@ class TransactionAccountSelector extends StatelessWidget {
                     height: 38,
                     decoration: BoxDecoration(
                       color: isSelected
-                          ? AppColors.primary
-                          : (isDark
-                              ? Colors.white10
-                              : AppColors.primary.withValues(alpha: 0.1)),
+                          ? acc.displayColor
+                          : acc.displayColor.withValues(alpha: 0.12),
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: Icon(
                       acc.defaultIcon,
                       size: 20,
-                      color: isSelected ? Colors.white : AppColors.primary,
+                      color: isSelected ? Colors.white : acc.displayColor,
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -120,7 +159,7 @@ class TransactionAccountSelector extends StatelessWidget {
                                       ? FontWeight.w700
                                       : FontWeight.w600,
                                   color: isSelected
-                                      ? AppColors.primary
+                                      ? acc.displayColor
                                       : foreground,
                                 ),
                                 maxLines: 1,
@@ -188,7 +227,7 @@ class TransactionAccountSelector extends StatelessWidget {
                         ? Icons.radio_button_checked_rounded
                         : Icons.radio_button_off_rounded,
                     color: isSelected
-                        ? AppColors.primary
+                        ? acc.displayColor
                         : muted.withValues(alpha: 0.5),
                     size: 20,
                   ),

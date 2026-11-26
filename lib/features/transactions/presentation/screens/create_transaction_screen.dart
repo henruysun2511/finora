@@ -29,11 +29,13 @@ import 'receipt_capture_screen.dart';
 class CreateTransactionScreen extends ConsumerStatefulWidget {
   final String? initialWalletId;
   final String? initialType;
+  final String? initialPhotoUrl;
 
   const CreateTransactionScreen({
     super.key,
     this.initialWalletId,
     this.initialType,
+    this.initialPhotoUrl,
   });
 
   @override
@@ -69,6 +71,10 @@ class _CreateTransactionScreenState
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final notifier = ref.read(transactionFormProvider.notifier);
+      if (widget.initialPhotoUrl != null &&
+          widget.initialPhotoUrl!.isNotEmpty) {
+        notifier.setPhoto(widget.initialPhotoUrl);
+      }
       if (widget.initialType == 'income') {
         notifier.setType(TransactionType.income);
       } else if (widget.initialType == 'expense') {
@@ -166,6 +172,34 @@ class _CreateTransactionScreenState
       return;
     }
 
+    if (formState.accountId == null || formState.accountId!.isEmpty) {
+      AppToast.show(
+        context,
+        message: 'Vui lòng chọn hoặc thêm tài khoản nguồn tiền trước khi lưu',
+        type: ToastType.warning,
+      );
+      return;
+    }
+
+    if (formState.type == TransactionType.transfer) {
+      if (formState.toAccountId == null || formState.toAccountId!.isEmpty) {
+        AppToast.show(
+          context,
+          message: 'Vui lòng chọn tài khoản nhận tiền',
+          type: ToastType.warning,
+        );
+        return;
+      }
+      if (formState.accountId == formState.toAccountId) {
+        AppToast.show(
+          context,
+          message: 'Tài khoản chuyển và nhận tiền không được trùng nhau',
+          type: ToastType.warning,
+        );
+        return;
+      }
+    }
+
     final createdTx = await ref.read(transactionFormProvider.notifier).submit();
     if (!mounted) return;
 
@@ -187,7 +221,9 @@ class _CreateTransactionScreenState
   Future<void> _handleCaptureReceipt() async {
     final uploadedUrl = await Navigator.of(context).push<String>(
       MaterialPageRoute(
-        builder: (_) => const ReceiptCaptureScreen(),
+        builder: (_) => const ReceiptCaptureScreen(
+          navigateToCreate: false,
+        ),
       ),
     );
     if (uploadedUrl != null && uploadedUrl.isNotEmpty && mounted) {
@@ -489,12 +525,11 @@ class _CreateTransactionScreenState
                       notifier.setAccount(id: acc.id, name: acc.name),
                 ),
                 data: (accounts) {
-                  final list = accounts.isNotEmpty
-                      ? accounts
-                      : TransactionAccountSelector.defaultFallbackAccounts;
+                  final list = accounts;
 
-                  if (formState.accountId == null ||
-                      formState.accountId!.isEmpty) {
+                  if (list.isNotEmpty &&
+                      (formState.accountId == null ||
+                          formState.accountId!.isEmpty)) {
                     WidgetsBinding.instance.addPostFrameCallback((_) {
                       if (mounted &&
                           (formState.accountId == null ||
@@ -508,6 +543,14 @@ class _CreateTransactionScreenState
                   }
 
                   if (formState.type == TransactionType.transfer) {
+                    if (list.isEmpty) {
+                      return TransactionAccountSelector(
+                        accounts: const [],
+                        selectedId: null,
+                        onSelect: (_) {},
+                      );
+                    }
+
                     return Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -559,6 +602,14 @@ class _CreateTransactionScreenState
                               notifier.setToAccount(id: acc.id, name: acc.name),
                         ),
                       ],
+                    );
+                  }
+
+                  if (list.isEmpty) {
+                    return TransactionAccountSelector(
+                      accounts: const [],
+                      selectedId: null,
+                      onSelect: (_) {},
                     );
                   }
 

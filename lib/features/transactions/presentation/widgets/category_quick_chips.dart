@@ -95,10 +95,10 @@ class CategoryQuickChips extends ConsumerWidget {
               ),
             ),
           ),
-          error: (_, __) => _buildFallbackChips(isDark, foreground, muted, border),
+          error: (_, __) => _buildEmptyState(isDark, foreground, muted, border),
           data: (categories) {
             if (categories.isEmpty) {
-              return _buildFallbackChips(isDark, foreground, muted, border);
+              return _buildEmptyState(isDark, foreground, muted, border);
             }
 
             final top4 = categories.take(4).toList();
@@ -161,77 +161,32 @@ class CategoryQuickChips extends ConsumerWidget {
     );
   }
 
-  Widget _buildFallbackChips(
+  Widget _buildEmptyState(
       bool isDark, Color foreground, Color muted, Color border) {
-    final fallbacks = isExpense
-        ? [
-            ('cat-1', 'Ăn uống', 'utensils', '#EF4444'),
-            ('cat-2', 'Mua sắm', 'shopping-cart', '#3B82F6'),
-            ('cat-3', 'Cà phê', 'coffee', '#F59E0B'),
-            ('cat-4', 'Di chuyển', 'car', '#10B981'),
-          ]
-        : [
-            ('cat-inc-1', 'Lương', 'wallet', '#10B981'),
-            ('cat-inc-2', 'Thưởng', 'gift', '#F59E0B'),
-            ('cat-inc-3', 'Đầu tư', 'trending-up', '#3B82F6'),
-            ('cat-inc-4', 'Khác', 'plus-circle', '#8B5CF6'),
-          ];
-
-    return Row(
-      children: fallbacks.map((f) {
-        final isSelected = f.$1 == selectedCategoryId;
-        return Expanded(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 4),
-            child: InkWell(
-              onTap: () => onSelectCategory(
-                Category(
-                  id: f.$1,
-                  name: f.$2,
-                  icon: f.$3,
-                  color: f.$4,
-                  type: isExpense ? CategoryType.expense : CategoryType.income,
-                ),
-              ),
-              borderRadius: BorderRadius.circular(14),
-              child: Container(
-                padding: const EdgeInsets.symmetric(vertical: 8),
-                decoration: BoxDecoration(
-                  color: isSelected
-                      ? AppColors.primary.withValues(alpha: 0.12)
-                      : (isDark ? AppColors.darkSurface : Colors.white),
-                  borderRadius: BorderRadius.circular(14),
-                  border: Border.all(
-                    color: isSelected ? AppColors.primary : border,
-                    width: isSelected ? 1.5 : 1,
-                  ),
-                ),
-                child: Column(
-                  children: [
-                    CategoryIcon(
-                      icon: f.$3,
-                      colorHex: f.$4,
-                      size: 32,
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      f.$2,
-                      style: GoogleFonts.inter(
-                        fontSize: 11,
-                        fontWeight:
-                            isSelected ? FontWeight.w700 : FontWeight.w500,
-                        color: isSelected ? AppColors.primary : foreground,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
-                ),
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+      decoration: BoxDecoration(
+        color: isDark ? AppColors.darkSurface : Colors.white,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: border),
+      ),
+      child: Row(
+        children: [
+          Icon(Icons.category_outlined, size: 24, color: muted),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              'Chưa có danh mục nào. Hãy tạo danh mục trước.',
+              style: GoogleFonts.inter(
+                fontSize: 13,
+                fontWeight: FontWeight.w500,
+                color: muted,
               ),
             ),
           ),
-        );
-      }).toList(),
+        ],
+      ),
     );
   }
 }
@@ -310,8 +265,38 @@ class _FullCategoryPickerSheet extends ConsumerWidget {
           Expanded(
             child: categoriesAsync.when(
               loading: () => const Center(child: CircularProgressIndicator()),
-              error: (err, _) => Center(child: Text('Lỗi: $err')),
+              error: (err, _) => Center(
+                child: Text(
+                  'Không thể tải danh mục',
+                  style: GoogleFonts.inter(fontSize: 14, color: muted),
+                ),
+              ),
               data: (categories) {
+                if (categories.isEmpty) {
+                  return Center(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.category_outlined, size: 48, color: muted),
+                        const SizedBox(height: 12),
+                        Text(
+                          'Chưa có danh mục nào',
+                          style: GoogleFonts.inter(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
+                            color: foreground,
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        Text(
+                          'Vui lòng tạo danh mục để phân loại giao dịch',
+                          style: GoogleFonts.inter(fontSize: 12, color: muted),
+                        ),
+                      ],
+                    ),
+                  );
+                }
+
                 return GridView.builder(
                   padding: const EdgeInsets.all(16),
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(

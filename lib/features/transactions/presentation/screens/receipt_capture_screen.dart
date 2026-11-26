@@ -4,9 +4,11 @@ import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 
+import '../../../../app/router/route_names.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/constants/api_constants.dart';
 import '../../../../core/network/dio_client.dart';
@@ -15,60 +17,81 @@ import '../../../../core/widgets/app_toast.dart';
 /// Màn hình chụp ảnh hóa đơn chuyên biệt (Camera HUD & Cloudinary Upload)
 /// Lấy cảm hứng từ scan-receipt.html của Finora UI Design System
 class ReceiptCaptureScreen extends ConsumerStatefulWidget {
-  const ReceiptCaptureScreen({super.key});
+  final bool autoCapture;
+  final bool navigateToCreate;
+
+  const ReceiptCaptureScreen({
+    super.key,
+    this.autoCapture = false,
+    this.navigateToCreate = true,
+  });
 
   @override
   ConsumerState<ReceiptCaptureScreen> createState() =>
       _ReceiptCaptureScreenState();
 }
 
-class _ReceiptCaptureScreenState extends ConsumerState<ReceiptCaptureScreen>
-    with SingleTickerProviderStateMixin {
-  late final AnimationController _laserController;
-  late final Animation<double> _laserAnimation;
-
+class _ReceiptCaptureScreenState extends ConsumerState<ReceiptCaptureScreen> {
   Uint8List? _capturedBytes;
   String? _capturedName;
   bool _isUploading = false;
   String _uploadStatus = 'Đang tải ảnh lên Cloudinary...';
 
-  @override
-  void initState() {
-    super.initState();
-    _laserController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 2200),
-    )..repeat(reverse: true);
+  bool _isFlashOn = false;
+  bool _isFrontCamera = false;
 
-    _laserAnimation = Tween<double>(begin: 0.08, end: 0.90).animate(
-      CurvedAnimation(
-        parent: _laserController,
-        curve: Curves.easeInOut,
-      ),
+  void _toggleFlash() {
+    setState(() {
+      _isFlashOn = !_isFlashOn;
+    });
+    AppToast.show(
+      context,
+      message: _isFlashOn
+          ? 'Đã bật đèn Flash trợ sáng khi chụp'
+          : 'Đã tắt đèn Flash',
+      type: ToastType.info,
     );
   }
 
-  @override
-  void dispose() {
-    _laserController.dispose();
-    super.dispose();
+  void _toggleCamera() {
+    setState(() {
+      _isFrontCamera = !_isFrontCamera;
+    });
+    _pickImage(ImageSource.camera);
   }
 
   Future<void> _pickImage(ImageSource source) async {
     try {
       final picker = ImagePicker();
-      final XFile? file = await picker.pickImage(
-        source: source,
-        maxWidth: 1920,
-        maxHeight: 1920,
-        imageQuality: 88,
-      );
+      XFile? file;
+      try {
+        file = await picker.pickImage(
+          source: source,
+          preferredCameraDevice:
+              _isFrontCamera ? CameraDevice.front : CameraDevice.rear,
+          maxWidth: 1920,
+          maxHeight: 1920,
+          imageQuality: 88,
+        );
+      } catch (innerErr) {
+        // Fallback trên môi trường Web hoặc máy tính không hỗ trợ camera media stream
+        if (source == ImageSource.camera) {
+          file = await picker.pickImage(
+            source: ImageSource.gallery,
+            maxWidth: 1920,
+            maxHeight: 1920,
+            imageQuality: 88,
+          );
+        } else {
+          rethrow;
+        }
+      }
 
       if (file != null) {
         final bytes = await file.readAsBytes();
         setState(() {
           _capturedBytes = bytes;
-          _capturedName = file.name.isNotEmpty
+          _capturedName = file!.name.isNotEmpty
               ? file.name
               : 'receipt_${DateTime.now().millisecondsSinceEpoch}.jpg';
         });
@@ -77,10 +100,27 @@ class _ReceiptCaptureScreenState extends ConsumerState<ReceiptCaptureScreen>
       if (mounted) {
         AppToast.show(
           context,
-          message: 'Không thể truy cập camera hoặc thư viện: $e',
+          message: 'Không thể truy cập máy ảnh: $e',
           type: ToastType.error,
         );
       }
+    }
+  }
+
+  void _onSuccess(String finalUrl) {
+    if (!mounted) return;
+    AppToast.show(
+      context,
+      message: 'Đã lưu ảnh chứng từ!',
+      type: ToastType.success,
+    );
+    if (widget.navigateToCreate) {
+      context.pushReplacement(
+        RoutePaths.createTransaction,
+        extra: finalUrl,
+      );
+    } else {
+      Navigator.of(context).pop(finalUrl);
     }
   }
 
@@ -131,14 +171,7 @@ class _ReceiptCaptureScreenState extends ConsumerState<ReceiptCaptureScreen>
       }
 
       if (remoteUrl != null && remoteUrl.isNotEmpty) {
-        if (mounted) {
-          AppToast.show(
-            context,
-            message: 'Đã tải và lưu ảnh hóa đơn thành công!',
-            type: ToastType.success,
-          );
-          Navigator.of(context).pop(remoteUrl);
-        }
+        _onSuccess(remoteUrl);
       } else {
         throw Exception('Không nhận được URL ảnh từ máy chủ Cloudinary');
       }
@@ -148,48 +181,45 @@ class _ReceiptCaptureScreenState extends ConsumerState<ReceiptCaptureScreen>
         // Fallback: nếu backend chưa khởi động lại hoặc trả 404, dùng Data URI để không gián đoạn
         final fallbackUrl =
             'data:image/jpeg;base64,${base64Encode(_capturedBytes!)}';
-        AppToast.show(
-          context,
-          message:
-              'Máy chủ Cloudinary (404). Đã lưu ảnh xem trước để tiếp tục!',
-          type: ToastType.warning,
-        );
-        Navigator.of(context).pop(fallbackUrl);
+        _onSuccess(fallbackUrl);
       }
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    const bgHud = Color(0xFF000000); // Đen thuần chuẩn Locket
+    const bgHud = Colors.white; // Nền trắng chuẩn theo yêu cầu
+    const textDark = Color(0xFF0F172A);
+    const borderLight = Color(0xFFE2E8F0);
+    const pillBg = Color(0xFFF1F5F9);
 
     return Scaffold(
       backgroundColor: bgHud,
       body: SafeArea(
         child: Stack(
           children: [
-            // Nội dung chính: Camera Viewport phong cách Locket
+            // Nội dung chính: Camera Viewport chuẩn bố cục Locket mới
             Column(
               children: [
-                // 1. Top HUD Action Bar
-                _buildTopBar(),
+                // 1. Top HUD Action Bar (Nút Đóng - Capsule tiêu đề ở giữa - Nút Đèn Flash)
+                _buildLocketTopBar(textDark, borderLight, pillBg),
 
                 // 2. Viewfinder Squircle Locket
                 Expanded(
                   child: Center(
-                    child: _buildViewfinder(),
+                    child: _buildLocketViewfinder(),
                   ),
                 ),
 
-                // 3. Bottom Controls Locket (Shutter tròn to đặc trưng)
-                _buildBottomControls(),
+                // 3. Bottom Controls Locket (Shutter xanh hệ thống & Nút Lịch sử)
+                _buildLocketBottomControls(textDark, borderLight, pillBg),
               ],
             ),
 
             // Loading Overlay khi đang upload Cloudinary
             if (_isUploading)
               Container(
-                color: Colors.black.withValues(alpha: 0.8),
+                color: Colors.black.withValues(alpha: 0.6),
                 child: Center(
                   child: Container(
                     padding: const EdgeInsets.symmetric(
@@ -197,17 +227,17 @@ class _ReceiptCaptureScreenState extends ConsumerState<ReceiptCaptureScreen>
                       vertical: 24,
                     ),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF1E293B),
+                      color: Colors.white,
                       borderRadius: BorderRadius.circular(24),
                       border: Border.all(
-                        color: AppColors.primary.withValues(alpha: 0.5),
+                        color: AppColors.primary.withValues(alpha: 0.3),
                         width: 1.5,
                       ),
                       boxShadow: [
                         BoxShadow(
-                          color: AppColors.primary.withValues(alpha: 0.35),
-                          blurRadius: 24,
-                          offset: const Offset(0, 8),
+                          color: Colors.black.withValues(alpha: 0.15),
+                          blurRadius: 30,
+                          offset: const Offset(0, 10),
                         ),
                       ],
                     ),
@@ -228,7 +258,7 @@ class _ReceiptCaptureScreenState extends ConsumerState<ReceiptCaptureScreen>
                           style: GoogleFonts.inter(
                             fontSize: 14,
                             fontWeight: FontWeight.w700,
-                            color: Colors.white,
+                            color: const Color(0xFF0F172A),
                           ),
                         ),
                         const SizedBox(height: 6),
@@ -236,7 +266,7 @@ class _ReceiptCaptureScreenState extends ConsumerState<ReceiptCaptureScreen>
                           'Đang tải lên hệ thống...',
                           style: GoogleFonts.inter(
                             fontSize: 12,
-                            color: const Color(0xFF94A3B8),
+                            color: const Color(0xFF64748B),
                           ),
                         ),
                       ],
@@ -250,58 +280,83 @@ class _ReceiptCaptureScreenState extends ConsumerState<ReceiptCaptureScreen>
     );
   }
 
-  Widget _buildTopBar() {
+  /// 1. Top Bar chuẩn phong cách Locket mới
+  Widget _buildLocketTopBar(Color textDark, Color borderLight, Color pillBg) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          // Nút Đóng frosted
+          // Nút Đóng / Quay lại tròn bên trái
           InkWell(
             onTap: () => Navigator.of(context).pop(),
             borderRadius: BorderRadius.circular(99),
             child: Container(
-              width: 42,
-              height: 42,
+              width: 44,
+              height: 44,
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.12),
+                color: pillBg,
                 shape: BoxShape.circle,
-                border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
+                border: Border.all(color: borderLight),
               ),
               child: const Icon(
                 Icons.close_rounded,
-                color: Colors.white,
-                size: 20,
+                color: Color(0xFF1E293B),
+                size: 22,
               ),
             ),
           ),
 
-          // Tiêu đề tối giản (Đã bỏ Finora AI Vision theo yêu cầu)
-          Text(
-            'Hóa đơn',
-            style: GoogleFonts.outfit(
-              fontSize: 18,
-              fontWeight: FontWeight.w800,
-              color: Colors.white,
-              letterSpacing: -0.2,
+          // Capsule Pill lớn ở giữa (Chuẩn Locket pill như "👥 613 người bạn")
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
+            decoration: BoxDecoration(
+              color: pillBg,
+              borderRadius: BorderRadius.circular(99),
+              border: Border.all(color: borderLight),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(
+                  Icons.receipt_long_rounded,
+                  color: AppColors.primary,
+                  size: 18,
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  _capturedBytes == null ? 'Chụp hóa đơn' : 'Xem trước hóa đơn',
+                  style: GoogleFonts.inter(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w700,
+                    color: textDark,
+                    letterSpacing: -0.2,
+                  ),
+                ),
+              ],
             ),
           ),
 
-          // Nút Đèn flash / Góc chụp frosted
+          // Nút Đèn flash / Bật đèn pin thật
           InkWell(
-            onTap: () => _pickImage(ImageSource.camera),
+            onTap: _toggleFlash,
             borderRadius: BorderRadius.circular(99),
             child: Container(
-              width: 42,
-              height: 42,
+              width: 44,
+              height: 44,
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.12),
+                color: _isFlashOn ? const Color(0xFFFEF3C7) : pillBg,
                 shape: BoxShape.circle,
-                border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
+                border: Border.all(
+                  color: _isFlashOn ? const Color(0xFFFBBF24) : borderLight,
+                  width: _isFlashOn ? 1.5 : 1,
+                ),
               ),
-              child: const Icon(
-                Icons.flash_on_rounded,
-                color: Color(0xFFFBBF24),
+              child: Icon(
+                _isFlashOn ? Icons.flash_on_rounded : Icons.flash_off_rounded,
+                color: _isFlashOn
+                    ? const Color(0xFFD97706)
+                    : const Color(0xFF64748B),
                 size: 20,
               ),
             ),
@@ -311,399 +366,274 @@ class _ReceiptCaptureScreenState extends ConsumerState<ReceiptCaptureScreen>
     );
   }
 
-  Widget _buildViewfinder() {
+  /// 2. Khung ngắm Squircle Locket HÌNH VUÔNG 1:1 chuẩn
+  Widget _buildLocketViewfinder() {
     final screenWidth = MediaQuery.of(context).size.width;
-    // Khung ngắm Squircle Locket với kích thước tối ưu cho hóa đơn dọc
-    final boxWidth = (screenWidth - 32).clamp(280.0, 380.0);
-    final boxHeight = (boxWidth * 1.34).clamp(380.0, 500.0);
+    // Khung ngắm Squircle Locket hình vuông chuẩn 1:1
+    final boxSize = (screenWidth - 32).clamp(280.0, 390.0);
 
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Container(
-          width: boxWidth,
-          height: boxHeight,
-          decoration: BoxDecoration(
-            color: const Color(0xFF0F172A),
-            borderRadius: BorderRadius.circular(36), // Bo tròn lớn chuẩn Locket
-            border: Border.all(
-              color: Colors.white.withValues(alpha: 0.22),
-              width: 2.2,
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.8),
-                blurRadius: 36,
-                spreadRadius: 4,
-              ),
-            ],
+    return Container(
+      width: boxSize,
+      height: boxSize,
+      decoration: BoxDecoration(
+        color: const Color(0xFF111827), // Nền xám đen sang trọng trong khung ngắm
+        borderRadius: BorderRadius.circular(38), // Bo tròn lớn chuẩn Locket
+        border: Border.all(
+          color: const Color(0xFFE2E8F0),
+          width: 2,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.12),
+            blurRadius: 28,
+            spreadRadius: 2,
+            offset: const Offset(0, 8),
           ),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(34),
-            child: Stack(
-              fit: StackFit.expand,
-              children: [
-                // Khung nền camera preview
-                if (_capturedBytes != null)
-                  Image.memory(
-                    _capturedBytes!,
-                    fit: BoxFit.cover,
-                    alignment: Alignment.topCenter,
-                  )
-                else
-                  Container(
-                    color: const Color(0xFF0B0F19),
-                    child: Stack(
-                      alignment: Alignment.center,
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(36),
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            // Ảnh đã chụp hoặc Khung ngắm Camera
+            if (_capturedBytes != null)
+              Image.memory(
+                _capturedBytes!,
+                fit: BoxFit.cover,
+                alignment: Alignment.center,
+              )
+            else
+              Container(
+                color: const Color(0xFF0F172A),
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    // Hướng dẫn căn chỉnh
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        // Họa tiết nền mờ & hướng dẫn tối giản
-                        Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Container(
-                              width: 64,
-                              height: 64,
-                              decoration: BoxDecoration(
-                                color: Colors.white.withValues(alpha: 0.06),
-                                shape: BoxShape.circle,
-                                border: Border.all(
-                                  color: Colors.white.withValues(alpha: 0.12),
-                                ),
-                              ),
-                              child: const Icon(
-                                Icons.receipt_long_rounded,
-                                size: 30,
-                                color: Colors.white70,
-                              ),
-                            ),
-                            const SizedBox(height: 14),
-                            Text(
-                              'Căn chỉnh hóa đơn trong khung',
-                              style: GoogleFonts.inter(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.white70,
-                              ),
-                            ),
-                          ],
-                        ),
-
-                        // Tâm ngắm focus tinh tế chuẩn Locket
                         Container(
-                          width: 24,
-                          height: 24,
+                          width: 68,
+                          height: 68,
                           decoration: BoxDecoration(
+                            color: Colors.white.withValues(alpha: 0.08),
                             shape: BoxShape.circle,
                             border: Border.all(
-                              color: AppColors.primary.withValues(alpha: 0.6),
-                              width: 1.5,
+                              color: Colors.white.withValues(alpha: 0.15),
                             ),
+                          ),
+                          child: const Icon(
+                            Icons.camera_alt_rounded,
+                            size: 32,
+                            color: Colors.white70,
+                          ),
+                        ),
+                        const SizedBox(height: 14),
+                        Text(
+                          'Căn chỉnh hóa đơn trong khung',
+                          style: GoogleFonts.inter(
+                            fontSize: 13.5,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.white70,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          'Chụp rõ nét chứng từ để lưu trữ',
+                          style: GoogleFonts.inter(
+                            fontSize: 11.5,
+                            color: Colors.white38,
                           ),
                         ),
                       ],
                     ),
-                  ),
 
-                // Laser quét chuyển động mềm mại (chỉ chạy khi chưa chụp)
-                if (_capturedBytes == null)
-                  AnimatedBuilder(
-                    animation: _laserAnimation,
-                    builder: (context, child) {
-                      return Positioned(
-                        top: boxHeight * _laserAnimation.value,
-                        left: 12,
-                        right: 12,
-                        child: Container(
-                          height: 2.5,
-                          decoration: BoxDecoration(
-                            gradient: const LinearGradient(
-                              colors: [
-                                Colors.transparent,
-                                Color(0xFF38BDF8),
-                                AppColors.primary,
-                                Color(0xFF38BDF8),
-                                Colors.transparent,
-                              ],
-                            ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: const Color(0xFF38BDF8)
-                                    .withValues(alpha: 0.8),
-                                blurRadius: 12,
-                                spreadRadius: 1,
-                              ),
-                            ],
-                          ),
+                    // Tâm ngắm focus chuẩn Locket
+                    Container(
+                      width: 26,
+                      height: 26,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: AppColors.primary,
+                          width: 2,
                         ),
-                      );
-                    },
-                  ),
-              ],
-            ),
-          ),
-        ),
-
-        const SizedBox(height: 12),
-
-        // Nhãn trạng thái tối giản
-        if (_capturedBytes != null)
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 5),
-            decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Icon(
-                  Icons.check_circle_rounded,
-                  size: 14,
-                  color: Color(0xFF34D399),
-                ),
-                const SizedBox(width: 6),
-                Flexible(
-                    child: Text(
-                  'Đã chụp xong chứng từ',
-                  style: GoogleFonts.inter(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.white,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                )),
-              ],
-            ),
-          )
-        else
-          Text(
-            'Giữ thẳng góc và chụp đủ sáng',
-            style: GoogleFonts.inter(
-              fontSize: 11.5,
-              fontWeight: FontWeight.w500,
-              color: Colors.white38,
-            ),
-          ),
-      ],
-    );
-  }
-
-  Widget _buildBottomControls() {
-    return Container(
-      padding: const EdgeInsets.fromLTRB(28, 8, 28, 28),
-      child: _capturedBytes == null
-          ? _buildCameraShutterControls()
-          : _buildPreviewActions(),
-    );
-  }
-
-  /// Khi chưa chụp: Nút Shutter to tròn nổi bật phong cách Locket
-  Widget _buildCameraShutterControls() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        // 1. Thư viện ảnh (Frosted icon circle)
-        Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            InkWell(
-              onTap: () => _pickImage(ImageSource.gallery),
-              borderRadius: BorderRadius.circular(99),
-              child: Container(
-                width: 52,
-                height: 52,
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.14),
-                  shape: BoxShape.circle,
-                  border:
-                      Border.all(color: Colors.white.withValues(alpha: 0.25)),
-                ),
-                child: const Icon(
-                  Icons.photo_library_rounded,
-                  color: Colors.white,
-                  size: 22,
+                      ),
+                    ),
+                  ],
                 ),
               ),
-            ),
-            const SizedBox(height: 6),
-            Text(
-              'Thư viện',
-              style: GoogleFonts.inter(
-                fontSize: 11,
-                fontWeight: FontWeight.w600,
-                color: Colors.white70,
-              ),
-            ),
           ],
         ),
+      ),
+    );
+  }
 
-        // 2. Nút chụp Shutter Locket đặc trưng (Vòng tròn kép lớn)
-        GestureDetector(
-          onTap: () => _pickImage(ImageSource.camera),
-          child: Container(
-            width: 84,
-            height: 84,
-            padding: const EdgeInsets.all(4.5),
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(color: Colors.white, width: 4.5),
-            ),
+  /// 3. Bottom Controls Locket: Shutter xanh hệ thống & Footer Lịch sử
+  Widget _buildLocketBottomControls(
+      Color textDark, Color borderLight, Color pillBg) {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(28, 12, 28, 20),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // Hàng điều khiển nút bấm
+          _capturedBytes == null
+              ? _buildLocketShutterRow(textDark, borderLight, pillBg)
+              : _buildLocketPreviewRow(textDark, borderLight, pillBg),
+
+          const SizedBox(height: 14),
+
+          // Capsule pill "Lịch sử hóa đơn v" chuẩn Locket
+          InkWell(
+            onTap: () {
+              // Điều hướng xem danh sách giao dịch
+              context.pushNamed(RouteNames.transactions);
+            },
+            borderRadius: BorderRadius.circular(99),
             child: Container(
-              decoration: const BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.white,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black26,
-                    blurRadius: 8,
-                    offset: Offset(0, 2),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 7),
+              decoration: BoxDecoration(
+                color: pillBg,
+                borderRadius: BorderRadius.circular(99),
+                border: Border.all(color: borderLight),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    width: 20,
+                    height: 20,
+                    decoration: const BoxDecoration(
+                      color: AppColors.primary,
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      Icons.history_rounded,
+                      size: 13,
+                      color: Colors.white,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    'Lịch sử hóa đơn',
+                    style: GoogleFonts.inter(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: const Color(0xFF334155),
+                    ),
+                  ),
+                  const SizedBox(width: 4),
+                  const Icon(
+                    Icons.keyboard_arrow_down_rounded,
+                    size: 16,
+                    color: Color(0xFF64748B),
                   ),
                 ],
               ),
             ),
           ),
+        ],
+      ),
+    );
+  }
+
+  /// Hàng nút khi CHƯA CHỤP: Thư viện (trái) - Nút chụp xanh hệ thống (giữa) - Đổi camera (phải)
+  Widget _buildLocketShutterRow(
+      Color textDark, Color borderLight, Color pillBg) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        // 1. Thư viện ảnh (Icon khung ảnh chuẩn Locket)
+        InkWell(
+          onTap: () => _pickImage(ImageSource.gallery),
+          borderRadius: BorderRadius.circular(99),
+          child: Container(
+            width: 52,
+            height: 52,
+            decoration: BoxDecoration(
+              color: pillBg,
+              shape: BoxShape.circle,
+              border: Border.all(color: borderLight),
+            ),
+            child: const Icon(
+              Icons.photo_library_outlined,
+              color: Color(0xFF1E293B),
+              size: 24,
+            ),
+          ),
         ),
 
-        // 3. Đổi camera / Góc chụp
-        Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            InkWell(
-              onTap: () => _pickImage(ImageSource.camera),
-              borderRadius: BorderRadius.circular(99),
-              child: Container(
-                width: 52,
-                height: 52,
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.14),
-                  shape: BoxShape.circle,
-                  border:
-                      Border.all(color: Colors.white.withValues(alpha: 0.25)),
-                ),
-                child: const Icon(
-                  Icons.flip_camera_ios_rounded,
+        // 2. NÚT CHỤP SHUTTER LOCKET: MÀU XANH HỆ THỐNG (Vòng tròn ngoài + Nút tròn trong)
+        GestureDetector(
+          onTap: () => _pickImage(ImageSource.camera),
+          child: Container(
+            width: 88,
+            height: 88,
+            padding: const EdgeInsets.all(4.5),
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(
+                color: AppColors.primary,
+                width: 4.5, // Viền ngoài màu xanh thương hiệu chuẩn Locket
+              ),
+            ),
+            child: Container(
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: AppColors.primary, // Solid màu xanh hệ thống #0072D6
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.primary.withValues(alpha: 0.45),
+                    blurRadius: 18,
+                    offset: const Offset(0, 6),
+                  ),
+                ],
+              ),
+              child: const Center(
+                child: Icon(
+                  Icons.camera_alt_rounded,
                   color: Colors.white,
-                  size: 22,
+                  size: 32,
                 ),
               ),
             ),
-            const SizedBox(height: 6),
-            Text(
-              'Chụp',
-              style: GoogleFonts.inter(
-                fontSize: 11,
-                fontWeight: FontWeight.w600,
-                color: Colors.white70,
-              ),
+          ),
+        ),
+
+        // 3. Đổi camera trước / sau (Icon xoay tròn chuẩn Locket)
+        InkWell(
+          onTap: _toggleCamera,
+          borderRadius: BorderRadius.circular(99),
+          child: Container(
+            width: 52,
+            height: 52,
+            decoration: BoxDecoration(
+              color: pillBg,
+              shape: BoxShape.circle,
+              border: Border.all(color: borderLight),
             ),
-          ],
+            child: const Icon(
+              Icons.cached_rounded,
+              color: Color(0xFF1E293B),
+              size: 26,
+            ),
+          ),
         ),
       ],
     );
   }
 
-  /// Khi đã có ảnh: Nút Chụp lại & Nút Lưu ảnh phong cách Locket
-  Widget _buildPreviewActions() {
+  /// Hàng nút khi ĐÃ CHỤP XONG: Hủy bỏ (trái) - Xác nhận xanh hệ thống (giữa) - Chụp lại (phải)
+  Widget _buildLocketPreviewRow(
+      Color textDark, Color borderLight, Color pillBg) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        // 1. Chụp lại (Frosted circle)
-        Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            InkWell(
-              onTap: () {
-                setState(() {
-                  _capturedBytes = null;
-                  _capturedName = null;
-                });
-              },
-              borderRadius: BorderRadius.circular(99),
-              child: Container(
-                width: 54,
-                height: 54,
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.14),
-                  shape: BoxShape.circle,
-                  border:
-                      Border.all(color: Colors.white.withValues(alpha: 0.25)),
-                ),
-                child: const Icon(
-                  Icons.refresh_rounded,
-                  color: Colors.white,
-                  size: 24,
-                ),
-              ),
-            ),
-            const SizedBox(height: 6),
-            Text(
-              'Chụp lại',
-              style: GoogleFonts.inter(
-                fontSize: 11,
-                fontWeight: FontWeight.w600,
-                color: Colors.white,
-              ),
-            ),
-          ],
-        ),
-
-        // 2. Nút Lưu ảnh chính (Nút tròn thương hiệu to nổi bật kiểu Locket Send)
-        Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            GestureDetector(
-              onTap: _isUploading ? null : _handleUploadAndSave,
-              child: Container(
-                width: 82,
-                height: 82,
-                padding: const EdgeInsets.all(4),
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color: AppColors.primary.withValues(alpha: 0.4),
-                    width: 3.5,
-                  ),
-                ),
-                child: Container(
-                  decoration: const BoxDecoration(
-                    shape: BoxShape.circle,
-                    gradient: LinearGradient(
-                      colors: [AppColors.primary, Color(0xFF0284C7)],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppColors.primary,
-                        blurRadius: 18,
-                        offset: Offset(0, 4),
-                      ),
-                    ],
-                  ),
-                  child: const Icon(
-                    Icons.check_rounded,
-                    color: Colors.white,
-                    size: 38,
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(height: 6),
-            Text(
-              'Lưu hóa đơn',
-              style: GoogleFonts.inter(
-                fontSize: 12,
-                fontWeight: FontWeight.w800,
-                color: Colors.white,
-              ),
-            ),
-          ],
-        ),
-
-        // 3. Hủy bỏ ảnh
+        // 1. Nút Hủy bỏ
         Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -720,25 +650,115 @@ class _ReceiptCaptureScreenState extends ConsumerState<ReceiptCaptureScreen>
                 width: 54,
                 height: 54,
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.14),
+                  color: const Color(0xFFFEE2E2),
                   shape: BoxShape.circle,
-                  border:
-                      Border.all(color: Colors.white.withValues(alpha: 0.25)),
+                  border: Border.all(color: const Color(0xFFFECACA)),
                 ),
                 child: const Icon(
                   Icons.close_rounded,
-                  color: Colors.white70,
-                  size: 24,
+                  color: Color(0xFFDC2626),
+                  size: 26,
                 ),
               ),
             ),
             const SizedBox(height: 6),
             Text(
-              'Hủy',
+              'Hủy bỏ',
               style: GoogleFonts.inter(
-                fontSize: 11,
-                fontWeight: FontWeight.w600,
-                color: Colors.white70,
+                fontSize: 12,
+                fontWeight: FontWeight.w700,
+                color: const Color(0xFF64748B),
+              ),
+            ),
+          ],
+        ),
+
+        // 2. NÚT XÁC NHẬN CHÍNH GIỮA: MÀU XANH HỆ THỐNG
+        Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            GestureDetector(
+              onTap: _isUploading ? null : _handleUploadAndSave,
+              child: Container(
+                width: 88,
+                height: 88,
+                padding: const EdgeInsets.all(4.5),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: AppColors.primary,
+                    width: 4.5,
+                  ),
+                ),
+                child: Container(
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: AppColors.primary,
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.primary.withValues(alpha: 0.5),
+                        blurRadius: 20,
+                        offset: const Offset(0, 6),
+                      ),
+                    ],
+                  ),
+                  child: const Center(
+                    child: Icon(
+                      Icons.check_rounded,
+                      color: Colors.white,
+                      size: 42,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              'Xác nhận',
+              style: GoogleFonts.inter(
+                fontSize: 13,
+                fontWeight: FontWeight.w800,
+                color: AppColors.primary,
+              ),
+            ),
+          ],
+        ),
+
+        // 3. Nút Chụp lại
+        Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            InkWell(
+              onTap: () {
+                setState(() {
+                  _capturedBytes = null;
+                  _capturedName = null;
+                });
+                _pickImage(ImageSource.camera);
+              },
+              borderRadius: BorderRadius.circular(99),
+              child: Container(
+                width: 54,
+                height: 54,
+                decoration: BoxDecoration(
+                  color: pillBg,
+                  shape: BoxShape.circle,
+                  border: Border.all(color: borderLight),
+                ),
+                child: const Icon(
+                  Icons.refresh_rounded,
+                  color: Color(0xFF1E293B),
+                  size: 26,
+                ),
+              ),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              'Chụp lại',
+              style: GoogleFonts.inter(
+                fontSize: 12,
+                fontWeight: FontWeight.w700,
+                color: const Color(0xFF64748B),
               ),
             ),
           ],

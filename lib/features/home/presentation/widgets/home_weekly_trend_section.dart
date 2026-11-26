@@ -252,7 +252,77 @@ class _HomeWeeklyTrendSectionState
     defaultIndex: 5,
   );
 
+  static const _emptyData7d = _PeriodDataset(
+    sub: '7 ngày gần nhất · Đơn vị: nghìn ₫',
+    income: '₫0',
+    expense: '₫0',
+    surplus: '₫0',
+    bench: 'Chưa có chi tiêu',
+    benchFraction: 0.1,
+    days: [
+      _ChartDayItem(day: 'T2', incomeHeight: 0.05, expenseHeight: 0.05, inVal: '₫0', expVal: '₫0', inAmt: 0, expAmt: 0, title: 'Thứ Hai', note: 'Chưa có giao dịch'),
+      _ChartDayItem(day: 'T3', incomeHeight: 0.05, expenseHeight: 0.05, inVal: '₫0', expVal: '₫0', inAmt: 0, expAmt: 0, title: 'Thứ Ba', note: 'Chưa có giao dịch'),
+      _ChartDayItem(day: 'T4', incomeHeight: 0.05, expenseHeight: 0.05, inVal: '₫0', expVal: '₫0', inAmt: 0, expAmt: 0, title: 'Thứ Tư', note: 'Chưa có giao dịch'),
+      _ChartDayItem(day: 'T5', incomeHeight: 0.05, expenseHeight: 0.05, inVal: '₫0', expVal: '₫0', inAmt: 0, expAmt: 0, title: 'Thứ Năm', note: 'Chưa có giao dịch'),
+      _ChartDayItem(day: 'T6', incomeHeight: 0.05, expenseHeight: 0.05, inVal: '₫0', expVal: '₫0', inAmt: 0, expAmt: 0, title: 'Thứ Sáu', note: 'Chưa có giao dịch'),
+      _ChartDayItem(day: 'T7', incomeHeight: 0.05, expenseHeight: 0.05, inVal: '₫0', expVal: '₫0', inAmt: 0, expAmt: 0, title: 'Thứ Bảy', note: 'Chưa có giao dịch'),
+      _ChartDayItem(day: 'CN', incomeHeight: 0.05, expenseHeight: 0.05, inVal: '₫0', expVal: '₫0', inAmt: 0, expAmt: 0, title: 'Chủ Nhật', note: 'Chưa có giao dịch'),
+    ],
+    defaultIndex: 6,
+  );
+
+  static const _emptyData4w = _PeriodDataset(
+    sub: '4 tuần qua trong tháng · Đơn vị: triệu ₫',
+    income: '₫0',
+    expense: '₫0',
+    surplus: '₫0',
+    bench: 'Chưa có chi tiêu',
+    benchFraction: 0.1,
+    days: [
+      _ChartDayItem(day: 'W1', incomeHeight: 0.05, expenseHeight: 0.05, inVal: '₫0', expVal: '₫0', inAmt: 0, expAmt: 0, title: 'Tuần 1', note: 'Chưa có giao dịch'),
+      _ChartDayItem(day: 'W2', incomeHeight: 0.05, expenseHeight: 0.05, inVal: '₫0', expVal: '₫0', inAmt: 0, expAmt: 0, title: 'Tuần 2', note: 'Chưa có giao dịch'),
+      _ChartDayItem(day: 'W3', incomeHeight: 0.05, expenseHeight: 0.05, inVal: '₫0', expVal: '₫0', inAmt: 0, expAmt: 0, title: 'Tuần 3', note: 'Chưa có giao dịch'),
+      _ChartDayItem(day: 'W4', incomeHeight: 0.05, expenseHeight: 0.05, inVal: '₫0', expVal: '₫0', inAmt: 0, expAmt: 0, title: 'Tuần 4', note: 'Chưa có giao dịch'),
+    ],
+    defaultIndex: 3,
+  );
+
+  static const _emptyDataMonth = _PeriodDataset(
+    sub: 'So sánh các tháng gần nhất · Đơn vị: triệu ₫',
+    income: '₫0',
+    expense: '₫0',
+    surplus: '₫0',
+    bench: 'Chưa có chi tiêu',
+    benchFraction: 0.1,
+    days: [
+      _ChartDayItem(day: 'T1', incomeHeight: 0.05, expenseHeight: 0.05, inVal: '₫0', expVal: '₫0', inAmt: 0, expAmt: 0, title: 'Tháng 1', note: 'Chưa có giao dịch'),
+      _ChartDayItem(day: 'T2', incomeHeight: 0.05, expenseHeight: 0.05, inVal: '₫0', expVal: '₫0', inAmt: 0, expAmt: 0, title: 'Tháng 2', note: 'Chưa có giao dịch'),
+      _ChartDayItem(day: 'T3', incomeHeight: 0.05, expenseHeight: 0.05, inVal: '₫0', expVal: '₫0', inAmt: 0, expAmt: 0, title: 'Tháng 3', note: 'Chưa có giao dịch'),
+      _ChartDayItem(day: 'T4', incomeHeight: 0.05, expenseHeight: 0.05, inVal: '₫0', expVal: '₫0', inAmt: 0, expAmt: 0, title: 'Tháng 4', note: 'Chưa có giao dịch'),
+      _ChartDayItem(day: 'T5', incomeHeight: 0.05, expenseHeight: 0.05, inVal: '₫0', expVal: '₫0', inAmt: 0, expAmt: 0, title: 'Tháng 5', note: 'Chưa có giao dịch'),
+      _ChartDayItem(day: 'T6', incomeHeight: 0.05, expenseHeight: 0.05, inVal: '₫0', expVal: '₫0', inAmt: 0, expAmt: 0, title: 'Tháng 6', note: 'Chưa có giao dịch'),
+    ],
+    defaultIndex: 5,
+  );
+
   _PeriodDataset _getCurrentData(CashFlowModel? realCashFlow) {
+    final hasData = realCashFlow != null &&
+        (realCashFlow.timeline.isNotEmpty ||
+            realCashFlow.totalIncome > 0 ||
+            realCashFlow.totalExpense > 0);
+
+    if (!hasData) {
+      switch (_selectedPeriod) {
+        case '4w':
+          return _emptyData4w;
+        case 'month':
+          return _emptyDataMonth;
+        case '7d':
+        default:
+          return _emptyData7d;
+      }
+    }
+
     switch (_selectedPeriod) {
       case '4w':
         return _data4w;
@@ -260,29 +330,25 @@ class _HomeWeeklyTrendSectionState
         return _dataMonth;
       case '7d':
       default:
-        // Nếu API trả về timeline thật có dữ liệu thì cập nhật số tổng
-        if (realCashFlow != null && realCashFlow.timeline.isNotEmpty) {
-          final realTotalIn = realCashFlow.totalIncome;
-          final realTotalExp = realCashFlow.totalExpense;
-          final realSurplus = realTotalIn - realTotalExp;
-          return _PeriodDataset(
-            sub: _data7d.sub,
-            income: realTotalIn > 0
-                ? CurrencyFormatter.formatCompact(realTotalIn)
-                : _data7d.income,
-            expense: realTotalExp > 0
-                ? CurrencyFormatter.formatCompact(realTotalExp)
-                : _data7d.expense,
-            surplus: realSurplus >= 0
-                ? '+${CurrencyFormatter.formatCompact(realSurplus)}'
-                : '-${CurrencyFormatter.formatCompact(realSurplus.abs())}',
-            bench: _data7d.bench,
-            benchFraction: _data7d.benchFraction,
-            days: _data7d.days,
-            defaultIndex: _data7d.defaultIndex,
-          );
-        }
-        return _data7d;
+        final realTotalIn = realCashFlow.totalIncome;
+        final realTotalExp = realCashFlow.totalExpense;
+        final realSurplus = realTotalIn - realTotalExp;
+        return _PeriodDataset(
+          sub: _data7d.sub,
+          income: realTotalIn > 0
+              ? CurrencyFormatter.formatCompact(realTotalIn)
+              : _data7d.income,
+          expense: realTotalExp > 0
+              ? CurrencyFormatter.formatCompact(realTotalExp)
+              : _data7d.expense,
+          surplus: realSurplus >= 0
+              ? '+${CurrencyFormatter.formatCompact(realSurplus)}'
+              : '-${CurrencyFormatter.formatCompact(realSurplus.abs())}',
+          bench: _data7d.bench,
+          benchFraction: _data7d.benchFraction,
+          days: _data7d.days,
+          defaultIndex: _data7d.defaultIndex,
+        );
     }
   }
 

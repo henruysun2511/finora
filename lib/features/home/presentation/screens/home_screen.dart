@@ -116,19 +116,33 @@ class HomeScreen extends ConsumerWidget {
                     children: [
                       // ── Mascot AI Insight Banner ────────────────────────
                       overviewAsync.maybeWhen(
-                        data: (ov) => MascotBanner(
-                          name: 'Nora AI',
-                          message:
-                              'Tỷ lệ tiết kiệm tháng này đạt ${ov.monthlyCashflow.savingsRate.toStringAsFixed(1)}%, thặng dư ròng +${(ov.monthlyCashflow.netCashflow / 1000000).toStringAsFixed(1)}M ₫!',
-                          actionText: 'Xem chi tiết',
-                          onAction: () => context.push(RoutePaths.dashboard),
-                        ),
+                        data: (ov) {
+                          if (ov.monthlyCashflow.income == 0 &&
+                              ov.monthlyCashflow.expense == 0) {
+                            return MascotBanner(
+                              name: 'Nora AI',
+                              message:
+                                  'Chào mừng bạn đến với Finora! Hãy thêm tài khoản và ghi nhận giao dịch đầu tiên để Nora đồng hành nhé.',
+                              actionText: 'Bắt đầu ngay',
+                              onAction: () =>
+                                  context.push(RoutePaths.createTransaction),
+                            );
+                          }
+                          return MascotBanner(
+                            name: 'Nora AI',
+                            message:
+                                'Tỷ lệ tiết kiệm tháng này đạt ${ov.monthlyCashflow.savingsRate.toStringAsFixed(1)}%, thặng dư ròng +${(ov.monthlyCashflow.netCashflow / 1000000).toStringAsFixed(1)}M ₫!',
+                            actionText: 'Xem chi tiết',
+                            onAction: () => context.push(RoutePaths.dashboard),
+                          );
+                        },
                         orElse: () => MascotBanner(
                           name: 'Nora AI',
                           message:
-                              'Bạn đã tiết kiệm được 47.6% thu nhập tháng này, vượt mục tiêu 10%!',
-                          actionText: 'Xem chi tiết',
-                          onAction: () => context.push(RoutePaths.dashboard),
+                              'Chào mừng bạn đến với Finora! Hãy thêm tài khoản và ghi nhận giao dịch đầu tiên để Nora đồng hành nhé.',
+                          actionText: 'Bắt đầu ngay',
+                          onAction: () =>
+                              context.push(RoutePaths.createTransaction),
                         ),
                       ),
                       const SizedBox(height: 14),

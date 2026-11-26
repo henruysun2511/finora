@@ -758,15 +758,8 @@ class WalletsOverviewScreen extends ConsumerWidget {
           Divider(height: 1, color: borderColor),
           if (accounts.isNotEmpty)
             ...accounts.map((acc) {
-              Color dotColor = AppColors.primary;
-              IconData icon = Icons.account_balance_rounded;
-              if (acc.type.isCash) {
-                dotColor = AppColors.success;
-                icon = Icons.account_balance_wallet_rounded;
-              } else if (acc.type.isEWallet) {
-                dotColor = const Color(0xFFA50064);
-                icon = Icons.smartphone_rounded;
-              }
+              final dotColor = acc.displayColor;
+              final icon = acc.displayIcon;
 
               return _buildWalletRow(
                 context: context,
@@ -811,18 +804,15 @@ class WalletsOverviewScreen extends ConsumerWidget {
         child: Row(
           children: [
             Container(
-              width: 9,
-              height: 9,
+              width: 24,
+              height: 24,
               decoration: BoxDecoration(
-                color: dotColor,
-                shape: BoxShape.circle,
+                color: dotColor.withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(6),
               ),
+              child: Icon(icon, size: 14, color: dotColor),
             ),
-            const SizedBox(width: 9),
-            Icon(icon,
-                size: 15,
-                color: isDark ? AppColors.darkMuted : AppColors.lightMuted),
-            const SizedBox(width: 7),
+            const SizedBox(width: 10),
             Expanded(
               child: Text(
                 name,
