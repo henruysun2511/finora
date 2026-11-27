@@ -112,8 +112,7 @@ class ChatInputBarState extends State<ChatInputBar> {
           widget.onSendMedia!(
             bytes,
             filename,
-            promptHint:
-                '📷 Đã tải lên ảnh hóa đơn: $filename. Hãy đọc bóc tách OCR giúp tôi.',
+            promptHint: '',
           );
         } else {
           widget.onSend(

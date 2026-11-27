@@ -288,9 +288,9 @@ class ChatBubble extends StatelessWidget {
   Widget _buildUserImageBubble(BuildContext context) {
     final bytes = message.mediaBytes;
     final url = message.imageUrl;
-    final hasCaption = message.textContent.isNotEmpty &&
-        !message.textContent.contains('Ảnh hóa đơn') &&
-        message.textContent != '📷 Ảnh hóa đơn';
+    final lowerText = message.textContent.trim().toLowerCase();
+    final hasCaption = lowerText.isNotEmpty &&
+        !lowerText.contains('ảnh hóa đơn');
 
     return GestureDetector(
       onTap: () => _showFullImageDialog(context, bytes: bytes, url: url),
