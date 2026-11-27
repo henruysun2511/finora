@@ -176,6 +176,11 @@ class AiChatNotifier extends StateNotifier<AiChatState> {
         isSending: false,
         mascotId: newMascot,
       );
+
+      final multiCount = assistantMsg.payloadJson?['multiCount'];
+      if (multiCount is num && multiCount > 1) {
+        await loadHistory(walletId);
+      }
     } catch (e) {
       String errorMessage = 'Không thể kết nối đến máy chủ AI. Vui lòng thử lại sau.';
       if (e is DioException) {
@@ -283,6 +288,11 @@ class AiChatNotifier extends StateNotifier<AiChatState> {
         isSending: false,
         mascotId: newMascot,
       );
+
+      final multiCount = assistantMsg.payloadJson?['multiCount'];
+      if (multiCount is num && multiCount > 1) {
+        await loadHistory(walletId);
+      }
     } catch (e) {
       String userFriendlyError =
           'Dịch vụ đọc hóa đơn đang bận. Vui lòng thử lại hoặc nhập tay.';
