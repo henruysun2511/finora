@@ -87,7 +87,7 @@ class ConfirmationPromptCard extends StatelessWidget {
         preview['account_name'] ??
         payload['accountName'] ??
         payload['account'] ??
-        'Tiền Mặt Sẵn Có';
+        'Chưa chọn tài khoản';
 
     final isIncome = preview['type']?.toString().toUpperCase() == 'INCOME' ||
         payload['type']?.toString().toUpperCase() == 'INCOME';

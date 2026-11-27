@@ -1,10 +1,12 @@
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 
+import '../../../../app/router/route_names.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/widgets/app_toast.dart';
 import '../../../../core/services/cloudinary_service.dart';
@@ -141,16 +143,6 @@ class _EditTransactionDraftBottomSheetState
     'Thu nhập phụ / Freelance',
     'Quà tặng / Được cho',
     'Thu nhập khác',
-  ];
-
-  // Tài khoản thanh toán phổ biến (fallback)
-  static const List<String> _accounts = [
-    'Tiền mặt',
-    'Vietcombank DigiBank',
-    'Techcombank Mobile',
-    'Ví MoMo',
-    'MB Bank',
-    'Thẻ tín dụng',
   ];
 
   @override
@@ -789,79 +781,126 @@ class _EditTransactionDraftBottomSheetState
                         ),
                       ),
                       const SizedBox(height: 6),
-                      DropdownButtonFormField<String>(
-                        value: _selectedAccountId != null &&
-                                userAccounts.any((a) => a.id == _selectedAccountId)
-                            ? _selectedAccountId
-                            : (userAccounts.isNotEmpty
-                                ? userAccounts.first.id
-                                : (_accounts.contains(_selectedAccount)
-                                    ? _selectedAccount
-                                    : _accounts.first)),
-                        isExpanded: true,
-                        dropdownColor:
-                            isDark ? AppColors.darkSurface : Colors.white,
-                        style: GoogleFonts.inter(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w600,
-                          color: isDark ? Colors.white : Colors.black87,
-                        ),
-                        decoration: InputDecoration(
-                          filled: true,
-                          fillColor: isDark
-                              ? const Color(0xFF0F172A)
-                              : const Color(0xFFF8FAFC),
-                          contentPadding: const EdgeInsets.symmetric(
+                      if (userAccounts.isEmpty)
+                        Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.symmetric(
                               horizontal: 12, vertical: 10),
-                          border: OutlineInputBorder(
+                          decoration: BoxDecoration(
+                            color: isDark
+                                ? const Color(0xFF0F172A)
+                                : const Color(0xFFF8FAFC),
                             borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide(
+                            border: Border.all(
                               color: isDark
                                   ? const Color(0xFF334155)
                                   : const Color(0xFFE2E8F0),
                             ),
                           ),
-                        ),
-                        items: userAccounts.isNotEmpty
-                            ? userAccounts.map((a) {
-                                final currentAmt = double.tryParse(_amountController.text) ?? 0.0;
-                                final isLow = isExpense && a.balance < currentAmt;
-                                final balanceStr = NumberFormat.currency(
-                                  locale: 'vi_VN',
-                                  symbol: '₫',
-                                  decimalDigits: 0,
-                                ).format(a.balance).trim();
-                                return DropdownMenuItem(
-                                  value: a.id,
-                                  child: Text(
-                                    '${a.name} ($balanceStr)',
-                                    overflow: TextOverflow.ellipsis,
-                                    style: TextStyle(
-                                      color: isLow
-                                          ? const Color(0xFFEF4444)
-                                          : (isDark ? Colors.white : Colors.black87),
-                                      fontWeight: isLow ? FontWeight.w700 : FontWeight.w500,
-                                    ),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  'Chưa có tài khoản nguồn tiền',
+                                  style: GoogleFonts.inter(
+                                    fontSize: 12.5,
+                                    fontWeight: FontWeight.w500,
+                                    color: isDark
+                                        ? AppColors.darkMuted
+                                        : AppColors.lightMuted,
                                   ),
-                                );
-                              }).toList()
-                            : _accounts.map((a) {
-                                return DropdownMenuItem(value: a, child: Text(a));
-                              }).toList(),
-                        onChanged: (val) {
-                          if (val != null) {
-                            if (userAccounts.any((a) => a.id == val)) {
-                              final acc = userAccounts.firstWhere((a) => a.id == val);
+                                ),
+                              ),
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                  context.push(RoutePaths.createAccount);
+                                },
+                                style: TextButton.styleFrom(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 8, vertical: 4),
+                                  minimumSize: Size.zero,
+                                  tapTargetSize:
+                                      MaterialTapTargetSize.shrinkWrap,
+                                ),
+                                child: Text(
+                                  '+ Thêm',
+                                  style: GoogleFonts.inter(
+                                    fontSize: 12.5,
+                                    fontWeight: FontWeight.w700,
+                                    color: AppColors.primary,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        )
+                      else
+                        DropdownButtonFormField<String>(
+                          value: _selectedAccountId != null &&
+                                  userAccounts.any((a) => a.id == _selectedAccountId)
+                              ? _selectedAccountId
+                              : userAccounts.first.id,
+                          isExpanded: true,
+                          dropdownColor:
+                              isDark ? AppColors.darkSurface : Colors.white,
+                          style: GoogleFonts.inter(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            color: isDark ? Colors.white : Colors.black87,
+                          ),
+                          decoration: InputDecoration(
+                            filled: true,
+                            fillColor: isDark
+                                ? const Color(0xFF0F172A)
+                                : const Color(0xFFF8FAFC),
+                            contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 12, vertical: 10),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide(
+                                color: isDark
+                                    ? const Color(0xFF334155)
+                                    : const Color(0xFFE2E8F0),
+                              ),
+                            ),
+                          ),
+                          items: userAccounts.map((a) {
+                            final currentAmt =
+                                double.tryParse(_amountController.text) ?? 0.0;
+                            final isLow = isExpense && a.balance < currentAmt;
+                            final balanceStr = NumberFormat.currency(
+                              locale: 'vi_VN',
+                              symbol: '₫',
+                              decimalDigits: 0,
+                            ).format(a.balance).trim();
+                            return DropdownMenuItem(
+                              value: a.id,
+                              child: Text(
+                                '${a.name} ($balanceStr)',
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  color: isLow
+                                      ? const Color(0xFFEF4444)
+                                      : (isDark ? Colors.white : Colors.black87),
+                                  fontWeight:
+                                      isLow ? FontWeight.w700 : FontWeight.w500,
+                                ),
+                              ),
+                            );
+                          }).toList(),
+                          onChanged: (val) {
+                            if (val != null &&
+                                userAccounts.any((a) => a.id == val)) {
+                              final acc =
+                                  userAccounts.firstWhere((a) => a.id == val);
                               setState(() {
                                 _selectedAccountId = acc.id;
                                 _selectedAccount = acc.name;
                               });
-                            } else {
-                              setState(() => _selectedAccount = val);
                             }
-                          }
-                        },
-                      ),
+                          },
+                        ),
                       // Cảnh báo số dư không đủ nếu tài khoản có balance < amount
                       if (userAccounts.isNotEmpty) ...[
                         Builder(
