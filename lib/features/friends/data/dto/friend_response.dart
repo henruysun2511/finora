@@ -27,9 +27,10 @@ class FriendResponseDto {
     final friend = json['friend'] as Map<String, dynamic>? ?? json;
     final id = json['id'] as String? ?? '';
     final friendId = friend['id'] as String? ?? id;
+    final fsId = json['friendshipId'] as String? ?? id;
 
     return FriendResponseDto(
-      friendshipId: id,
+      friendshipId: fsId,
       userId: friendId,
       fullName: friend['fullName'] as String? ?? '',
       username: friend['username'] as String? ?? (friend['email'] as String? ?? '').split('@').first,

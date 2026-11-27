@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../auth/presentation/providers/auth_provider.dart';
 import '../../domain/models/friend.dart';
 import '../../domain/models/friend_request.dart';
 import '../../domain/models/user_search_result.dart';
@@ -57,6 +58,13 @@ class FriendsListNotifier extends AsyncNotifier<FriendsListState> {
   @override
   Future<FriendsListState> build() async {
     ref.onDispose(() => _debounceTimer?.cancel());
+
+    // Tự động lắng nghe thay đổi Auth: đổi tài khoản hoặc đăng xuất sẽ fetch lại đúng dữ liệu
+    final user = ref.watch(authNotifierProvider).valueOrNull;
+    if (user == null) {
+      return const FriendsListState();
+    }
+
     final repo = ref.read(friendsRepositoryProvider);
     final results = await Future.wait([
       repo.getFriends(),
@@ -123,6 +131,17 @@ class FriendsListNotifier extends AsyncNotifier<FriendsListState> {
 
     try {
       await repo.sendFriendRequest(userId);
+      // Đồng bộ lại toàn bộ danh sách để cập nhật sentRequests và Auto-Accept (nếu có)
+      final results = await Future.wait([
+        repo.getFriends(),
+        repo.getFriendRequests(),
+        repo.getSentRequests(),
+      ]);
+      state = state.whenData((s) => s.copyWith(
+            friends: results[0] as List<Friend>,
+            pendingRequests: results[1] as List<FriendRequest>,
+            sentRequests: results[2] as List<FriendRequest>,
+          ));
     } catch (_) {
       // Revert nếu API thất bại
       state = state.whenData((s) {
@@ -179,6 +198,16 @@ class FriendsListNotifier extends AsyncNotifier<FriendsListState> {
 
     try {
       await repo.acceptFriendRequest(friendshipId);
+      final results = await Future.wait([
+        repo.getFriends(),
+        repo.getFriendRequests(),
+        repo.getSentRequests(),
+      ]);
+      state = state.whenData((s) => s.copyWith(
+            friends: results[0] as List<Friend>,
+            pendingRequests: results[1] as List<FriendRequest>,
+            sentRequests: results[2] as List<FriendRequest>,
+          ));
     } catch (_) {
       // Revert
       state = AsyncData(currentState);
@@ -202,6 +231,16 @@ class FriendsListNotifier extends AsyncNotifier<FriendsListState> {
 
     try {
       await repo.rejectFriendRequest(friendshipId);
+      final results = await Future.wait([
+        repo.getFriends(),
+        repo.getFriendRequests(),
+        repo.getSentRequests(),
+      ]);
+      state = state.whenData((s) => s.copyWith(
+            friends: results[0] as List<Friend>,
+            pendingRequests: results[1] as List<FriendRequest>,
+            sentRequests: results[2] as List<FriendRequest>,
+          ));
     } catch (_) {
       // Revert
       state = AsyncData(currentState);
