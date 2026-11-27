@@ -83,12 +83,6 @@ class RouteNames {
   static const String mascotShowcase = 'mascotShowcase';
   static const String notificationSettings = 'notificationSettings';
   static const String quickActionsSettings = 'quickActionsSettings';
-
-  // 11. Sample Features (CRUD Mẫu)
-  static const String products = 'products';
-  static const String productDetail = 'productDetail';
-  static const String createProduct = 'createProduct';
-  static const String editProduct = 'editProduct';
 }
 
 /// Định danh các URL Path tương ứng
@@ -180,10 +174,4 @@ class RoutePaths {
   static const String mascotShowcase = '/mascots/showcase';
   static const String notificationSettings = '/settings/notifications';
   static const String quickActionsSettings = '/settings/quick-actions';
-
-  // 11. Sample Features (CRUD Mẫu)
-  static const String products = '/products';
-  static const String productDetail = '/products/:id';
-  static const String createProduct = '/products/create';
-  static const String editProduct = '/products/:id/edit';
 }

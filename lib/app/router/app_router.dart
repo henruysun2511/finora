@@ -26,9 +26,6 @@ import '../../features/onboarding/presentation/screens/onboarding_mascot_screen.
 import '../../features/onboarding/presentation/screens/onboarding_profile_screen.dart';
 import '../../features/onboarding/presentation/screens/onboarding_wallet_screen.dart';
 import '../../features/onboarding/presentation/screens/onboarding_welcome_screen.dart';
-import '../../features/products/presentation/screens/product_detail_screen.dart';
-import '../../features/products/presentation/screens/product_form_screen.dart';
-import '../../features/products/presentation/screens/products_screen.dart';
 import '../../features/profile/presentation/screens/profile_screen.dart';
 import '../../features/profile/presentation/screens/user_profile_detail_screen.dart';
 import '../../features/mascot/presentation/screens/mascot_settings_screen.dart';
@@ -637,40 +634,6 @@ GoRouter appRouter(AppRouterRef ref) {
         parentNavigatorKey: _rootNavigatorKey,
         path: '/quick-actions',
         builder: (context, state) => const QuickActionsSettingsScreen(),
-      ),
-
-      // ==========================================
-      // 11. PHÂN HỆ MẪU: QUẢN LÝ SẢN PHẨM (CRUD Product)
-      // ==========================================
-      GoRoute(
-        parentNavigatorKey: _rootNavigatorKey,
-        path: RoutePaths.products,
-        name: RouteNames.products,
-        builder: (context, state) => const ProductsScreen(),
-      ),
-      GoRoute(
-        parentNavigatorKey: _rootNavigatorKey,
-        path: RoutePaths.createProduct,
-        name: RouteNames.createProduct,
-        builder: (context, state) => const ProductFormScreen(),
-      ),
-      GoRoute(
-        parentNavigatorKey: _rootNavigatorKey,
-        path: RoutePaths.editProduct,
-        name: RouteNames.editProduct,
-        builder: (context, state) {
-          final id = state.pathParameters['id'];
-          return ProductFormScreen(productId: id);
-        },
-      ),
-      GoRoute(
-        parentNavigatorKey: _rootNavigatorKey,
-        path: RoutePaths.productDetail,
-        name: RouteNames.productDetail,
-        builder: (context, state) {
-          final id = state.pathParameters['id'] ?? '';
-          return ProductDetailScreen(productId: id);
-        },
       ),
     ],
     errorBuilder: (context, state) => Scaffold(
