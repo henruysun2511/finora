@@ -460,13 +460,6 @@ class ProfileScreen extends ConsumerWidget {
                     ),
                   ],
                 ),
-                const SizedBox(height: 14),
-                ProfileSettingsTile(
-                  icon: Icons.inventory_2_rounded,
-                  title: 'Quản lý Sản phẩm (CRUD)',
-                  subtitle: 'Mẫu chuẩn Create, Read, Update, Delete',
-                  onTap: () => context.push(RoutePaths.products),
-                ),
               ],
             ),
           ),
