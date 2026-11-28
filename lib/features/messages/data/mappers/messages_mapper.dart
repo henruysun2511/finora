@@ -37,13 +37,17 @@ class MessagesMapper {
     return apiCodeToEmoji[code.toLowerCase()] ?? code;
   }
 
+  DateTime _parseLocalDateTime(String raw) {
+    return (DateTime.tryParse(raw) ?? DateTime.now()).toLocal();
+  }
+
   Conversation toDomainConversation(ConversationResponseDto dto) {
     return Conversation(
       id: dto.friendId,
       title: dto.friendFullName,
       avatar: dto.friendAvatar,
       lastMessageContent: dto.lastMessageContent,
-      lastMessageAt: DateTime.tryParse(dto.lastMessageAt) ?? DateTime.now(),
+      lastMessageAt: _parseLocalDateTime(dto.lastMessageAt),
       unreadCount: dto.unreadCount,
       isGroup: dto.isGroup,
       groupWalletName: dto.groupWalletName,
@@ -56,7 +60,7 @@ class MessagesMapper {
       name: dto.name,
       amount: dto.amount,
       photoUrl: dto.photoUrl,
-      transactionDate: DateTime.tryParse(dto.transactionDate) ?? DateTime.now(),
+      transactionDate: _parseLocalDateTime(dto.transactionDate),
       isExpense: dto.isExpense,
       groupWalletName: dto.groupWalletName,
     );
@@ -78,7 +82,7 @@ class MessagesMapper {
           : null,
       isMe: dto.senderId == currentUserId,
       isRead: dto.isRead,
-      createdAt: DateTime.tryParse(dto.createdAt) ?? DateTime.now(),
+      createdAt: _parseLocalDateTime(dto.createdAt),
       reactions: dto.reactions.map(toDisplayEmoji).toList(),
     );
   }

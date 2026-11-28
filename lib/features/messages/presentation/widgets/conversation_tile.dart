@@ -25,13 +25,16 @@ class ConversationTile extends StatelessWidget {
   }
 
   String _formatTime(DateTime dt) {
+    final local = dt.toLocal();
     final now = DateTime.now();
-    final diff = now.difference(dt);
+    final diff = now.difference(local);
     if (diff.inMinutes < 1) return 'Vừa xong';
     if (diff.inMinutes < 60) return '${diff.inMinutes}p';
-    if (diff.inHours < 24) return '${dt.hour}:${dt.minute.toString().padLeft(2, '0')}';
+    if (diff.inHours < 24) {
+      return '${local.hour.toString().padLeft(2, '0')}:${local.minute.toString().padLeft(2, '0')}';
+    }
     if (diff.inDays < 7) return '${diff.inDays} ngày';
-    return '${dt.day}/${dt.month}';
+    return '${local.day}/${local.month}';
   }
 
   @override
