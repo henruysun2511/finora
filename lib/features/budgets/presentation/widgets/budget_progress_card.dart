@@ -35,10 +35,19 @@ class BudgetProgressCard extends StatelessWidget {
     String pillText;
     IconData pillIcon;
 
-    if (pct >= 100.0) {
+    final isExceeded = budget.effectiveLimit > 0
+        ? budget.spentAmount > budget.effectiveLimit
+        : budget.spentAmount > 0;
+
+    if (isExceeded || pct > 100.0) {
       statusColor = AppColors.danger;
       pillBg = AppColors.danger.withValues(alpha: 0.12);
       pillText = 'Vượt';
+      pillIcon = Icons.error_outline_rounded;
+    } else if (pct >= 100.0) {
+      statusColor = AppColors.danger;
+      pillBg = AppColors.danger.withValues(alpha: 0.12);
+      pillText = 'Hết ngân sách';
       pillIcon = Icons.error_outline_rounded;
     } else if (pct >= 80.0) {
       statusColor = const Color(0xFFF97316); // Solarn Orange / Warn

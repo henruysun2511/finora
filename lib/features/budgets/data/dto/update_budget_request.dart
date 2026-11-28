@@ -16,11 +16,9 @@ class UpdateBudgetRequest {
     if (limitAmount != null) map['limitAmount'] = limitAmount;
     if (periodType != null) {
       map['period'] = periodType!.toLowerCase();
-      map['periodType'] = periodType!.toLowerCase();
     }
     if (isRolloverEnabled != null) {
       map['isRollover'] = isRolloverEnabled;
-      map['isRolloverEnabled'] = isRolloverEnabled;
     }
     return map;
   }

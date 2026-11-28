@@ -23,10 +23,8 @@ class CreateBudgetRequest {
         'limitAmount': limitAmount,
         // Backend NestJS nhận field 'period' (enum: 'weekly', 'monthly', 'yearly')
         'period': periodType.toLowerCase(),
-        'periodType': periodType.toLowerCase(),
         'startDate': startDate.toIso8601String().split('T').first,
         // Backend NestJS nhận field 'isRollover'
         'isRollover': isRolloverEnabled,
-        'isRolloverEnabled': isRolloverEnabled,
       };
 }

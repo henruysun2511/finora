@@ -492,6 +492,25 @@ class _HomePhotoCalendarSectionState
     final formattedDate = '$weekdayStr, $dayNum/${date.month}/${date.year}';
 
     final hasExpense = dayItem != null && dayItem.totalExpense > 0;
+    final dailyGridAsync = ref.watch(
+      monthlyDailyGridProvider(
+        (year: _currentMonth.year, month: _currentMonth.month),
+      ),
+    );
+    final dayTransactions = <dynamic>[];
+    final dailySummary = dailyGridAsync.valueOrNull;
+    if (dailySummary != null) {
+      for (final g in dailySummary.days) {
+        if (g.date.year == _currentMonth.year &&
+            g.date.month == _currentMonth.month &&
+            g.date.day == dayNum) {
+          dayTransactions.addAll(
+            g.transactions.where((tx) => tx.isExpense),
+          );
+          break;
+        }
+      }
+    }
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -589,40 +608,62 @@ class _HomePhotoCalendarSectionState
         ),
         const SizedBox(height: 10),
         if (hasExpense) ...[
-          // Danh sách các khoản chi tiêu minh họa khớp ngày đã chọn
-          _DayDetailRow(
-            isDark: isDark,
-            iconName: 'utensils',
-            name: 'Ăn uống',
-            meta: 'bữa chính · Tiền mặt',
-            amount: -dayItem.totalExpense * 0.65,
-            onTap: () => _openTransactionDetailModal(
-              context: context,
-              dateStr: formattedDate,
-              dayItem: dayItem,
-              dayNum: dayNum,
-              isDark: isDark,
-              initialIndex: 0,
-            ),
-          ),
-          if (dayItem.transactionCount > 1) ...[
-            const SizedBox(height: 8),
-            _DayDetailRow(
-              isDark: isDark,
-              iconName: 'coffee',
-              name: 'Cà phê & Đồ uống',
-              meta: 'Highlands Coffee · MoMo',
-              amount: -dayItem.totalExpense * 0.35,
-              onTap: () => _openTransactionDetailModal(
-                context: context,
-                dateStr: formattedDate,
-                dayItem: dayItem,
-                dayNum: dayNum,
-                isDark: isDark,
-                initialIndex: 1,
+          if (dayTransactions.isNotEmpty)
+            for (var i = 0; i < dayTransactions.length; i++) ...[
+              if (i > 0) const SizedBox(height: 8),
+              Builder(
+                builder: (context) {
+                  final tx = dayTransactions[i];
+                  final title = tx.name.isNotEmpty
+                      ? tx.name
+                      : (tx.categoryName ?? 'Chi tiêu');
+                  final metaParts = <String>[
+                    if (tx.categoryName != null &&
+                        tx.categoryName!.isNotEmpty)
+                      tx.categoryName!,
+                    if (tx.accountName != null && tx.accountName!.isNotEmpty)
+                      tx.accountName!,
+                  ];
+                  final meta = metaParts.isNotEmpty
+                      ? metaParts.join(' · ')
+                      : 'Chi tiêu';
+                  return _DayDetailRow(
+                    isDark: isDark,
+                    iconName: tx.categoryIcon ?? 'receipt',
+                    name: title,
+                    meta: meta,
+                    amount: -tx.amount,
+                    onTap: () => _openTransactionDetailModal(
+                      context: context,
+                      dateStr: formattedDate,
+                      dayItem: dayItem,
+                      dayNum: dayNum,
+                      isDark: isDark,
+                      initialIndex: i,
+                    ),
+                  );
+                },
+              ),
+            ]
+          else if (dailyGridAsync.isLoading)
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 12),
+              child: Center(
+                child: SizedBox(
+                  width: 18,
+                  height: 18,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                ),
+              ),
+            )
+          else
+            Text(
+              'Nhấn "Xem chi tiết" để xem giao dịch trong ngày.',
+              style: GoogleFonts.inter(
+                fontSize: 11.5,
+                color: isDark ? AppColors.darkMuted : AppColors.lightMuted,
               ),
             ),
-          ],
         ] else ...[
           Row(
             children: [
@@ -669,12 +710,20 @@ class _HomePhotoCalendarSectionState
   }) {
     if (dayItem == null) return;
 
-    final dailySummary = ref.read(dailyGridProvider).value;
+    final dailySummary = ref
+        .read(
+          monthlyDailyGridProvider(
+            (year: _currentMonth.year, month: _currentMonth.month),
+          ),
+        )
+        .valueOrNull;
     final List<_DetailTxEntry> entries = [];
 
     if (dailySummary != null) {
       for (final g in dailySummary.days) {
-        if (g.date.day == dayNum && g.date.month == _currentMonth.month) {
+        if (g.date.day == dayNum &&
+            g.date.month == _currentMonth.month &&
+            g.date.year == _currentMonth.year) {
           for (final tx in g.transactions) {
             entries.add(
               _DetailTxEntry(
@@ -697,41 +746,7 @@ class _HomePhotoCalendarSectionState
       }
     }
 
-    if (entries.isEmpty) {
-      final total = dayItem.totalExpense > 0 ? dayItem.totalExpense : 155000.0;
-      final p1 = dayItem.highlightPhotoUrl ??
-          'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=700&auto=format&fit=crop';
-      const p2 =
-          'https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=700&auto=format&fit=crop';
-
-      entries.add(
-        _DetailTxEntry(
-          title: 'Ăn uống',
-          category: 'Ăn uống & Nhà hàng',
-          categoryIcon: 'utensils',
-          account: 'Tiền mặt',
-          time: '12:30',
-          amount: -total * 0.65,
-          note: 'Bữa trưa chính cùng đồng nghiệp dự án FINORA',
-          photoUrl: p1,
-        ),
-      );
-
-      if (dayItem.transactionCount > 1) {
-        entries.add(
-          _DetailTxEntry(
-            title: 'Cà phê & Đồ uống',
-            category: 'Cà phê & Giải khát',
-            categoryIcon: 'coffee',
-            account: 'Ví MoMo',
-            time: '14:45',
-            amount: -total * 0.35,
-            note: 'Highlands Coffee - 2 Ly Phin Sữa Đá Cỡ Vừa',
-            photoUrl: p2,
-          ),
-        );
-      }
-    }
+    if (entries.isEmpty) return;
 
     showModalBottomSheet(
       context: context,

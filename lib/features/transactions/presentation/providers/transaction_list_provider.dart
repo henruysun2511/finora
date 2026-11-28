@@ -14,6 +14,13 @@ final dailyGridProvider =
   return DailyGridNotifier();
 });
 
+/// Provider nạp danh sách giao dịch theo tháng/năm cụ thể (dùng cho Lịch ảnh chi tiêu)
+final monthlyDailyGridProvider = FutureProvider.autoDispose
+    .family<MonthlyTransactionSummary, ({int year, int month})>((ref, params) {
+  final repo = ref.watch(transactionRepositoryProvider);
+  return repo.getDailyGrid(month: params.month, year: params.year);
+});
+
 class DailyGridNotifier extends AsyncNotifier<MonthlyTransactionSummary> {
   @override
   Future<MonthlyTransactionSummary> build() async {
