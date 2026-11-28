@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../auth/presentation/providers/auth_provider.dart';
+import '../../../auth/presentation/providers/auth_provider.dart';
 import '../../domain/models/friend.dart';
 import '../../domain/models/friend_request.dart';
 import '../../domain/models/user_search_result.dart';
