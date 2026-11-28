@@ -28,22 +28,13 @@ class FriendsListScreen extends ConsumerStatefulWidget {
   ConsumerState<FriendsListScreen> createState() => _FriendsListScreenState();
 }
 
-class _FriendsListScreenState extends ConsumerState<FriendsListScreen>
-    with SingleTickerProviderStateMixin {
-  late final TabController _tabController;
+class _FriendsListScreenState extends ConsumerState<FriendsListScreen> {
   final TextEditingController _friendFilterCtrl = TextEditingController();
   final TextEditingController _searchCtrl = TextEditingController();
   String _friendFilter = '';
 
   @override
-  void initState() {
-    super.initState();
-    _tabController = TabController(length: 3, vsync: this);
-  }
-
-  @override
   void dispose() {
-    _tabController.dispose();
     _friendFilterCtrl.dispose();
     _searchCtrl.dispose();
     super.dispose();
@@ -403,37 +394,46 @@ class _FriendsListScreenState extends ConsumerState<FriendsListScreen>
     Color foreground,
     Color muted,
   ) {
-    if (pending.isEmpty && sent.isEmpty) {
-      return const FriendsEmptyState(
-        icon: Icons.mail_outline_rounded,
-        title: 'Không có lời mời nào',
-        description: 'Lời mời kết bạn nhận được và đã gửi sẽ hiển thị ở đây.',
-      );
-    }
+    return RefreshIndicator(
+      color: AppColors.primary,
+      onRefresh: () => ref.read(friendsListProvider.notifier).refresh(),
+      child: pending.isEmpty && sent.isEmpty
+          ? ListView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              children: const [
+                SizedBox(height: 80),
+                FriendsEmptyState(
+                  icon: Icons.mail_outline_rounded,
+                  title: 'Không có lời mời nào',
+                  description: 'Lời mời kết bạn nhận được và đã gửi sẽ hiển thị ở đây.',
+                ),
+              ],
+            )
+          : ListView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              padding: const EdgeInsets.only(bottom: 32),
+              children: [
+                // ── Lời mời nhận được ──
+                if (pending.isNotEmpty) ...[
+                  _buildSectionHeader('Lời mời nhận được', pending.length),
+                  ...pending.map((req) => FriendRequestCard(
+                        request: req,
+                        onAccept: () => _acceptRequest(context, req),
+                        onReject: () => _rejectRequest(context, req),
+                      )),
+                ],
 
-    return ListView(
-      padding: const EdgeInsets.only(bottom: 32),
-      children: [
-        // ── Lời mời nhận được ──
-        if (pending.isNotEmpty) ...[
-          _buildSectionHeader('Lời mời nhận được', pending.length),
-          ...pending.map((req) => FriendRequestCard(
-                request: req,
-                onAccept: () => _acceptRequest(context, req),
-                onReject: () => _rejectRequest(context, req),
-              )),
-        ],
-
-        // ── Đã gửi ──
-        if (sent.isNotEmpty) ...[
-          _buildSectionHeader('Đã gửi', sent.length),
-          ...sent.map((req) => FriendRequestCard(
-                request: req,
-                isSent: true,
-                onCancel: () => _cancelSentRequest(context, req),
-              )),
-        ],
-      ],
+                // ── Đã gửi ──
+                if (sent.isNotEmpty) ...[
+                  _buildSectionHeader('Đã gửi', sent.length),
+                  ...sent.map((req) => FriendRequestCard(
+                        request: req,
+                        isSent: true,
+                        onCancel: () => _cancelSentRequest(context, req),
+                      )),
+                ],
+              ],
+            ),
     );
   }
 
