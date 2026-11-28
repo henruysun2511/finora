@@ -119,7 +119,7 @@ class ChatBubble extends StatelessWidget {
             alignment: Alignment.center,
             child: ClipOval(
               child: MascotWidget(
-                mascotId: message.mascot ?? mascot.id,
+                mascotId: mascot.id,
                 size: 32,
                 float: false,
               ),
