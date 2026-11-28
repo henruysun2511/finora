@@ -1,7 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:finora_mb/core/utils/currency_formatter.dart';
-import 'package:finora_mb/core/validation/inputs/email_input.dart';
-import 'package:finora_mb/core/validation/inputs/password_input.dart';
+import 'package:finora_mb/features/auth/domain/validators/auth_validators.dart';
 
 void main() {
   group('CurrencyFormatter', () {
@@ -18,21 +17,23 @@ void main() {
     });
   });
 
-  group('Validation Inputs', () {
-    test('EmailInput validation', () {
-      const empty = EmailInput.dirty('');
-      expect(empty.isValid, isFalse);
-
-      const valid = EmailInput.dirty('user@finora.vn');
-      expect(valid.isValid, isTrue);
+  group('AuthValidators', () {
+    test('validateEmail', () {
+      expect(AuthValidators.validateEmail(''), isNotNull);
+      expect(AuthValidators.validateEmail('invalid-email'), isNotNull);
+      expect(AuthValidators.validateEmail('user@finora.vn'), isNull);
     });
 
-    test('PasswordInput validation', () {
-      const short = PasswordInput.dirty('123');
-      expect(short.isValid, isFalse);
+    test('validatePassword', () {
+      expect(AuthValidators.validatePassword(''), isNotNull);
+      expect(AuthValidators.validatePassword('123'), isNotNull);
+      expect(AuthValidators.validatePassword('123456'), isNull);
+    });
 
-      const valid = PasswordInput.dirty('123456');
-      expect(valid.isValid, isTrue);
+    test('validateUsername', () {
+      expect(AuthValidators.validateUsername(''), isNotNull);
+      expect(AuthValidators.validateUsername('ab'), isNotNull);
+      expect(AuthValidators.validateUsername('admin'), isNull);
     });
   });
 }

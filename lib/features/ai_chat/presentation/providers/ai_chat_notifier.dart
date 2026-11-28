@@ -3,6 +3,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
+import '../../../../core/widgets/mascot/mascot_registry.dart';
 import '../../domain/models/chat_message_model.dart';
 import '../../domain/models/send_message_input.dart';
 import '../../domain/models/wallet_item_model.dart';
@@ -80,15 +81,8 @@ class AiChatNotifier extends StateNotifier<AiChatState> {
       final messages = await _repository.getHistory(walletId: walletId);
       final sortedMessages = List<ChatMessageModel>.from(messages.reversed);
 
-      String currentMascot = state.mascotId;
-      if (currentMascot == 'nora') {
-        for (final m in messages) {
-          if (m.mascot != null && m.mascot!.isNotEmpty) {
-            currentMascot = m.mascot!;
-            break;
-          }
-        }
-      }
+      // Luôn giữ mascotId đồng bộ theo tài sản ròng thực tế của người dùng
+      final currentMascot = state.mascotId;
 
       state = state.copyWith(
         messages: sortedMessages.isEmpty
@@ -168,13 +162,9 @@ class AiChatNotifier extends StateNotifier<AiChatState> {
         ),
       );
 
-      // Cập nhật Mascot nếu câu trả lời từ linh vật cụ thể
-      final newMascot = assistantMsg.mascot ?? state.mascotId;
-
       state = state.copyWith(
         messages: [...state.messages, assistantMsg],
         isSending: false,
-        mascotId: newMascot,
       );
 
       final multiCount = assistantMsg.payloadJson?['multiCount'];
@@ -263,8 +253,6 @@ class AiChatNotifier extends StateNotifier<AiChatState> {
         filename: filename,
       );
 
-      final newMascot = assistantMsg.mascot ?? state.mascotId;
-
       final serverImageUrl = assistantMsg.imageUrl;
       final serverAudioUrl = assistantMsg.audioUrl;
 
@@ -286,7 +274,6 @@ class AiChatNotifier extends StateNotifier<AiChatState> {
       state = state.copyWith(
         messages: [...updatedMessages, assistantMsg],
         isSending: false,
-        mascotId: newMascot,
       );
 
       final multiCount = assistantMsg.payloadJson?['multiCount'];
@@ -570,13 +557,17 @@ class AiChatNotifier extends StateNotifier<AiChatState> {
 
   static List<ChatMessageModel> _welcomeMessage(String mascotId) {
     final now = DateTime.now();
+    final mascotData = MascotRegistry.get(mascotId);
+    final mascotName = mascotData.name;
+    final mascotRole = mascotData.role;
+
     return [
       ChatMessageModel(
         id: 'welcome-msg',
         role: ChatRoleEnum.assistant,
         messageType: ChatMessageTypeEnum.text,
         textContent:
-            'Xin chào! Mình là trợ lý AI tài chính Finora. Bạn có thể nhắn tin nhanh để ghi chép chi tiêu (ví dụ: "cà phê 35k", "ăn trưa 50k ví tiền mặt") hoặc hỏi bất cứ điều gì về tài chính cá nhân!',
+            'Xin chào! Mình là $mascotName ($mascotRole) - trợ lý tài chính AI của bạn. Bạn có thể nhắn tin nhanh để ghi chép chi tiêu (ví dụ: "cà phê 35k", "ăn trưa 50k ví tiền mặt") hoặc hỏi bất cứ điều gì về tài chính cá nhân nhé!',
         createdAt: now,
         mascot: mascotId,
       ),
