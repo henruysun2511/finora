@@ -13,6 +13,9 @@ import '../../../../core/widgets/confirm_dialog.dart';
 import '../../../../core/widgets/page_header.dart';
 import '../../domain/models/transaction_enums.dart';
 import '../../domain/models/transaction_item.dart';
+import '../../../budgets/presentation/providers/budget_detail_provider.dart';
+import '../../../budgets/presentation/providers/budget_list_provider.dart';
+import '../../../dashboard/presentation/providers/dashboard_providers.dart';
 import '../providers/transaction_list_provider.dart';
 import '../providers/transaction_providers.dart';
 import '../widgets/transaction_detail_balance_card.dart';
@@ -96,6 +99,10 @@ class TransactionDetailScreen extends ConsumerWidget {
         final repo = ref.read(transactionRepositoryProvider);
         await repo.deleteTransaction(transactionId);
         ref.read(dailyGridProvider.notifier).refresh();
+        ref.invalidate(monthlyDailyGridProvider);
+        ref.invalidate(dashboardCalendarByMonthProvider);
+        ref.invalidate(budgetListProvider);
+        ref.invalidate(budgetDetailProvider);
 
         if (context.mounted) {
           AppToast.show(

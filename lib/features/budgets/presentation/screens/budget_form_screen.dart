@@ -57,9 +57,6 @@ class _BudgetFormScreenState extends ConsumerState<BudgetFormScreen> {
     final b = widget.initialBudget;
     if (b != null) {
       _populateFromBudget(b);
-    } else {
-      _selectedWalletId = '11111111-1111-4111-8111-111111111111';
-      _selectedCategoryId = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';
     }
   }
 
@@ -122,9 +119,11 @@ class _BudgetFormScreenState extends ConsumerState<BudgetFormScreen> {
       );
     }
 
-    if (_selectedWalletId != null && !seen.contains(_selectedWalletId)) {
+    if (currentBudget != null &&
+        _selectedWalletId != null &&
+        !seen.contains(_selectedWalletId)) {
       seen.add(_selectedWalletId!);
-      final name = currentBudget?.walletName ??
+      final name = currentBudget.walletName ??
           'Ví chi tiêu (${_selectedWalletId!.substring(0, 8)})';
       list.add(
         DropdownMenuItem(
@@ -149,40 +148,6 @@ class _BudgetFormScreenState extends ConsumerState<BudgetFormScreen> {
               Expanded(
                 child: Text(
                   name,
-                  overflow: TextOverflow.ellipsis,
-                  style: GoogleFonts.inter(fontSize: 14),
-                ),
-              ),
-            ],
-          ),
-        ),
-      );
-    }
-
-    if (list.isEmpty) {
-      list.add(
-        DropdownMenuItem(
-          value: '11111111-1111-4111-8111-111111111111',
-          child: Row(
-            children: [
-              Container(
-                width: 28,
-                height: 28,
-                decoration: BoxDecoration(
-                  color: AppColors.primary.withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                alignment: Alignment.center,
-                child: const LucideIcon(
-                  name: 'wallet',
-                  size: 16,
-                  color: AppColors.primary,
-                ),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: Text(
-                  'Ví Cá Nhân (VND)',
                   overflow: TextOverflow.ellipsis,
                   style: GoogleFonts.inter(fontSize: 14),
                 ),
@@ -229,9 +194,11 @@ class _BudgetFormScreenState extends ConsumerState<BudgetFormScreen> {
       );
     }
 
-    if (_selectedCategoryId != null && !seen.contains(_selectedCategoryId)) {
+    if (currentBudget != null &&
+        _selectedCategoryId != null &&
+        !seen.contains(_selectedCategoryId)) {
       seen.add(_selectedCategoryId!);
-      final name = currentBudget?.categoryName ??
+      final name = currentBudget.categoryName ??
           'Danh mục (${_selectedCategoryId!.substring(0, 8)})';
       list.add(
         DropdownMenuItem(
@@ -257,31 +224,6 @@ class _BudgetFormScreenState extends ConsumerState<BudgetFormScreen> {
       );
     }
 
-    if (list.isEmpty) {
-      list.add(
-        DropdownMenuItem(
-          value: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',
-          child: Row(
-            children: [
-              const CategoryIcon(
-                icon: 'utensils',
-                colorHex: '#F97316',
-                size: 28,
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: Text(
-                  'Ăn uống & Tiệc tùng',
-                  overflow: TextOverflow.ellipsis,
-                  style: GoogleFonts.inter(fontSize: 14),
-                ),
-              ),
-            ],
-          ),
-        ),
-      );
-    }
-
     return list;
   }
 
@@ -294,11 +236,15 @@ class _BudgetFormScreenState extends ConsumerState<BudgetFormScreen> {
     final items = _buildWalletItems(currentBudget, wallets);
     final value = items.any((i) => i.value == _selectedWalletId)
         ? _selectedWalletId
-        : items.first.value;
+        : (items.isNotEmpty ? items.first.value : null);
 
     return DropdownButtonFormField<String>(
       value: value,
       isExpanded: true,
+      hint: Text(
+        items.isEmpty ? 'Chưa có ví chi tiêu' : 'Chọn ví chi tiêu',
+        style: GoogleFonts.inter(fontSize: 14),
+      ),
       decoration: InputDecoration(
         filled: true,
         fillColor: isDark ? AppColors.darkSurface : Colors.white,
@@ -306,7 +252,9 @@ class _BudgetFormScreenState extends ConsumerState<BudgetFormScreen> {
       ),
       validator: BudgetValidators.validateWalletId,
       items: items,
-      onChanged: (val) => setState(() => _selectedWalletId = val),
+      onChanged: items.isEmpty
+          ? null
+          : (val) => setState(() => _selectedWalletId = val),
     );
   }
 
@@ -319,11 +267,15 @@ class _BudgetFormScreenState extends ConsumerState<BudgetFormScreen> {
     final items = _buildCategoryItems(currentBudget, categories);
     final value = items.any((i) => i.value == _selectedCategoryId)
         ? _selectedCategoryId
-        : items.first.value;
+        : (items.isNotEmpty ? items.first.value : null);
 
     return DropdownButtonFormField<String>(
       value: value,
       isExpanded: true,
+      hint: Text(
+        items.isEmpty ? 'Chưa có danh mục chi tiêu' : 'Chọn danh mục chi tiêu',
+        style: GoogleFonts.inter(fontSize: 14),
+      ),
       decoration: InputDecoration(
         filled: true,
         fillColor: isDark ? AppColors.darkSurface : Colors.white,
@@ -331,7 +283,9 @@ class _BudgetFormScreenState extends ConsumerState<BudgetFormScreen> {
       ),
       validator: BudgetValidators.validateCategoryId,
       items: items,
-      onChanged: (val) => setState(() => _selectedCategoryId = val),
+      onChanged: items.isEmpty
+          ? null
+          : (val) => setState(() => _selectedCategoryId = val),
     );
   }
 
@@ -536,7 +490,7 @@ class _BudgetFormScreenState extends ConsumerState<BudgetFormScreen> {
               controller: _limitController,
               keyboardType: TextInputType.number,
               inputFormatters: [
-                FilteringTextInputFormatter.digitsOnly,
+                _ThousandsSeparatorInputFormatter(),
               ],
               decoration: InputDecoration(
                 hintText: 'Ví dụ: 5.000.000',
@@ -695,6 +649,52 @@ class _BudgetFormScreenState extends ConsumerState<BudgetFormScreen> {
           ],
         ),
       ),
+    );
+  }
+}
+
+/// Tự động chèn dấu chấm phân cách hàng nghìn khi nhập số tiền (vd: 100000 -> 100.000).
+class _ThousandsSeparatorInputFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
+    final digits = newValue.text
+        .replaceAll(RegExp(r'[^0-9]'), '')
+        .replaceFirst(RegExp(r'^0+(?=\d)'), '');
+
+    if (digits.isEmpty) {
+      return const TextEditingValue(
+        text: '',
+        selection: TextSelection.collapsed(offset: 0),
+      );
+    }
+
+    final formatted = digits.replaceAllMapped(
+      RegExp(r'\B(?=(\d{3})+(?!\d))'),
+      (_) => '.',
+    );
+
+    // Đếm số chữ số trước con trỏ ở chuỗi mới để giữ đúng vị trí con trỏ sau khi format.
+    final rawCursor = newValue.selection.baseOffset.clamp(0, newValue.text.length);
+    final digitsBeforeCursor = newValue.text
+        .substring(0, rawCursor)
+        .replaceAll(RegExp(r'[^0-9]'), '')
+        .length;
+
+    var targetOffset = 0;
+    var countedDigits = 0;
+    while (targetOffset < formatted.length && countedDigits < digitsBeforeCursor) {
+      if (formatted[targetOffset] != '.') {
+        countedDigits++;
+      }
+      targetOffset++;
+    }
+
+    return TextEditingValue(
+      text: formatted,
+      selection: TextSelection.collapsed(offset: targetOffset),
     );
   }
 }

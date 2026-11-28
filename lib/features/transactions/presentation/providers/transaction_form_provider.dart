@@ -1,6 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../settings/presentation/providers/user_settings_provider.dart';
+import '../../../budgets/presentation/providers/budget_detail_provider.dart';
+import '../../../budgets/presentation/providers/budget_list_provider.dart';
+import '../../../dashboard/presentation/providers/dashboard_providers.dart';
 import '../../domain/models/create_transaction_input.dart';
 import '../../domain/models/transaction_enums.dart';
 import '../../domain/models/transaction_item.dart';
@@ -224,8 +227,12 @@ class TransactionFormNotifier extends StateNotifier<TransactionFormState> {
         );
       }
 
-      // Làm mới danh sách giao dịch
+      // Làm mới danh sách giao dịch, lịch trang chủ và ngân sách liên quan
       _ref.read(dailyGridProvider.notifier).refresh();
+      _ref.invalidate(monthlyDailyGridProvider);
+      _ref.invalidate(dashboardCalendarByMonthProvider);
+      _ref.invalidate(budgetListProvider);
+      _ref.invalidate(budgetDetailProvider);
 
       state = state.copyWith(isLoading: false);
       return createdItem;
